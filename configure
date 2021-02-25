@@ -14,9 +14,17 @@ MAKE_UNAME=`uname -s`
 if [ "${CPP}" = "" ]; then
   CPP=g++
 fi
+bRunningLinux=0
+if [ "${MAKE_UNAME}" = "Linux" ]; then
+  bRunningLinux=1
+fi
 bRunningMacOS=0
 if [ "${MAKE_UNAME}" = "Darwin" ]; then
   bRunningMacOS=1
+fi
+bRunningSolaris=0
+if [ "${MAKE_UNAME}" = "SunOS" ]; then
+  bRunningSolaris=1
 fi
 bRunningUbuntu=0
 if grep Ubuntu /etc/lsb-release >/dev/null 2>&1
@@ -226,12 +234,16 @@ fi
 printf ";\n" >> Makefile;
 printf "\n" >> Makefile;
 printf "%%.o: %%.cpp\n" >> Makefile;
-printf "\t${CPP} -g -Wall -c \$< -o \$@ -D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT" >> Makefile;
-if [ "${MAKE_UNAME}" = "Darwin" ]; then
+printf "\t${CPP} -g" >> Makefile;
+if [ $bRunningSolaris ]; then
+  printf " -std=c++14" >> Makefile:
+fi
+printf " -Wall -c \$< -o \$@ -D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT" >> Makefile;
+if [ $bRunningMacOS ]; then
   printf " -I/usr/local/include -DCOMMON_MACOS" >> Makefile;
-elif [ "${MAKE_UNAME}" = "Linux" ]; then
+elif [ $bRunningLinux ]; then
   printf " -I/opt/app/workload/include -I/opt/app/workload/local/include -DCOMMON_LINUX" >> Makefile;
-elif [ "${MAKE_UNAME}" = "SunOS" ]; then
+elif [ $bRunningSolaris ]; then
   printf " -I/opt/csw/include -I/usr/local/appl/include -I/usr/local/include -DCOMMON_SOLARIS" >> Makefile;
 fi
 if [ $bFoundB64 -eq 1 ]; then

@@ -236,7 +236,7 @@ printf "\n" >> Makefile;
 printf "%%.o: %%.cpp\n" >> Makefile;
 printf "\t${CPP} -g" >> Makefile;
 if [ $bRunningSolaris ]; then
-  printf " -std=c++14" >> Makefile:
+  printf " -std=c++14" >> Makefile;
 fi
 printf " -Wall -c \$< -o \$@ -D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT" >> Makefile;
 if [ $bRunningMacOS ]; then

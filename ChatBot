@@ -1,0 +1,104 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Chat Bot
+// -------------------------------------
+// file       : ChatBot
+// author     : Ben Kietzman
+// begin      : 2018-01-12
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file ChatBot
+* \brief ChatBot Class
+*/
+#ifndef _COMMON_CHAT_BOT_
+#define _COMMON_CHAT_BOT_
+// {{{ includes
+#include <cerrno>
+#include <cstring>
+#include <ctime>
+#include <iostream>
+#include <list>
+#include <map>
+#include <netdb.h>
+#include <openssl/md5.h>
+#include <poll.h>
+#include <sstream>
+#include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+using namespace std;
+#include "Json"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ ChatBot
+    class ChatBot
+    {
+      private:
+      bool m_bConnected;
+      bool m_bDebug;
+      bool m_bQuit;
+      int m_fdSocket;
+      list<string> m_rooms;
+      list<Json *> m_messages;
+      string m_strBuffer[2];
+      string m_strUser;
+      void (*m_pMessage)(Json *);
+
+      void analyze(Json *ptMessage);
+
+      protected:
+      map<string, string> m_formArguments;
+      string m_strFormAction;
+      string m_strFormFooter;
+      string m_strFormHeader;
+
+      public:
+      ChatBot();
+      ~ChatBot();
+      bool close(string &strError);
+      void close();
+      bool connect(const string strServer, const string strPort, const string strUser, const string strPassword, const string strName, string &strError);
+      void disconnect();
+      string form(const string strIdent, const string strForm, const string strHeader = "", const string strFooter = "");
+      string form(const string strIdent, const string strForm, map<string, string> arguments, const string strHeader = "", const string strFooter = "");
+      string ident(const string strUser);
+      void join(const string strRoom);
+      void message(const string strTarget, const string strMessage);
+      void part(const string strRoom);
+      void ping();
+      bool process(int nTimeout, string &strError);
+      void putMessage(Json *ptMessage);
+      void putMessage(const string strFunction, Json *ptMessage = NULL);
+      void quit();
+      list<string> rooms();
+      void setArguments(map<string, string> arguments);
+      void setDebug(const bool bDebug);
+      void setForm(const string strAction, const string strHeader = "", const string strFooter = "");
+      void setForm(const string strAction, map<string, string> arguments, const string strHeader = "", const string strFooter = "");
+      void setFormArguments(map<string, string> arguments);
+      void setFormFooter(const string strFooter);
+      void setFormHeader(const string strHeader);
+      void setMessage(void (*pMessage)(Json *));
+    };
+    // }}}
+  }
+}
+
+#endif

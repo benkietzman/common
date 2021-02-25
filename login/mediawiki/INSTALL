@@ -1,0 +1,27 @@
+------------------------------------------
+
+Wiki Version < 1.13
+
+Copy the central_login.php file to the wiki's extensions directory.
+
+Add the following line to the LocalSettings.php file.  Make any necessary modifications.
+
+// Central Login
+include('extensions/central_login.php');
+
+Modify the custom settings in "extensions/central_login.php".
+
+------------------------------------------
+
+Wiki Version >= 1.13
+
+Copy the Auth_central.php file to the wiki's extensions directory.
+
+Add the following line to the LocalSettings.php file.  Make any necessary modifications.
+
+// Central Login
+include('extensions/Auth_central.php');
+
+Modify the custom settings in "extensions/Auth_central.php".
+
+------------------------------------------

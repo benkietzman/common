@@ -1,0 +1,13 @@
+table, th, td {text-align: left; border-style: none; border-collapse: collapse; border-spacing: 0px; padding: 0px; empty-cells: show;}
+table.std_pad, table.std_pad th, table.std_pad td {text-align: left; padding: 2px 6px;}
+table.std_grid {border-width: 1px; border-style: solid; border-color: #dddddd;}
+table.std_pad th, table.std_grid th {background: #dddddd;}
+table.std_grid th, table.std_grid td {border-width: 1px; border-style: solid; border-color: #dddddd; padding: 2px 6px;}
+
+fieldset {border-radius: 10px; box-shadow: 3px 3px 4px #888888;}
+fieldset legend {color: black;}
+
+.modal {overflow: visible;}
+.modal:focus {outline: 0;}
+
+.input-group-addon {width: auto;}

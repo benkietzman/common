@@ -1,0 +1,203 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Samba
+// -------------------------------------
+// file       : Samba
+// author     : Ben Kietzman
+// begin      : 2010-03-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Samba
+* \brief Samba Class
+*/
+#ifndef _COMMON_SAMBA_
+#define _COMMON_SAMBA_
+// {{{ includes
+#include <cstdio>
+#include <fstream>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include <list>
+using namespace std;
+#include <unistd.h>
+#include <libsmbclient.h>
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ static globals
+    //! Stores the Windows workgroup/domain.
+    static string smb_gstrWorkgroup;
+    //! Stores the Windows user name.
+    static string smb_gstrUsername;
+    //! Stores the Windows password.
+    static string smb_gstrPassword;
+    // }}}
+    // {{{ Samba
+    //! Supplies file/directory functions to access Windows shared drives.
+    /*!
+    * The objective of the class is to provide simplified logic that normally would require complex C logic or system calls.
+    */
+    class Samba
+    {
+      private:
+      list<string> m_directoryList;
+      list<string>::iterator m_directoryIterator;
+      pid_t m_nPid;
+      string m_strPid;
+      string m_strServer;
+      string m_strShare;
+      string m_strPath;
+      smbc_dirent *m_pDirectoryItem;
+
+      static void authenticate(const char *pszServer, const char *pszShare, char *pszWorkgroup, int nWGLength, char *pszUsername, int nUNLength, char *pszPassword, int nPWLength);
+      smbc_dirent *getDirectoryEntry(const string strPath);
+      string getPath(const string strPath);
+
+      public:
+      Samba();
+      ~Samba();
+
+      //! Determines if a directory exists.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool directoryExist(const string strPath);
+      //! Performs a directory listing and stores the results in a list.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      list<string> directoryList(const string strPath = "./");
+      //! Creates a directory and any parent directories that might be missing.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool establishDirectory(const string strPath);
+      //! Fetches the next item out of the directory listing.
+      /*!
+      * \param strItem - Returns the item.
+      */
+      bool fetchDirectoryItem(string &strItem);
+      //! Determines when the file was last accessed.
+      /*!
+      * \param strPath - The path to the file.
+      * \param nYear - Returns the year.
+      * \param nMonth - Returns the month.
+      * \param nDay - Returns the day.
+      * \param nHour - Returns the military hour.
+      * \param nMinute - Returns the minute.
+      * \param nSecond - Returns the second.
+      */
+      bool fileAccessDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      //! Determines when the file was last changed.
+      /*!
+      * \param strPath - The path to the file.
+      * \param nYear - Returns the year.
+      * \param nMonth - Returns the month.
+      * \param nDay - Returns the day.
+      * \param nHour - Returns the military hour.
+      * \param nMinute - Returns the minute.
+      * \param nSecond - Returns the second.
+      */
+      bool fileChangeDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      //! Determines if a file is empty.
+      /*!
+      * \param strPath - The path to the file.
+      */
+      bool fileEmpty(const string strPath);
+      //! Determines if a file exists.
+      /*!
+      * \param strLocalPath - The path to the local file.
+      * \param strRemotePath - The path to the remote file.
+      */
+      bool fileExist(const string strPath);
+      //! Determines when the file was last modified.
+      /*!
+      * \param strPath - The path to the file.
+      * \param nYear - Returns the year.
+      * \param nMonth - Returns the month.
+      * \param nDay - Returns the day.
+      * \param nHour - Returns the military hour.
+      * \param nMinute - Returns the minute.
+      * \param nSecond - Returns the second.
+      */
+      bool fileModifyDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      //! Determines the size in bytes of a file.
+      /*!
+      * \param strPath - The path to the file.
+      */
+      long fileSize(const string strPath);
+      //! Retrieves a remote file.
+      /*!
+      * \param strRemotePath - The path to the remote file.
+      * \param strLocalPath - The path to the local file.
+      */
+      bool get(const string strRemotePath, const string strLocalPath);
+      //! Retrieves a remote file.
+      /*!
+      * \param strRemotePath - The path to the remote file.
+      * \param ssLocalData - The local data.
+      */
+      bool get(const string strRemotePath, stringstream &ssData);
+      //! Initiate the Samba session.
+      /*!
+      * \param strServer - The server name or ip address of the remote Windows machine.
+      * \param strShare - The remote Windows share name.
+      * \param strWorkgroup - The workgroup/domain of which the remote Windows user account belongs.
+      * \param strUsername - The user name of the account used to connect to the remote Windows network.
+      * \param strPassword - The user account password on the remote Windows network.
+      */
+      bool init(const string strServer, const string strShare, const string strWorkgroup, const string strUsername, const string strPassword);
+      //! Creates a directory.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool makeDirectory(const string strPath);
+      //! Stores a file remotely.
+      /*!
+      * \param strLocalPath - The path to the local file.
+      * \param strRemotePath - The path to the remote file.
+      */
+      bool put(const string strLocalPath, const string strRemotePath);
+      //! Stores a file remotely.
+      /*!
+      * \param strRemotePath - The path to the remote file.
+      * \param ssLocalData - The local file.
+      */
+      bool put(stringstream &ssLocalData, const string strRemotePath);
+      //! Removes a file/directory.
+      /*!
+      * \param strPath - The path to the file/directory.
+      */
+      bool remove(const string strPath);
+      //! Recursively removes a directory.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool removeDirectory(const string strPath);
+      //! Renames a file/directory.
+      /*!
+      * \param strOldPath - The old path to the file/directory.
+      * \param strNewPath - The new path to the file/directory.
+      */
+      bool rename(const string strOldPath, const string strNewPath);
+    };
+    // }}}
+  }
+}
+#endif

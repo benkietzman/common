@@ -1,0 +1,545 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Service Junction
+// -------------------------------------
+// file       : ServiceJunction
+// author     : Ben Kietzman
+// begin      : 2013-11-30
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file ServiceJunction
+* \brief ServiceJunction Class
+*/
+#ifndef _COMMON_SERVICE_JUNCTION_
+#define _COMMON_SERVICE_JUNCTION_
+// {{{ includes
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <mutex>
+#include <netdb.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#include <poll.h>
+#include <pthread.h>
+#ifdef COMMON_LINUX
+#include <semaphore.h>
+#endif
+#include <string>
+#ifdef COMMON_SOLARIS
+#include <synch.h>
+#endif
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <thread>
+#include <vector>
+using namespace std;
+#include "File"
+#include "Json"
+#include "StringManip"
+#include "Utility"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ sjreqdata
+    struct sjreqdata
+    {
+      bool bSent;
+      int fdSocket;
+      string strBuffer[2];
+    };
+    // }}}
+    // {{{ ServiceJunction
+    //! Interfaces with the Service Junction.
+    /*!
+    * Provides an interfaces to the ServiceJunction.
+    */
+    class ServiceJunction
+    {
+      protected:
+      bool m_bDodgeConcentrator;
+      bool m_bUseSecureJunction;
+      bool m_bUseSingleSocket;
+      bool m_bThrottle;
+      bool m_bTimestamp;
+      map<int, sjreqdata *> m_requests;
+      map<string, map<string, string> > m_database;
+      map<string, string> m_loggerLabel;
+      size_t m_unThrottle;
+      size_t m_unUniqueID;
+      std::mutex m_mutexGetAddrInfo;
+      std::mutex m_mutexRequests;
+      std::mutex m_mutexUnique;
+      string m_strApplication;
+      string m_strEmail;
+      string m_strCtsJunctionServer;
+      string m_strFrequency;
+      string m_strLoggerApplication;
+      string m_strLoggerPassword;
+      string m_strLoggerUser;
+      string m_strPrefix;
+      string m_strProgram;
+      string m_strRoom;
+      string m_strTimeout;
+      string m_strTroutJunctionServer;
+      thread *m_pThreadRequest;
+      time_t m_ulModifyTime;
+      void (*m_pLoggerPush)(map<string, string> &);
+      File m_file;
+      StringManip m_manip;
+      Utility *m_pUtility;
+
+      /*! \fn void logger(list<string> in, list<string> out)
+      * \brief Forwards messages to the Logger service.
+      * \param in Contains input.
+      * \param out Contains output.
+      */
+      void logger(list<string> in, list<string> out);
+
+      public:
+      ServiceJunction(string &strError);
+      ~ServiceJunction();
+
+      /*! \fn bool batch(map<string, list<string> > in, map<string, list<string> > &out, string &strError)
+      * \brief Submits a Service Junction request.
+      * \param in Contains request lines.
+      * \param out Contains response lines.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool batch(map<string, list<string> > in, map<string, list<string> > &out, string &strError);
+      /*! \fn bool bridge(const string strUser, const string strPassword, Json *ptRequest, Json *ptResponse, string &strError)
+      * Communicates with the Bridge.
+      * \param strUser - Contains the User.
+      * \param strPassword - Contains the Password.
+      * \param ptRequest - Contains the request.
+      * \param ptResponse - Contains the response.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool bridge(const string strUser, const string strPassword, Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "")
+      * Constructs and sends an email.
+      * \param strURL - The input URL.
+      * \param strType - The input type.
+      * \param ptAuth - The input AUTH variables.
+      * \param ptGet - The input GET variables.
+      * \param ptPost - The input POST variables.
+      * \param ptPut - The input PUT variables.
+      * \param strProxy - The outbound proxy.
+      * \param strCookies - The input/output cookies.
+      * \param strHeader - The output header.
+      * \param strContent - The output content.
+      * \param strError Contains the error message.
+      * \param strUserAgent Contains the User Agent data.
+      * \param bMobile Contains the mobile boolean true/false value.
+      * \param bFailOnError Contains the fail on error boolean true/false value.
+      * \param strCustomRequest Contains the custom request value.
+      * \return Returns a boolean true/false value.
+      */
+      bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "");
+      /*! \fn void dodgeConcentrator(const bool bDodge = true)
+      * \brief Dodges the port concentrator.
+      */
+      void dodgeConcentrator(const bool bDodge = true);
+      /*! \fn bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, list<string> fileList, string &strError)
+      * Constructs and sends an email.
+      * \param strFrom - The from address.
+      * \param toList - The list of recipients.
+      * \param ccList - The list of carbon copy recipients.
+      * \param bccList - The list of blind carbon copy recipients.
+      * \param strSubject - The subject line.
+      * \param strText - The plain text message.
+      * \param strHTML - The HTML message.
+      * \param fileList - The list of attachments.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, list<string> fileList, string &strError);
+      /*! \fn bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, map<string, string> fileMap, string &strError)
+      * Constructs and sends an email.
+      * \param strFrom - The from address.
+      * \param toList - The list of recipients.
+      * \param ccList - The list of carbon copy recipients.
+      * \param bccList - The list of blind carbon copy recipients.
+      * \param strSubject - The subject line.
+      * \param strText - The plain text message.
+      * \param strHTML - The HTML message.
+      * \param fileMap - The map of attachments.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, map<string, string> fileMap, string &strError);
+      /*! \fn bool finance(const string strFunction, const string strSymbol, const string strCred, map<string, string> &jsonMap, string &strError)
+      * \brief Provide socket communication with CTS.
+      * \param strFunction Contains the function.
+      * \param strSymbol Contains the symbol.
+      * \param strCred Contains the credentials.
+      * \param jsonMap Contains the results.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool finance(const string strFunction, const string strSymbol, const string strCred, map<string, string> &jsonMap, string &strError);
+      /*! \fn bool fusionQuery(const string strUser, const string strPassword, string &strAuth, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the Google Fusion application.
+      * \param strUser Contains the Google user.
+      * \param strPassword Contains the Google password.
+      * \param strAuth Contains the Google authorization token.
+      * \param strQuery Contains the Google Fusion query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool fusionQuery(const string strUser, const string strPassword, string &strAuth, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool fusionUpdate(const string strUser, const string strPassword, string &strAuth, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the Google Fusion application.
+      * \param strUser Contains the Google user.
+      * \param strPassword Contains the Google password.
+      * \param strAuth Contains the Google authorization token.
+      * \param strUpdate Contains the Google Fusion insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool fusionUpdate(const string strUser, const string strPassword, string &strAuth, const string strUpdate, string &strError);
+      /*! \fn string getCtsJunctionServer()
+      * \brief Gets the CTS Junction server.
+      * \return Returns the CTS Junction server.
+      */
+      string getCtsJunctionServer();
+      /*! \fn string getTroutJunctionServer()
+      * \brief Gets the TROUT Junction server.
+      * \return Returns the TROUT Junction server.
+      */
+      string getTroutJunctionServer();
+      /*! \fn bool ircBot(const string strRoom, const string strMessage, string &strError)
+      * \brief Submits a IRC Bot request.
+      * \param strRoom Contains room or user ID.
+      * \param strMessage Contains message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool ircBot(const string strRoom, const string strMessage, string &strError);
+      /*! \fn bool ircBot(const string strSender, const string strRoom, const string strMessage, string &strError)
+      * \brief Submits a IRC Bot request.
+      * \param strSender Contains sender.
+      * \param strRoom Contains room or user ID.
+      * \param strMessage Contains message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool ircBot(const string strSender, const string strRoom, const string strMessage, string &strError);
+      /*! \fn bool jwt(const string strSigner, const string strSecret, string &strPayload, Json *ptPayload, string &strError)
+      * \brief (En/De)codes JSON Web Tokens (JWT).
+      * \param strSigner Contains the signer.
+      * \param strSecret Contains the secret.
+      * \param strPayload Contains/Returns the encoded payload.
+      * \param ptPayload Contains/Returns the decoded payload.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool jwt(const string strSigner, const string strSecret, string &strPayload, Json *ptPayload, string &strError);
+      /*! \fn bool logger(const string strApplication, const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strApplication Contains the application.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strApplication, const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError);
+      /*! \fn bool logger(const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError);
+      /*! \fn bool logger(const string strApplication, const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strApplication Contains the application.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strFunction Contains the function.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param result Contains a list of the JSON results.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strApplication, const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError);
+      /*! \fn bool logger(const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strFunction Contains the function.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param result Contains a list of the JSON results.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError);
+      /*! \fn bool mssqlQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the MSSQL database.
+      * \param strUser Contains the MSSQL user.
+      * \param strPassword Contains the MSSQL password.
+      * \param strServer Contains the MSSQL server.
+      * \param strQuery Contains the MSSQL query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool mssqlQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool mssqlUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the MSSQL database.
+      * \param strUser Contains the MSSQL user.
+      * \param strPassword Contains the MSSQL password.
+      * \param strServer Contains the MSSQL server.
+      * \param strUpdate Contains the MSSQL insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool mssqlUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError);
+      /*! \fn bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strQuery Contains the MySQL query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError)
+      * \brief Runs an insert/update/delete against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strID Contains the auto-increment ID.
+      * \param strRows Contains the number of impacted rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError);
+      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError);
+      /*! \fn bool oracleQuery(const string strSchema, const string strPassword, const string strTnsName, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the Oracle database.
+      * \param strSchema Contains the Oracle schema.
+      * \param strPassword Contains the Oracle password.
+      * \param strTnsName Contains the Oracle TNS name.
+      * \param strQuery Contains the Oracle query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool oracleQuery(const string strSchema, const string strPassword, const string strTnsName, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strID, string &strRows, string &strError)
+      * \brief Runs an insert/update/delete against the Oracle database.
+      * \param strSchema Contains the Oracle schema.
+      * \param strPassword Contains the Oracle password.
+      * \param strTnsName Contains the Oracle TNS name.
+      * \param strUpdate Contains the Oracle insert/update/delete query.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strID Contains the auto-increment ID.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strID, string &strRows, string &strError);
+      /*! \fn bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the Oracle database.
+      * \param strSchema Contains the Oracle schema.
+      * \param strPassword Contains the Oracle password.
+      * \param strTnsName Contains the Oracle TNS name.
+      * \param strUpdate Contains the Oracle insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strError);
+      /*! \fn bool page(const string strUser, const string strMessage, string &strError)
+      * \brief Sends a text page.
+      * \param strUser Contains the user.
+      * \param strMessage Contains the message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool page(const string strUser, const string strMessage, string &strError);
+      /*! \fn bool pdf(const string strPdf, list<string> &pages, string &strError)
+      * \brief Converts a PDF to text.
+      * \param strPdf Contains the PDF.
+      * \param pages Returns the text pages.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool pdf(const string strPdf, list<string> &pages, string &strError);
+      /*! \fn bool pdf(const string strPdf, const string strOwnerPassword, const string strUserPassword, list<string> &pages, string &strError)
+      * \brief Converts a PDF to text.
+      * \param strPdf Contains the PDF.
+      * \param strOwnerPassowrd Contains the owner password.
+      * \param strUserPassword Contains the user password.
+      * \param pages Returns the text pages.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool pdf(const string strPdf, const string strOwnerPassword, const string strUserPassword, list<string> &pages, string &strError);
+      /*! \fn bool qBot(const string strRoom, const string strMessage, string &strError)
+      * \brief Submits a Q Bot request.
+      * \param strRoom Contains room or user ID.
+      * \param strMessage Contains message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool qBot(const string strRoom, const string strMessage, string &strError);
+      /*! \fn bool qBot(const string strSender, const string strRoom, const string strMessage, string &strError)
+      * \brief Submits a Q Bot request.
+      * \param strSender Contains sender.
+      * \param strRoom Contains room or user ID.
+      * \param strMessage Contains message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool qBot(const string strSender, const string strRoom, const string strMessage, string &strError);
+      /*! \fn bool request(list<string> in, list<string> &out, string &strError)
+      * \brief Submits a Service Junction request.
+      * \param in Contains request lines.
+      * \param out Contains response lines.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(list<string> in, list<string> &out, string &strError);
+      /*! \fn bool request(list<string> in, list<string> &out, time_t CTimeout, string &strError)
+      * \brief Submits a Service Junction request.
+      * \param in Contains request lines.
+      * \param out Contains response lines.
+      * \param CTimeout Contains the timeout.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(list<string> in, list<string> &out, time_t CTimeout, string &strError);
+      /*! \fn void requestThread()
+      * \brief Request thread.
+      */
+      void requestThread();
+      /*! \fn void setApplication(const string strApplication)
+      * \brief Set the application.
+      * \param strApplication Contains the application.
+      */
+      void setApplication(const string strApplication);
+      /*! \fn void setLogger(const string strApplication, const string strUser, const string strPassword, void (*pPush)(map<string, string> &), map<string, string> label)
+      * \brief Set the Logger authentication credentials.
+      * \param strApplication Contains the application.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param pPush Contains the push function.
+      * \param label Contains default labels.
+      */
+      void setLogger(const string strApplication, const string strUser, const string strPassword, void (*pPush)(map<string, string> &), map<string, string> label);
+      /*! \fn void setProgram(const string strProgram)
+      * \brief Set the program.
+      * \param strProgram Contains the program.
+      */
+      void setProgram(const string strProgram);
+      /*! \fn void setThrottle(const size_t unThrottle)
+      * \brief Set the throttle.
+      * \param unThrottle Contains the throttle.
+      */
+      void setThrottle(const size_t unThrottle);
+      /*! \fn void setTimeout(const string strTimeout)
+      * \brief Set the timeout.
+      * \param strTimeout Contains the timeout.
+      */
+      void setTimeout(const string strTimeout);
+      /*! \fn bool sysInfo(Json *ptRequest, Json *ptResponse, string &strError)
+      * \brief Submits a System Information request via the Service Junction.
+      * \param ptRequest Contains the request.
+      * \param ptResponse Contains the response.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool sysInfo(Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn bool sysInfo(const string strServer, const string strProcess, Json *ptResponse, string &strError)
+      * \brief Submits a System Information request via the Service Junction.
+      * \param strServer Contains the server.
+      * \param strProcess Contains the process.
+      * \param ptResponse Contains the response.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool sysInfo(const string strServer, const string strProcess, Json *ptResponse, string &strError);
+      /*! \fn bool teradataQuery(const string strUser, const string strPassword, const string strURL, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the Teradata database.
+      * \param strUser Contains the Teradata user.
+      * \param strPassword Contains the Teradata password.
+      * \param strURL Contains the Teradata URL.
+      * \param strQuery Contains the MySQL query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool teradataQuery(const string strUser, const string strPassword, const string strURL, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool teradataUpdate(const string strUser, const string strPassword, const string strURL, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the Teradata database.
+      * \param strUser Contains the Teradata user.
+      * \param strPassword Contains the Teradata password.
+      * \param strServer Contains the Teradata URL.
+      * \param strUpdate Contains the Teradata insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool teradataUpdate(const string strUser, const string strPassword, const string strURL, const string strUpdate, string &strError);
+      /*! \fn void useSecureJunction(const bool bUseSecureJunction = true)
+      * \brief Use secure Service Junction requests.
+      * \param bUseSecureJunction Contains the secure Service Junction value.
+      * \return Returns a boolean true/false value. 
+      */
+      void useSecureJunction(const bool bUseSecureJunction = true);
+      /*! \fn void useSingleSocket(const bool bUseSingleSocket = true)
+      * \brief Use single socket.  This should only be enabled within non-forking environments.
+      * \param bUseSingleSocket Contains the single socket value.
+      */
+      void useSingleSocket(const bool bUseSingleSocket = true);
+      /*! \fn Utility *utility()
+      * \brief Interfaces with the Utility class.
+      * \return Returns a pointer to the Utility class.
+      */
+      Utility *utility();
+    };
+    // }}}
+  }
+}
+#endif

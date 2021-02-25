@@ -1,0 +1,79 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// XML
+// -------------------------------------
+// file       : Xml
+// author     : Ben Kietzman
+// begin      : 2011-07-06
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Xml
+* \brief XML Functions
+*/
+#ifndef _COMMON_XML_
+#define _COMMON_XML_
+// {{{ includes
+#include <expat.h>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <map>
+#include <sstream>
+#include <string>
+using namespace std;
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ xmlItem
+    struct xmlItem
+    {
+      map<string, string> attr;
+      map<string, xmlItem> child;
+      struct xmlItem *ptCurrent;
+      struct xmlItem *ptParent;
+      string strData;
+    };
+    // }}}
+    /*! \fn void xmlCleanTicketList(struct xmlItem &tItem)
+    * \brief Clean XML ticket list data.
+    * \param tItem Contains the XML ticket list data.
+    */
+    void xmlCleanTicketList(struct xmlItem &tItem);
+    /*! \fn void xmlData(void *data, const XML_Char *s, int len)
+    * \brief Processes XML data.
+    * \param data Contains data.
+    * \param s Contains the string.
+    * \param len Contains the string length.
+    */
+    void xmlData(void *data, const XML_Char *s, int len);
+    /*! \fn void xmlEnd(void *data, const char *el)
+    * \brief Processes XML end tag.
+    * \param data Contains data.
+    * \param el Contains the element.
+    */
+    void xmlEnd(void *data, const char *el);
+    /*! \fn void xmlStart(void *data, const char *el, const char **attr)
+    * \brief Processes XML start tag.
+    * \param data Contains data.
+    * \param el Contains the element.
+    * \param attr Contains the attributes.
+    */
+    void xmlStart(void *data, const char *el, const char **attr);
+  }
+}
+#endif

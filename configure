@@ -1,0 +1,285 @@
+#!/bin/bash
+###########################################
+# Common Libraries
+# -------------------------------------
+# file       : configure
+# author     : Ben Kietzman
+# begin      : 2010-03-03
+# copyright  : kietzman.org
+# email      : ben@kietzman.org
+###########################################
+
+MAKE_UNAME=`uname -s`
+
+if [ "${CPP}" = "" ]; then
+  CPP=g++
+fi
+bRunningMacOS=0
+if [ "${MAKE_UNAME}" = "Darwin" ]; then
+  bRunningMacOS=1
+fi
+bRunningUbuntu=0
+if grep Ubuntu /etc/lsb-release >/dev/null 2>&1
+then
+  bRunningUbuntu=1
+fi
+
+bFoundB64=0
+bFoundExpat=0
+bFoundMJson=0
+bFoundOpenSsl=0
+bFoundSamba=0
+bFoundTar=0
+bFoundXmlRpc=0
+bFoundZLib=0
+
+if [ "${LD_LIBRARY_PATH}" = "" ]; then
+  LD_LIBRARY_PATH=/opt/csw/lib:/usr/local/lib:/usr/lib:/lib
+fi
+declare -a var
+var=(`printf $LD_LIBRARY_PATH | tr ':' ' '`)
+for s in ${var[@]}; do
+  if [ -f "/opt/app/workload/local/include/b64/encode.h" -o -f "/opt/csw/include/b64/encode.h" -o -f "/usr/include/b64/encode.h" -o -f "/usr/local/include/b64/encode.h" -o -f "/data/extras/include/b64/encode.h" ]; then
+    bFoundB64=1
+  fi
+  if [ -f "/opt/app/workload/include/expat.h" -o -f "/opt/csw/include/expat.h" -o -f "/usr/include/expat.h" -o -f "/usr/local/include/expat.h" -o -f "/data/extras/include/expat.h" -o -f "/usr/local/opt/expat/include/expat.h" ]; then
+    bFoundExpat=1
+  fi
+  if [ -f "/opt/app/workload/local/include/mjson-1.7/json.h" -o -f "/usr/local/include/mjson-1.7/json.h" ]; then
+    bFoundMJson=1
+  fi
+  if [ -f "/opt/app/workload/include/openssl/ssl.h" -o -f "/opt/csw/include/openssl/ssl.h" -o -f "/usr/include/openssl/ssl.h" -o -f "/usr/local/include/openssl/ssl.h" -o -f "/usr/local/ssl/include/openssl/ssl.h" -o -f "/data/extras/ssl/include/openssl/ssl.h" -o -f "/usr/local/opt/openssl/include/openssl/ssl.h" ]; then
+    bFoundOpenSsl=1
+  fi
+  if [ -f "/opt/app/workload/include/libsmbclient.h" -o -f "/opt/csw/include/libsmbclient.h" -o -f "/usr/include/libsmbclient.h" -o -f "/usr/include/samba/libsmbclient.h" -o -f "/usr/include/samba-4.0/libsmbclient.h" -o -f "/usr/local/include/libsmbclient.h" -o -f "/data/extras/include/libsmbclient.h" ]; then
+    bFoundSamba=1
+  fi
+  if [ -f "/opt/app/workload/include/libtar.h" -o -f "/usr/include/libtar.h" -o -f "/usr/local/include/libtar.h" -o -f "/data/extras/include/libtar.h" -o -f "/usr/local/opt/libtar/include/libtar.h" ]; then
+    bFoundTar=1
+  fi
+  if [ -f "/opt/app/workload/include/xmlrpc-c/base.h" -o -f "/usr/include/xmlrpc-c/base.h" -o -f "/usr/local/include/xmlrpc-c/base.h" -o -f "/data/extras/include/xmlrpc-c/base.h" ]; then
+    bFoundXmlRpc=1
+  fi
+  if [ -f "/opt/app/workload/include/zlib.h" -o -f "/usr/include/zlib.h" -o -f "/usr/local/include/zlib.h" -o -f "/data/extras/include/zlib.h" -o -f "/usr/local/opt/zlib/include/zlib.h" ]; then
+    bFoundZLib=1
+  fi
+done
+printf "Configuring B64...";
+if [ $bFoundB64 -eq 1 ]; then
+  printf "found";
+elif [ $bRunningMacOS -eq 1 ]; then
+  printf "not found - brew install libb64";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install libb64-dev";
+else
+  printf "not found - skipping (http://libb64.sourceforge.net)";
+fi
+printf "\n";
+printf "Configuring Expat...";
+if [ $bFoundExpat -eq 1 ]; then
+  printf "found";
+elif [ $bRunningMacOS -eq 1 ]; then
+  printf "not found - brew install expat";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install libexpat1-dev";
+else
+  printf "not found - skipping (http://expat.sourceforge.net)";
+fi
+printf "\n";
+printf "Configuring MJSON...";
+if [ $bFoundMJson -eq 1 ]; then
+  printf "found";
+else
+  printf "not found - skipping (http://sourceforge.net/projects/mjson)";
+fi
+printf "\n";
+printf "Configuring OpenSSL...";
+if [ $bFoundOpenSsl -eq 1 ]; then
+  printf "found";
+elif [ $bRunningMacOS -eq 1 ]; then
+  printf "not found - brew install openssl@1.1";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install libssl-dev";
+else
+  printf "not found - skipping (http://www.openssl.org)";
+fi
+printf "\n";
+printf "Configuring Samba Client...";
+if [ $bFoundSamba -eq 1 ]; then
+  printf "found";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install libsmbclient-dev";
+else
+  printf "not found - skipping (http://www.samba.org/samba/download)";
+fi
+printf "\n";
+printf "Configuring Tar...";
+if [ $bFoundTar -eq 1 ]; then
+  printf "found";
+elif [ $bRunningMacOS -eq 1 ]; then
+  printf "not found - brew install libtar";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install libtar-dev";
+else
+  printf "not found - skipping (http://www.feep.net/libtar/#Download)";
+fi
+printf "\n";
+printf "Configuring XMLRPC...";
+if [ $bFoundXmlRpc -eq 1 ]; then
+  printf "found";
+elif [ $bRunningMacOS -eq 1 ]; then
+  printf "not found - brew install xmlrpc-c";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install libxmlrpc-core-c3-dev";
+else
+  printf "not found - skipping (http://xmlrpc-c.sourceforge.net)";
+fi
+printf "\n";
+printf "Configuring ZLib...";
+if [ $bFoundZLib -eq 1 ]; then
+  printf "found";
+elif [ $bRunningMacOS -eq 1 ]; then
+  printf "not found - brew install zlib";
+elif [ $bRunningUbuntu -eq 1 ]; then
+  printf "not found - sudo apt install zlib1g-dev";
+else
+  printf "not found - skipping (http://www.zlib.net)";
+fi
+printf "\n";
+printf "Configuring Makefile...";
+> Makefile;
+printf '#MAKEFLAGS="-j ${C}"' >> Makefile;
+printf "\n\n" >> Makefile
+printf "all: libcommon.a\n" >> Makefile;
+printf "\n" >> Makefile;
+printf "libcommon.a:" >> Makefile;
+printf " DateTime.o" >> Makefile;
+printf " File.o" >> Makefile;
+printf " SignalHandling.o" >> Makefile;
+printf " Terminal.o" >> Makefile;
+if [ $bFoundB64 -eq 1 -o $bFoundOpenSsl -eq 1 ]; then
+  printf " StringManip.o" >> Makefile;
+  if [ $bFoundOpenSsl -eq 1 ]; then
+    printf " Irc.o" >> Makefile;
+  fi
+fi
+if [ $bFoundMJson -eq 1 ]; then
+  printf " Acorn.o" >> Makefile;
+  printf " Bridge.o" >> Makefile;
+  printf " Central.o" >> Makefile;
+  printf " ChatBot.o" >> Makefile;
+  printf " Json.o" >> Makefile;
+  printf " Syslog.o" >> Makefile
+  printf " Utility.o" >> Makefile;
+  if [ $bFoundExpat -eq 1 ]; then
+    printf " Xml.o" >> Makefile;
+  fi
+  if [ $bFoundOpenSsl -eq 1 ]; then
+    printf " ServiceJunction.o" >> Makefile;
+    if [ $bFoundXmlRpc -eq 1 ]; then
+      printf " BitMessage.o" >> Makefile;
+    fi
+  fi
+fi
+if [ $bFoundTar -eq 1 -a $bFoundZLib -eq 1 ]; then
+  printf " Archive.o" >> Makefile;
+fi
+if [ $bFoundSamba -eq 1 ]; then
+  printf " Samba.o" >> Makefile;
+fi
+printf "\n" >> Makefile;
+printf "\tar rcs libcommon.a" >> Makefile
+printf " DateTime.o" >> Makefile
+printf " File.o" >> Makefile
+printf " SignalHandling.o" >> Makefile
+printf " Terminal.o" >> Makefile
+if [ $bFoundMJson -eq 1 ]; then
+  printf " Acorn.o" >> Makefile
+  printf " Bridge.o" >> Makefile
+  printf " Central.o" >> Makefile
+  printf " ChatBot.o" >> Makefile
+  printf " Json.o" >> Makefile
+  printf " Syslog.o" >> Makefile
+  printf " Utility.o" >> Makefile
+  if [ $bFoundExpat -eq 1 ]; then
+    printf " Xml.o" >> Makefile;
+  fi
+  if [ $bFoundOpenSsl -eq 1 ]; then
+    printf " ServiceJunction.o" >> Makefile
+    if [ $bFoundXmlRpc -eq 1 ]; then
+      printf " BitMessage.o" >> Makefile
+    fi
+  fi
+fi
+if [ $bFoundB64 -eq 1 -o $bFoundOpenSsl -eq 1 ]; then
+  printf " StringManip.o" >> Makefile
+  if [ $bFoundOpenSsl -eq 1 ]; then
+    printf " Irc.o" >> Makefile
+  fi
+fi
+if [ $bFoundTar -eq 1 -a $bFoundZLib -eq 1 ]; then
+  printf " Archive.o" >> Makefile
+fi
+if [ $bFoundSamba -eq 1 ]; then
+  printf " Samba.o" >> Makefile
+fi
+printf ";\n" >> Makefile;
+printf "\n" >> Makefile;
+printf "%%.o: %%.cpp\n" >> Makefile;
+printf "\t${CPP} -g -Wall -c \$< -o \$@ -D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT" >> Makefile;
+if [ "${MAKE_UNAME}" = "Darwin" ]; then
+  printf " -I/usr/local/include -DCOMMON_MACOS" >> Makefile;
+elif [ "${MAKE_UNAME}" = "Linux" ]; then
+  printf " -I/opt/app/workload/include -I/opt/app/workload/local/include -DCOMMON_LINUX" >> Makefile;
+elif [ "${MAKE_UNAME}" = "SunOS" ]; then
+  printf " -I/opt/csw/include -I/usr/local/appl/include -I/usr/local/include -DCOMMON_SOLARIS" >> Makefile;
+fi
+if [ $bFoundB64 -eq 1 ]; then
+  if [ -d "/usr/local/opt/libb64/include" ]; then
+    printf " -I/usr/local/opt/libb64/include" >> Makefile
+  fi
+  printf " -DCOMMON_B64" >> Makefile
+fi
+if [ $bFoundExpat -eq 1 ]; then
+  if [ -d "/usr/local/opt/expat/include" ]; then
+    printf " -I/usr/local/opt/expat/include" >> Makefile
+  fi
+fi
+if [ $bFoundOpenSsl -eq 1 ]; then
+  if [ -d "/usr/local/opt/openssl/include" ]; then
+    printf " -I/usr/local/opt/openssl/include" >> Makefile
+  fi
+  printf " -DCOMMON_OPENSSL" >> Makefile
+fi
+if [ $bFoundSamba -eq 1 ]; then
+  if [ -f "/opt/app/workload/include/samba-4.0/libsmbclient.h" ]; then
+    printf " -I/opt/app/workload/include/samba-4.0" >> Makefile
+  elif [ -f "/usr/include/samba/libsmbclient.h" ]; then
+    printf " -I/usr/include/samba" >> Makefile
+  elif [ -f "/usr/include/samba-4.0/libsmbclient.h" ]; then
+    printf " -I/usr/include/samba-4.0" >> Makefile
+  fi
+fi
+if [ $bFoundTar -eq 1 ]; then
+  if [ -d "/usr/local/opt/libtar/include" ]; then
+    printf " -I/usr/local/opt/libtar/include" >> Makefile
+  fi
+fi
+if [ $bFoundXmlRpc -eq 1 ]; then
+  if [ -d "/usr/local/opt/xmlrpc-c/include" ]; then
+    printf " -I/usr/local/opt/xmlrpc-c/include" >> Makefile
+  fi
+fi
+if [ $bFoundZLib -eq 1 ]; then
+  if [ -d "/usr/local/opt/zlib/include" ]; then
+    printf " -I/usr/local/opt/zlib/include" >> Makefile
+  fi
+fi
+printf ";\n" >> Makefile;
+printf "\n" >> Makefile;
+printf "clean:\n" >> Makefile;
+printf "\t-rm -fr *.o *.a\n" >> Makefile;
+printf "\n" >> Makefile;
+printf "distclean:\n" >> Makefile;
+printf "\t-rm -fr *.o *.a Makefile\n" >> Makefile;
+printf "done\n";

@@ -1,0 +1,121 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Archive
+// -------------------------------------
+// file       : Archive
+// author     : Ben Kietzman
+// begin      : 2010-03-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Archive
+* \brief Archive Class
+*/
+#ifndef _COMMON_ARCHIVE_
+#define _COMMON_ARCHIVE_
+// {{{ includes
+#include <fcntl.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cwctype>
+#include <fstream>
+#include <string>
+#include <list>
+#include <sys/types.h>
+#include <sys/stat.h>
+using namespace std;
+#include <libtar.h>
+#include <zlib.h>
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ Archive
+    //! Performs many tar and gzip operations.
+    /*!
+    * This class requires the tar and z libraries during compilation.
+    * ex: g++ -g -o program program.o -ltar -lz
+    */
+    class Archive
+    {
+      public:
+      Archive();
+      ~Archive();
+
+      //! Auto-select compression/archiving depending on the file extension.
+      /*!
+      * Will not Compress, GZip, or BZip2 because of file extension dependancy.
+      * When a list is provided it will tar the list.
+      * \param strFile - The output file.
+      * \param fileList - The list of files/directories to be archived.
+      * \sa Auto(const string strFile, const string strFiles = "")
+      */
+      bool Auto(const string strFile, list<string> fileList);
+      //! Non-list version of Auto.
+      /*!
+      * \param strFile - The output file.
+      * \param strFiles - The file/directory to be archived.
+      * \sa Auto(const string strFile, list<string> fileList)
+      */
+      bool Auto(const string strFile, const string strFiles = "");
+      //! Auto-select uncompression and unarchiving depending on the file extension.
+      /*!
+      * Intended to be an unarchiver, but will firstly uncompress if needed.
+      * \param strFile - The file to be uncompressed and unarchived.
+      */
+      bool AutoUntar(const string strFile);
+
+      //! Archives a list of files/directories using tar.
+      /*!
+      * \param strFile - The output file.
+      * \param fileList - The list of files/directories to be archived.
+      * \sa tar(const string strFile, const string strFiles)
+      */
+      bool tar(const string strFile, list<string> fileList);
+      //! Archive a file/directory using tar.
+      /*!
+      * \param strFile - The output file.
+      * \param strFiles - The file/directory to be archived.
+      * \warning Non-list version of tar.
+      * \sa tar(const string strFile, list<string> fileList)
+      */
+      bool tar(const string strFile, const string strFiles);
+      //! Unpacks an archive using tar.
+      /*!
+      * \param strFile - The input file.
+      * \param bKeepOriginal - Determines whether to keep the original file.
+      */
+      bool untar(const string strFile, const bool bKeepOriginal = true);
+
+      //! Compresses a file using gzip.
+      /*!
+      * \param strFile - The input file.
+      * \param bKeepOriginal - Determines whether to keep the original file.
+      */
+      bool gzip(const string strFile, const bool bKeepOriginal = false);
+      //! Uncompresses a file using gunzip.
+      /*!
+      * \param strFile - The input file.
+      * \param bKeepOriginal - Determines whether to keep the original file.
+      */
+      bool gunzip(const string strFile, const bool bKeepOriginal = false);
+    };
+    // }}}
+  }
+}
+#endif

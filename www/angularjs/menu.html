@@ -1,0 +1,53 @@
+<!--
+// vim600: fdm=marker
+///////////////////////////////////////////
+// author     : Ben Kietzman
+// begin      : 2015-08-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+-->
+<div ng-controller="menu" style="padding-top:50px;">
+  <div ng-if="common.m_menu" class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid" id="navfluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigationbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#/">{{application}}</a>
+      </div>
+      <div class="collapse navbar-collapse" id="navigationbar">
+        <ul class="nav navbar-nav">
+          <li ng-repeat="item in common.m_menu.left" class="{{item.active}}"><a href="#{{item.href}}"><span ng-show="item.icon" class="glyphicon glyphicon-{{item.icon}}" style="margin-right:8px;"></span>{{item.value}}</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li ng-repeat="item in common.m_menu.right" class="{{item.active}}"><a href="#{{item.href}}"><span ng-show="item.icon" class="glyphicon glyphicon-{{item.icon}}" style="margin-right:8px;"></span>{{item.value}}</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div ng-if="common.m_submenu" class="navbar navbar-default" role="navigation">
+    <div class="container-fluid" id="navfluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#subnavigationbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="collapse navbar-collapse" id="subnavigationbar">
+        <ul class="nav navbar-nav">
+          <li ng-repeat="item in common.m_submenu.left" class="{{item.active}}"><a href="#{{item.href}}"><span ng-show="item.icon" class="glyphicon glyphicon-{{item.icon}}" style="margin-right:8px;"></span>{{item.value}}</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li ng-repeat="item in common.m_submenu.right" class="{{item.active}}"><a href="#{{item.href}}"><span ng-show="item.icon" class="glyphicon glyphicon-{{item.icon}}" style="margin-right:8px;"></span>{{item.value}}</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div ng-show="message" style="color:red;font-weight:bold;">{{message}}</div>
+</div>

@@ -1,0 +1,318 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Acorn
+// -------------------------------------
+// file       : Acorn
+// author     : Ben Kietzman
+// begin      : 2018-12-27
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Acorn
+* \brief Acorn Class
+*/
+#ifndef _COMMON_ACORN_
+#define _COMMON_ACORN_
+// {{{ includes
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <mutex>
+#include <netdb.h>
+#include <poll.h>
+#include <pthread.h>
+#ifdef COMMON_LINUX
+#include <semaphore.h>
+#endif
+#include <string>
+#ifdef COMMON_SOLARIS
+#include <synch.h>
+#endif
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <thread>
+#include <vector>
+using namespace std;
+#include "File"
+#include "Json"
+#include "StringManip"
+#include "Utility"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ acornreqdata
+    struct acornreqdata
+    {
+      bool bSent;
+      int fdSocket;
+      string strBuffer[2];
+    };
+    // }}}
+    // {{{ Acorn
+    //! Interfaces with Acorn.
+    /*!
+    * Provides an interfaces to Acorn.
+    */
+    class Acorn
+    {
+      protected:
+      bool m_bUseSingleSocket;
+      map<int, acornreqdata *> m_requests;
+      size_t m_unThrottle;
+      size_t m_unUniqueID;
+      std::mutex m_mutexGetAddrInfo;
+      std::mutex m_mutexRequests;
+      std::mutex m_mutexUnique;
+      string m_strApplication;
+      string m_strProgram;
+      string m_strTimeout;
+      thread *m_pThreadRequest;
+      File m_file;
+      StringManip m_manip;
+      Utility *m_pUtility;
+
+      public:
+      Acorn(string &strError);
+      ~Acorn();
+
+      /*! \fn bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, list<string> fileList, string &strError)
+      * Constructs and sends an email.
+      * \param strFrom - The from address.
+      * \param toList - The list of recipients.
+      * \param ccList - The list of carbon copy recipients.
+      * \param bccList - The list of blind carbon copy recipients.
+      * \param strSubject - The subject line.
+      * \param strText - The plain text message.
+      * \param strHTML - The HTML message.
+      * \param fileList - The list of attachments.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, list<string> fileList, string &strError);
+      /*! \fn bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, map<string, string> fileMap, string &strError)
+      * Constructs and sends an email.
+      * \param strFrom - The from address.
+      * \param toList - The list of recipients.
+      * \param ccList - The list of carbon copy recipients.
+      * \param bccList - The list of blind carbon copy recipients.
+      * \param strSubject - The subject line.
+      * \param strText - The plain text message.
+      * \param strHTML - The HTML message.
+      * \param fileMap - The map of attachments.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool email(const string strFrom, list<string> toList, list<string> ccList, list<string> bccList, const string strSubject, const string strText, const string strHTML, map<string, string> fileMap, string &strError);
+      /*! \fn bool jwt(const string strSigner, const string strSecret, string &strPayload, Json *ptPayload, string &strError)
+      * \brief (En/De)codes JSON Web Tokens (JWT).
+      * \param strSigner Contains the signer.
+      * \param strSecret Contains the secret.
+      * \param strPayload Contains/Returns the encoded payload.
+      * \param ptPayload Contains/Returns the decoded payload.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool jwt(const string strSigner, const string strSecret, string &strPayload, Json *ptPayload, string &strError);
+            /*! \fn bool logger(const string strApplication, const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strApplication Contains the application.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strApplication, const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError);
+      /*! \fn bool logger(const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strUser, const string strPassword, const string strMessage, map<string, string> label, string &strError);
+      /*! \fn bool logger(const string strApplication, const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strApplication Contains the application.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strFunction Contains the function.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param result Contains a list of the JSON results.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strApplication, const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError);
+      /*! \fn bool logger(const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError)
+      * \brief Provide socket communication with the logger service.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strFunction Contains the function.
+      * \param strMessage Contains the message.
+      * \param label Contains the list of labels.
+      * \param result Contains a list of the JSON results.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool logger(const string strUser, const string strPassword, const string strFunction, const string strMessage, map<string, string> label, list<Json *> &result, string &strError);
+/*! \fn bool mssqlQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the MSSQL database.
+      * \param strUser Contains the MSSQL user.
+      * \param strPassword Contains the MSSQL password.
+      * \param strServer Contains the MSSQL server.
+      * \param strQuery Contains the MSSQL query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mssqlQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool mssqlUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the MSSQL database.
+      * \param strUser Contains the MSSQL user.
+      * \param strPassword Contains the MSSQL password.
+      * \param strServer Contains the MSSQL server.
+      * \param strUpdate Contains the MSSQL insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mssqlUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError);
+      /*! \fn bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strQuery Contains the MySQL query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError)
+      * \brief Runs an insert/update/delete against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strID Contains the auto-increment ID.
+      * \param strRows Contains the number of impacted rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError);
+      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError);
+      /*! \fn bool oracleQuery(const string strSchema, const string strPassword, const string strTnsName, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the Oracle database.
+      * \param strSchema Contains the Oracle schema.
+      * \param strPassword Contains the Oracle password.
+      * \param strTnsName Contains the Oracle TNS name.
+      * \param strQuery Contains the Oracle query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool oracleQuery(const string strSchema, const string strPassword, const string strTnsName, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strID, string &strRows, string &strError)
+      * \brief Runs an insert/update/delete against the Oracle database.
+      * \param strSchema Contains the Oracle schema.
+      * \param strPassword Contains the Oracle password.
+      * \param strTnsName Contains the Oracle TNS name.
+      * \param strUpdate Contains the Oracle insert/update/delete query.
+      * \param strID Contains the auto-increment ID.
+      * \param strRows Contains the number of impacted rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strID, string &strRows, string &strError);
+      /*! \fn bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the Oracle database.
+      * \param strSchema Contains the Oracle schema.
+      * \param strPassword Contains the Oracle password.
+      * \param strTnsName Contains the Oracle TNS name.
+      * \param strUpdate Contains the Oracle insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strError);
+      /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
+      * \brief Submits an Acorn request.
+      * \param ptRequest Contains request.
+      * \param ptResponse Contains response.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
+      * \brief Submits an Acorn request.
+      * \param ptRequest Contains request.
+      * \param ptResponse Contains response.
+      * \param CTimeout Contains the timeout.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError);
+      /*! \fn void requestThread()
+      * \brief Request thread.
+      */
+      void requestThread();
+      /*! \fn void setApplication(const string strApplication)
+      * \brief Set the application.
+      * \param strApplication Contains the application.
+      */
+      void setApplication(const string strApplication);
+      /*! \fn void setThrottle(const size_t unThrottle)
+      * \brief Set the throttle.
+      * \param unThrottle Contains the throttle.
+      */
+      void setThrottle(const size_t unThrottle);
+      /*! \fn void setTimeout(const string strTimeout)
+      * \brief Set the timeout.
+      * \param strTimeout Contains the timeout.
+      */
+      void setTimeout(const string strTimeout);
+      /*! \fn void useSingleSocket(const bool bUseSingleSocket = true)
+      * \brief Use single socket.  This should only be enabled within non-forking environments.
+      * \param bUseSingleSocket Contains the single socket value.
+      */
+      void useSingleSocket(const bool bUseSingleSocket = true);
+      /*! \fn Utility *utility()
+      * \brief Interfaces with the Utility class.
+      * \return Returns a pointer to the Utility class.
+      */
+      Utility *utility();
+    };
+    // }}}
+  }
+}
+#endif

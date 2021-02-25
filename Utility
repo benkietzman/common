@@ -1,0 +1,196 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Utility
+// -------------------------------------
+// file       : Utility
+// author     : Ben Kietzman
+// begin      : 2013-11-30
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Utility
+* \brief Utility Class
+*/
+#ifndef _COMMON_UTILITY_
+#define _COMMON_UTILITY_
+// {{{ includes
+#include <csignal>
+#include <ctime>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#include <poll.h>
+#ifdef COMMON_SOLARIS
+#include <procfs.h>
+#endif
+#include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <zlib.h>
+using namespace std;
+#include "File"
+#include "Json"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ Utility
+    //! Contains utility tools.
+    /*!
+    * Provides utility tools.
+    */
+    class Utility
+    {
+      private:
+      std::mutex m_mutexConf;
+      time_t m_ulModifyTime;
+      File m_file;
+
+      public:
+      Json *m_conf;
+      string m_strConf;
+
+      Utility(string &strError);
+      ~Utility();
+
+      /*! \fn Json *conf()
+      * \brief Interfaces with the configuration storage.
+      * \return Returns a pointer to the configuration storage.
+      */
+      Json *conf();
+      /*! \fn void daemonize()
+      * \brief Turns the process into a system daemon.
+      */
+      void daemonize();
+      /*! \fn string getConfPath()
+      * \brief Gets the configuration storage path.
+      * \return Returns the configuration storage path.
+      */
+      string getConfPath();
+      /*! \fn bool getLine(FILE *pFile, string &strLine)
+      * \brief Reads a line of data from a socket.
+      * \param pFile Contains the file handle.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(FILE *pFile, string &strLine);
+      /*! \fn bool getLine(gzFile pgzFile, string &strLine)
+      * \brief Reads a line of data from a zlib compressed file.
+      * \param pgzFile Contains the file handle.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(gzFile pgzFile, string &strLine);
+      /*! \fn bool getLine(int fdFile, string &strLine, const time_t CTimeout, int &nReturn)
+      * \brief Reads a line of data from a file/socket.
+      * \param fdFile Contains the file descriptor.
+      * \param strLine Contains the newly read line.
+      * \param CTimeout Contains the timeout.
+      * \param nReturn Contains the returned value from read.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(int fdFile, string &strLine, const time_t CTimeout, int &nReturn);
+      /*! \fn bool getLine(int fdFile, string &strLine, int &nReturn)
+      * \brief Reads a line of data from a file/socket.
+      * \param fdFile Contains the file descriptor.
+      * \param strLine Contains the newly read line.
+      * \param nReturn Contains the returned value from read.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(int fdFile, string &strLine, int &nReturn);
+      /*! \fn bool getLine(int fdFile, string &strLine)
+      * \brief Reads a line of data from a file/socket.
+      * \param fdFile Contains the file descriptor.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(int fdFile, string &strLine);
+      /*! \fn bool getLine(ifstream &inFile, string &strLine)
+      * \brief Reads a line of data from a socket.
+      * \param inFile Contains the file handle.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(ifstream &inFile, string &strLine);
+      /*! \fn bool getLine(istream &inStream, string &strLine)
+      * \brief Reads a line of data from a stream.
+      * \param inStream Contains the stream.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(istream &inStream, string &strLine);
+      /*! \fn bool getLine(SSL *ssl, string &strLine, const time_t CTimeout, int &nReturn)
+      * \brief Reads a line of data from a socket.
+      * \param ssl Contains the SSL handle.
+      * \param strLine Contains the newly read line.
+      * \param CTimeout Contains the timeout.
+      * \param nReturn Contains the returned value from SSL_read.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(SSL *ssl, string &strLine, const time_t CTimeout, int &nReturn);
+      /*! \fn bool getLine(SSL *ssl, string &strLine, int &nReturn)
+      * \brief Reads a line of data from a socket.
+      * \param ssl Contains the SSL handle.
+      * \param strLine Contains the newly read line.
+      * \param nReturn Contains the returned value from SSL_read.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(SSL *ssl, string &strLine, int &nReturn);
+      /*! \fn bool getLine(SSL *ssl, string &strLine)
+      * \brief Reads a line of data from a socket.
+      * \param ssl Contains the SSL handle.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(SSL *ssl, string &strLine);
+      /*! \fn bool getLine(stringstream &ssData, string &strLine)
+      * \brief Reads a line of data from a stream.
+      * \param ssData Contains the string stream.
+      * \param strLine Contains the newly read line.
+      * \return Returns a boolean true/false value.
+      */
+      bool getLine(stringstream &ssData, string &strLine);
+      /*! \fn bool isProcessAlreadyRunning(const string strProcess)
+      * \brief Determines if another process of the same name is already running.
+      * \param strProcess Contains process name.
+      * \return Returns a boolean true/false value.
+      */
+      bool isProcessAlreadyRunning(const string strProcess);
+      /*! \fn void msleep(const unsigned long ulMilliSec)
+      * \brief Sleep given milliseconds.
+      * \param ulMilliSec Contains the milliseconds.
+      */
+      void msleep(const unsigned long ulMilliSec);
+      /*! \fn bool readConf(string &strError)
+      * \brief Read configuration file.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool readConf(string &strError);
+      /*! \fn void setConfPath(const string strPath)
+      * \brief Sets the configuration storage path.
+      * \param strError Contains the error message.
+      */
+      void setConfPath(const string strPath, string &strError);
+    };
+    // }}}
+  }
+}
+#endif

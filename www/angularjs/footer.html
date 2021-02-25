@@ -1,0 +1,32 @@
+<!--
+// vim600: fdm=marker
+///////////////////////////////////////////
+// author     : Ben Kietzman
+// begin      : 2015-08-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+-->
+<div id="footer" ng-controller="footer">
+  <br>
+  <div ng-show="message" style="color:red;font-weight:bold;">{{message}}<br><br></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 text-muted credit">
+        <a ng-show="footer.email && footer.subject" href="mailto:{{footer.email}}?subject={{footer.subject}}">Contact Admin</a>
+        <span ng-show="footer.email && footer.subject && footer.version"> --- </span>
+        <span ng-show="footer.version">{{footer.version}}</span>
+      </div>
+      <div class="col-md-4 hidden-xs text-muted credit" style="font-size:9px;text-align:center;">
+        <strong ng-show="footer.title" style="font-size:11px;">{{footer.title}}</strong>
+        <span ng-show="footer.message && footer.title"><br></span>
+        <span ng-show="footer.message">{{footer.message}}</span>
+      </div>
+      <div class="col-md-4 text-muted credit" style="font-size:10px;text-align:right;">
+        <span ng-show="footer.year">&copy; {{footer.year}}</span> <a ng-show="footer.company && footer.website" href="{{footer.website}}" target="_new">{{footer.company}}</a>
+        <span ng-show="footer.engineer"><br>Engineered by <a ng-show="footer.engineer.link" href="{{footer.engineer.link}}" target="{{footer.engineer.target}}">{{footer.engineer.first_name}} {{footer.engineer.last_name}}</a><span ng-show="!footer.engineer.link">{{footer.engineer.first_name}} {{footer.engineer.last_name}}</span><span>
+      </div>
+    </div>
+  </div>
+  <br>
+</div>

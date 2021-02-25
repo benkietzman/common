@@ -1,0 +1,175 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// SignalHandling
+// -------------------------------------
+// file       : SignalHandling
+// author     : Ben Kietzman
+// begin      : 2010-03-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file SignalHandling
+* \brief SignalHandling Functions
+*/
+#ifndef _COMMON_SIGNALHANDLING_
+#define _COMMON_SIGNALHANDLING_
+// {{{ includes
+#include <csignal>
+#include <cstring>
+#include <string>
+using namespace std;
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ defines
+    #ifndef SIGHUP
+    #define SIGHUP  1   /* hangup */
+    #endif
+    #ifndef SIGINT
+    #define SIGINT  2   /* interrupt (rubout) */
+    #endif
+    #ifndef SIGQUIT
+    #define SIGQUIT 3   /* quit (ASCII FS) */
+    #endif
+    #ifndef SIGILL
+    #define SIGILL  4   /* illegal instruction (not reset when caught) */
+    #endif
+    #ifndef SIGTRAP
+    #define SIGTRAP 5   /* trace trap (not reset when caught) */
+    #endif
+    #ifndef SIGIOT
+    #define SIGIOT  6   /* IOT instruction */
+    #endif
+    #ifndef SIGABRT
+    #define SIGABRT 6   /* used by abort, replace SIGIOT in the future */
+    #endif
+    #ifndef SIGFPE
+    #define SIGFPE  8   /* floating point exception */
+    #endif
+    #ifndef SIGKILL
+    #define SIGKILL 9   /* kill (cannot be caught or ignored) */
+    #endif
+    #ifndef SIGBUS
+    #define SIGBUS  10  /* bus error */
+    #endif
+    #ifndef SIGSEGV
+    #define SIGSEGV 11  /* segmentation violation */
+    #endif
+    #ifndef SIGSYS
+    #define SIGSYS  12  /* bad argument to system call */
+    #endif
+    #ifndef SIGPIPE
+    #define SIGPIPE 13  /* write on a pipe with no one to read it */
+    #endif
+    #ifndef SIGALRM
+    #define SIGALRM 14  /* alarm clock */
+    #endif
+    #ifndef SIGTERM
+    #define SIGTERM 15  /* software termination signal from kill */
+    #endif
+    #ifndef SIGCLD
+    #define SIGCLD  18  /* child status change */
+    #endif
+    #ifndef SIGCHLD
+    #define SIGCHLD 18  /* child status change alias (POSIX) */
+    #endif
+    #ifndef COMMON_MACOS
+    #ifndef SIGPWR
+    #define SIGPWR  19  /* power-fail restart */
+    #endif
+    #endif
+    #ifndef SIGWINCH
+    #define SIGWINCH 20 /* window size change */
+    #endif
+    #ifndef SIGURG
+    #define SIGURG  21  /* urgent socket condition */
+    #endif
+    #ifndef COMMON_MACOS
+    #ifndef SIGPOLL
+    #define SIGPOLL 22  /* pollable event occured */
+    #endif
+    #endif
+    #ifndef SIGIO
+    #define SIGIO   SIGPOLL /* socket I/O possible (SIGPOLL alias) */
+    #endif
+    #ifndef SIGSTOP
+    #define SIGSTOP 23  /* stop (cannot be caught or ignored) */
+    #endif
+    #ifndef SIGTSTP
+    #define SIGTSTP 24  /* user stop requested from tty */
+    #endif
+    #ifndef SIGCONT
+    #define SIGCONT 25  /* stopped process has been continued */
+    #endif
+    #ifndef SIGTTIN
+    #define SIGTTIN 26  /* background tty read attempted */
+    #endif
+    #ifndef SIGTTOU
+    #define SIGTTOU 27  /* background tty write attempted */
+    #endif
+    #ifndef SIGVTALRM
+    #define SIGVTALRM 28    /* virtual timer expired */
+    #endif
+    #ifndef SIGPROF
+    #define SIGPROF 29  /* profiling timer expired */
+    #endif
+    #ifndef SIGXCPU
+    #define SIGXCPU 30  /* exceeded cpu limit */
+    #endif
+    #ifndef SIGXFSZ
+    #define SIGXFSZ 31  /* exceeded file size limit */
+    #endif
+    #ifndef SIGWAITING
+    #define SIGWAITING 32   /* process's lwps are blocked */
+    #endif
+    #ifndef SIGLWP
+    #define SIGLWP  33  /* special signal used by thread library */
+    #endif
+    #ifndef SIGFREEZE
+    #define SIGFREEZE 34    /* special signal used by CPR */
+    #endif
+    #ifndef SIGTHAW
+    #define SIGTHAW 35  /* special signal used by CPR */
+    #endif
+    #ifndef SIGCANCEL
+    #define SIGCANCEL 36    /* thread cancellation signal used by libthread */
+    #endif
+    #ifndef SIGLOST
+    #define SIGLOST 37  /* resource lost (eg, record-lock lost) */
+    #endif
+    // }}}
+    // {{{ prototypes
+    //! Designates the given function to handle any signals that are caught.
+    /*!
+    *  \param function - Contain the address to the function that will catch and handle signals.
+    */
+    void sethandles(void (*function)(int));
+    //! Translates the given signal id to a string interpretation.
+    /*!
+    * \param strSignal - Stores the string version of the signal.
+    * \param nSignal - The given stignal id.
+    */
+    string sigstring(string &strSignal, int nSignal);
+    //! Sets the given signal to be ignored.
+    /*!
+    * \param nSignal - The given signal to be ignored.
+    */
+    void sigdummy(int nSignal);
+    // }}}
+  }
+}
+#endif

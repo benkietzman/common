@@ -1,0 +1,16 @@
+<!--
+// vim600: fdm=marker
+///////////////////////////////////////////
+// author     : Ben Kietzman
+// begin      : 2018-05-01
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+-->
+<div ng-controller="messages">
+  <div ng-repeat="message in common.m_messages" class="alert alert-{{message.Class}} alert-dismissible fade in">
+    <button class="close" data-dismiss="alert" aria-label="close" ng-click="close(message.Index)">&times;</button>
+    <strong ng-show="message.Title">{{message.Title}}<br></strong>
+    {{message.Body}}
+  </div>
+</div>

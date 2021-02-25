@@ -1,0 +1,36 @@
+<!--
+// vim600: fdm=marker
+///////////////////////////////////////////
+// author     : Ben Kietzman
+// begin      : 2015-08-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+-->
+<div ng-controller="menu" style="padding: 50px 0px 20px 0px;">
+  <div ng-if="common.m_menu" class="navbar navbar-dark bg-dark fixed-top navbar-expand-md" role="navigation" style="box-shadow: 3px 3px 4px #888888;">
+    <a class="navbar-brand" href="#/">{{application}}</a>
+    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navigationbar"><span class="sr-only">Toggle navigation</span>&#x2630;</button>
+    <div class="collapse navbar-collapse" id="navigationbar">
+      <ul class="nav navbar-nav">
+        <li ng-repeat="item in common.m_menu.left" class="nav-item {{item.active}}"><a href="#{{item.href}}" class="nav-link">{{item.value}}</a></li>
+      </ul>
+      <ul class="nav navbar-nav ml-auto">
+        <li ng-repeat="item in common.m_menu.right" class="nav-item {{item.active}}"><a href="#{{item.href}}" class="nav-link">{{item.value}}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div ng-if="common.m_submenu" class="navbar navbar-light bg-light navbar-expand-md" style="box-shadow: 3px 3px 4px #888888;">
+    <span></span>
+    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#subnavigationbar"><span class="sr-only">"Toggle navigation"</span>&#x2630;</button>
+    <div class="collapse navbar-collapse" id="subnavigationbar">
+      <ul class="nav navbar-nav">
+        <li ng-repeat="item in common.m_submenu.left" class="nav-item {{item.active}}"><a href="#{{item.href}}" class="nav-link">{{item.value}}</a></li>
+      </ul>
+      <ul class="nav navbar-nav ml-auto">
+        <li ng-repeat="item in common.m_submenu.right" class="nav-item {{item.active}}"><a href="#{{item.href}}" class="nav-link">{{item.value}}</a></div>
+      </ul>
+    </div>
+  </div>
+  <div ng-show="message" style="color:red;font-weight:bold;">{{message}}</div>
+</div>

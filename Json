@@ -1,0 +1,149 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// JSON
+// -------------------------------------
+// file       : Json
+// author     : Ben Kietzman
+// begin      : 2011-07-06
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Json
+* \brief JSON Functions
+*/
+#ifndef _COMMON_JSON_
+#define _COMMON_JSON_
+// {{{ includes
+#include <cstdlib>
+#include <expat.h>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <map>
+#include <sstream>
+#include <string>
+using namespace std;
+#include <mjson-1.7/json.h>
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    /*! \fn void jsonData(void *data, const XML_Char *s, int len)
+    * \brief Processes XML data.
+    * \param data Contains data.
+    * \param s Contains the string.
+    * \param len Contains the string length.
+    */
+    void jsonData(void *data, const XML_Char *s, int len);
+    /*! \fn void jsonEnd(void *data, const char *el)
+    * \brief Processes XML end tag.
+    * \param data Contains data.
+    * \param el Contains the element.
+    */
+    void jsonEnd(void *data, const char *el);
+    /*! \fn void jsonStart(void *data, const char *el, const char **attr)
+    * \brief Processes XML start tag.
+    * \param data Contains data.
+    * \param el Contains the element.
+    * \param attr Contains the attributes.
+    */
+    void jsonStart(void *data, const char *el, const char **attr);
+    /*! \fn void parseJson(json_t *current, json_t *end, map<string, string> &jsonMap, const bool bOverwrite = false)
+    * \brief Parses the incoming JSON data.
+    * \param current Contains JSON current item.
+    * \param current Contains JSON end item.
+    * \param jsonMap Contains list of ticket data.
+    * \param bOverwrite Contains a boolean overwrite value.
+    */
+    void parseJson(json_t *current, json_t *end, map<string, string> &jsonMap, const bool bOverwrite = false);
+    // {{{ Json
+    //! Parses JSON.
+    /*!
+    * Provides a JSON parser.
+    */
+    class Json
+    {
+      private:
+      string m_strError;
+
+      void clearList();
+      void clearMap();
+      void clearValue();
+      void clearForList();
+      void clearForMap(const string strKey = "");
+      void clearForValue();
+      string fcifDecode(string &strDecoded, const string strData);
+      string fcifEncode(string &strEncoded, const string strData);
+      void parseFcif(const string strFcif);
+      string xml(string &strXml, const string strTag);
+      string xmlEncode(string &strEncoded, const string strData);
+
+      public:
+      char t;
+      string m_strTag;
+      string v;
+      list<Json *> l;
+      map<string, string> a;
+      map<string, Json *> m;
+      Json *m_ptCurrent;
+      Json *m_ptParent;
+
+      Json() : t('s'), m_ptCurrent(this), m_ptParent(NULL) {};
+      Json(json_t *root);
+      Json(list<string> jsonList);
+      Json(map<string, string> jsonMap);
+      Json(const string strJson);
+      Json(Json *ptJson);
+      ~Json();
+      string fcif(string &strFcif, const bool bAppend = false);
+      void flatten(list<string> &jsonList);
+      void flatten(map<string, string> &jsonMap, const bool bOverwrite = false, const bool bMultiLayer = true);
+      void clearError();
+      string getError();
+      bool good();
+      void insert(list<string> jsonList);
+      void insert(map<string, string> jsonMap);
+      void insert(const string strKey, list<string> jsonList);
+      void insert(const string strKey, map<string, string> jsonMap);
+      void insert(const string strKey, const string strValue, const char cType = 's');
+      void insert(const string strKey, Json *ptJson);
+      void insert(const string strValue, const char cType = 's');
+      string json(string &strJson, const bool bAppend = false);
+      ostream &json(ostream &os);
+      bool match(Json *ptJson);
+      void merge(Json *ptJson, const bool bOverwrite = false, const bool bMatch = false);
+      void parse(json_t *root);
+      bool parse(const string strJson);
+      void push_back(list<string> jsonList);
+      void push_back(map<string, string> jsonMap);
+      void push_back(const string strValue, const char cType = 's');
+      void push_back(Json *ptJson);
+      void push_front(list<string> jsonList);
+      void push_front(map<string, string> jsonMap);
+      void push_front(const string strValue, const char cType = 's');
+      void push_front(Json *ptJson);
+      void setError(const string strError);
+      void value(const string strValue, const char cType = 's');
+      string xml(string &strXml, const bool bAppend = false);
+
+      friend ostream & operator<<(ostream &os, Json &tJson);
+      friend ostream & operator<<(ostream &os, Json *ptJson);
+
+    };
+    // }}}
+  }
+}
+#endif

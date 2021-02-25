@@ -1,0 +1,184 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Terminal
+// -------------------------------------
+// file       : Terminal
+// author     : Ben Kietzman
+// begin      : 2014-03-20
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Terminal
+* \brief Terminal Class
+*/
+#ifndef _COMMON_TERMINAL_
+#define _COMMON_TERMINAL_
+// {{{ includes
+#include <arpa/telnet.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <netdb.h>
+#include <poll.h>
+#include <sstream>
+#include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vector>
+using namespace std;
+#include "StringManip"
+// }}}
+// {{{ defines
+#define maxfd(x,y) ((x) > (y) ? (x) : (y))
+// }}} 
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ Terminal
+    //! Contains terminal scraping tools.
+    /*!
+    * Provides terminal scraping tools.
+    */
+    class Terminal
+    {
+      private:
+      bool m_bDebug;
+      bool m_bCaught;
+      bool m_bConnected;
+      bool m_bNumbered;
+      bool m_bUncaught;
+      bool m_bWait;
+      bool m_bWrap;
+      int m_fdClientRead;
+      int m_fdClientWrite;
+      int m_fdServerRead;
+      int m_fdServerWrite;
+      int m_fdSocket;
+      int m_nSocketTimeout[2];
+      list<string> m_caught;
+      list<string> m_uncaught;
+      string m_strBuffer;
+      string m_strError;
+      string m_strPrefix;
+      string m_strType;
+      ostream *m_posDebug;
+      size_t m_unCol;
+      size_t m_unCols;
+      size_t m_unRow;
+      size_t m_unRows;
+      size_t m_unSaveCol;
+      size_t m_unSaveRow;
+      vector<string> m_screen;
+      vector<list<size_t> > m_tab;
+      vector<string> m_telopts;
+      StringManip m_manip;
+
+      bool caught();
+      bool col(const size_t unCol);
+      bool debug();
+      void down(const size_t unCount = 1);
+      string encode(const string strData, string &strEncode);
+      void left(const size_t unCount = 1);
+      bool numbered();
+      void parse();
+      void prefix(const string strPrefix);
+      bool read();
+      void reset();
+      void resize();
+      void right(const size_t unCount = 1);
+      bool row(const size_t unRow);
+      bool tab(const size_t unRow, const size_t unCol, const bool bAdd = true);
+      string type();
+      bool uncaught();
+      void up(const size_t unCount = 1);
+      bool write(const char *pszData, size_t unSize);
+      bool write(const string strData);
+      bool write(const unsigned char *pszData, size_t unSize);
+
+      protected:
+      bool connected();
+      void error(const string strError);
+      void error(const string strPrefix, const string strError);
+
+      public:
+      Terminal();
+      virtual ~Terminal();
+
+      void caught(const bool bCaught);
+      size_t col();
+      bool cols(const size_t unCols);
+      size_t cols();
+      bool connect(const string strServer, const string strPort);
+      void debug(const bool bDebug);
+      bool disconnect();
+      void display();
+      string error();
+      bool find(const string strData);
+      bool find(const string strData, const size_t unStartRow);
+      bool find(const string strData, const size_t unStartRow, const size_t unEndRow);
+      bool find(const string strData, const size_t unStartRow, const size_t unStartCol, const size_t unEndcol);
+      bool findPos(const string strData, size_t &unRow, size_t &unCol);
+      bool findPos(const string strData, const size_t unStartRow, size_t &unRow, size_t &unCol);
+      bool findPos(const string strData, const size_t unStartRow, const size_t unEndRow, size_t &unRow, size_t &unCol);
+      bool findPos(const string strData, const size_t unStartRow, const size_t unStartCol, const size_t unEndcol, size_t &unRow, size_t &unCol);
+      bool get(string &strData, const size_t unRow, const size_t unStartCol, const size_t unEndcol);
+      virtual bool getServer(const string strSystem, string &strServer, string &strPort);
+      void getSocketTimeout(int &nShort, int &nLong);
+      virtual bool login(const string strServer, const string strPort, const string strUser, const string strPassword);
+      virtual bool logout();
+      void numbered(const bool bNumbered);
+      string prefix();
+      size_t row();
+      bool rows(const size_t unRows);
+      size_t rows();
+      void screen(string &strScreen);
+      void screen(vector<string> &vecScreen);
+      bool send(const string strData, const size_t unCount = 1);
+      bool sendCtrl(char cKey, const bool bWait = true);
+      bool sendDown(const size_t unCount = 1, const bool bWait = true);
+      bool sendEnter(const bool bWait = true);
+      bool sendEscape(const bool bWait = true);
+      bool sendFunction(const int nKey);
+      bool sendHome(const bool bWait = true);
+      bool sendKey(const char cKey, const size_t unCount = 1, const bool bWait = true);
+      bool sendKeypadEnter(const bool bWait = true);
+      bool sendLeft(const size_t unCount = 1, const bool bWait = true);
+      bool sendLeft(const size_t unRow, const size_t unStartCol, const size_t unEndCol, const string strValue);
+      bool sendRight(const size_t unCount = 1, const bool bWait = true);
+      bool sendRight(const size_t unRow, const size_t unStartCol, const size_t unEndCol, const string strValue);
+      bool sendShiftFunction(const int nKey);
+      bool sendTab(const size_t unCount = 1, const bool bWait = true);
+      bool sendUp(const size_t unCount = 1, const bool bWait = true);
+      bool sendWait(const string strData, const size_t unCount = 1);
+      void setClientHandle(const int fdHandle);
+      void setClientHandles(const int fdRead, const int fdWrite);
+      void setDebugStream(ostream *posDebug);
+      void setServerHandle(const int fdHandle);
+      void setServerHandles(const int fdRead, const int fdWrite);
+      void setSocketTimeout(const int nShort, const int nLong);
+      void type(const string strType);
+      void uncaught(const bool bUncaught);
+      bool wait(const bool bWait = true);
+    };
+    // }}}
+  }
+}
+#endif

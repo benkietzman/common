@@ -1,0 +1,342 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Central
+// -------------------------------------
+// file       : Central
+// author     : Ben Kietzman
+// begin      : 2011-07-05
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Central
+* \brief Central Class
+*/
+#ifndef _COMMON_CENTRAL_
+#define _COMMON_CENTRAL_
+// {{{ includes
+#include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <string>
+#ifdef COMMON_SOLARIS
+#include <procfs.h>
+#endif
+#include <sys/utsname.h>
+using namespace std;
+#include "Acorn"
+#include "Archive"
+#include "DateTime"
+#include "File"
+#include "Json"
+#include "ServiceJunction"
+#include "SignalHandling"
+#include "StringManip"
+#include "Utility"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ commonDatabase
+    struct commonDatabase
+    {
+      map<string, string> credentials;
+      std::mutex access; 
+    };
+    // }}}
+    // {{{ Central
+    //! Interfaces with the central tools.
+    /*!
+    * Provides interfaces to many central tools.
+    */
+    class Central
+    {
+      protected:
+      bool m_bLock;
+      bool m_bTimestamp;
+      map<string, list<string> > m_alert;
+      map<string, commonDatabase *> m_database;
+      std::mutex m_mutexAlert;
+      std::mutex m_mutexLog;
+      string m_strApplication;
+      string m_strDatabase;
+      string m_strEmail;
+      string m_strFrequency;
+      string m_strLog;
+      string m_strPassword;
+      string m_strPrefix;
+      string m_strRoom;
+      string m_strUser;
+      bool (*m_pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &);
+      Acorn *m_pAcorn;
+      Archive *m_pArchive;
+      DateTime *m_pDate;
+      File *m_pFile;
+      ServiceJunction *m_pJunction;
+      StringManip *m_pManip;
+      Utility *m_pUtility;
+
+      public:
+      Central(string &strError);
+      ~Central();
+
+      /*! \fn Acorn *acorn()
+      * \brief Interfaces with the Acorn class.
+      * \return Returns a pointer to the Acorn class.
+      */
+      Acorn *acorn();
+      /*! \fn bool addDatabase(const string strName, map<string, string> credentials, string &strError)
+      * \brief Adds database credentials to list of databases.
+      * \param strName Contains the database name.
+      * \param credentials Contains the database credentials.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool addDatabase(const string strName, map<string, string> credentials, string &strError);
+      /*! \fn bool alert(const string strMessage)
+      * \brief Sends emails and text pages to application developers and posts a message on the IRC chatter.
+      * \param strMessage Contains the email message.
+      * \return Returns a boolean true/false value.
+      */
+      bool alert(const string strMessage);
+      /*! \fn bool alert(const string strMessage, string &strError)
+      * \brief Sends emails and text pages to application developers and posts a message on the IRC chatter.
+      * \param strMessage Contains the email message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool alert(const string strMessage, string &strError);
+      /*! \fn bool alert(const string strApplication, const string strMessage, string &strError)
+      * \brief Sends emails and text pages to application developers and posts a message on the IRC chatter.
+      * \param strApplication Contains the application.
+      * \param strMessage Contains the email message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool alert(const string strApplication, const string strMessage, string &strError);
+      /*! \fn Archive *archive()
+      * \brief Interfaces with the Archive class.
+      * \return Returns a pointer to the Archive class.
+      */
+      Archive *archive();
+      /*! \fn DateTime *date()
+      * \brief Interfaces with the DateTime class.
+      * \return Returns a pointer to the DateTime class.
+      */
+      DateTime *date();
+      /*! \fn File *file()
+      * \brief Interfaces with the File class.
+      * \return Returns a pointer to the File class.
+      */
+      File *file();
+      /*! \fn void free(list<map<string, string> > *result)
+      * \brief Frees query results.
+      * \param result Contains the query results.
+      */
+      void free(list<map<string, string> > *result);
+      /*! \fn void getProcessStatus(struct tm &tTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident)
+      * \brief Retrieves process status of the current process.
+      * \param CTime Contains the start time.
+      * \param fCpu Contains the CPU usage.
+      * \param fMem Contains the memory usage.
+      * \param ulImage Contains the image size.
+      * \param ulResident Contans the resident size.
+      * \return Returns the process status.
+      */
+      void getProcessStatus(time_t &CTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident);
+      /*! \fn ServiceJunction *junction()
+      * \brief Interfaces with the Service Junction class.
+      * \return Returns a pointer to the Service Junction class.
+      */
+      ServiceJunction *junction();
+      /*! \fn bool log(const string strMessage)
+      * \brief Writes a message to the application log.
+      * \param strMessage Contains the message.
+      * \return Returns a boolean true/false value.
+      */
+      bool log(const string strMessage);
+      /*! \fn bool log(const string strMessage, string &strError)
+      * \brief Writes a message to the application log.
+      * \param strMessage Contains the message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool log(const string strMessage, string &strError);
+      /*! \fn bool log(const string strLog, const string strPrefix, const string strMessage, string &strError, const string strFrequency = "", const bool bLock = false, const bool bTimestamp = false)
+      * \brief Writes a message to the application log.
+      * \param strLog Contains the log directory path.
+      * \param strPrefix Contains the log prefix.
+      * \param strMessage Contains the message.
+      * \param strError Contains the error message.
+      * \param strFrequency Contains the archival frequency.
+      * \param bLock Contains the semaphore locking value.
+      * \param bTimestamp Contains the timestamp value.
+      * \return Returns a boolean true/false value.
+      */
+      bool log(const string strLog, const string strPrefix, const string strMessage, string &strError, const string strFrequency = "", const bool bLock = false, const bool bTimestamp = false);
+      /*! \fn StringManip *manip()
+      * \brief Interfaces with the StringManip class.
+      * \return Returns a pointer to the StringManip class.
+      */
+      StringManip *manip();
+      /*! \fn bool notify(const string strMessage)
+      * \brief Sends an email to the admins.
+      * \param strMessage Contains the email message.
+      * \return Returns a boolean true/false value.
+      */
+      bool notify(const string strMessage);
+      /*! \fn bool notify(const string strSubject, const string strMessage)
+      * \brief Sends an email to the admins.
+      * \param strSubject Contains the email subject.
+      * \param strMessage Contains the email message.
+      * \return Returns a boolean true/false value.
+      */
+      bool notify(const string strSubject, const string strMessage);
+      /*! \fn bool notify(const string strSubject, const string strMessage, string &strError)
+      * \brief Sends an email to the admins.
+      * \param strSubject Contains the email subject.
+      * \param strMessage Contains the email message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool notify(const string strSubject, const string strMessage, string &strError);
+      /*! \fn bool putCentralMessage(const string strMessage, string &strError, const bool bAlert = false)
+      * \brief Puts a message into the central messaging system.
+      * \param strMessage Contains the message.
+      * \param strError Contains the error message.
+      * \param bAlert Contains whether this is an alert message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool putCentralMessage(const string strMessage, string &strError, const bool bAlert = false);
+      /*! \fn list<map<string, string> > *query(const string strName, const string strQuery, string &strError)
+      * \brief Runs a query using database list.
+      * \param strName Contains the database name.
+      * \param strQuery Contains the MySQL query.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs. 
+      */
+      list<map<string, string> > *query(const string strName, const string strQuery, string &strError);
+      /*! \fn list<map<string, string> > *query(const string strName, const string strQuery, unsigned long long &ullRows, string &strError)
+      * \brief Runs a query using database list.
+      * \param strName Contains the database name.
+      * \param strQuery Contains the MySQL query.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs. 
+      */
+      list<map<string, string> > *query(const string strName, const string strQuery, unsigned long long &ullRows, string &strError);
+      /*! \fn void addDatabase(const string strName)
+      * \brief Removes database credentials from list of databases.
+      * \param strName Contains the database name.
+      */
+      void removeDatabase(const string strName);
+      /*! \fn bool request(const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
+      * \brief Sends a Central request.
+      * \param strFunction Contains the Function.
+      * \param strJwt Contains the Jwt.
+      * \param strSessionID Contains the SessionID.
+      * \param ptRequest Contains the request.
+      * \param ptResponse Contains the response.
+      */
+      bool request(const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn bool request(const string strUser, const string strPassword, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
+      * \brief Sends a Central request.
+      * \param strUser Contains the User.
+      * \param strPassword Contains the Password.
+      * \param strDatabase Contains the Database.
+      * \param strFunction Contains the Function.
+      * \param strJwt Contains the Jwt.
+      * \param strSessionID Contains the SessionID.
+      * \param ptRequest Contains the request.
+      * \param ptResponse Contains the response.
+      */
+      bool request(const string strUser, const string strPassword, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn void setApplication(const string strApplication)
+      * \brief Set the application.
+      * \param strApplication Contains the application.
+      */
+      void setApplication(const string strApplication);
+      /*! \fn void setAuth(const string strUser, const string strPassword, const string strDatabase)
+      * \brief Sends a Central request.
+      * \param strUser Contains the User.
+      * \param strPassword Contains the Password.
+      * \param strDatabase Contains the Database.
+      */
+      void setAuth(const string strUser, const string strPassword, const string strDatabase);
+      /*! \fn void setEmail(const string strEmail)
+      * \brief Set the email account.
+      * \param strEmail Contains the email account.
+      */
+      void setEmail(const string strEmail);
+      /*! \fn void setLog(const string strLog, const string strPrefix = "", const string strFrequency = "monthly", const bool bLock = false, const bool bTimestamp = false)
+      * \brief Set the log path.
+      * \param strLog Contains the log path.
+      * \param strPrefix Contains the log prefix.
+      * \param strFrequency Contains the archival frequency.
+      * \param bLock Contains the semaphore locking value.
+      * \param bTimestamp Contains the timestamp value.
+      */
+      void setLog(const string strLog, const string strPrefix = "", const string strFrequency = "monthly", const bool bLock = false, const bool bTimestamp = false);
+      /*! \fn void setMysql(bool (*pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &))
+      * \brief Set the MySQL function.
+      * \param pMysql Contains the MySQL function.
+      */
+      void setMysql(bool (*pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &));
+      /*! \fn void setRoom(const string strRoom)
+      * \brief Set the room.
+      * \param strRoom Contains the room.
+      */
+      void setRoom(const string strRoom);
+      /*! \fn bool update(const string strName, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete using database list.
+      * \param strName Contains the database name.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool update(const string strName, const string strUpdate, string &strError);
+      /*! \fn bool update(const string strName, const string strUpdate, string &strID, string &strError)
+      * \brief Runs an insert/update/delete using database list.
+      * \param strName Contains the database name.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strID Contains the returned ID.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool update(const string strName, const string strUpdate, string &strID, string &strError);
+      /*! \fn bool update(const string strName, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+      * \brief Runs an insert/update/delete using database list.
+      * \param strName Contains the database name.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param ullID Contains the returned ID.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value. 
+      */
+      bool update(const string strName, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
+      /*! \fn Utility *utility()
+      * \brief Interfaces with the Utility class.
+      * \return Returns a pointer to the Utility class.
+      */
+      Utility *utility();
+    };
+    // }}}
+  }
+}
+#endif

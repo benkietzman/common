@@ -1,0 +1,164 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// File
+// -------------------------------------
+// file       : File
+// author     : Ben Kietzman
+// begin      : 2010-03-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file File
+* \brief File Class
+*/
+
+#ifndef _COMMON_FILE_
+#define _COMMON_FILE_
+// {{{ includes
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <cstdlib>
+#include <cstdio>
+#include <fstream>
+#include <cstring>
+#include <stddef.h>
+#include <string>
+#include <list>
+using namespace std;
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ File
+    //! Supplies simplified file/directory functions.
+    /*!
+    * The objective of the class is to provide simplified logic that normally would require complex C logic or system calls.
+    */
+    class File
+    {
+      private:
+
+      public:
+      File();
+      ~File();
+
+      //! Determines if a file exists.
+      /*!
+      * \param strPath - The path to the file.
+      */
+      bool fileExist(const string strPath);
+      //! Determines if a file is empty.
+      /*!
+      * \param strPath - The path to the file.
+      */
+      bool fileEmpty(const string strPath);
+      //! Determines the size in bytes of a file.
+      /*!
+      * \param strPath - The path to the file.
+      */
+      long fileSize(const string strPath);
+      //! Determines when the file was last accessed.
+      /*!
+      * \param strPath - The path to the file.
+      * \param nYear - Returns the year.
+      * \param nMonth - Returns the month.
+      * \param nDay - Returns the day.
+      * \param nHour - Returns the military hour.
+      * \param nMinute - Returns the minute.
+      * \param nSecond - Returns the second.
+      */
+      bool fileAccessDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      //! Determines when the file was last changed.
+      /*!
+      * \param strPath - The path to the file.
+      * \param nYear - Returns the year.
+      * \param nMonth - Returns the month.
+      * \param nDay - Returns the day.
+      * \param nHour - Returns the military hour.
+      * \param nMinute - Returns the minute.
+      * \param nSecond - Returns the second.
+      */
+      bool fileChangeDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      //! Determines when the file was last modified.
+      /*!
+      * \param strPath - The path to the file.
+      * \param nYear - Returns the year.
+      * \param nMonth - Returns the month.
+      * \param nDay - Returns the day.
+      * \param nHour - Returns the military hour.
+      * \param nMinute - Returns the minute.
+      * \param nSecond - Returns the second.
+      */
+      bool fileModifyDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      //! Copies a file.
+      /*!
+      * \param strOldPath - The old path to the file.
+      * \param strNewPath - The new path to the file.
+      */
+      bool copy(const string strOldPath, const string strNewPath);
+      //! Renames a file/directory.
+      /*!
+      * \param strOldPath - The old path to the file/directory.
+      * \param strNewPath - The new path to the file/directory.
+      */
+      bool rename(const string strOldPath, const string strNewPath);
+      //! Removes a file/directory.
+      /*!
+      * \param strPath - The path to the file/directory.
+      */
+      bool remove(const string strPath);
+      //! Determines if a directory exists.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool directoryExist(const string strPath);
+      //! Performs a directory listing and stores the results in a list.
+      /*!
+      * \param strPath - The path to the directory.
+      * \param dirList - The resultant directory list.
+      */
+      list<string> directoryList(const string strPath, list<string> &dirList);
+      //! Creates a directory.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool makeDirectory(const string strPath);
+      //! Creates a directory and any parent directories that might be missing.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool establishDirectory(const string strPath);
+      //! Recursively removes a directory.
+      /*!
+      * \param strPath - The path to the directory.
+      */
+      bool removeDirectory(const string strPath);
+      //! Finds a line of text in a file.
+      /*!
+      * This can be used to find a line using a search string, but has no pattern matching.
+      * \param inFile - The input file stream.
+      * \param bResetFilePointer - Resets the file pointer back to the beginning of the line before searching.
+      * \param bEatLine - Moves to the next line after finding the search string.
+      * \param strString - The search string.
+      */
+      bool findLine(ifstream &inFile, const bool bResetFilePointer, const bool bEatLine, const string strString);
+    };
+    // }}}
+  }
+}
+#endif

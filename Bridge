@@ -1,0 +1,239 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Bridge
+// -------------------------------------
+// file       : Bridge
+// author     : Ben Kietzman
+// begin      : 2020-01-13
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Bridge
+* \brief Bridge Class
+*/
+#ifndef _COMMON_BRIDGE_
+#define _COMMON_BRIDGE_
+// {{{ includes
+#include <ctime>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <mutex>
+#include <netdb.h>
+#include <poll.h>
+#include <pthread.h>
+#ifdef COMMON_LINUX
+#include <semaphore.h>
+#endif
+#include <string>
+#ifdef COMMON_SOLARIS
+#include <synch.h>
+#endif
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <thread>
+#include <vector>
+using namespace std;
+#include "File"
+#include "Json"
+#include "StringManip"
+#include "Utility"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ Bridge
+    //! Interfaces with Bridge.
+    /*!
+    * Provides an interfaces to Bridge.
+    */
+    class Bridge
+    {
+      protected:
+      bool m_bAuthenticated;
+      bool m_bFailed;
+      int m_fdSocket;
+      list<string> m_buffer[2];
+      size_t m_unThrottle;
+      size_t m_unUniqueID;
+      std::mutex m_mutexResource;
+      std::mutex m_mutexGetAddrInfo;
+      string m_strBuffer[2];
+      string m_strLine;
+      string m_strPassword;
+      string m_strTimeout;
+      string m_strUser;
+      string m_strUserID;
+      time_t m_CTime[2];
+      File m_file;
+      StringManip m_manip;
+      Utility *m_pUtility;
+
+      /*! \fn bool connect(string &strError)
+      * \brief Connects and registers the application to the Bridge.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool connect(string &strError);
+      /*! \fn bool disconnect(string &strError)
+      * \brief Disconnects the application from the Bridge.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool disconnect(string &strError);
+      /*! \fn bool getMessages(string &strError)
+      * \brief Receives incoming messages.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool getMessages(string &strError);
+
+      public:
+      Bridge(string &strError);
+      ~Bridge();
+
+      /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError)
+      * \brief Sends a query request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs..
+      */
+      /*! \fn void dbFree(list<map<string, string> > *result) 
+      * \brief Frees query results.
+      * \param result Contains the query results.
+      */
+      void dbFree(list<map<string, string> > *result);
+      list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError);
+      /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
+      * \brief Sends a query request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs..
+      */
+      list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
+      /*! \fn bool dbUpdate(const string strDatabase, const string strUpdate, string &strError)
+      * \brief Sends an update request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool dbUpdate(const string strDatabase, const string strUpdate, string &strError);
+      /*! \fn bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+      * \brief Sends an update request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param ullID Contains the returned ID.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
+      /*! \fn bool application(const string strApplication, Json *ptMessage, string &strError)
+      * \brief Submits an application Bridge request.
+      * \param strApplication Contains the application.
+      * \param ptMessage Contains the message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool application(const string strApplication, Json *ptMessage, string &strError);
+      /*! \fn bool getMessage(Json *ptMessage, string &strError)
+      * \brief Receives a incoming message.
+      * \param ptMessage Contains the message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool getMessage(Json *ptMessage, string &strError);
+      /*! \fn bool getMessages(list<Json *> &messages, string &strError)
+      * \brief Receives incoming messages.
+      * \param messages Contains the messages.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool getMessages(list<Json *> &messages, string &strError);
+      /*! \fn bool passwordVerify(const string strApplication, const string strType, const string strUser, const string strPassword, string &strError)
+      * \brief Verifies SLA credentials.
+      * \param strApplication Contains the application.
+      * \param strType Contains the type.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool passwordVerify(const string strApplication, const string strType, const string strUser, const string strPassword, string &strError);
+      /*! \fn bool putMessage(Json *ptMessage, string &strError)
+      * \brief Sends an outgoing message.
+      * \param ptMessage Contains the message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool putMessage(Json *ptMessage, string &strError);
+      /*! \fn bool putMessages(list<Json *> &messages, string &strError)
+      * \brief Sends an outgoing messages.
+      * \param messages Contains the messages.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool putMessages(list<Json *> &messages, string &strError);
+      /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
+      * \brief Submits a Bridge request.
+      * \param ptRequest Contains the request.
+      * \param ptResponse Contains the response.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
+      * \brief Submits an Bridge request.
+      * \param ptRequest Contains the request.
+      * \param ptResponse Contains the response.
+      * \param CTimeout Contains the timeout.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError);
+      /*! \fn void setCredentials(const string strUser, const string strPassword, const string strUserID = "")
+      * \brief Set the credentials.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strUserID Contains the user ID.
+      */
+      void setCredentials(const string strUser, const string strPassword, const string strUserID = "");
+      /*! \fn void setThrottle(const size_t unThrottle)
+      * \brief Set the throttle.
+      * \param unThrottle Contains the throttle.
+      */
+      void setThrottle(const size_t unThrottle);
+      /*! \fn void setTimeout(const string strTimeout)
+      * \brief Set the timeout.
+      * \param strTimeout Contains the timeout.
+      */
+      void setTimeout(const string strTimeout);
+      /*! \fn Utility *utility()
+      * \brief Interfaces with the Utility class.
+      * \return Returns a pointer to the Utility class.
+      */
+      Utility *utility();
+    };
+    // }}}
+  }
+}
+#endif

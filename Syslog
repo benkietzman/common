@@ -1,0 +1,206 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Syslog
+// -------------------------------------
+// file       : Bridge
+// author     : Ben Kietzman
+// begin      : 2020-06-01
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Syslog
+* \brief Syslog Class
+*/
+#ifndef _COMMON_SYSLOG_
+#define _COMMON_SYSLOG_
+// {{{ includes
+#include <arpa/inet.h>
+#include <cmath>
+#include <ctime>
+#include <pwd.h>
+#include <sstream>
+#include <string>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <syslog.h>
+#include <unistd.h>
+using namespace std;
+#include "Json"
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ Syslog
+    //! Interfaces with syslog.
+    /*!
+    * Provides an interfaces to syslog.
+    */
+    class Syslog
+    {
+      protected:
+      int m_nFacility;
+      int m_nOption;
+      string m_strApplication;
+      string m_strProgram;
+      string m_strUser;
+
+      public:
+      /*! \fn Syslog(const string strApplication = "", const string strProgram = "", const int nOption = LOG_PID, const int nFacility = LOG_USER)
+      * \brief Constructor.
+      * \param strApplication Contains the application.
+      * \param strProgram Contains the program.
+      * \param nOption Contains the syslog option.
+      * \param nFacility Contains the syslog facility.
+      */
+      Syslog(const string strApplication = "", const string strProgram = "", const int nOption = LOG_PID, const int nFacility = LOG_USER);
+      ~Syslog();
+
+      /*! \fn void commandEnded(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message a system command is executed.
+      * \param strCommandName Contains the command name.
+      * \param nPriority Contains the syslog priority.
+      */
+      void commandEnded(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO);
+      /*! \fn void commandLaunched(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when a system command is executed.
+      * \param strCommandName Contains the command name.
+      * \param strEventDetail Contains the event detail.
+      * \param nPriority Contains the syslog priority.
+      */
+      void commandLaunched(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO);
+      /*! \fn void connectionStarted(const string strEventDetails = "", const int fdSocket = -1, const bool bResult = true, const int nPriority = LOG_INFO)
+      * \brief Sends a message when an INET socket connection is accepted.
+      * \param strEventDetail Contains the event detail.
+      * \param fdSocket Contains the socket.
+      * \param bResult Contains a boolean true/false.
+      * \param nPriority Contains the syslog priority.
+      */
+      void connectionStarted(const string strEventDetails = "", const int fdSocket = -1, const bool bResult = true, const int nPriority = LOG_INFO);
+      /*! \fn void connectionStopped(const string strEventDetails = "", const int fdSocket = -1, const int nPriority = LOG_INFO)
+      * \brief Sends a message when an INET socket connection is closed.
+      * \param strEventDetail Contains the event detail.
+      * \param fdSocket Contains the socket.
+      * \param nPriority Contains the syslog priority.
+      */
+      void connectionStopped(const string strEventDetails = "", const int fdSocket = -1, const int nPriority = LOG_INFO);
+      /*! \fn void groupCreated(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is created.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void groupCreated(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void groupDeleted(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is deleted.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void groupDeleted(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void groupModified(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is modified.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void groupModified(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void log(const string strMessage, const int nPriority = LOG_INFO)
+      * \brief Sends a message to syslog.
+      * \param strMessage Contains the message.
+      * \param nPriority Contains the syslog priority.
+      */
+      void log(const string strMessage, const int nPriority = LOG_INFO);
+      /*! \fn void log(Json *ptMessage, const string strEventDetails = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message.
+      * \param ptMessage Contains the message.
+      * \param strEventDetail Contains the event detail.
+      * \param nPriority Contains the syslog priority.
+      */
+      void log(Json *ptMessage, const string strEventDetails = "", const int nPriority = LOG_INFO);
+      /*! \fn void logoff(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is logged off.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void logoff(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void logon(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is authenticated or authorized.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void logon(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void privilegeLevelChanged(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when a privilege level is changed.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void privilegeLevelChanged(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void userAccountCreated(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is created.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void userAccountCreated(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void userAccountDeleted(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is deleted.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void userAccountDeleted(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+      /*! \fn void userAccountModified(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
+      * \brief Sends a message when an account is modified.
+      * \param strEventDetail Contains the event detail.
+      * \param strLoginID Contains the login ID.
+      * \param bResult Contains a bool true/false value.
+      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
+      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
+      * \param nPriority Contains the syslog priority.
+      */
+      void userAccountModified(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
+    };
+    // }}}
+  }
+}
+#endif

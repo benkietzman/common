@@ -1,0 +1,210 @@
+// vim: syntax=cpp
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// DateTime
+// -------------------------------------
+// file       : DateTime
+// author     : Ben Kietzman
+// begin      : 2010-03-03
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file DateTime
+* \brief DateTime Class
+*/
+#ifndef _COMMON_DATETIME_
+#define _COMMON_DATETIME_
+// {{{ includes
+#include <ctime>
+#include <cstring>
+#include <string>
+using namespace std;
+// }}}
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ DateTime
+    //! Performs date/time retrieval and manipulation.
+    class DateTime
+    {
+      public:
+      DateTime();
+      ~DateTime();
+
+      //! Gets the current year.
+      inline int getYear(int &nValue){struct tm tTime; time_t CTime; time(&CTime); localtime_r(&CTime, &tTime); return nValue = (tTime.tm_year + 1900);};
+      //! Gets the current month.
+      inline int getMonth(int &nValue){struct tm tTime; time_t CTime; time(&CTime); localtime_r(&CTime, &tTime); return nValue = (tTime.tm_mon + 1);};
+      //! Gets the current day.
+      inline int getDay(int &nValue){struct tm tTime; time_t CTime; time(&CTime); localtime_r(&CTime, &tTime); return nValue = tTime.tm_mday;};
+      //! Gets the current hour.
+      inline int getHour(int &nValue){struct tm tTime; time_t CTime; time(&CTime); localtime_r(&CTime, &tTime); return nValue = tTime.tm_hour;};
+      //! Gets the current minute.
+      inline int getMinute(int &nValue){struct tm tTime; time_t CTime; time(&CTime); localtime_r(&CTime, &tTime); return nValue = tTime.tm_min;};
+      //! Gets the current second.
+      inline int getSecond(int &nValue){struct tm tTime; time_t CTime; time(&CTime); localtime_r(&CTime, &tTime); return nValue = tTime.tm_sec;};
+      //! Converts civilian time to military.
+      /*!
+      * \param nHour - The given civilian hour.  Returns the corresponding military hour.
+      * \param strTimeOfDay - The time-of-day as "AM" or "PM".
+      */
+      void civilianToMilitary(int &nHour, const string strTimeOfDay);
+      //! Converts military time to civilian.
+      /*!
+      * \param nHour - The given military hour.  Returns the corresponding civilian hour.
+      * \param strTimeOfDay - Returns the time-of-day as "AM" or "PM".
+      */
+      void militaryToCivilian(int &nHour, string &strTimeOfDay);
+      //! Determines if it is leap year.
+      /*!
+      * \param nYear - The given year.
+      */
+      bool isLeapYear(const int nYear);
+      //! Performs year addition.
+      /*!
+      * \param nYear - The given year.
+      * \param nNumber - The number to be added.
+      */
+      void addYears(int &nYear, const int nNumber);
+      //! Performs month addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nNumber - The number to be added.
+      */
+      void addMonths(int &nYear, int &nMonth, const int nNumber);
+      //! Performs day addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nNumber - The number to be added.
+      */
+      void addDays(int &nYear, int &nMonth, int &nDay, const int nNumber);
+      //! Performs civilian hour addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nHour - The given civilian hour.
+      * \param strTimeOfDay - The given time-of-day as "AM" or "PM".
+      * \param nNumber - The number to be added.
+      */
+      void addHoursCivilian(int &nYear, int &nMonth, int &nDay, int &nHour, string &strTimeOfDay, const int nNumber);
+      //! Performs military hour addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nHour - The given military hour.
+      * \param nNumber - The number to be added.
+      */
+      void addHoursMilitary(int &nYear, int &nMonth, int &nDay, int &nHour, const int nNumber);
+      //! Performs civilian minute addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nHour - The given civilian hour.
+      * \param nMinute - The given minute.
+      * \param strTimeOfDay - The given time-of-day as "AM" or "PM".
+      * \param nNumber - The number to be added.
+      */
+      void addMinutesCivilian(int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, string &strTimeOfDay, const int nNumber);
+      //! Performs military minute addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nHour - The given military hour.
+      * \param nMinute - The given minute.
+      * \param nNumber - The number to be added.
+      */
+      void addMinutesMilitary(int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, const int nNumber);
+      //! Performs civilian second addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nHour - The given civilian hour.
+      * \param nMinute - The given minute.
+      * \param nSecond - The given Second.
+      * \param strTimeOfDay - The given time-of-day as "AM" or "PM".
+      * \param nNumber - The number to be added.
+      */
+      void addSecondsCivilian(int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond, string &strTimeOfDay, const int nNumber);
+      //! Performs military second addition.
+      /*!
+      * Accounts for rollover in date figures of higher precedence.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDay - The given day.
+      * \param nHour - The given military hour.
+      * \param nMinute - The given minute.
+      * \param nSecond - The given second.
+      * \param nNumber - The number to be added.
+      */
+      void addSecondsMilitary(int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond, const int nNumber);
+      //! Get the number of days in the current year.
+      /*!
+      * Accounts for leap year.
+      * \param nDaysInYear - The result.
+      * \return The result.
+      */
+      int daysInYear(int &nDaysInYear);
+      //! Get the number of days in the given year.
+      /*!
+      * Accounts for leap year.
+      * \param nYear - The given year.
+      * \param nDaysInYear - The result.
+      * \return The result.
+      */
+      int daysInYear(const int nYear, int &nDaysInYear);
+      //! Get the number of days in the current month.
+      /*!
+      * Accounts for leap year.
+      * \param nDaysInMonth - The result.
+      * \return The result.
+      */
+      int daysInMonth(int &nDaysInMonth);
+      //! Get the number of days in the given month of the current year.
+      /*!
+      * Accounts for leap year.
+      * \param nMonth - The given month.
+      * \param nDaysInMonth - The result.
+      * \return The result.
+      */
+      int daysInMonth(const int nMonth, int &nDaysInMonth);
+      //! Get the number of days in the given month of the given year.
+      /*!
+      * Accounts for leap year.
+      * \param nYear - The given year.
+      * \param nMonth - The given month.
+      * \param nDaysInMonth - The result.
+      * \return The result.
+      */
+      int daysInMonth(const int nYear, const int nMonth, int &nDaysInMonth);
+    };
+    // }}}
+  }
+}
+#endif

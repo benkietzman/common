@@ -235,15 +235,15 @@ printf ";\n" >> Makefile;
 printf "\n" >> Makefile;
 printf "%%.o: %%.cpp\n" >> Makefile;
 printf "\t${CPP} -g" >> Makefile;
-if [ $bRunningSolaris ]; then
+if [ $bRunningSolaris -eq 1 ]; then
   printf " -std=c++14" >> Makefile;
 fi
 printf " -Wall -c \$< -o \$@ -D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT" >> Makefile;
-if [ $bRunningMacOS ]; then
+if [ $bRunningMacOS -eq 1 ]; then
   printf " -I/usr/local/include -DCOMMON_MACOS" >> Makefile;
-elif [ $bRunningLinux ]; then
+elif [ $bRunningLinux -eq 1 ]; then
   printf " -I/opt/app/workload/include -I/opt/app/workload/local/include -DCOMMON_LINUX" >> Makefile;
-elif [ $bRunningSolaris ]; then
+elif [ $bRunningSolaris -eq 1 ]; then
   printf " -I/opt/csw/include -I/usr/local/appl/include -I/usr/local/include -DCOMMON_SOLARIS" >> Makefile;
 fi
 if [ $bFoundB64 -eq 1 ]; then

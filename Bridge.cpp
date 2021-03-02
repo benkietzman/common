@@ -566,7 +566,7 @@ extern "C++"
       bool bResult = false;
       list<Json *> messages;
 
-      messages.push_back(ptMessage);
+      messages.push_back(new Json(ptMessage));
       bResult = putMessages(messages, strError);
       while (!messages.empty())
       {

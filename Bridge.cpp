@@ -372,26 +372,6 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ getMessage()
-    bool Bridge::getMessage(Json *ptMessage, string &strError)
-    {
-      bool bResult = false;
-
-      if (getMessages(strError))
-      {
-        bResult = true;
-        m_mutexResource.lock();
-        if (!m_buffer[0].empty())
-        {
-          ptMessage->parse(m_buffer[0].front());
-          m_buffer[0].pop_front();
-        }
-        m_mutexResource.unlock();
-      }
-
-      return bResult;
-    }
-    // }}}
     // {{{ getMessages()
     bool Bridge::getMessages(list<Json *> &messages, string &strError)
     {
@@ -556,23 +536,6 @@ extern "C++"
         }
       }
       m_mutexResource.unlock();
-
-      return bResult;
-    }
-    // }}}
-    // {{{ putMessage()
-    bool Bridge::putMessage(Json *ptMessage, string &strError)
-    {
-      bool bResult = false;
-      list<Json *> messages;
-
-      messages.push_back(new Json(ptMessage));
-      bResult = putMessages(messages, strError);
-      while (!messages.empty())
-      {
-        delete messages.front();
-        messages.pop_front();
-      }
 
       return bResult;
     }

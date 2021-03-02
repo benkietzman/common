@@ -155,13 +155,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool application(const string strApplication, Json *ptMessage, string &strError);
-      /*! \fn bool getMessage(Json *ptMessage, string &strError)
-      * \brief Receives a incoming message.
-      * \param ptMessage Contains the message.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
-      bool getMessage(Json *ptMessage, string &strError);
       /*! \fn bool getMessages(list<Json *> &messages, string &strError)
       * \brief Receives incoming messages.
       * \param messages Contains the messages.
@@ -179,13 +172,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool passwordVerify(const string strApplication, const string strType, const string strUser, const string strPassword, string &strError);
-      /*! \fn bool putMessage(Json *ptMessage, string &strError)
-      * \brief Sends an outgoing message.
-      * \param ptMessage Contains the message.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
-      bool putMessage(Json *ptMessage, string &strError);
       /*! \fn bool putMessages(list<Json *> &messages, string &strError)
       * \brief Sends an outgoing messages.
       * \param messages Contains the messages.

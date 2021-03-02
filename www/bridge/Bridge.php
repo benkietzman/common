@@ -309,23 +309,6 @@ class Bridge
     return $this->m_strError;
   }
   // }}}
-  // {{{ getMessage()
-  public function getMessage(&$message)
-  {
-    $bResult = false;
-
-    if ($this->getMessagesInternal())
-    {
-      $bResult = true;
-      if (sizeof($this->m_buffer[0]) > 0)
-      {
-        $message = json_decode(array_shift($this->m_buffer[0]));
-      }
-    }
-
-    return $bResult;
-  }
-  // }}}
   // {{{ getMessages()
   public function getMessages(&$messages)
   {
@@ -488,19 +471,6 @@ class Bridge
         }
       }
     }
-
-    return $bResult;
-  }
-  // }}}
-  // {{{ putMessage()
-  public function putMessage(&$message)
-  {
-    $bResult = false;
-    $messages = [];
-
-    $messages[] = $message;
-    $bResult = $this->putMessages($messages);
-    unset($messages);
 
     return $bResult;
   }

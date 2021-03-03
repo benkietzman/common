@@ -117,6 +117,7 @@ else
   cd ../
   if [ 'git clone https://github.com/ruimaciel/mjson.git' ]; then
     cd mjson
+    autoconf
     ./configure
     make
     make install

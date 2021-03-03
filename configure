@@ -77,13 +77,13 @@ if [ $bFoundB64 -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
   if [ 'brew install libb64' ]; then
-    $bFoundB64=1
+    bFoundB64=1
   else
     printf "not found - brew install libb64";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install libb64-dev' ]; then
-    $bFoundB64=1
+    bFoundB64=1
   else
     printf "not found - sudo apt install libb64-dev";
   fi
@@ -96,13 +96,13 @@ if [ $bFoundExpat -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
   if [ 'brew install expat' ]; then
-    $bFoundExpat=1
+    bFoundExpat=1
   else
     printf "not found - brew install expat";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install libexpat1-dev']; then
-    $bFoundExpat=1
+    bFoundExpat=1
   else
     printf "not found - sudo apt install libexpat1-dev";
   fi
@@ -120,6 +120,7 @@ else
     ./configure
     make
     make install
+    bFoundMJson=1
     cd ../common
   else
     printf "not found - skipping (https://github.com/ruimaciel/mjson)";
@@ -132,13 +133,13 @@ if [ $bFoundOpenSsl -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
   if [ 'brew install openssl@1.1' ]; then
-    $bFoundOpenSsl=1
+    bFoundOpenSsl=1
   else
     printf "not found - brew install openssl@1.1";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install libssl-dev' ]; then
-    $bFoundOpenSsl=1
+    bFoundOpenSsl=1
   else
     printf "not found - sudo apt install libssl-dev";
   fi
@@ -151,7 +152,7 @@ if [ $bFoundSamba -eq 1 ]; then
   printf "found";
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install libsmbclient-dev' ]; then
-    $bFoundSamba=1
+    bFoundSamba=1
   else
     printf "not found - sudo apt install libsmbclient-dev";
   fi
@@ -164,13 +165,13 @@ if [ $bFoundTar -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
   if [ 'brew install libtar' ]; then
-    $bFoundTar=1
+    bFoundTar=1
   else
     printf "not found - brew install libtar";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install libtar-dev' ]; then
-    $bFoundTar=1
+    bFoundTar=1
   else
     printf "not found - sudo apt install libtar-dev";
   fi
@@ -183,13 +184,13 @@ if [ $bFoundXmlRpc -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
   if [ 'brew install xmlrpc-c' ]; then
-    $bFoundXmlRpc=1
+    bFoundXmlRpc=1
   else
     printf "not found - brew install xmlrpc-c";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install libxmlrpc-core-c3-dev' ]; then
-    $bFoundXmlRpc=1
+    bFoundXmlRpc=1
   else
     printf "not found - sudo apt install libxmlrpc-core-c3-dev";
   fi
@@ -202,13 +203,13 @@ if [ $bFoundZLib -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
   if [ 'brew install zlib' ]; then
-    $bFoundZLib=1
+    bFoundZLib=1
   else
     printf "not found - brew install zlib";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
   if [ 'sudo apt install zlib1g-dev' ]; then
-    $bFoundZLib=1
+    bFoundZLib=1
   else
     printf "not found - sudo apt install zlib1g-dev";
   fi

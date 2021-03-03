@@ -76,17 +76,9 @@ printf "Configuring B64...";
 if [ $bFoundB64 -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
-  if [ 'brew install libb64' ]; then
-    bFoundB64=1
-  else
-    printf "not found - brew install libb64";
-  fi
+  printf "not found - brew install libb64";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install libb64-dev' ]; then
-    bFoundB64=1
-  else
-    printf "not found - sudo apt install libb64-dev";
-  fi
+  printf "not found - sudo apt install libb64-dev";
 else
   printf "not found - skipping (http://libb64.sourceforge.net)";
 fi
@@ -95,17 +87,9 @@ printf "Configuring Expat...";
 if [ $bFoundExpat -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
-  if [ 'brew install expat' ]; then
-    bFoundExpat=1
-  else
-    printf "not found - brew install expat";
-  fi
+  printf "not found - brew install expat";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install libexpat1-dev']; then
-    bFoundExpat=1
-  else
-    printf "not found - sudo apt install libexpat1-dev";
-  fi
+  printf "not found - sudo apt install libexpat1-dev";
 else
   printf "not found - skipping (http://expat.sourceforge.net)";
 fi
@@ -114,33 +98,16 @@ printf "Configuring MJSON...";
 if [ $bFoundMJson -eq 1 ]; then
   printf "found";
 else
-  cd ../
-  sudo apt install -y check
-  git clone https://github.com/ruimaciel/mjson.git
-  cd mjson
-  autoreconf --install
-  ./configure
-  make
-  make install
-  bFoundMJson=1
-  cd ../common
+  printf "not found - skipping (http://sourceforge.net/projects/mjson)";
 fi
 printf "\n";
 printf "Configuring OpenSSL...";
 if [ $bFoundOpenSsl -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
-  if [ 'brew install openssl@1.1' ]; then
-    bFoundOpenSsl=1
-  else
-    printf "not found - brew install openssl@1.1";
-  fi
+  printf "not found - brew install openssl@1.1";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install -y libssl-dev' ]; then
-    bFoundOpenSsl=1
-  else
-    printf "not found - sudo apt install libssl-dev";
-  fi
+  printf "not found - sudo apt install libssl-dev";
 else
   printf "not found - skipping (http://www.openssl.org)";
 fi
@@ -149,11 +116,7 @@ printf "Configuring Samba Client...";
 if [ $bFoundSamba -eq 1 ]; then
   printf "found";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install -y libsmbclient-dev' ]; then
-    bFoundSamba=1
-  else
-    printf "not found - sudo apt install libsmbclient-dev";
-  fi
+  printf "not found - sudo apt install libsmbclient-dev";
 else
   printf "not found - skipping (http://www.samba.org/samba/download)";
 fi
@@ -162,17 +125,9 @@ printf "Configuring Tar...";
 if [ $bFoundTar -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
-  if [ 'brew install libtar' ]; then
-    bFoundTar=1
-  else
-    printf "not found - brew install libtar";
-  fi
+  printf "not found - brew install libtar";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install -y libtar-dev' ]; then
-    bFoundTar=1
-  else
-    printf "not found - sudo apt install libtar-dev";
-  fi
+  printf "not found - sudo apt install libtar-dev";
 else
   printf "not found - skipping (http://www.feep.net/libtar/#Download)";
 fi
@@ -181,17 +136,9 @@ printf "Configuring XMLRPC...";
 if [ $bFoundXmlRpc -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
-  if [ 'brew install xmlrpc-c' ]; then
-    bFoundXmlRpc=1
-  else
-    printf "not found - brew install xmlrpc-c";
-  fi
+  printf "not found - brew install xmlrpc-c";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install -y libxmlrpc-core-c3-dev' ]; then
-    bFoundXmlRpc=1
-  else
-    printf "not found - sudo apt install libxmlrpc-core-c3-dev";
-  fi
+  printf "not found - sudo apt install libxmlrpc-core-c3-dev";
 else
   printf "not found - skipping (http://xmlrpc-c.sourceforge.net)";
 fi
@@ -200,17 +147,9 @@ printf "Configuring ZLib...";
 if [ $bFoundZLib -eq 1 ]; then
   printf "found";
 elif [ $bRunningMacOS -eq 1 ]; then
-  if [ 'brew install zlib' ]; then
-    bFoundZLib=1
-  else
-    printf "not found - brew install zlib";
-  fi
+  printf "not found - brew install zlib";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install -y zlib1g-dev' ]; then
-    bFoundZLib=1
-  else
-    printf "not found - sudo apt install zlib1g-dev";
-  fi
+  printf "not found - sudo apt install zlib1g-dev";
 else
   printf "not found - skipping (http://www.zlib.net)";
 fi

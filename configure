@@ -115,6 +115,7 @@ if [ $bFoundMJson -eq 1 ]; then
   printf "found";
 else
   cd ../
+  sudo apt install -y check
   git clone https://github.com/ruimaciel/mjson.git
   cd mjson
   autoreconf --install
@@ -135,7 +136,7 @@ elif [ $bRunningMacOS -eq 1 ]; then
     printf "not found - brew install openssl@1.1";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install libssl-dev' ]; then
+  if [ 'sudo apt install -y libssl-dev' ]; then
     bFoundOpenSsl=1
   else
     printf "not found - sudo apt install libssl-dev";
@@ -148,7 +149,7 @@ printf "Configuring Samba Client...";
 if [ $bFoundSamba -eq 1 ]; then
   printf "found";
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install libsmbclient-dev' ]; then
+  if [ 'sudo apt install -y libsmbclient-dev' ]; then
     bFoundSamba=1
   else
     printf "not found - sudo apt install libsmbclient-dev";
@@ -167,7 +168,7 @@ elif [ $bRunningMacOS -eq 1 ]; then
     printf "not found - brew install libtar";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install libtar-dev' ]; then
+  if [ 'sudo apt install -y libtar-dev' ]; then
     bFoundTar=1
   else
     printf "not found - sudo apt install libtar-dev";
@@ -186,7 +187,7 @@ elif [ $bRunningMacOS -eq 1 ]; then
     printf "not found - brew install xmlrpc-c";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install libxmlrpc-core-c3-dev' ]; then
+  if [ 'sudo apt install -y libxmlrpc-core-c3-dev' ]; then
     bFoundXmlRpc=1
   else
     printf "not found - sudo apt install libxmlrpc-core-c3-dev";
@@ -205,7 +206,7 @@ elif [ $bRunningMacOS -eq 1 ]; then
     printf "not found - brew install zlib";
   fi
 elif [ $bRunningUbuntu -eq 1 ]; then
-  if [ 'sudo apt install zlib1g-dev' ]; then
+  if [ 'sudo apt install -y zlib1g-dev' ]; then
     bFoundZLib=1
   else
     printf "not found - sudo apt install zlib1g-dev";

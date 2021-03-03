@@ -115,18 +115,14 @@ if [ $bFoundMJson -eq 1 ]; then
   printf "found";
 else
   cd ../
-  if [ 'git clone https://github.com/ruimaciel/mjson.git' ]; then
-    cd mjson
-    autoconf
-    ./configure
-    make
-    make install
-    bFoundMJson=1
-    cd ../common
-  else
-    printf "not found - skipping (https://github.com/ruimaciel/mjson)";
-  fi
-  cd -
+  git clone https://github.com/ruimaciel/mjson.git
+  cd mjson
+  autoconf
+  ./configure
+  make
+  make install
+  bFoundMJson=1
+  cd ../common
 fi
 printf "\n";
 printf "Configuring OpenSSL...";

@@ -26,7 +26,9 @@
 #ifndef _COMMON_UTILITY_
 #define _COMMON_UTILITY_
 // {{{ includes
+#include <cerrno>
 #include <csignal>
+#include <cstring>
 #include <ctime>
 #include <fcntl.h>
 #include <fstream>
@@ -39,6 +41,7 @@
 #include <procfs.h>
 #endif
 #include <string>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -51,6 +54,7 @@ extern "C++"
 {
   namespace common
   {
+    enum common_socket_type {COMMON_SOCKET_UNKNOWN, COMMON_SOCKET_ENCRYPTED, COMMON_SOCKET_UNENCRYPTED, COMMON_SOCKET_INVALID};
     // {{{ Utility
     //! Contains utility tools.
     /*!
@@ -189,6 +193,25 @@ extern "C++"
       * \param strError Contains the error message.
       */
       void setConfPath(const string strPath, string &strError);
+      /*! \fn bool socketType(int fdSocket, common_socket_type &eType, string &strError)
+      * \brief Take a peek of the current socket to determine if it's a regular or encrypted one.
+      * \param fdSocket Contains the socket descriptor.
+      * \param eType Returns an enum indicating if the socket is encrypted, unencrypted, or invalid.
+      * \param strError Contains the error.
+      * \return Returns a boolean true/false value.
+      *   - SOC_UNENCRYPTED: This is a regular unencrypted socket.
+      *   - SOC_ENCRYPTED:   This is an SSL encrypted socket;
+      *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
+      */
+      bool socketType(int fdSocket, common_socket_type &eType, string &strError);
+      /*! \fn string sslstrerror(SSL *ssl, int nReturn, string &strErrorCode)
+      * \brief Obtain an SSL error message.
+      * \param ssl Contains the SSL handle.
+      * \param nReturn Contains the return.
+      * \param strErrorCode Contains the error code.
+      * \return Returns the error string.
+      */
+      string sslstrerror(SSL *ssl, int nReturn, string &strErrorCode);
     };
     // }}}
   }

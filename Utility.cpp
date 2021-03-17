@@ -98,7 +98,7 @@ extern "C++"
       {
         strLine += (char)nChar;
       }
-      
+
       return (!strLine.empty() || nChar != EOF);
     }
     bool Utility::getLine(gzFile pgzFile, string &strLine)
@@ -391,6 +391,72 @@ extern "C++"
       m_strConf = strPath;
       m_ulModifyTime = 0;
       readConf(strError);
+    }
+    // }}}
+    // {{{ socketType()
+    bool Utility::socketType(int fdSocket, common_socket_type &eType, string &strError)
+    {
+      bool bResult = false;
+      int nReturn;
+      char cChar;
+
+      if ((nReturn = recv(fdSocket, &cChar, 1, MSG_PEEK)) > 0)
+      {
+        bResult = true;
+        // Checking SSL handshake packet type:
+        eType = ((cChar == 0x14 /* Change Cipher Spec */ || cChar == 0x15 /* Alert */ || cChar == 0x16 /* Handshake */ || cChar == 0x17 /* Application Data */)?COMMON_SOCKET_ENCRYPTED:COMMON_SOCKET_UNENCRYPTED);
+      }
+      else
+      {
+        strError = strerror(errno);
+      }
+
+      return bResult;
+    }
+    // }}}
+    // {{{ sslstrerror()
+    string Utility::sslstrerror(SSL *ssl, int nReturn, string &strErrorCode)
+    {
+      stringstream ssError, ssErrorCode;
+      unsigned long ulError;
+
+      switch (SSL_get_error(ssl, nReturn))
+      {
+        case SSL_ERROR_NONE : ssErrorCode << "SSL_ERROR_NONE"; ssError << "The TLS/SSL I/O operation completed."; break;
+        case SSL_ERROR_ZERO_RETURN : ssErrorCode << "SSL_ERROR_ZERO_RETURN"; ssError << "The TLS/SSL connection has been closed."; break;
+        case SSL_ERROR_WANT_READ : ssErrorCode << "SSL_ERROR_WANT_READ"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+        case SSL_ERROR_WANT_WRITE : ssErrorCode << "SSL_ERROR_WANT_WRITE"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+        case SSL_ERROR_WANT_CONNECT : ssErrorCode << "SSL_ERROR_WANT_CONNECT"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+        case SSL_ERROR_WANT_ACCEPT : ssErrorCode << "SSL_ERROR_WANT_ACCEPT"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+        case SSL_ERROR_WANT_X509_LOOKUP : ssErrorCode << "SSL_ERROR_WANT_X509_LOOKUP"; ssError << "The operation did not complete because an application callback set by SSL_CTX_set_client_cert_cb() has asked to be called again."; break;
+        case SSL_ERROR_SYSCALL :
+        {
+          ssErrorCode << "SSL_ERROR_SYSCALL";
+          ssError << "Some I/O error occurred.  ";
+          if (nReturn == 0)
+          {
+            ssError << "Received invalid EOF.";
+          }
+          else
+          {
+            ssError << "read(" << errno << ") " << strerror(errno);
+          }
+          while ((ulError = ERR_get_error()) != 0)
+          {
+            char szError[120];
+            if (ERR_error_string(ulError, szError) != NULL)
+            {
+              ssError << "  " << szError;
+            }
+          }
+          break;
+        }
+        case SSL_ERROR_SSL : strErrorCode = "SSL_ERROR_SSL"; ssError << "A failure in the SSL library occurred, usually a protocol error."; break;
+        default : ssErrorCode << nReturn; ssError << "Caught an unknown error.";
+      }
+      strErrorCode = ssErrorCode.str();
+
+      return ssError.str();
     }
     // }}}
   }

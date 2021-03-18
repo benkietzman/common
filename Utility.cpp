@@ -397,8 +397,8 @@ extern "C++"
     bool Utility::socketType(int fdSocket, common_socket_type &eType, string &strError)
     {
       bool bResult = false;
-      int nReturn;
       char cChar;
+      int nReturn;
 
       if ((nReturn = recv(fdSocket, &cChar, 1, MSG_PEEK)) > 0)
       {

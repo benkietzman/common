@@ -115,7 +115,7 @@ extern "C++"
               SSL_CTX *ctx = NULL;
               if (j == 0)
               {
-                method = (SSL_METHOD *)SSLv23_client_method();
+                method = (SSL_METHOD *)TLS_client_method();
               }
               if (j == 1 || (ctx = SSL_CTX_new(method)) != NULL)
               {
@@ -2148,7 +2148,7 @@ extern "C++"
                 SSL_CTX *ctx = NULL;
                 if (j == 0)
                 {
-                  method = (SSL_METHOD *)SSLv23_client_method();
+                  method = (SSL_METHOD *)TLS_client_method();
                 }
                 if (j == 1 || (ctx = SSL_CTX_new(method)) != NULL)
                 {

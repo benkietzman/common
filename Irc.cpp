@@ -121,7 +121,7 @@ extern "C++"
             {
               if (::connect(m_fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
               {
-                if (!m_bSSL || (m_method = (SSL_METHOD *)SSLv23_client_method()) != NULL)
+                if (!m_bSSL || (m_method = (SSL_METHOD *)TLS_client_method()) != NULL)
                 {
                   if (!m_bSSL || (m_ctx = SSL_CTX_new(m_method)) != NULL)
                   {

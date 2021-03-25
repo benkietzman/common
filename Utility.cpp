@@ -276,6 +276,58 @@ extern "C++"
       return (!strLine.empty() || ssData);
     }
     // }}}
+    // {{{ initSSL()
+    SSL_CTX *Utility::initSSL(const string strCertificate, const string strPrivateKey, string &strError)
+    {
+      long lErrCode;
+      const char* lcpErrMsg;
+      stringstream ssMessage;
+      SSL_CTX *ctx = NULL;
+      SSL_METHOD *sslMethod;
+
+      SSL_load_error_strings();
+      SSL_library_init();
+      OpenSSL_add_all_algorithms();
+      CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
+      sslMethod = (SSL_METHOD *)TLS_server_method();
+      ERR_clear_error();
+      ctx = SSL_CTX_new(sslMethod);
+      if (ctx == NULL)
+      {
+        lErrCode = ERR_get_error();
+        lcpErrMsg = ERR_error_string(lErrCode, NULL);
+        ssMessage << "SSL_CTX_new(" << lErrCode << ") " << lcpErrMsg;
+        strError = ssMessage.str();
+        return NULL;
+      }
+      if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) <= 0)
+      {
+        lErrCode = ERR_get_error();
+        lcpErrMsg = ERR_error_string(lErrCode, NULL);
+        ssMessage << "SSL_CTX_use_certificate_file(" << lErrCode << ") " << lcpErrMsg;
+        strError = ssMessage.str();
+        return NULL;
+      }
+      if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) <= 0)
+      {
+        lErrCode = ERR_get_error();
+        lcpErrMsg = ERR_error_string(lErrCode, NULL);
+        ssMessage << "SSL_CTX_use_PrivateKey_file(" << lErrCode << ") " << lcpErrMsg;
+        strError = ssMessage.str();
+        return NULL;
+      }
+      if (!SSL_CTX_check_private_key(ctx))
+      {
+        lErrCode = ERR_get_error();
+        lcpErrMsg = ERR_error_string(lErrCode, NULL);
+        ssMessage << "SSL_CTX_check_private_key(" << lErrCode << ") " << lcpErrMsg;
+        strError = ssMessage.str();
+        return NULL;
+      }
+
+      return ctx;
+    }
+    // }}}
     // {{{ isProcessAlreadyRunning()
     bool Utility::isProcessAlreadyRunning(const string strProcess)
     {

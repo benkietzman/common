@@ -34,6 +34,7 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <poll.h>
@@ -171,6 +172,13 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool getLine(stringstream &ssData, string &strLine);
+      /*! \fn SSL_CTX *initSSL(const string strCertificate, const string strPrivateKey, string &strError)
+      * \brief SSL initialization.
+      * \param strCertificate Contains the certificate.
+      * \param strPrivateKey Contains the private key
+      * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
+      */
+      SSL_CTX *initSSL(const string strCertificate, const string strPrivateKey, string &strError);
       /*! \fn bool isProcessAlreadyRunning(const string strProcess)
       * \brief Determines if another process of the same name is already running.
       * \param strProcess Contains process name.

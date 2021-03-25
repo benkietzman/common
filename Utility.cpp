@@ -356,36 +356,36 @@ extern "C++"
     // {{{ loadSSLCertKey()
     bool Utility::loadSSLCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
     {
-      long lErrCode;
-      const char* lcpErrMsg;
-      stringstream ssMessage;
+      bool bResult = true;
+      string strFunction;
 
       if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) <= 0)
       {
-        lErrCode = ERR_get_error();
-        lcpErrMsg = ERR_error_string(lErrCode, NULL);
-        ssMessage << "SSL_CTX_use_certificate_file(" << lErrCode << ") " << lcpErrMsg;
-        strError = ssMessage.str();
-        return false;
+        bResult = false;
+        strFunction = "SSL_CTX_use_certificate_file";
       }
       if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) <= 0)
       {
-        lErrCode = ERR_get_error();
-        lcpErrMsg = ERR_error_string(lErrCode, NULL);
-        ssMessage << "SSL_CTX_use_PrivateKey_file(" << lErrCode << ") " << lcpErrMsg;
-        strError = ssMessage.str();
-        return false;
+        bResult = false;
+        strFunction = "SSL_CTX_use_PrivateKey_file";
       }
       if (!SSL_CTX_check_private_key(ctx))
       {
+        bResult = false;
+        strFunction = "SSL_CTX_check_private_key";
+      }
+      if (!bResult)
+      {
+        long lErrCode;
+        const char* lcpErrMsg;
+        stringstream ssMessage;
         lErrCode = ERR_get_error();
         lcpErrMsg = ERR_error_string(lErrCode, NULL);
-        ssMessage << "SSL_CTX_check_private_key(" << lErrCode << ") " << lcpErrMsg;
+        ssMessage << strFunction << "(" << lErrCode << ") " << lcpErrMsg;
         strError = ssMessage.str();
-        return false;
       }
 
-      return true;
+      return bResult;
     }
     // }}}
     // {{{ msleep()

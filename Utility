@@ -172,19 +172,26 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool getLine(stringstream &ssData, string &strLine);
-      /*! \fn SSL_CTX *initSSL(const string strCertificate, const string strPrivateKey, string &strError)
-      * \brief SSL initialization.
-      * \param strCertificate Contains the certificate.
-      * \param strPrivateKey Contains the private key
+      /*! \fn SSL_CTX *initSSL(string &strError)
+      * \brief OpenSSL initialization.
+      * \param strError Returns an error message.
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
-      SSL_CTX *initSSL(const string strCertificate, const string strPrivateKey, string &strError);
+      SSL_CTX *initSSL(string &strError);
       /*! \fn bool isProcessAlreadyRunning(const string strProcess)
       * \brief Determines if another process of the same name is already running.
       * \param strProcess Contains process name.
       * \return Returns a boolean true/false value.
       */
       bool isProcessAlreadyRunning(const string strProcess);
+      /*! \fn bool loadSSLCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
+      * \brief Loads the SSL certificate and private key into the SSL CTX and then checks their consistency.
+      * \param ctx Contains the SSL context.
+      * \param strCertificate Contains the certificate.
+      * \param strPrivateKey Contains the private key.
+      * \return Returns a boolean true/false value.
+      */
+      bool loadSSLCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError);
       /*! \fn void msleep(const unsigned long ulMilliSec)
       * \brief Sleep given milliseconds.
       * \param ulMilliSec Contains the milliseconds.

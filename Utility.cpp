@@ -465,6 +465,7 @@ extern "C++"
       }
       if (!bResult)
       {
+        strError = sslstrerror();
       }
 
       return bResult;

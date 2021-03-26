@@ -276,34 +276,6 @@ extern "C++"
       return (!strLine.empty() || ssData);
     }
     // }}}
-    // {{{ initSSL()
-    SSL_CTX *Utility::initSSL(string &strError)
-    {
-      long lErrCode;
-      const char* lcpErrMsg;
-      stringstream ssMessage;
-      SSL_CTX *ctx = NULL;
-      SSL_METHOD *method;
-
-      SSL_load_error_strings();
-      SSL_library_init();
-      OpenSSL_add_all_algorithms();
-      CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
-      method = (SSL_METHOD *)TLS_server_method();
-      ERR_clear_error();
-      ctx = SSL_CTX_new(method);
-      if (ctx == NULL)
-      {
-        lErrCode = ERR_get_error();
-        lcpErrMsg = ERR_error_string(lErrCode, NULL);
-        ssMessage << "SSL_CTX_new(" << lErrCode << ") " << lcpErrMsg;
-        strError = ssMessage.str();
-        return NULL;
-      }
-
-      return ctx;
-    }
-    // }}}
     // {{{ isProcessAlreadyRunning()
     bool Utility::isProcessAlreadyRunning(const string strProcess)
     {
@@ -349,41 +321,6 @@ extern "C++"
         }
       }
       procList.clear();
-
-      return bResult;
-    }
-    // }}}
-    // {{{ loadSSLCertKey()
-    bool Utility::loadSSLCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
-    {
-      bool bResult = true;
-      string strFunction;
-
-      if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) <= 0)
-      {
-        bResult = false;
-        strFunction = "SSL_CTX_use_certificate_file";
-      }
-      if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) <= 0)
-      {
-        bResult = false;
-        strFunction = "SSL_CTX_use_PrivateKey_file";
-      }
-      if (!SSL_CTX_check_private_key(ctx))
-      {
-        bResult = false;
-        strFunction = "SSL_CTX_check_private_key";
-      }
-      if (!bResult)
-      {
-        long lErrCode;
-        const char* lcpErrMsg;
-        stringstream ssMessage;
-        lErrCode = ERR_get_error();
-        lcpErrMsg = ERR_error_string(lErrCode, NULL);
-        ssMessage << strFunction << "(" << lErrCode << ") " << lcpErrMsg;
-        strError = ssMessage.str();
-      }
 
       return bResult;
     }
@@ -477,47 +414,83 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ sslstrerror()
-    string Utility::sslstrerror(SSL *ssl, int nReturn, string &strErrorCode)
+    // {{{ sslInit()
+    SSL_CTX *Utility::sslInit(string &strError)
     {
-      stringstream ssError, ssErrorCode;
+      long lErrCode;
+      const char* lcpErrMsg;
+      stringstream ssMessage;
+      SSL_CTX *ctx = NULL;
+      SSL_METHOD *method;
+
+      SSL_load_error_strings();
+      SSL_library_init();
+      OpenSSL_add_all_algorithms();
+      CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
+      method = (SSL_METHOD *)TLS_server_method();
+      ERR_clear_error();
+      ctx = SSL_CTX_new(method);
+      if (ctx == NULL)
+      {
+        lErrCode = ERR_get_error();
+        lcpErrMsg = ERR_error_string(lErrCode, NULL);
+        ssMessage << "SSL_CTX_new(" << lErrCode << ") " << lcpErrMsg;
+        strError = ssMessage.str();
+        return NULL;
+      }
+
+      return ctx;
+    }
+    // }}}
+    // {{{ sslLoadCertKey()
+    bool Utility::sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
+    {
+      bool bResult = true;
+      string strFunction;
+
+      if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) <= 0)
+      {
+        bResult = false;
+        strFunction = "SSL_CTX_use_certificate_file";
+      }
+      if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) <= 0)
+      {
+        bResult = false;
+        strFunction = "SSL_CTX_use_PrivateKey_file";
+      }
+      if (!SSL_CTX_check_private_key(ctx))
+      {
+        bResult = false;
+        strFunction = "SSL_CTX_check_private_key";
+      }
+      if (!bResult)
+      {
+      }
+
+      return bResult;
+    }
+    // }}}
+    // {{{ sslstrerror()
+    string Utility::sslstrerror()
+    {
+      bool bFirst = true;
+      char szError[1024];
+      stringstream ssError;
       unsigned long ulError;
 
-      switch (SSL_get_error(ssl, nReturn))
+      while ((ulError = ERR_get_error()) != 0)
       {
-        case SSL_ERROR_NONE : ssErrorCode << "SSL_ERROR_NONE"; ssError << "The TLS/SSL I/O operation completed."; break;
-        case SSL_ERROR_ZERO_RETURN : ssErrorCode << "SSL_ERROR_ZERO_RETURN"; ssError << "The TLS/SSL connection has been closed."; break;
-        case SSL_ERROR_WANT_READ : ssErrorCode << "SSL_ERROR_WANT_READ"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-        case SSL_ERROR_WANT_WRITE : ssErrorCode << "SSL_ERROR_WANT_WRITE"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-        case SSL_ERROR_WANT_CONNECT : ssErrorCode << "SSL_ERROR_WANT_CONNECT"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-        case SSL_ERROR_WANT_ACCEPT : ssErrorCode << "SSL_ERROR_WANT_ACCEPT"; ssError << "The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-        case SSL_ERROR_WANT_X509_LOOKUP : ssErrorCode << "SSL_ERROR_WANT_X509_LOOKUP"; ssError << "The operation did not complete because an application callback set by SSL_CTX_set_client_cert_cb() has asked to be called again."; break;
-        case SSL_ERROR_SYSCALL :
+        if (bFirst)
         {
-          ssErrorCode << "SSL_ERROR_SYSCALL";
-          ssError << "Some I/O error occurred.  ";
-          if (nReturn == 0)
-          {
-            ssError << "Received invalid EOF.";
-          }
-          else
-          {
-            ssError << "read(" << errno << ") " << strerror(errno);
-          }
-          while ((ulError = ERR_get_error()) != 0)
-          {
-            char szError[120];
-            if (ERR_error_string(ulError, szError) != NULL)
-            {
-              ssError << "  " << szError;
-            }
-          }
-          break;
+          bFirst = false;
         }
-        case SSL_ERROR_SSL : strErrorCode = "SSL_ERROR_SSL"; ssError << "A failure in the SSL library occurred, usually a protocol error."; break;
-        default : ssErrorCode << nReturn; ssError << "Caught an unknown error.";
+        else
+        {
+          ssError << ", ";
+        }
+        ERR_error_string_n(ulError, szError, 1024);
+        ssError << ERR_lib_error_string(ulError) << "::" << ERR_func_error_string(ulError) << "(" << ulError << "," << szError << ") " << ERR_reason_error_string(ulError);
       }
-      strErrorCode = ssErrorCode.str();
 
       return ssError.str();
     }

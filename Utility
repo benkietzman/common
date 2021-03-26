@@ -184,14 +184,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool isProcessAlreadyRunning(const string strProcess);
-      /*! \fn bool loadSSLCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
-      * \brief Loads the SSL certificate and private key into the SSL CTX and then checks their consistency.
-      * \param ctx Contains the SSL context.
-      * \param strCertificate Contains the certificate.
-      * \param strPrivateKey Contains the private key.
-      * \return Returns a boolean true/false value.
-      */
-      bool loadSSLCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError);
       /*! \fn void msleep(const unsigned long ulMilliSec)
       * \brief Sleep given milliseconds.
       * \param ulMilliSec Contains the milliseconds.
@@ -219,14 +211,25 @@ extern "C++"
       *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
       */
       bool socketType(int fdSocket, common_socket_type &eType, string &strError);
-      /*! \fn string sslstrerror(SSL *ssl, int nReturn, string &strErrorCode)
+      /*! \fn SSL_CTX *sslInit(string &strError)
+      * \brief OpenSSL initialization.
+      * \param strError Returns an error message.
+      * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
+      */
+      SSL_CTX *sslInit(string &strError);
+      /*! \fn bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
+      * \brief Loads the SSL certificate and private key into the SSL CTX and then checks their consistency.
+      * \param ctx Contains the SSL context.
+      * \param strCertificate Contains the certificate.
+      * \param strPrivateKey Contains the private key.
+      * \return Returns a boolean true/false value.
+      */
+      bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError);
+      /*! \fn string sslstrerror()
       * \brief Obtain an SSL error message.
-      * \param ssl Contains the SSL handle.
-      * \param nReturn Contains the return.
-      * \param strErrorCode Contains the error code.
       * \return Returns the error string.
       */
-      string sslstrerror(SSL *ssl, int nReturn, string &strErrorCode);
+      string sslstrerror();
     };
     // }}}
   }

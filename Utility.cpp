@@ -33,6 +33,7 @@ extern "C++"
     // {{{ Utility()
     Utility::Utility(string &strError)
     {
+      m_bSslInit = false;
       m_ulModifyTime = 0;
       m_strConf = "/etc/central.conf";
       m_conf = new Json;
@@ -414,8 +415,9 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ sslInit
     // {{{ sslInit()
-    SSL_CTX *Utility::sslInit(string &strError)
+    SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError)
     {
       long lErrCode;
       const char* lcpErrMsg;
@@ -423,11 +425,15 @@ extern "C++"
       SSL_CTX *ctx = NULL;
       SSL_METHOD *method;
 
-      SSL_load_error_strings();
-      SSL_library_init();
-      OpenSSL_add_all_algorithms();
-      CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
-      method = (SSL_METHOD *)TLS_server_method();
+      if (!m_bSslInit)
+      {
+        m_bSslInit = true;
+        SSL_load_error_strings();
+        SSL_library_init();
+        OpenSSL_add_all_algorithms();
+        CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
+      }
+      method = (SSL_METHOD *)((bSslServer)?TLS_server_method():TLS_client_method());
       ERR_clear_error();
       ctx = SSL_CTX_new(method);
       if (ctx == NULL)
@@ -441,6 +447,19 @@ extern "C++"
 
       return ctx;
     }
+    // }}}
+    // {{{ sslInitClient()
+    SSL_CTX *Utility::sslInitClient(string &strError)
+    {
+      return sslInit(false, strError);
+    }
+    // }}}
+    // {{{ sslInitServer()
+    SSL_CTX *Utility::sslInitServer(string &strError)
+    {
+      return sslInit(true, strError);
+    }
+    // }}}
     // }}}
     // {{{ sslLoadCertKey()
     bool Utility::sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)

@@ -452,25 +452,6 @@ extern "C++"
 
       return bResult;
     }
-    bool Central::log(const char *pszMessage, ...)
-    {
-      char *pszBuffer;
-      size_t unLength;
-      string strMessage;
-      va_list vArgs;
-
-      va_start(vArgs, pszMessage);
-      unLength = vsnprintf(NULL, 0, pszMessage, vArgs) + 1;
-      va_end(vArgs);
-      pszBuffer = (char *)malloc(unLength);
-      va_start(vArgs, pszMessage);
-      vsnprintf(pszBuffer, unLength, pszMessage, vArgs);
-      va_end(vArgs);
-      strMessage = pszBuffer;
-      ::free(pszBuffer);
-
-      return log(strMessage);
-    }
     bool Central::log(const string strLog, const string strPrefix, const string strMessage, string &strError, const string strFrequency, const bool bLock, const bool bTimestamp)
     {
       bool bNeedArchive = false, bResult = false;
@@ -632,6 +613,27 @@ extern "C++"
       }
 
       return bResult;
+    }
+    // }}}
+    // {{{ logf()
+    bool Central::logf(const char *pszMessage, ...)
+    {
+      char *pszBuffer;
+      size_t unLength;
+      string strMessage;
+      va_list vArgs;
+
+      va_start(vArgs, pszMessage);
+      unLength = vsnprintf(NULL, 0, pszMessage, vArgs) + 1;
+      va_end(vArgs);
+      pszBuffer = (char *)malloc(unLength);
+      va_start(vArgs, pszMessage);
+      vsnprintf(pszBuffer, unLength, pszMessage, vArgs);
+      va_end(vArgs);
+      strMessage = pszBuffer;
+      ::free(pszBuffer);
+
+      return log(strMessage);
     }
     // }}}
     // {{{ manip()

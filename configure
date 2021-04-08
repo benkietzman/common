@@ -177,6 +177,7 @@ if [ $bFoundMJson -eq 1 ]; then
   printf " Central.o" >> Makefile;
   printf " ChatBot.o" >> Makefile;
   printf " Json.o" >> Makefile;
+  printf " Storage.o" >> Makefile
   printf " Syslog.o" >> Makefile
   printf " Utility.o" >> Makefile;
   if [ $bFoundExpat -eq 1 ]; then
@@ -207,6 +208,7 @@ if [ $bFoundMJson -eq 1 ]; then
   printf " Central.o" >> Makefile
   printf " ChatBot.o" >> Makefile
   printf " Json.o" >> Makefile
+  printf " Storage.o" >> Makefile
   printf " Syslog.o" >> Makefile
   printf " Utility.o" >> Makefile
   if [ $bFoundExpat -eq 1 ]; then

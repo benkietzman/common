@@ -47,19 +47,37 @@ extern "C++"
       unlock();
     }
     // }}}
-    // {{{ load()
-    void Storage::load(Json *ptStorage)
+    // {{{ get()
+    Json *Storage::get()
     {
+      Json *ptStorage;
+
       lock();
-      delete m_ptStorage;
-      m_ptStorage = new Json(ptStorage);
+      ptStorage = new Json(m_ptStorage);
       unlock();
+
+      return ptStorage;
     }
     // }}}
     // {{{ lock()
     void Storage::lock()
     {
       m_mutexStorage.lock();
+    }
+    // }}}
+    // {{{ ptr()
+    Json *Storage::ptr()
+    {
+      return m_ptStorage;
+    }
+    // }}}
+    // {{{ put()
+    void Storage::put(Json *ptStorage)
+    {
+      lock();
+      delete m_ptStorage;
+      m_ptStorage = new Json(ptStorage);
+      unlock();
     }
     // }}}
     // {{{ request()

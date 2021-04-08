@@ -26,6 +26,7 @@
 #ifndef _COMMON_CENTRAL_
 #define _COMMON_CENTRAL_
 // {{{ includes
+#include <cstdarg>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -178,6 +179,12 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool log(const string strMessage, string &strError);
+      /*! \fn bool log(const char *pszMessage, ...)
+      * \brief Writes a message to the application log.
+      * \param pszMessage Contains the message.
+      * \return Returns a boolean true/false value.
+      */
+      bool log(const char *pszMessage, ...);
       /*! \fn bool log(const string strLog, const string strPrefix, const string strMessage, string &strError, const string strFrequency = "", const bool bLock = false, const bool bTimestamp = false)
       * \brief Writes a message to the application log.
       * \param strLog Contains the log directory path.

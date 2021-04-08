@@ -1,0 +1,60 @@
+// vim600: fdm=marker
+/* -*- c++ -*- */
+///////////////////////////////////////////
+// Storage
+// -------------------------------------
+// file       : Storage
+// author     : Ben Kietzman
+// begin      : 2021-04-07
+// copyright  : kietzman.org
+// email      : ben@kietzman.org
+///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
+/*! \file Storage
+* \brief Storage Class
+*
+* Provides storage functionality.
+*/
+
+#ifndef _COMMON_STORAGE_
+#define _COMMON_STORAGE_
+
+// {{{ includes
+#include <mutex>
+using namespace std;
+#include "Json"
+// }}}
+
+extern "C++"
+{
+  namespace common
+  {
+    // {{{ Storage
+    class Storage
+    {
+      private:
+      mutex m_mutexStorage;
+      Json *m_ptStorage;
+
+      public:
+      Storage();
+      ~Storage();
+      void load(Json *ptStorage);
+      void lock();
+      bool request(const string strAction, list<string> keys, Json *ptData, string &strError);
+      void unlock();
+    };
+    // }}}
+  }
+}
+
+#endif

@@ -519,11 +519,37 @@ extern "C++"
     {
       return vault("add", keys, ptData, strError);
     }
+    bool Warden::vaultAdd(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      list<string> keys;
+
+      if (vault("add", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+      keys.clear();
+
+      return bResult;
+    }
     // }}}
     // {{{ vaultDelete()
     bool Warden::vaultDelete(list<string> keys, string &strError)
     {
       return vault("delete", keys, NULL, strError);
+    }
+    bool Warden::vaultDelete(string &strError)
+    {
+      bool bResult = false;
+      list<string> keys;
+
+      if (vault("delete", keys, NULL, strError))
+      {
+        bResult = true;
+      }
+      keys.clear();
+
+      return bResult;
     }
     // }}}
     // {{{ vaultRetrieve()
@@ -568,6 +594,19 @@ extern "C++"
     bool Warden::vaultUpdate(list<string> keys, Json *ptData, string &strError)
     {
       return vault("update", keys, ptData, strError);
+    }
+    bool Warden::vaultUpdate(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      list<string> keys;
+
+      if (vault("update", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+      keys.clear();
+
+      return bResult;
     }
     // }}}
     // }}}

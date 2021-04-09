@@ -35,8 +35,6 @@ extern "C++"
     {
       m_bUseSingleSocket = false;
       m_strUnix = strUnix;
-      m_ulModifyTime = 0;
-      m_unThrottle = 0;
       m_unUniqueID = 0;
       m_pUtility = new Utility(strError);
     }
@@ -440,10 +438,32 @@ extern "C++"
       }
     }
     // }}}
-    // {{{ setApplication()
-    void Password::setApplication(const string strApplication)
+    // {{{ safe()
+    bool Password::safe(const string strFunction, list<string> keys, Json *ptData, string &strError)
     {
-      m_strApplication = strApplication;
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Module", "safe");
+      ptRequest->insert("Function", strFunction);
+      ptRequest->insert("Keys", keys);
+      if (ptData != NULL)
+      {
+        ptRequest->insert("Data", ptData);
+      }
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Data") != ptResponse->m.end())
+        {
+          string strJson;
+          ptData->parse(ptResponse->m["Data"]->json(strJson));
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
     }
     // }}}
     // {{{ setTimeout()

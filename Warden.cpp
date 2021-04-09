@@ -2,9 +2,9 @@
 // vim600: fdm=marker
 /* -*- c++ -*- */
 ///////////////////////////////////////////
-// Password
+// Warden
 // -------------------------------------
-// file       : Password.cpp
+// file       : Warden.cpp
 // author     : Ben Kietzman
 // begin      : 2021-04-08
 // copyright  : kietzman.org
@@ -20,18 +20,18 @@
 *                                                                         *
 **************************************************************************/
 
-/*! \file Password.cpp
-* \brief Password Class
+/*! \file Warden.cpp
+* \brief Warden Class
 */
 // {{{ includes
-#include "Password"
+#include "Warden"
 // }}}
 extern "C++"
 {
   namespace common
   {
-    // {{{ Password()
-    Password::Password(const string strUnix, string &strError)
+    // {{{ Warden()
+    Warden::Warden(const string strUnix, string &strError)
     {
       m_bUseSingleSocket = false;
       m_strUnix = strUnix;
@@ -39,8 +39,8 @@ extern "C++"
       m_pUtility = new Utility(strError);
     }
     // }}}
-    // {{{ ~Password()
-    Password::~Password()
+    // {{{ ~Warden()
+    Warden::~Warden()
     {
       if (m_bUseSingleSocket)
       {
@@ -50,11 +50,11 @@ extern "C++"
     }
     // }}}
     // {{{ request()
-    bool Password::request(Json *ptRequest, Json *ptResponse, string &strError)
+    bool Warden::request(Json *ptRequest, Json *ptResponse, string &strError)
     {
       return request(ptRequest, ptResponse, 0, strError);
     }
-    bool Password::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
+    bool Warden::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
     {
       bool bResult = false;
       time_t CEnd, CStart;
@@ -92,11 +92,11 @@ extern "C++"
           m_mutexUnique.unlock();
           ssUniqueID << unUniqueID;
           ptJson->insert("ProcessType", "parallel");
-          ptJson->insert("passwordUniqueID", ssUniqueID.str(), 'n');
+          ptJson->insert("wardenUniqueID", ssUniqueID.str(), 'n');
           ptJson->json(strBuffer);
           strBuffer.append("\n");
           delete ptJson;
-          passreqdata *ptData = new passreqdata;
+          wardenreqdata *ptData = new wardenreqdata;
           ptData->bSent = false;
           ptData->fdUnix = readpipe[1];
           ptData->strBuffer[0] = strBuffer;
@@ -125,10 +125,10 @@ extern "C++"
                       delete ptJson->m["ProcessType"];
                       ptJson->m.erase("ProcessType");
                     }
-                    if (ptJson->m.find("passwordUniqueID") != ptJson->m.end())
+                    if (ptJson->m.find("wardenUniqueID") != ptJson->m.end())
                     {
-                      delete ptJson->m["passwordUniqueID"];
-                      ptJson->m.erase("passwordUniqueID");
+                      delete ptJson->m["wardenUniqueID"];
+                      ptJson->m.erase("wardenUniqueID");
                     }
                     bResult = true;
                     ptResponse->parse(ptJson->json(strJson));
@@ -275,7 +275,7 @@ extern "C++"
         }
         if (!bResult && strError.empty())
         {
-          strError = "Password request failed without returning an error message.";
+          strError = "Warden request failed without returning an error message.";
         }
       }
 
@@ -283,7 +283,7 @@ extern "C++"
     }
     // }}}
     // {{{ requestThread()
-    void Password::requestThread()
+    void Warden::requestThread()
     {
       size_t unSleep = 1;
 
@@ -309,7 +309,7 @@ extern "C++"
               size_t unIndex = 1;
               pollfd *fds = new pollfd[m_requests.size() + 1];
               m_mutexRequests.lock();
-              for (map<int, passreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
+              for (map<int, wardenreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
               {
                 if (!i->second->bSent)
                 {
@@ -340,9 +340,9 @@ extern "C++"
                     while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                     {
                       Json *ptJson = new Json(strBuffer[0].substr(0, unPosition));
-                      if (ptJson->m.find("passwordUniqueID") != ptJson->m.end() && !ptJson->m["passwordUniqueID"]->v.empty())
+                      if (ptJson->m.find("wardenUniqueID") != ptJson->m.end() && !ptJson->m["wardenUniqueID"]->v.empty())
                       {
-                        size_t unUniqueID = atoi(ptJson->m["passwordUniqueID"]->v.c_str());
+                        size_t unUniqueID = atoi(ptJson->m["wardenUniqueID"]->v.c_str());
                         m_mutexRequests.lock();
                         if (m_requests.find(unUniqueID) != m_requests.end())
                         {
@@ -373,7 +373,7 @@ extern "C++"
                 if (unIndex > 1)
                 {
                   m_mutexRequests.lock();
-                  for (map<int, passreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
+                  for (map<int, wardenreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
                   {
                     for (size_t j = 1; j < unIndex; j++)
                     {
@@ -401,7 +401,7 @@ extern "C++"
               }
               delete[] fds;
             }
-            for (map<int, passreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
+            for (map<int, wardenreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
             {
               if (i->second->bSent)
               {
@@ -428,7 +428,7 @@ extern "C++"
           }
         }
       }
-      for (map<int, passreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
+      for (map<int, wardenreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
       {
         if (i->second->fdUnix != -1)
         {
@@ -438,13 +438,47 @@ extern "C++"
       }
     }
     // }}}
-    // {{{ safe()
-    bool Password::safe(const string strFunction, list<string> keys, Json *ptData, string &strError)
+    // {{{ setTimeout()
+    void Warden::setTimeout(const string strTimeout)
+    {
+      m_strTimeout = strTimeout;
+    }
+    // }}}
+    // {{{ useSingleSocket()
+    void Warden::useSingleSocket(const bool bUseSingleSocket)
+    {
+      if (m_bUseSingleSocket != bUseSingleSocket)
+      {
+        m_bUseSingleSocket = bUseSingleSocket;
+        if (m_bUseSingleSocket)
+        {
+          m_pThreadRequest = new thread([this](){requestThread();});
+          #ifdef COMMON_LINUX
+          pthread_setname_np(m_pThreadRequest->native_handle(), "P_requestThread");
+          #endif
+        }
+        else
+        {
+          m_pThreadRequest->join();
+          delete m_pThreadRequest;
+        }
+      }
+    }
+    // }}}
+    // {{{ utility()
+    Utility *Warden::utility()
+    {
+      return m_pUtility;
+    }
+    // }}}
+    // {{{ vault
+    // {{{ vault()
+    bool Warden::vault(const string strFunction, list<string> keys, Json *ptData, string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Module", "safe");
+      ptRequest->insert("Module", "vault");
       ptRequest->insert("Function", strFunction);
       ptRequest->insert("Keys", keys);
       if (ptData != NULL)
@@ -466,38 +500,36 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ setTimeout()
-    void Password::setTimeout(const string strTimeout)
+    // {{{ vaultAdd()
+    bool Warden::vaultAdd(list<string> keys, Json *ptData, string &strError)
     {
-      m_strTimeout = strTimeout;
+      return vault("add", keys, ptData, strError);
     }
     // }}}
-    // {{{ useSingleSocket()
-    void Password::useSingleSocket(const bool bUseSingleSocket)
+    // {{{ vaultDelete()
+    bool Warden::vaultDelete(list<string> keys, string &strError)
     {
-      if (m_bUseSingleSocket != bUseSingleSocket)
-      {
-        m_bUseSingleSocket = bUseSingleSocket;
-        if (m_bUseSingleSocket)
-        {
-          m_pThreadRequest = new thread([this](){requestThread();});
-          #ifdef COMMON_LINUX
-          pthread_setname_np(m_pThreadRequest->native_handle(), "P_requestThread");
-          #endif
-        }
-        else
-        {
-          m_pThreadRequest->join();
-          delete m_pThreadRequest;
-        }
-      }
+      return vault("delete", keys, NULL, strError);
     }
     // }}}
-    // {{{ utility()
-    Utility *Password::utility()
+    // {{{ vaultRetrieve()
+    bool Warden::vaultRetrieve(list<string> keys, Json *ptData, string &strError)
     {
-      return m_pUtility;
+      return vault("retrieve", keys, ptData, strError);
     }
+    // }}}
+    // {{{ vaultRetrieveKeys()
+    bool Warden::vaultRetrieveKeys(list<string> keys, Json *ptData, string &strError)
+    {
+      return vault("retrieveKeys", keys, ptData, strError);
+    }
+    // }}}
+    // {{{ vaultUpdate()
+    bool Warden::vaultUpdate(list<string> keys, Json *ptData, string &strError)
+    {
+      return vault("update", keys, ptData, strError);
+    }
+    // }}}
     // }}}
   }
 }

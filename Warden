@@ -2,9 +2,9 @@
 // vim600: fdm=marker
 /* -*- c++ -*- */
 ///////////////////////////////////////////
-// Password
+// Warden
 // -------------------------------------
-// file       : Password
+// file       : Warden
 // author     : Ben Kietzman
 // begin      : 2021-04-08
 // copyright  : kietzman.org
@@ -20,11 +20,11 @@
 *                                                                         *
 **************************************************************************/
 
-/*! \file Password
-* \brief Password Class
+/*! \file Warden
+* \brief Warden Class
 */
-#ifndef _COMMON_PASSWORD_
-#define _COMMON_PASSWORD_
+#ifndef _COMMON_WARDEN_
+#define _COMMON_WARDEN_
 // {{{ includes
 #include <fcntl.h>
 #include <fstream>
@@ -47,24 +47,24 @@ extern "C++"
 {
   namespace common
   {
-    // {{{ passreqdata
-    struct passreqdata
+    // {{{ wardenreqdata
+    struct wardenreqdata
     {
       bool bSent;
       int fdUnix;
       string strBuffer[2];
     };
     // }}}
-    // {{{ Password
-    //! Interfaces with Password.
+    // {{{ Warden
+    //! Interfaces with Warden.
     /*!
-    * Provides an interfaces to Password.
+    * Provides an interfaces to Warden.
     */
-    class Password
+    class Warden
     {
       protected:
       bool m_bUseSingleSocket;
-      map<int, passreqdata *> m_requests;
+      map<int, wardenreqdata *> m_requests;
       size_t m_unUniqueID;
       mutex m_mutexRequests;
       mutex m_mutexUnique;
@@ -74,11 +74,11 @@ extern "C++"
       Utility *m_pUtility;
 
       public:
-      Password(const string strUnix, string &strError);
-      ~Password();
+      Warden(const string strUnix, string &strError);
+      ~Warden();
 
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
-      * \brief Submits a Password request.
+      * \brief Submits a Warden request.
       * \param ptRequest Contains the request.
       * \param ptResponse Contains the response.
       * \param strError Contains the error message.
@@ -86,7 +86,7 @@ extern "C++"
       */
       bool request(Json *ptRequest, Json *ptResponse, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
-      * \brief Submits a Password request.
+      * \brief Submits a Warden request.
       * \param ptRequest Contains the request.
       * \param ptResponse Contains the response.
       * \param CTimeout Contains the timeout.
@@ -98,15 +98,6 @@ extern "C++"
       * \brief Request thread.
       */
       void requestThread();
-      /*! \fn bool safe(const string strFunction, list<string> keys, Json *ptData, string &strError)
-      * \brief Submits a safe request.
-      * \param strFunction Contains the function.
-      * \param keys Contains the keys.
-      * \param ptData Contains the data.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
-      bool safe(const string strFunction, list<string> keys, Json *ptData, string &strError);
       /*! \fn void setTimeout(const string strTimeout)
       * \brief Set the timeout.
       * \param strTimeout Contains the timeout.
@@ -122,6 +113,54 @@ extern "C++"
       * \return Returns a pointer to the Utility class.
       */
       Utility *utility();
+      /*! \fn bool vault(const string strFunction, list<string> keys, Json *ptData, string &strError)
+      * \brief Submits a vault request.
+      * \param strFunction Contains the function.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vault(const string strFunction, list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool vaultAdd(list<string> keys, Json *ptData, string &strError)
+      * \brief Submits a vault add request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultAdd(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool vaultDelete(list<string> keys, string &strError)
+      * \brief Submits a vault delete request.
+      * \param keys Contains the keys.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultDelete(list<string> keys, string &strError);
+      /*! \fn bool vaultRetrieve(list<string> keys, Json *ptData, string &strError)
+      * \brief Submits a vault retrieve request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultRetrieve(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool vaultRetrieveKeys(list<string> keys, Json *ptData, string &strError)
+      * \brief Submits a vault retrieveKeys request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultRetrieveKeys(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool vaultUpdate(list<string> keys, Json *ptData, string &strError)
+      * \brief Submits a vault update request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultUpdate(list<string> keys, Json *ptData, string &strError);
     };
     // }}}
   }

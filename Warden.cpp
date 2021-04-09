@@ -531,11 +531,37 @@ extern "C++"
     {
       return vault("retrieve", keys, ptData, strError);
     }
+    bool Warden::vaultRetrieve(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      list<string> keys;
+
+      if (vault("retrieve", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+      keys.clear();
+
+      return bResult;
+    }
     // }}}
     // {{{ vaultRetrieveKeys()
     bool Warden::vaultRetrieveKeys(list<string> keys, Json *ptData, string &strError)
     {
       return vault("retrieveKeys", keys, ptData, strError);
+    }
+    bool Warden::vaultRetrieveKeys(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      list<string> keys;
+
+      if (vault("retrieveKeys", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+      keys.clear();
+
+      return bResult;
     }
     // }}}
     // {{{ vaultUpdate()

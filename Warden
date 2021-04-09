@@ -151,6 +151,13 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool vaultRetrieve(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool vaultRetrieve(Json *ptData, string &strError)
+      * \brief Submits a vault retrieve request.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultRetrieve(Json *ptData, string &strError);
       /*! \fn bool vaultRetrieveKeys(list<string> keys, Json *ptData, string &strError)
       * \brief Submits a vault retrieveKeys request.
       * \param keys Contains the keys.
@@ -159,6 +166,13 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool vaultRetrieveKeys(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool vaultRetrieveKeys(Json *ptData, string &strError)
+      * \brief Submits a vault retrieveKeys request.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultRetrieveKeys(Json *ptData, string &strError);
       /*! \fn bool vaultUpdate(list<string> keys, Json *ptData, string &strError)
       * \brief Submits a vault update request.
       * \param keys Contains the keys.

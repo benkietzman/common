@@ -68,6 +68,7 @@ extern "C++"
       size_t m_unUniqueID;
       mutex m_mutexRequests;
       mutex m_mutexUnique;
+      string m_strApplication;
       string m_strTimeout;
       string m_strUnix;
       thread *m_pThreadRequest;
@@ -98,6 +99,11 @@ extern "C++"
       * \brief Request thread.
       */
       void requestThread();
+      /*! \fn void setApplication(const string strApplication)
+      * \brief Set the application.
+      * \param strApplication Contains the application.
+      */
+      void setApplication(const string strApplication);
       /*! \fn void setTimeout(const string strTimeout)
       * \brief Set the timeout.
       * \param strTimeout Contains the timeout.

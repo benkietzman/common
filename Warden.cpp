@@ -438,6 +438,12 @@ extern "C++"
       }
     }
     // }}}
+    // {{{ setApplication()
+    void Warden::setApplication(const string strApplication)
+    {
+      m_strApplication = strApplication;
+    }
+    // }}}
     // {{{ setTimeout()
     void Warden::setTimeout(const string strTimeout)
     {
@@ -476,26 +482,34 @@ extern "C++"
     bool Warden::vault(const string strFunction, list<string> keys, Json *ptData, string &strError)
     {
       bool bResult = false;
-      Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Module", "vault");
-      ptRequest->insert("Function", strFunction);
-      ptRequest->insert("Keys", keys);
-      if (ptData != NULL)
+      if (!m_strApplication.empty())
       {
-        ptRequest->insert("Data", ptData);
-      }
-      if (request(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-        if (ptResponse->m.find("Data") != ptResponse->m.end())
+        Json *ptRequest = new Json, *ptResponse = new Json;
+        ptRequest->insert("Module", "vault");
+        ptRequest->insert("Function", strFunction);
+        keys.push_front(m_strApplication);
+        ptRequest->insert("Keys", keys);
+        if (ptData != NULL)
         {
-          string strJson;
-          ptData->parse(ptResponse->m["Data"]->json(strJson));
+          ptRequest->insert("Data", ptData);
         }
+        if (request(ptRequest, ptResponse, strError))
+        {
+          bResult = true;
+          if (ptResponse->m.find("Data") != ptResponse->m.end())
+          {
+            string strJson;
+            ptData->parse(ptResponse->m["Data"]->json(strJson));
+          }
+        }
+        delete ptRequest;
+        delete ptResponse;
       }
-      delete ptRequest;
-      delete ptResponse;
+      else
+      {
+        strError = "Please provide the Application.";
+      }
 
       return bResult;
     }

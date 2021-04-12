@@ -75,7 +75,7 @@ extern "C++"
       Utility *m_pUtility;
 
       public:
-      Warden(const string strUnix, string &strError);
+      Warden(const string strApplication, const string strUnix, string &strError);
       ~Warden();
 
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)

@@ -31,12 +31,20 @@ extern "C++"
   namespace common
   {
     // {{{ Warden()
-    Warden::Warden(const string strUnix, string &strError)
+    Warden::Warden(const string strApplication, const string strUnix, string &strError)
     {
       m_bUseSingleSocket = false;
       m_strUnix = strUnix;
       m_unUniqueID = 0;
       m_pUtility = new Utility(strError);
+      if (!strApplication.empty())
+      {
+        m_strApplication = strApplication;
+      }
+      else
+      {
+        strError = "Please provide the Applicatin.";
+      }
     }
     // }}}
     // {{{ ~Warden()

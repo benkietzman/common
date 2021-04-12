@@ -105,5 +105,74 @@ class Warden
     $this->m_strError = $strError;
   }
   // }}}
+  // {{{ vault
+  // {{{ vault()
+  public function vault($strFunction, $keys, &$data)
+  {
+    $bResult = false;
+
+    if ($this->m_strApplication != '')
+    {
+      $request = [];
+      $request['Module'] = 'vault';
+      $request['Function'] = $strFunction;
+      array_unshift($keys, $this->m_strApplication);
+      $request['Keys'] = $keys;
+      if ($data != null)
+      {
+        $request['Data'] = $data;
+      }
+      $response = null;
+      if ($this->request($request, $response))
+      {
+        $bResult = true;
+        if (is_array($response) && isset($response['Data']))
+        {
+          unset($data);
+          $data = $response['Data'];
+        }
+      }
+      unset($request);
+      unset($response);
+    }
+    else
+    {
+      $this->setError('Please provide the Application.');
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ vaultAdd()
+  public function vaultAdd($keys, &$data)
+  {
+    return $this->vault("add", $keys, $data);
+  }
+  // }}}
+  // {{{ vaultDelete()
+  public function vaultDelete($keys)
+  {
+    return $this->vault("delete", $keys);
+  }
+  // }}}
+  // {{{ vaultRetrieve()
+  public function vaultRetrieve($keys, &$data)
+  {
+    return $this->vault("ad", $keys, $data);
+  }
+  // }}}
+  // {{{ vaultRetrieveKeys()
+  public function vaultRetrieveKeys($keys, &$data)
+  {
+    return $this->vault("retrieveKeys", $keys, $data);
+  }
+  // }}}
+  // {{{ vaultUpdate()
+  public function vaultUpdate($keys, &$data)
+  {
+    return $this->vault("update", $keys, $data);
+  }
+  // }}}
+  // }}}
 }
 ?>

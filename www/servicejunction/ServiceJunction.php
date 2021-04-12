@@ -6,6 +6,16 @@
 // copyright  : kietzman.org
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
+
+/**************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 2 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+**************************************************************************/
+
 class ServiceJunction
 {
   // {{{ variables
@@ -950,7 +960,7 @@ class ServiceJunction
       }
       if (!$bResult)
       {
-        $this->setError('Failed to receive end of Service Junction request.');
+        $this->setError('Failed to receive end of Service Junction response.');
       }
       else if (sizeof($response) == 0)
       {

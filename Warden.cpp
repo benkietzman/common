@@ -43,7 +43,7 @@ extern "C++"
       }
       else
       {
-        strError = "Please provide the Applicatin.";
+        strError = "Please provide the Application.";
       }
     }
     // }}}

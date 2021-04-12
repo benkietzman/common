@@ -117,6 +117,10 @@ class Warden
       $request['Module'] = 'vault';
       $request['Function'] = $strFunction;
       array_unshift($keys, $this->m_strApplication);
+      if (!is_array($keys))
+      {
+        $keys = [];
+      }
       $request['Keys'] = $keys;
       if ($data != null)
       {
@@ -158,7 +162,7 @@ class Warden
   // {{{ vaultRetrieve()
   public function vaultRetrieve($keys, &$data)
   {
-    return $this->vault("ad", $keys, $data);
+    return $this->vault("retrieve", $keys, $data);
   }
   // }}}
   // {{{ vaultRetrieveKeys()

@@ -69,7 +69,7 @@ class Warden
       fwrite($handle, json_encode($request)."\n");
       while (!$bResult && !feof($handle))
       {
-        if (($strLine = trim(fgets($handle))) != '' && $strLine != '""')
+        if (($strLine = fgets($handle)) !== false)
         {
           $bResult = true;
           $response = json_decode($strLine, true);
@@ -116,11 +116,11 @@ class Warden
       $request = [];
       $request['Module'] = 'vault';
       $request['Function'] = $strFunction;
-      array_unshift($keys, $this->m_strApplication);
       if (!is_array($keys))
       {
         $keys = [];
       }
+      array_unshift($keys, $this->m_strApplication);
       $request['Keys'] = $keys;
       if ($data != null)
       {
@@ -132,7 +132,6 @@ class Warden
         $bResult = true;
         if (is_array($response) && isset($response['Data']))
         {
-          unset($data);
           $data = $response['Data'];
         }
       }

@@ -149,13 +149,13 @@ extern "C++"
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool vaultDelete(list<string> keys, string &strError);
-      /*! \fn bool vaultDelete(string &strError)
-      * \brief Submits a vault delete request.
+      bool vaultRemove(list<string> keys, string &strError);
+      /*! \fn bool vaultRemove(string &strError)
+      * \brief Submits a vault remove request.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool vaultDelete(string &strError);
+      bool vaultRemove(string &strError);
       /*! \fn bool vaultRetrieve(list<string> keys, Json *ptData, string &strError)
       * \brief Submits a vault retrieve request.
       * \param keys Contains the keys.

@@ -532,7 +532,7 @@ extern "C++"
       bool bResult = false;
       list<string> keys;
 
-      if (vault("add", keys, ptData, strError))
+      if (vaultAdd(keys, ptData, strError))
       {
         bResult = true;
       }
@@ -541,17 +541,17 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ vaultDelete()
-    bool Warden::vaultDelete(list<string> keys, string &strError)
+    // {{{ vaultRemove()
+    bool Warden::vaultRemove(list<string> keys, string &strError)
     {
-      return vault("delete", keys, NULL, strError);
+      return vault("remove", keys, NULL, strError);
     }
-    bool Warden::vaultDelete(string &strError)
+    bool Warden::vaultRemove(string &strError)
     {
       bool bResult = false;
       list<string> keys;
 
-      if (vault("delete", keys, NULL, strError))
+      if (vaultRemove(keys, strError))
       {
         bResult = true;
       }
@@ -570,7 +570,7 @@ extern "C++"
       bool bResult = false;
       list<string> keys;
 
-      if (vault("retrieve", keys, ptData, strError))
+      if (vaultRetrieve(keys, ptData, strError))
       {
         bResult = true;
       }
@@ -589,7 +589,7 @@ extern "C++"
       bool bResult = false;
       list<string> keys;
 
-      if (vault("retrieveKeys", keys, ptData, strError))
+      if (vaultRetrieveKeys(keys, ptData, strError))
       {
         bResult = true;
       }
@@ -608,7 +608,7 @@ extern "C++"
       bool bResult = false;
       list<string> keys;
 
-      if (vault("update", keys, ptData, strError))
+      if (vaultUpdate(keys, ptData, strError))
       {
         bResult = true;
       }

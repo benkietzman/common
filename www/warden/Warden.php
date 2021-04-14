@@ -152,10 +152,10 @@ class Warden
     return $this->vault("add", $keys, $data);
   }
   // }}}
-  // {{{ vaultDelete()
-  public function vaultDelete($keys)
+  // {{{ vaultRemove()
+  public function vaultRemove($keys)
   {
-    return $this->vault("delete", $keys);
+    return $this->vault("remove", $keys);
   }
   // }}}
   // {{{ vaultRetrieve()

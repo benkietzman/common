@@ -78,6 +78,31 @@ extern "C++"
       Warden(const string strApplication, const string strUnix, string &strError);
       ~Warden();
 
+      /*! \fn bool password(const string strFunction, Json *ptData, string &strError)
+      * \brief Submits a password request.
+      * \param strFunction Contains the function.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool password(const string strFunction, Json *ptData, string &strError);
+      /*! \fn bool passwordLogin(const string strUser, const string strPassword, string &strError)
+      * \brief Submits a password request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool passwordLogin(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool passwordVerify(const string strUser, const string strPassword, const string strType, string &strError)
+      * \brief Submits a password request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strType Contains the type.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool passwordVerify(const string strUser, const string strPassword, const string strType, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Warden request.
       * \param ptRequest Contains the request.
@@ -201,6 +226,22 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool vaultUpdate(Json *ptData, string &strError);
+      /*! \fn bool windows(const string strFunction, Json *ptData, string &strError)
+      * \brief Submits a windows request.
+      * \param strFunction Contains the function.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool windows(const string strFunction, Json *ptData, string &strError);
+      /*! \fn bool windowsLogin(const string strUser, const string strPassword, string &strError)
+      * \brief Submits a windows request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool windowsLogin(const string strUser, const string strPassword, string &strError);
     };
     // }}}
   }

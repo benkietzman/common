@@ -27,7 +27,7 @@ class Warden
   protected $m_strUnix;
   // }}}
   // {{{ __construct()
-  public function __construct($strApplication, $strUnix, $strConf = null)
+  public function __construct($strApplication, $strUnix)
   {
     $this->m_strUnix = $strUnix;
     if ($strApplication != '')
@@ -37,10 +37,6 @@ class Warden
     else
     {
       $this->m_strError = 'Please provide the Application.';
-    }
-    if ($strConf != '')
-    {
-      $this->m_strConf = $strConf;
     }
   }
   // }}}

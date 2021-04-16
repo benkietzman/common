@@ -2,7 +2,7 @@
 // vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
-// begin      : 2013-11-12
+// begin      : 2021-04-15
 // copyright  : kietzman.org
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
@@ -54,6 +54,72 @@ class Warden
   {
     return $this->m_strError;
   }
+  // }}}
+  // {{{ password
+  // {{{ password()
+  public function password($strFunction, $data)
+  {
+    $bResult = false;
+
+    $request = $data;
+    $request['Module'] = 'password';
+    $request['Function'] = $strFunction;
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ passwordLogin()
+  public function passwordLogin($strUser, $strPassword)
+  {
+    $bResult = false;
+
+    $data = [];
+    $data['User'] = $strUser;
+    $data['Password'] = $strPassword;
+    if ($this->password('login', $data))
+    {
+      $bResult = true;
+    }
+    unset($data);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ passwordVerify()
+  public function passwordVerify($strUser, $strPassword, $strType)
+  {
+    $bResult = false;
+
+    if ($this->m_strApplication != '')
+    {
+      $data = [];
+      $data['User'] = $strUser;
+      $data['Password'] = $strPassword;
+      if ($strType != '')
+      {
+        $data['Type'] = $strPassword;
+      }
+      if ($this->password('verify', $data))
+      {
+        $bResult = true;
+      }
+      unset($data);
+    }
+    else
+    {
+      $this->setError('Please provide the Application.');
+    }
+
+    return $bResult;
+  }
+  // }}}
   // }}}
   // {{{ request()
   public function request($request, &$response)
@@ -174,6 +240,44 @@ class Warden
   public function vaultUpdate($keys, &$data)
   {
     return $this->vault("update", $keys, $data);
+  }
+  // }}}
+  // }}}
+  // {{{ windows
+  // {{{ windows()
+  public function windows($strFunction, $data)
+  {
+    $bResult = false;
+
+    $request = $data;
+    $request['Module'] = 'windows';
+    $request['Function'] = $strFunction;
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ windowsLogin()
+  public function windowsLogin($strUser, $strPassword)
+  {
+    $bResult = false;
+
+    $data = [];
+    $data['User'] = $strUser;
+    $data['Password'] = $strPassword;
+    if ($this->windows('login', $data))
+    {
+      $bResult = true;
+    }
+    unset($data);
+
+    return $bResult;
   }
   // }}}
   // }}}

@@ -104,7 +104,10 @@ extern "C++"
         ptData->insert("Application", m_strApplication);
         ptData->insert("User", strUser);
         ptData->insert("Password", strPassword);
-        ptData->insert("Type", strType);
+        if (!strType.empty())
+        {
+          ptData->insert("Type", strType);
+        }
         if (password("verify", ptData, strError))
         {
           bResult = true;

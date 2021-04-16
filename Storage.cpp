@@ -47,6 +47,19 @@ extern "C++"
       unlock();
     }
     // }}}
+    // {{{ add()
+    bool Storage::add(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+
+      if (request("add", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ get()
     Json *Storage::get()
     {
@@ -78,6 +91,19 @@ extern "C++"
       delete m_ptStorage;
       m_ptStorage = new Json(ptStorage);
       unlock();
+    }
+    // }}}
+    // {{{ remove()
+    bool Storage::remove(list<string> keys, string &strError)
+    {
+      bool bResult = false;
+
+      if (request("remove", keys, NULL, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
     }
     // }}}
     // {{{ request()
@@ -264,10 +290,49 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ retrieve()
+    bool Storage::retrieve(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+
+      if (request("retrieve", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
+    }
+    // }}}
+    // {{{ retrieveKeys()
+    bool Storage::retrieveKeys(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+
+      if (request("retrieveKeys", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ unlock()
     void Storage::unlock()
     {
       m_mutexStorage.unlock();
+    }
+    // }}}
+    // {{{ update()
+    bool Storage::update(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+
+      if (request("update", keys, ptData, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
     }
     // }}}
   }

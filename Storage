@@ -48,12 +48,17 @@ extern "C++"
       public:
       Storage();
       ~Storage();
+      bool add(list<string> keys, Json *ptData, string &strError);
       Json *get();
       void lock();
       Json *ptr();
       void put(Json *ptStorage);
+      bool remove(list<string> keys, string &strError);
       bool request(const string strAction, list<string> keys, Json *ptData, string &strError);
+      bool retrieve(list<string> keys, Json *ptData, string &strError);
+      bool retrieveKeys(list<string> keys, Json *ptData, string &strError);
       void unlock();
+      bool update(list<string> keys, Json *ptData, string &strError);
     };
     // }}}
   }

@@ -51,6 +51,24 @@ class Warden
     return $this->m_strError;
   }
   // }}}
+  // {{{ authn()
+  public function authn($data)
+  {
+    $bResult = false;
+
+    $request = $data;
+    $request['Module'] = 'authn';
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ password
   // {{{ password()
   public function password($strFunction, $data)

@@ -57,6 +57,62 @@ extern "C++"
       delete m_pUtility;
     }
     // }}}
+    // {{{ authn()
+    bool Warden::authn(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
+
+      ptRequest->insert("Module", "authn");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    bool Warden::authn(const string strUser, const string strPassword, string &strError)
+    {
+      bool bResult = false;
+      Json *ptData = new Json;
+
+      ptData->insert("User", strUser);
+      ptData->insert("Password", strPassword);
+      if (authn(ptData, strError))
+      {
+        bResult = true;
+      }
+      delete ptData;
+
+      return bResult;
+    }
+    bool Warden::authn(const string strUser, const string strPassword, const string strType, string &strError)
+    {
+      bool bResult = false;
+
+      if (!m_strApplication.empty())
+      {
+        Json *ptData = new Json;
+        ptData->insert("Application", m_strApplication);
+        ptData->insert("User", strUser);
+        ptData->insert("Password", strPassword);
+        ptData->insert("Type", strType);
+        if (authn(ptData, strError))
+        {
+          bResult = true;
+        }
+        delete ptData;
+      }
+      else
+      {
+        strError = "Please provide the Application.";
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ password
     // {{{ password()
     bool Warden::password(const string strFunction, Json *ptData, string &strError)

@@ -78,6 +78,30 @@ extern "C++"
       Warden(const string strApplication, const string strUnix, string &strError);
       ~Warden();
 
+      /*! \fn bool authn(Json *ptData, string &strError)
+      * \brief Submits an authentication request.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool authn(Json *ptData, string &strError);
+      /*! \fn bool authn(const string strUser, const string strPassword, string &strError)
+      * \brief Submits an authentication request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool authn(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool authn(const string strUser, const string strPassword, const string strType, string &strError)
+      * \brief Submits an authentication request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strType Contains the type.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool authn(const string strUser, const string strPassword, const string strType, string &strError);
       /*! \fn bool password(const string strFunction, Json *ptData, string &strError)
       * \brief Submits a password request.
       * \param strFunction Contains the function.

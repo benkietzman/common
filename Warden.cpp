@@ -61,12 +61,14 @@ extern "C++"
     bool Warden::authn(Json *ptData, string &strError)
     {
       bool bResult = false;
+      string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
       ptRequest->insert("Module", "authn");
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
+        ptData->parse(ptResponse->json(strJson));
       }
       delete ptRequest;
       delete ptResponse;

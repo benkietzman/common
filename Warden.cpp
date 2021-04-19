@@ -68,7 +68,6 @@ extern "C++"
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
-        ptData->parse(ptResponse->json(strJson));
       }
       delete ptRequest;
       delete ptResponse;

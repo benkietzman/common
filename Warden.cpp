@@ -749,15 +749,13 @@ extern "C++"
     }
     // }}}
     // }}}
-    // {{{ windows
     // {{{ windows()
-    bool Warden::windows(const string strFunction, Json *ptData, string &strError)
+    bool Warden::windows(Json *ptData, string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
       ptRequest->insert("Module", "windows");
-      ptRequest->insert("Function", strFunction);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -767,16 +765,14 @@ extern "C++"
 
       return bResult;
     }
-    // }}}
-    // {{{ windowsLogin()
-    bool Warden::windowsLogin(const string strUser, const string strPassword, string &strError)
+    bool Warden::windows(const string strUser, const string strPassword, string &strError)
     {
       bool bResult = false;
       Json *ptData = new Json;
 
       ptData->insert("User", strUser);
       ptData->insert("Password", strPassword);
-      if (windows("login", ptData, strError))
+      if (windows(ptData, strError))
       {
         bResult = true;
       }
@@ -784,7 +780,6 @@ extern "C++"
 
       return bResult;
     }
-    // }}}
     // }}}
   }
 }

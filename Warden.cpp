@@ -113,15 +113,13 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ password
     // {{{ password()
-    bool Warden::password(const string strFunction, Json *ptData, string &strError)
+    bool Warden::password(Json *ptData, string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
       ptRequest->insert("Module", "password");
-      ptRequest->insert("Function", strFunction);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -131,16 +129,14 @@ extern "C++"
 
       return bResult;
     }
-    // }}}
-    // {{{ passwordLogin()
-    bool Warden::passwordLogin(const string strUser, const string strPassword, string &strError)
+    bool Warden::password(const string strUser, const string strPassword, string &strError)
     {
       bool bResult = false;
       Json *ptData = new Json;
 
       ptData->insert("User", strUser);
       ptData->insert("Password", strPassword);
-      if (password("login", ptData, strError))
+      if (password(ptData, strError))
       {
         bResult = true;
       }
@@ -148,9 +144,7 @@ extern "C++"
 
       return bResult;
     }
-    // }}}
-    // {{{ passwordVerify()
-    bool Warden::passwordVerify(const string strUser, const string strPassword, const string strType, string &strError)
+    bool Warden::password(const string strUser, const string strPassword, const string strType, string &strError)
     {
       bool bResult = false;
 
@@ -164,7 +158,7 @@ extern "C++"
         {
           ptData->insert("Type", strType);
         }
-        if (password("verify", ptData, strError))
+        if (password(ptData, strError))
         {
           bResult = true;
         }
@@ -177,7 +171,6 @@ extern "C++"
 
       return bResult;
     }
-    // }}}
     // }}}
     // {{{ request()
     bool Warden::request(Json *ptRequest, Json *ptResponse, string &strError)

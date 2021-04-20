@@ -102,23 +102,22 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool authn(const string strUser, const string strPassword, const string strType, string &strError);
-      /*! \fn bool password(const string strFunction, Json *ptData, string &strError)
+      /*! \fn bool password(Json *ptData, string &strError)
       * \brief Submits a password request.
-      * \param strFunction Contains the function.
       * \param ptData Contains the data.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool password(const string strFunction, Json *ptData, string &strError);
-      /*! \fn bool passwordLogin(const string strUser, const string strPassword, string &strError)
+      bool password(Json *ptData, string &strError);
+      /*! \fn bool password(const string strUser, const string strPassword, string &strError)
       * \brief Submits a password request.
       * \param strUser Contains the user.
       * \param strPassword Contains the password.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool passwordLogin(const string strUser, const string strPassword, string &strError);
-      /*! \fn bool passwordVerify(const string strUser, const string strPassword, const string strType, string &strError)
+      bool password(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool password(const string strUser, const string strPassword, const string strType, string &strError)
       * \brief Submits a password request.
       * \param strUser Contains the user.
       * \param strPassword Contains the password.
@@ -126,7 +125,7 @@ extern "C++"
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool passwordVerify(const string strUser, const string strPassword, const string strType, string &strError);
+      bool password(const string strUser, const string strPassword, const string strType, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Warden request.
       * \param ptRequest Contains the request.

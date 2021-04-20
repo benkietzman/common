@@ -117,15 +117,16 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool password(const string strUser, const string strPassword, string &strError);
-      /*! \fn bool password(const string strUser, const string strPassword, const string strType, string &strError)
+      /*! \fn bool password(const string strApplication, const string strUser, const string strPassword, const string strType, string &strError)
       * \brief Submits a password request.
+      * \param strApplication Contains the application.
       * \param strUser Contains the user.
       * \param strPassword Contains the password.
       * \param strType Contains the type.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool password(const string strUser, const string strPassword, const string strType, string &strError);
+      bool password(const string strApplication, const string strUser, const string strPassword, const string strType, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Warden request.
       * \param ptRequest Contains the request.

@@ -144,30 +144,23 @@ extern "C++"
 
       return bResult;
     }
-    bool Warden::password(const string strUser, const string strPassword, const string strType, string &strError)
+    bool Warden::password(const string strApplication, const string strUser, const string strPassword, const string strType, string &strError)
     {
       bool bResult = false;
+      Json *ptData = new Json;
 
-      if (!m_strApplication.empty())
+      ptData->insert("Application", strApplication);
+      ptData->insert("User", strUser);
+      ptData->insert("Password", strPassword);
+      if (!strType.empty())
       {
-        Json *ptData = new Json;
-        ptData->insert("Application", m_strApplication);
-        ptData->insert("User", strUser);
-        ptData->insert("Password", strPassword);
-        if (!strType.empty())
-        {
-          ptData->insert("Type", strType);
-        }
-        if (password(ptData, strError))
-        {
-          bResult = true;
-        }
-        delete ptData;
+        ptData->insert("Type", strType);
       }
-      else
+      if (password(ptData, strError))
       {
-        strError = "Please provide the Application.";
+        bResult = true;
       }
+      delete ptData;
 
       return bResult;
     }

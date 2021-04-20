@@ -88,26 +88,50 @@ extern "C++"
 
       return bResult;
     }
-    bool Warden::authn(const string strUser, const string strPassword, const string strType, string &strError)
+    bool Warden::authn(const string strApplication, const string strUser, const string strPassword, const string strType, string &strError)
+    {
+      bool bResult = false;
+      Json *ptData = new Json;
+
+      ptData->insert("Application", strApplication);
+      ptData->insert("User", strUser);
+      ptData->insert("Password", strPassword);
+      ptData->insert("Type", strType);
+      if (authn(ptData, strError))
+      {
+        bResult = true;
+      }
+      delete ptData;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ authz()
+    bool Warden::authz(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      string strJson;
+      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
+
+      ptRequest->insert("Module", "authz");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        ptData->parse(ptResponse->json(strJson));
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    bool Warden::authz(const string strUser, Json *ptData, string &strError)
     {
       bool bResult = false;
 
-      if (!m_strApplication.empty())
+      ptData->insert("User", strUser);
+      if (authz(ptData, strError))
       {
-        Json *ptData = new Json;
-        ptData->insert("Application", m_strApplication);
-        ptData->insert("User", strUser);
-        ptData->insert("Password", strPassword);
-        ptData->insert("Type", strType);
-        if (authn(ptData, strError))
-        {
-          bResult = true;
-        }
-        delete ptData;
-      }
-      else
-      {
-        strError = "Please provide the Application.";
+        bResult = true;
       }
 
       return bResult;
@@ -117,12 +141,14 @@ extern "C++"
     bool Warden::central(Json *ptData, string &strError)
     {
       bool bResult = false;
+      string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
       ptRequest->insert("Module", "central");
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
+        ptData->parse(ptResponse->json(strJson));
       }
       delete ptRequest;
       delete ptResponse;

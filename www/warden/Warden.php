@@ -52,7 +52,7 @@ class Warden
   }
   // }}}
   // {{{ authn()
-  public function authn($data)
+  public function authn(&$data)
   {
     $bResult = false;
 

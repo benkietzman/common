@@ -113,6 +113,35 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ central()
+    bool Warden::central(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
+
+      ptRequest->insert("Module", "central");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    bool Warden::central(const string strUser, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+
+      ptData->insert("User", strUser);
+      if (central(ptData, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ password()
     bool Warden::password(Json *ptData, string &strError)
     {

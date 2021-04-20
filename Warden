@@ -102,6 +102,21 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool authn(const string strUser, const string strPassword, const string strType, string &strError);
+      /*! \fn bool central(Json *ptData, string &strError)
+      * \brief Submits a central request.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool central(Json *ptData, string &strError);
+      /*! \fn bool central(const string strUser, Json *ptData, string &strError)
+      * \brief Submits a central request.
+      * \param strUser Contains the user.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool central(const string strUser, Json *ptData, string &strError);
       /*! \fn bool password(Json *ptData, string &strError)
       * \brief Submits a password request.
       * \param ptData Contains the data.

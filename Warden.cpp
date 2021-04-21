@@ -67,6 +67,10 @@ extern "C++"
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
+        if (ptResponse->m.find("Data") != ptResponse->m.end())
+        {
+          ptData->parse(ptResponse->m["Data"]->json(strJson));
+        }
       }
       delete ptRequest;
       delete ptResponse;

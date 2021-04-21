@@ -69,6 +69,28 @@ class Warden
     return $bResult;
   }
   // }}}
+  // {{{ authz()
+  public function authz(&$data)
+  {
+    $bResult = false;
+
+    $request = $data;
+    $request['Module'] = 'authz';
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+      if (is_array($response) && isset($response['Data']))
+      {
+        $data = $response['Data'];
+      }
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ password()
   public function password($data)
   {

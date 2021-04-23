@@ -70,7 +70,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
           var error = {};
           if (common.wsResponse(response, error))
           {
-            if (angular.isDefined(response.Error) && angular.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message != 'Please provide the userid.')
+            if (angular.isDefined(response.Error) && angular.isDefined(response.Error.Message) && response.Error.Message.length > 0)
             {
               $scope.message = response.Error.Message;
             }

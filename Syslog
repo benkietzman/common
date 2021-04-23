@@ -68,12 +68,6 @@ extern "C++"
       Syslog(const string strApplication = "", const string strProgram = "", const int nOption = LOG_PID, const int nFacility = LOG_USER);
       ~Syslog();
 
-      /*! \fn void commandEnded(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO)
-      * \brief Sends a message a system command is executed.
-      * \param strCommandName Contains the command name.
-      * \param nPriority Contains the syslog priority.
-      */
-      void commandEnded(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO);
       /*! \fn void commandLaunched(const string strCommandName, const string strEventDetails = "", const int nPriority = LOG_INFO)
       * \brief Sends a message when a system command is executed.
       * \param strCommandName Contains the command name.
@@ -89,13 +83,15 @@ extern "C++"
       * \param nPriority Contains the syslog priority.
       */
       void connectionStarted(const string strEventDetails = "", const int fdSocket = -1, const bool bResult = true, const int nPriority = LOG_INFO);
-      /*! \fn void connectionStopped(const string strEventDetails = "", const int fdSocket = -1, const int nPriority = LOG_INFO)
-      * \brief Sends a message when an INET socket connection is closed.
+      /*! \fn void connectionStartedCommandLaunched(const string strCommandName, const string strEventDetails = "", const int fdSocket = -1, const bool bResult = true, const int nPriority = LOG_INFO)
+      * \brief Sends a message when an INET socket connection is accepted and a system command is executed.
+      * \param strCommandName Contains the command name.
       * \param strEventDetail Contains the event detail.
       * \param fdSocket Contains the socket.
+      * \param bResult Contains a boolean true/false.
       * \param nPriority Contains the syslog priority.
       */
-      void connectionStopped(const string strEventDetails = "", const int fdSocket = -1, const int nPriority = LOG_INFO);
+      void connectionStartedCommandLaunched(const string strCommandName, const string strEventDetails = "", const int fdSocket = -1, const bool bResult = true, const int nPriority = LOG_INFO);
       /*! \fn void groupCreated(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
       * \brief Sends a message when an account is created.
       * \param strEventDetail Contains the event detail.
@@ -139,16 +135,6 @@ extern "C++"
       * \param nPriority Contains the syslog priority.
       */
       void log(Json *ptMessage, const string strEventDetails = "", const int nPriority = LOG_INFO);
-      /*! \fn void logoff(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
-      * \brief Sends a message when an account is logged off.
-      * \param strEventDetail Contains the event detail.
-      * \param strLoginID Contains the login ID.
-      * \param bResult Contains a bool true/false value.
-      * \param strProtocol Contains the protocol.  EX:  HTTP, HTTPS, JSON, RelayD, REST, SOAP, WS, WSS
-      * \param strService Contains the service.  EX:  Console Login, Remote Desktop, Web GUI
-      * \param nPriority Contains the syslog priority.
-      */
-      void logoff(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO);
       /*! \fn void logon(const string strEventDetails = "", const string strLoginID = "", const bool bResult = true, const string strProtocol = "", const string strService = "", const int nPriority = LOG_INFO)
       * \brief Sends a message when an account is authenticated or authorized.
       * \param strEventDetail Contains the event detail.

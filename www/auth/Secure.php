@@ -577,10 +577,6 @@ class Secure extends Basic
   {
     $response = null;
 
-    if ($this->m_module != null)
-    {
-      $this->m_syslog->logoff('Logged off the user against the '.$this->m_strLoginType.' module.', $this->getUserID());
-    }
     if (isset($_SESSION['sl_login_choice']))
     {
       unset($_SESSION['sl_login_choice']);

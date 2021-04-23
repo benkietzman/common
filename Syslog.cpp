@@ -52,6 +52,18 @@ extern "C++"
       closelog();
     }
     // }}}
+    // {{{ commandEnded()
+    void Syslog::commandEnded(const string strCommandName, const string strEventDetails, const int nPriority)
+    {
+      Json *ptMessage = new Json;
+
+      ptMessage->insert("Event Type", "Command Ended");
+      ptMessage->insert("Command Name", strCommandName);
+      ptMessage->insert("Login ID", m_strUser);
+      log(ptMessage, strEventDetails, nPriority);
+      delete ptMessage;
+    }
+    // }}}
     // {{{ commandLaunched()
     void Syslog::commandLaunched(const string strCommandName, const string strEventDetails, const int nPriority)
     {
@@ -104,6 +116,37 @@ extern "C++"
       ptMessage->insert("Action", ((bResult)?"Allowed":"Blocked"));
       ptMessage->insert("Command Name", strCommandName);
       ptMessage->insert("Login ID", m_strUser);
+      if (fdSocket != -1)
+      {
+        sockaddr_storage addr;
+        socklen_t len = sizeof(sockaddr_storage);
+        if (getpeername(fdSocket, (sockaddr *)&addr, &len) == 0)
+        {
+          char szIP[INET6_ADDRSTRLEN];
+          if (addr.ss_family == AF_INET)
+          {
+            sockaddr_in *s = (sockaddr_in *)&addr;
+            inet_ntop(AF_INET, &s->sin_addr, szIP, sizeof(szIP));
+          }
+          else if (addr.ss_family == AF_INET6)
+          {
+            sockaddr_in6 *s = (sockaddr_in6 *)&addr;
+            inet_ntop(AF_INET6, &s->sin6_addr, szIP, sizeof(szIP));
+          }
+          ptMessage->insert("Source IP", szIP);
+        }
+      }
+      log(ptMessage, strEventDetails, nPriority);
+      delete ptMessage;
+    }
+    // }}}
+    // {{{ connectionStopped()
+    void Syslog::connectionStopped(const string strEventDetails, const int fdSocket, const int nPriority)
+    {
+      Json *ptMessage = new Json;
+
+      ptMessage->insert("Event Type", "Connection Stopped");
+      ptMessage->insert("Action", "Teardown");
       if (fdSocket != -1)
       {
         sockaddr_storage addr;
@@ -211,6 +254,20 @@ extern "C++"
       ptMessage->insert("TimeStamp", ssTimeStamp.str());
       ptMessage->json(strMessage);
       log(strMessage, nPriority);
+    }
+    // }}}
+    // {{{ logoff()
+    void Syslog::logoff(const string strEventDetails, const string strLoginID, const bool bResult, const string strProtocol, const string strService, const int nPriority)
+    {
+      Json *ptMessage = new Json;
+
+      ptMessage->insert("Event Type", "Logoff");
+      ptMessage->insert("Login ID", ((!strLoginID.empty())?strLoginID:"N/A"));
+      ptMessage->insert("Result", ((bResult)?"Success":"Failure"));
+      ptMessage->insert("Protocol", ((!strProtocol.empty())?strProtocol:"N/A"));
+      ptMessage->insert("Service", ((!strService.empty())?strService:"N/A"));
+      log(ptMessage, strEventDetails, nPriority);
+      delete ptMessage;
     }
     // }}}
     // {{{ logon()

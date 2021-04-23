@@ -32,6 +32,17 @@ class Syslog
     closelog();
   }
   // }}}
+  // {{{ commandEnded()
+  public function commandEnded($strCommandName, $strEventDetails = null, $nPriority = LOG_INFO)
+  {
+    $message = array();
+    $message['Event Type'] = 'Command Ended';
+    $message['Command Name'] = $strCommandName;
+    $message['Login ID'] = $this->m_strUser;
+    $this->log($message, $strEventDetails, $nPriority);
+    unset($message);
+  }
+  // }}}
   // {{{ commandLaunched()
   public function commandLaunched($strCommandName, $strEventDetails = null, $nPriority = LOG_INFO)
   {
@@ -49,6 +60,44 @@ class Syslog
     $message = array();
     $message['Event Type'] = 'Connection Started';
     $message['Action'] = (($bResult)?'Allowed':'Blocked');
+    if ($fdSocket !== false)
+    {
+      $strAddress = null;
+      if (socket_getpeername($fdSocket, $strAddress) !== false)
+      {
+        $message['Source IP'] = $strAddress;
+      }
+    }
+    $this->log($message, $strEventDetails, $nPriority);
+    unset($message);
+  }
+  // }}}
+  // {{{ connectionStartedCommandLaunched()
+  public function connectionStartedCommandLaunched($strCommandName, $strEventDetails = null, $fdSocket = false, $bResult = true, $nPriority = LOG_INFO)
+  {
+    $message = array();
+    $message['Event Type'] = 'Connection Started & Command Launched';
+    $message['Action'] = (($bResult)?'Allowed':'Blocked');
+    $message['Command Name'] = $strCommandName;
+    $message['Login ID'] = $this->m_strUser;
+    if ($fdSocket !== false)
+    {
+      $strAddress = null;
+      if (socket_getpeername($fdSocket, $strAddress) !== false)
+      {
+        $message['Source IP'] = $strAddress;
+      }
+    }
+    $this->log($message, $strEventDetails, $nPriority);
+    unset($message);
+  }
+  // }}}
+  // {{{ connectionStopped()
+  public function connectionStopped($strEventDetails = null, $fdSocket = false, $nPriority = LOG_INFO)
+  {
+    $message = array();
+    $message['Event Type'] = 'Connection Stopped';
+    $message['Action'] = 'Teardown';
     if ($fdSocket !== false)
     {
       $strAddress = null;
@@ -179,6 +228,19 @@ class Syslog
     } else {
       syslog($nPriority, $this->jsonEncode($message));
 	  }
+  }
+  // }}}
+  // {{{ logoff()
+  public function logoff($strEventDetails = null, $strLoginID = null, $bResult = true, $strProtocol = null, $strService = null,  $nPriority = LOG_INFO)
+  {
+    $message = array();
+    $message['Event Type'] = 'Logoff';
+    $message['Login ID'] = (($strLoginID != '')?$strLoginID:'N/A');
+    $message['Result'] = (($bResult)?'Success':'Failure');
+    $message['Protocol'] = (($strProtocol != '')?$strProcotol:'N/A');
+    $message['Service'] = (($strService != '')?$strService:'N/A');
+    $this->log($message, $strEventDetails, $nPriority);
+    unset($message);
   }
   // }}}
   // {{{ logon()

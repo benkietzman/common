@@ -84,22 +84,22 @@ extern "C++"
     }
     // }}}
     // {{{ fdread()
-    int fdread(int fdSocket, string &strBuffer, bool &bGood)
+    bool fdread(int fdSocket, string &strBuffer, int &nReturn)
     {
+      bool bResult = true;
       char szBuffer[65536];
-      int nReturn, nSize = 65536;
+      int nSize = 65536;
 
-      bGood = true;
       if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
       {
         strBuffer.append(szBuffer, nReturn);
       }
       else
       {
-        bGood = false;
+        bResult = false;
       }
 
-      return nReturn;
+      return bResult;
     }
     // }}}
     // {{{ getConfPath()
@@ -510,13 +510,12 @@ extern "C++"
     }
     // }}}
     // {{{ sslread()
-    int sslread(SSL *ssl, string &strBuffer, bool &bGood)
+    bool sslread(SSL *ssl, string &strBuffer, int &nError)
     {
-      bool bDone = false;
+      bool bDone = false, bResult = true;;
       char szBuffer[65536];
       int nPending, nReturn, nSize = 65536;
 
-      bGood = true;
       while ((nPending = SSL_pending(ssl)) > 0)
       {
         bDone = true;
@@ -530,11 +529,11 @@ extern "C++"
         }
         else
         {
-          switch (SSL_get_error(ssl, nReturn))
+          switch ((nError = SSL_get_error(ssl, nReturn)))
           {
             case SSL_ERROR_ZERO_RETURN:
             case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL: bGood = false; break;
+            case SSL_ERROR_SSL: bResult = false; break;
           }
         }
       }
@@ -555,27 +554,27 @@ extern "C++"
             }
             else
             {
-              switch (SSL_get_error(ssl, nReturn))
+              switch ((nError = SSL_get_error(ssl, nReturn)))
               {
                 case SSL_ERROR_ZERO_RETURN:
                 case SSL_ERROR_SYSCALL:
-                case SSL_ERROR_SSL: bGood = false; break;
+                case SSL_ERROR_SSL: bResult = false; break;
               }
             }
           }
         }
         else
         {
-          switch (SSL_get_error(ssl, nReturn))
+          switch ((nError = SSL_get_error(ssl, nReturn)))
           {
             case SSL_ERROR_ZERO_RETURN:
             case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL: bGood = false; break;
+            case SSL_ERROR_SSL: bResult = false; break;
           }
         }
       }
 
-      return nReturn;
+      return bResult;
     }
     // }}}
     // {{{ sslstrerror()

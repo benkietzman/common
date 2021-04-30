@@ -444,6 +444,7 @@ extern "C++"
         strError = ssMessage.str();
         return NULL;
       }
+      SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
 
       return ctx;
     }

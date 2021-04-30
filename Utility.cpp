@@ -84,7 +84,7 @@ extern "C++"
     }
     // }}}
     // {{{ fdread()
-    bool fdread(int fdSocket, string &strBuffer, int &nReturn)
+    bool Utility::fdread(int fdSocket, string &strBuffer, int &nReturn)
     {
       bool bResult = true;
       char szBuffer[65536];
@@ -510,7 +510,7 @@ extern "C++"
     }
     // }}}
     // {{{ sslread()
-    bool sslread(SSL *ssl, string &strBuffer, int &nError)
+    bool Utility::sslread(SSL *ssl, string &strBuffer, int &nError)
     {
       bool bDone = false, bResult = true;;
       char szBuffer[65536];

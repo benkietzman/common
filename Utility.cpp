@@ -601,8 +601,6 @@ extern "C++"
 
       return ssError.str();
     }
-    // }}}
-    // {{{ sslstrerror()
     string Utility::sslstrerror(SSL *ssl, int nReturn)
     {
       stringstream ssError;
@@ -610,7 +608,7 @@ extern "C++"
       ssError << sslstrerror();
       if (ssError.str().empty())
       {
-        switch (SSL_get_error(ssl, nReturn))
+        switch (nReturn)
         {
           case SSL_ERROR_NONE : ssError << "[SSL_ERROR_NONE] The TLS/SSL I/O operation completed."; break;
           case SSL_ERROR_ZERO_RETURN : ssError << "[SSL_ERROR_ZERO_RETURN] The TLS/SSL connection has been closed."; break;

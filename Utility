@@ -233,15 +233,14 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError);
-      /*! \fn int sslread(SSL *ssl, char *pszBuffer, int nSize, bool &bGood)
+      /*! \fn int sslread(SSL *ssl, string &strBuffer, bool &bGood)
       * \brief Read data from SSL handle.
       * \param ssl SSL handle.
-      * \param pszBuffer Data buffer.
-      * \param int nSize Number of bytes.
+      * \param strBuffer Data buffer.
       * \param bGood Boolean true/false value of whether the SSL handle is still good.
       * \return Number of bytes read.
       */
-      int sslread(SSL *ssl, char *pszBuffer, int nSize, bool &bGood);
+      int sslread(SSL *ssl, string &strBuffer, bool &bGood);
       /*! \fn string sslstrerror()
       * \brief Obtain an SSL error message.
       * \return Returns the error string.

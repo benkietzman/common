@@ -602,5 +602,43 @@ extern "C++"
       return ssError.str();
     }
     // }}}
+    // {{{ sslstrerror()
+    string Utility::sslstrerror(SSL *ssl, int nReturn)
+    {
+      stringstream ssError;
+
+      ssError << sslstrerror();
+      if (ssError.str().empty())
+      {
+        switch (SSL_get_error(ssl, nReturn))
+        {
+          case SSL_ERROR_NONE : ssError << "[SSL_ERROR_NONE] The TLS/SSL I/O operation completed."; break;
+          case SSL_ERROR_ZERO_RETURN : ssError << "[SSL_ERROR_ZERO_RETURN] The TLS/SSL connection has been closed."; break;
+          case SSL_ERROR_WANT_READ : ssError << "[SSL_ERROR_WANT_READ] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_WRITE : ssError << "[SSL_ERROR_WANT_WRITE] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_CONNECT : ssError << "[SSL_ERROR_WANT_CONNECT] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_ACCEPT : ssError << "[SSL_ERROR_WANT_ACCEPT) The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_X509_LOOKUP : ssError << "[SSL_ERROR_WANT_X509_LOOKUP] The operation did not complete because an application callback set by SSL_CTX_set_client_cert_cb() has asked to be called again."; break;
+          case SSL_ERROR_SYSCALL :
+          {
+            ssError << "[SSL_ERROR_SYSCALL] Some I/O error occurred.  ";
+            if (nReturn == 0)
+            {
+              ssError << "Received invalid EOF.";
+            }
+            else
+            {
+              ssError << "read(" << errno << ") " << strerror(errno);
+            }
+            break;
+          }
+          case SSL_ERROR_SSL : ssError << "[SSL_ERROR_SSL] A failure in the SSL library occurred, usually a protocol error."; break;
+          default : ssError << "[" << nReturn << ") Caught an unknown error.";
+        }
+      }
+
+      return ssError.str();
+    }
+    // }}}
   }
 }

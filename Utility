@@ -254,6 +254,13 @@ extern "C++"
       * \return Returns the error string.
       */
       string sslstrerror();
+      /*! \fn string sslstrerror(SSL *ssl, int nReturn)
+      * \brief Obtain an SSL error message.
+      * \param ssl Contains the SSL handle.
+      * \param nReturn Contains the return.
+      * \return Returns the error string.
+      */
+      string sslstrerror(SSL *ssl, int nReturn);
     };
     // }}}
   }

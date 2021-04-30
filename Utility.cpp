@@ -83,6 +83,25 @@ extern "C++"
       signal(SIGTTIN, SIG_IGN);
     }
     // }}}
+    // {{{ fdread()
+    int fdread(int fdSocket, string &strBuffer, bool &bGood)
+    {
+      char szBuffer[65536];
+      int nReturn, nSize = 65536;
+
+      bGood = true;
+      if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
+      {
+        strBuffer.append(szBuffer, nReturn);
+      }
+      else
+      {
+        bGood = false;
+      }
+
+      return nReturn;
+    }
+    // }}}
     // {{{ getConfPath()
     string Utility::getConfPath()
     {

@@ -184,6 +184,14 @@ extern "C++"
       * \param ulMilliSec Contains the milliseconds.
       */
       void msleep(const unsigned long ulMilliSec);
+      /*! \fn int fdread(int fdSocket, string &strBuffer, bool &bGood)
+      * \brief Read data from file descriptor.
+      * \param fdSocket File descriprot.
+      * \param strBuffer Data buffer.
+      * \param bGood Boolean true/false value of whether the file descriptor is still good.
+      * \return Number of bytes read.
+      */
+      int fdread(int fdSocket, string &strBuffer, bool &bGood);
       /*! \fn bool readConf(string &strError)
       * \brief Read configuration file.
       * \param strError Contains the error message.

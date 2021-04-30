@@ -444,7 +444,6 @@ extern "C++"
         strError = ssMessage.str();
         return NULL;
       }
-      SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
 
       return ctx;
     }
@@ -489,6 +488,75 @@ extern "C++"
       }
 
       return bResult;
+    }
+    // }}}
+    // {{{ sslread()
+    int sslread(SSL *ssl, string &strBuffer, bool &bGood)
+    {
+      bool bDone = false;
+      char szBuffer[65536];
+      int nPending, nReturn, nSize = 65536;
+
+      bGood = true;
+      while ((nPending = SSL_pending(ssl)) > 0)
+      {
+        bDone = true;
+        if (nPending > nSize)
+        {
+          nPending = nSize;
+        }
+        if ((nReturn = SSL_read(ssl, szBuffer, nPending)) > 0)
+        {
+          strBuffer.append(szBuffer, nReturn);
+        }
+        else
+        {
+          switch (SSL_get_error(ssl, nReturn))
+          {
+            case SSL_ERROR_ZERO_RETURN:
+            case SSL_ERROR_SYSCALL:
+            case SSL_ERROR_SSL: bGood = false; break;
+          }
+        }
+      }
+      if (!bDone)
+      {
+        if ((nReturn = SSL_read(ssl, szBuffer, nSize)) > 0)
+        {
+          strBuffer.append(szBuffer, nReturn);
+          while ((nPending = SSL_pending(ssl)) > 0)
+          {
+            if (nPending > nSize)
+            {
+              nPending = nSize;
+            }
+            if ((nReturn = SSL_read(ssl, szBuffer, nPending)) > 0)
+            {
+              strBuffer.append(szBuffer, nReturn);
+            }
+            else
+            {
+              switch (SSL_get_error(ssl, nReturn))
+              {
+                case SSL_ERROR_ZERO_RETURN:
+                case SSL_ERROR_SYSCALL:
+                case SSL_ERROR_SSL: bGood = false; break;
+              }
+            }
+          }
+        }
+        else
+        {
+          switch (SSL_get_error(ssl, nReturn))
+          {
+            case SSL_ERROR_ZERO_RETURN:
+            case SSL_ERROR_SYSCALL:
+            case SSL_ERROR_SSL: bGood = false; break;
+          }
+        }
+      }
+
+      return nReturn;
     }
     // }}}
     // {{{ sslstrerror()

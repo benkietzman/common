@@ -173,12 +173,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool getLine(stringstream &ssData, string &strLine);
-      /*! \fn SSL_CTX *initSSL(string &strError)
-      * \brief OpenSSL initialization.
-      * \param strError Returns an error message.
-      * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
-      */
-      SSL_CTX *initSSL(string &strError);
       /*! \fn bool isProcessAlreadyRunning(const string strProcess)
       * \brief Determines if another process of the same name is already running.
       * \param strProcess Contains process name.

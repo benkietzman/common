@@ -529,10 +529,17 @@ extern "C++"
     // {{{ sslread()
     bool Utility::sslread(SSL *ssl, string &strBuffer, int &nReturn)
     {
-      bool bDone = false, bResult = true;;
+      bool bBlocking = false, bDone = false, bResult = true;;
       char szBuffer[65536];
       int nPending, nSize = 65536;
+      long lArg, lArgOrig;
 
+      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
+      {
+        bBlocking = true;
+        lArg |= O_NONBLOCK;
+        fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
+      }
       while ((nPending = SSL_pending(ssl)) > 0)
       {
         bDone = true;
@@ -589,6 +596,10 @@ extern "C++"
             case SSL_ERROR_SSL: bResult = false; break;
           }
         }
+      }
+      if (bBlocking)
+      {
+        fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
       }
 
       return bResult;

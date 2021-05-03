@@ -93,6 +93,14 @@ extern "C++"
       * \return Returns a boolean true/false value of whether the file descriptor is still good.
       */
       bool fdread(int fdSocket, string &strBuffer, int &nReturn);
+      /*! \fn bool fdwrite(int fdSocket, string &strBuffer, int &nReturn)
+      * \brief Read data from file descriptor and appends it onto the existing strBuffer.
+      * \param fdSocket File descriprot.
+      * \param strBuffer Data buffer.
+      * \param nReturn The number of bytes read.
+      * \return Returns a boolean true/false value of whether the file descriptor is still good.
+      */
+      bool fdwrite(int fdSocket, string &strBuffer, int &nReturn);
       /*! \fn string getConfPath()
       * \brief Gets the configuration storage path.
       * \return Returns the configuration storage path.
@@ -241,14 +249,22 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError);
-      /*! \fn bool sslread(SSL *ssl, string &strBuffer, int &nError)
+      /*! \fn bool sslread(SSL *ssl, string &strBuffer, int &nReturn)
       * \brief Read data from SSL handle and appends it onto the existing strBuffer.
       * \param ssl SSL handle.
       * \param strBuffer Data buffer.
-      * \param nError The error number.
+      * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the SSL handle is still good.
       */
-      bool sslread(SSL *ssl, string &strBuffer, int &nError);
+      bool sslread(SSL *ssl, string &strBuffer, int &nReturn);
+      /*! \fn bool sslwrite(SSL *ssl, string &strBuffer, int &nReturn)
+      * \brief Read data from SSL handle and appends it onto the existing strBuffer.
+      * \param ssl SSL handle.
+      * \param strBuffer Data buffer.
+      * \param nReturn The number of bytes read.
+      * \return Returns a boolean true/false value of whether the SSL handle is still good.
+      */
+      bool sslwrite(SSL *ssl, string &strBuffer, int &nReturn);
       /*! \fn string sslstrerror()
       * \brief Obtain an SSL error message.
       * \return Returns the error string.

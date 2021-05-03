@@ -102,6 +102,23 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ fdwrite()
+    bool Utility::fdwrite(int fdSocket, string &strBuffer, int &nReturn)
+    {
+      bool bResult = true;
+
+      if ((nReturn = write(fdSocket, strBuffer.c_str(), strBuffer.size())) > 0)
+      {
+        strBuffer.erase(0, nReturn);
+      }
+      else
+      {
+        bResult = false;
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ getConfPath()
     string Utility::getConfPath()
     {
@@ -510,11 +527,11 @@ extern "C++"
     }
     // }}}
     // {{{ sslread()
-    bool Utility::sslread(SSL *ssl, string &strBuffer, int &nError)
+    bool Utility::sslread(SSL *ssl, string &strBuffer, int &nReturn)
     {
       bool bDone = false, bResult = true;;
       char szBuffer[65536];
-      int nPending, nReturn, nSize = 65536;
+      int nPending, nSize = 65536;
 
       while ((nPending = SSL_pending(ssl)) > 0)
       {
@@ -529,7 +546,7 @@ extern "C++"
         }
         else
         {
-          switch ((nError = SSL_get_error(ssl, nReturn)))
+          switch (SSL_get_error(ssl, nReturn))
           {
             case SSL_ERROR_ZERO_RETURN:
             case SSL_ERROR_SYSCALL:
@@ -554,7 +571,7 @@ extern "C++"
             }
             else
             {
-              switch ((nError = SSL_get_error(ssl, nReturn)))
+              switch (SSL_get_error(ssl, nReturn))
               {
                 case SSL_ERROR_ZERO_RETURN:
                 case SSL_ERROR_SYSCALL:
@@ -565,12 +582,34 @@ extern "C++"
         }
         else
         {
-          switch ((nError = SSL_get_error(ssl, nReturn)))
+          switch (SSL_get_error(ssl, nReturn))
           {
             case SSL_ERROR_ZERO_RETURN:
             case SSL_ERROR_SYSCALL:
             case SSL_ERROR_SSL: bResult = false; break;
           }
+        }
+      }
+
+      return bResult;
+    }
+    // }}}
+    // {{{ sslwrite()
+    bool Utility::sslwrite(SSL *ssl, string &strBuffer, int &nReturn)
+    {
+      bool bResult = true;;
+
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), strBuffer.size())) > 0)
+      {
+        strBuffer.erase(0, nReturn);
+      }
+      else
+      {
+        switch (SSL_get_error(ssl, nReturn))
+        {
+          case SSL_ERROR_ZERO_RETURN:
+          case SSL_ERROR_SYSCALL:
+          case SSL_ERROR_SSL: bResult = false; break;
         }
       }
 

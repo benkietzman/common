@@ -669,7 +669,8 @@ extern "C++"
       ssError << sslstrerror();
       if (ssError.str().empty())
       {
-        switch (nReturn)
+        int nError;
+        switch ((nError = SSL_get_error(ssl, nReturn)))
         {
           case SSL_ERROR_NONE : ssError << "[SSL_ERROR_NONE] The TLS/SSL I/O operation completed."; break;
           case SSL_ERROR_ZERO_RETURN : ssError << "[SSL_ERROR_ZERO_RETURN] The TLS/SSL connection has been closed."; break;
@@ -687,12 +688,12 @@ extern "C++"
             }
             else
             {
-              ssError << "read(" << errno << ") " << strerror(errno);
+              ssError << strerror(errno);
             }
             break;
           }
           case SSL_ERROR_SSL : ssError << "[SSL_ERROR_SSL] A failure in the SSL library occurred, usually a protocol error."; break;
-          default : ssError << "[" << nReturn << ") Caught an unknown error.";
+          default : ssError << " [" << nError << "] Caught an unknown error.";
         }
       }
 

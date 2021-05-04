@@ -451,6 +451,16 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ sslDeinit()
+    void Utility::sslDeiInit()
+    {
+      if (m_bSslInit)
+      {
+        m_bSslInit = false;
+        EVP_cleanup();
+      }
+    }
+    // }}}
     // {{{ sslInit
     // {{{ sslInit()
     void Utility::sslInit()

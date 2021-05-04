@@ -222,6 +222,10 @@ extern "C++"
       *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
       */
       bool socketType(int fdSocket, common_socket_type &eType, string &strError);
+      /*! \fn void sslDeinit()
+      * \brief OpenSSL deinitialization.
+      */
+      void sslDeinit();
       /*! \fn void sslInit()
       * \brief OpenSSL initialization.
       */

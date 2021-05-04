@@ -89,7 +89,6 @@ extern "C++"
       vector<string> m_screen;
       vector<list<size_t> > m_tab;
       vector<string> m_telopts;
-      StringManip m_manip;
 
       bool caught();
       bool col(const size_t unCol);
@@ -114,6 +113,8 @@ extern "C++"
       bool write(const unsigned char *pszData, size_t unSize);
 
       protected:
+      StringManip m_manip;
+
       bool connected();
       void error(const string strError);
       void error(const string strPrefix, const string strError);
@@ -145,6 +146,7 @@ extern "C++"
       void getSocketTimeout(int &nShort, int &nLong);
       virtual bool login(const string strServer, const string strPort, const string strUser, const string strPassword);
       virtual bool logout();
+      virtual string message();
       void numbered(const bool bNumbered);
       string prefix();
       size_t row();

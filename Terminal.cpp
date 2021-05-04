@@ -602,6 +602,28 @@ extern "C++"
       return false; 
     }
     // }}}
+    // {{{ message()
+    string Terminal::message()
+    {
+      return "";
+    }
+    void Terminal::error(const string strError)
+    {
+      if (!strError.empty())
+      {
+        m_strError = strError;
+      }
+      else
+      {
+        m_strError.clear();
+      }
+    }
+    void Terminal::error(const string strPrefix, const string strError)
+    {
+      prefix(strPrefix);
+      error(strError);
+    }
+    // }}}
     // {{{ numbered()
     bool Terminal::numbered()
     {

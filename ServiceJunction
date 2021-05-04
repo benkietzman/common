@@ -117,14 +117,6 @@ extern "C++"
       ServiceJunction(string &strError);
       ~ServiceJunction();
 
-      /*! \fn bool batch(map<string, list<string> > in, map<string, list<string> > &out, string &strError)
-      * \brief Submits a Service Junction request.
-      * \param in Contains request lines.
-      * \param out Contains response lines.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
-      bool batch(map<string, list<string> > in, map<string, list<string> > &out, string &strError);
       /*! \fn bool bridge(const string strUser, const string strPassword, Json *ptRequest, Json *ptResponse, string &strError)
       * Communicates with the Bridge.
       * \param strUser - Contains the User.

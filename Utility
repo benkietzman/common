@@ -222,6 +222,10 @@ extern "C++"
       *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
       */
       bool socketType(int fdSocket, common_socket_type &eType, string &strError);
+      /*! \fn void sslInit()
+      * \brief OpenSSL initialization.
+      */
+      void sslInit();
       /*! \fn SSL_CTX *sslInit(const bool bSslServer, string &strError)
       * \brief OpenSSL initialization.
       * \param bSslServer A boolean indicates if the current program is an SSL server or client.  If true, the program is an SSL server; otherwise, it's an SSL client.

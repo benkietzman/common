@@ -453,14 +453,8 @@ extern "C++"
     // }}}
     // {{{ sslInit
     // {{{ sslInit()
-    SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError)
+    void Utility::sslInit()
     {
-      long lErrCode;
-      const char* lcpErrMsg;
-      stringstream ssMessage;
-      SSL_CTX *ctx = NULL;
-      SSL_METHOD *method;
-
       if (!m_bSslInit)
       {
         m_bSslInit = true;
@@ -469,6 +463,16 @@ extern "C++"
         OpenSSL_add_all_algorithms();
         CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
       }
+    }
+    SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError)
+    {
+      long lErrCode;
+      const char* lcpErrMsg;
+      stringstream ssMessage;
+      SSL_CTX *ctx = NULL;
+      SSL_METHOD *method;
+
+      sslInit();
       method = (SSL_METHOD *)((bSslServer)?TLS_server_method():TLS_client_method());
       ERR_clear_error();
       ctx = SSL_CTX_new(method);

@@ -110,8 +110,6 @@ extern "C++"
         m_bSSL = bSSL;
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_STREAM;
-        hints.ai_flags = 0;
-        hints.ai_protocol = 0;
         if ((nReturn = getaddrinfo(m_strServer.c_str(), m_strPort.c_str(), &hints, &result)) == 0)
         {
           struct addrinfo *rp;

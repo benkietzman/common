@@ -885,8 +885,6 @@ extern "C++"
               memset(&hints, 0, sizeof(addrinfo));
               hints.ai_family = AF_UNSPEC;
               hints.ai_socktype = SOCK_STREAM;
-              hints.ai_flags = 0;
-              hints.ai_protocol = 0;
               m_mutexGetAddrInfo.lock();
               nReturn = getaddrinfo(strServer.c_str(), "22676", &hints, &result);
               m_mutexGetAddrInfo.unlock();
@@ -1076,8 +1074,6 @@ extern "C++"
               memset(&hints, 0, sizeof(addrinfo));
               hints.ai_family = AF_UNSPEC;
               hints.ai_socktype = SOCK_STREAM;
-              hints.ai_flags = 0;
-              hints.ai_protocol = 0;
               m_mutexGetAddrInfo.lock();
               nReturn = getaddrinfo(strServer.c_str(), "22676", &hints, &result);
               m_mutexGetAddrInfo.unlock();

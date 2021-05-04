@@ -52,7 +52,7 @@ extern "C++"
       sema_init(&m_semaServiceJunctionRequestLock, 10, USYNC_THREAD, NULL);
       #endif
       m_bDodgeConcentrator = false;
-      m_bUseSecureJunction = false;
+      m_bUseSecureJunction = true;
       m_bUseSingleSocket = false;
       m_ulModifyTime = 0;
       m_unThrottle = 0;
@@ -1046,7 +1046,7 @@ extern "C++"
             label["loggerMessage"] = strMessage;
             (*m_pLoggerPush)(label);
           }
-          else 
+          else
           {
             list<Json *> result;
             string strError;
@@ -1937,7 +1937,7 @@ extern "C++"
                 #ifdef COMMON_SOLARIS
                 sema_wait(&m_semaServiceJunctionRequestLock);
                 #endif
-                while (!bConnected && unAttempt++ < junctionServer.size())
+                while (!bConnected[5] && unAttempt++ < junctionServer.size())
                 {
                   addrinfo hints, *result;
                   bConnected[0] = bConnected[1] = false;
@@ -2241,8 +2241,6 @@ extern "C++"
               memset(&hints, 0, sizeof(addrinfo));
               hints.ai_family = AF_UNSPEC;
               hints.ai_socktype = SOCK_STREAM;
-              hints.ai_flags = 0;
-              hints.ai_protocol = 0;
               m_mutexGetAddrInfo.lock();
               nReturn = getaddrinfo(strServer.c_str(), ((!m_bUseSecureJunction)?"5862":"5863"), &hints, &result);
               m_mutexGetAddrInfo.unlock();

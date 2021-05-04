@@ -1906,85 +1906,74 @@ extern "C++"
           if (!server.empty())
           {
             bool bDone = false;
+            SSL_CTX *ctx = NULL;
+            if (m_bUseSecureJunction)
+            {
+              SSL_METHOD *method = (SSL_METHOD *)TLS_client_method();
+              if ((ctx = SSL_CTX_new(method)) == NULL)
+              {
+                m_bUseSecureJunction = false;
+              }
+            }
             for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
             {
               for (int j = ((m_bUseSecureJunction)?0:1); !bDone && j < 2; j++)
               {
-                SSL_METHOD *method = NULL;
-                SSL_CTX *ctx = NULL;
-                if (j == 0)
+                bool bConnected[6] = {false, false, false, false, false, false};
+                int fdSocket = -1, nReturn = -1;
+                SSL *ssl = NULL;
+                string strServer;
+                unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
+                vector<string> junctionServer;
+                for (int k = 1; !m_manip.getToken(strServer, (*i), k, ",", true).empty(); k++)
                 {
-                  method = (SSL_METHOD *)TLS_client_method();
+                  junctionServer.push_back(m_manip.trim(strServer, strServer));
                 }
-                if (j == 1 || (ctx = SSL_CTX_new(method)) != NULL)
+                srand(unSeed);
+                unPick = rand_r(&unSeed) % junctionServer.size();
+                #ifdef COMMON_LINUX
+                sem_wait(&m_semaServiceJunctionRequestLock);
+                #endif
+                #ifdef COMMON_SOLARIS
+                sema_wait(&m_semaServiceJunctionRequestLock);
+                #endif
+                while (!bConnected && unAttempt++ < junctionServer.size())
                 {
-                  bool bConnected[6] = {false, false, false, false, false, false};
-                  int fdSocket = -1, nReturn = -1;
-                  SSL *ssl = NULL;
-                  string strServer;
-                  unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
-                  vector<string> junctionServer;
-                  if (j == 0)
+                  addrinfo hints, *result;
+                  bConnected[0] = bConnected[1] = false;
+                  if (unPick == junctionServer.size())
                   {
-                    SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+                    unPick = 0;
                   }
-                  for (int k = 1; !m_manip.getToken(strServer, (*i), k, ",", true).empty(); k++)
+                  strServer = junctionServer[unPick];
+                  memset(&hints, 0, sizeof(addrinfo));
+                  hints.ai_family = AF_UNSPEC;
+                  hints.ai_socktype = SOCK_STREAM;
+                  m_mutexGetAddrInfo.lock();
+                  nReturn = getaddrinfo(strServer.c_str(), ((j == 0)?((m_bDodgeConcentrator)?"5864":"5863"):"5862"), &hints, &result);
+                  m_mutexGetAddrInfo.unlock();
+                  if (nReturn == 0)
                   {
-                    junctionServer.push_back(m_manip.trim(strServer, strServer));
-                  }
-                  srand(unSeed);
-                  unPick = rand_r(&unSeed) % junctionServer.size();
-                  #ifdef COMMON_LINUX
-                  sem_wait(&m_semaServiceJunctionRequestLock);
-                  #endif
-                  #ifdef COMMON_SOLARIS
-                  sema_wait(&m_semaServiceJunctionRequestLock);
-                  #endif
-                  while (!bConnected && unAttempt++ < junctionServer.size())
-                  {
-                    addrinfo hints, *result;
-                    bConnected[0] = bConnected[1] = false;
-                    if (unPick == junctionServer.size())
+                    addrinfo *rp;
+                    bConnected[0] = true;
+                    for (rp = result; !bConnected[5] && rp != NULL; rp = rp->ai_next)
                     {
-                      unPick = 0;
-                    }
-                    strServer = junctionServer[unPick];
-                    memset(&hints, 0, sizeof(addrinfo));
-                    hints.ai_family = AF_UNSPEC;
-                    hints.ai_socktype = SOCK_STREAM;
-                    hints.ai_flags = 0;
-                    hints.ai_protocol = 0;
-                    m_mutexGetAddrInfo.lock();
-                    nReturn = getaddrinfo(strServer.c_str(), ((j == 0)?((m_bDodgeConcentrator)?"5864":"5863"):"5862"), &hints, &result);
-                    m_mutexGetAddrInfo.unlock();
-                    if (nReturn == 0)
-                    {
-                      addrinfo *rp;
-                      bConnected[0] = true;
-                      for (rp = result; !bConnected[5] && rp != NULL; rp = rp->ai_next)
+                      bConnected[1] = false;
+                      if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                       {
-                        bConnected[1] = false;
-                        if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
+                        bConnected[1] = true;
+                        if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                         {
-                          bConnected[1] = true;
-                          if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                          bConnected[2] = true;
+                          if (j == 1 || (ssl = SSL_new(ctx)) != NULL)
                           {
-                            bConnected[2] = true;
-                            if (j == 1 || (ssl = SSL_new(ctx)) != NULL)
+                            bConnected[3] = true;
+                            if (j == 1 || SSL_set_fd(ssl, fdSocket) == 1)
                             {
-                              bConnected[3] = true;
-                              if (j == 1 || SSL_set_fd(ssl, fdSocket) == 1)
+                              bConnected[4] = true;
+                              if (j == 1 || SSL_connect(ssl) == 1)
                               {
-                                bConnected[4] = true;
-                                if (j == 1 || SSL_connect(ssl) == 1)
-                                {
-                                  bConnected[5] = true;
-                                }
-                                else
-                                {
-                                  SSL_free(ssl);
-                                  close(fdSocket);
-                                }
+                                bConnected[5] = true;
                               }
                               else
                               {
@@ -1994,6 +1983,7 @@ extern "C++"
                             }
                             else
                             {
+                              SSL_free(ssl);
                               close(fdSocket);
                             }
                           }
@@ -2002,169 +1992,163 @@ extern "C++"
                             close(fdSocket);
                           }
                         }
-                      }
-                      freeaddrinfo(result);
-                    }
-                    unPick++;
-                  }
-                  #ifdef COMMON_LINUX
-                  sem_post(&m_semaServiceJunctionRequestLock);
-                  #endif
-                  #ifdef COMMON_SOLARIS
-                  sema_post(&m_semaServiceJunctionRequestLock);
-                  #endif
-                  junctionServer.clear();
-                  if (bConnected[4])
-                  {
-                    bool bExit = false;
-                    size_t unPosition;
-                    string strBuffer[2], strLine, strTrim;
-                    bDone = true;
-                    for (list<string>::iterator k = in.begin(); k != in.end(); k++)
-                    {
-                      strBuffer[1] += (*k) + "\n";
-                    }
-                    strBuffer[1] += "end\n";
-                    while (!bExit)
-                    {
-                      pollfd fds[1];
-                      fds[0].fd = fdSocket;
-                      fds[0].events = POLLIN;
-                      if (!strBuffer[1].empty())
-                      {
-                        fds[0].events |= POLLOUT;
-                      }
-                      if ((nReturn = poll(fds, 1, 250)) > 0)
-                      {
-                        if (fds[0].fd == fdSocket && (fds[0].revents & POLLIN))
+                        else
                         {
-                          if ((j == 0 && utility()->sslread(ssl, strBuffer[0], nReturn)) || (j == 1 && utility()->fdread(fdSocket, strBuffer[0], nReturn)))
+                          close(fdSocket);
+                        }
+                      }
+                    }
+                    freeaddrinfo(result);
+                  }
+                  unPick++;
+                }
+                #ifdef COMMON_LINUX
+                sem_post(&m_semaServiceJunctionRequestLock);
+                #endif
+                #ifdef COMMON_SOLARIS
+                sema_post(&m_semaServiceJunctionRequestLock);
+                #endif
+                junctionServer.clear();
+                if (bConnected[5])
+                {
+                  bool bExit = false;
+                  size_t unPosition;
+                  string strBuffer[2], strLine, strTrim;
+                  bDone = true;
+                  for (list<string>::iterator k = in.begin(); k != in.end(); k++)
+                  {
+                    strBuffer[1] += (*k) + "\n";
+                  }
+                  strBuffer[1] += "end\n";
+                  while (!bExit)
+                  {
+                    pollfd fds[1];
+                    fds[0].fd = fdSocket;
+                    fds[0].events = POLLIN;
+                    if (!strBuffer[1].empty())
+                    {
+                      fds[0].events |= POLLOUT;
+                    }
+                    if ((nReturn = poll(fds, 1, 250)) > 0)
+                    {
+                      if (fds[0].fd == fdSocket && (fds[0].revents & POLLIN))
+                      {
+                        if ((j == 0 && utility()->sslread(ssl, strBuffer[0], nReturn)) || (j == 1 && utility()->fdread(fdSocket, strBuffer[0], nReturn)))
+                        {
+                          while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                           {
-                            while ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                            strLine = strBuffer[0].substr(0, unPosition);
+                            strBuffer[0].erase(0, unPosition + 1);
+                            if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
                             {
-                              strLine = strBuffer[0].substr(0, unPosition);
-                              strBuffer[0].erase(0, unPosition + 1);
-                              if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
+                              if (strTrim == "end")
                               {
-                                if (strTrim == "end")
-                                {
-                                  bExit = bResult = true;
-                                }
-                                else
-                                {
-                                  out.push_back(strLine);
-                                }
+                                bExit = bResult = true;
+                              }
+                              else
+                              {
+                                out.push_back(strLine);
                               }
                             }
                           }
-                          else if (j == 0)
-                          {
-                            bExit = true;
-                            if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
-                            {
-                              stringstream ssError;
-                              ssError << "Utility::sslread(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
-                              strError = ssError.str();
-                            }
-                          }
-                          else
-                          {
-                            bExit = true;
-                            if (nReturn < 0)
-                            {
-                              stringstream ssError;
-                              ssError << "Utility::fdread(" << errno << ") " << strerror(errno);
-                              strError = ssError.str();
-                            }
-                          }
                         }
-                        if (fds[0].fd == fdSocket && (fds[0].revents & POLLOUT))
+                        else if (j == 0)
                         {
-                          if (j == 0 && !utility()->sslwrite(ssl, strBuffer[1], nReturn))
+                          bExit = true;
+                          if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
                           {
-                            bExit = true;
-                            if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
-                            {
-                              stringstream ssError;
-                              ssError << "Utility::sslwrite(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
-                              strError = ssError.str();
-                            }
+                            stringstream ssError;
+                            ssError << "Utility::sslread(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
+                            strError = ssError.str();
                           }
-                          else if (j == 1 && !utility()->fdwrite(fdSocket, strBuffer[1], nReturn))
+                        }
+                        else
+                        {
+                          bExit = true;
+                          if (nReturn < 0)
                           {
-                            bExit = true;
-                            if (nReturn < 0)
-                            {
-                              stringstream ssError;
-                              ssError << "Utility::fdwrite(" << errno << ") " << strerror(errno);
-                              strError = ssError.str();
-                            }
+                            stringstream ssError;
+                            ssError << "Utility::fdread(" << errno << ") " << strerror(errno);
+                            strError = ssError.str();
                           }
                         }
                       }
-                      else if (nReturn < 0)
+                      if (fds[0].fd == fdSocket && (fds[0].revents & POLLOUT))
                       {
-                        stringstream ssError;
-                        bExit = true;
-                        ssError << "poll(" << errno << ") " << strerror(errno);
-                        strError = ssError.str();
+                        if (j == 0 && !utility()->sslwrite(ssl, strBuffer[1], nReturn))
+                        {
+                          bExit = true;
+                          if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
+                          {
+                            stringstream ssError;
+                            ssError << "Utility::sslwrite(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
+                            strError = ssError.str();
+                          }
+                        }
+                        else if (j == 1 && !utility()->fdwrite(fdSocket, strBuffer[1], nReturn))
+                        {
+                          bExit = true;
+                          if (nReturn < 0)
+                          {
+                            stringstream ssError;
+                            ssError << "Utility::fdwrite(" << errno << ") " << strerror(errno);
+                            strError = ssError.str();
+                          }
+                        }
                       }
-                      time(&CEnd);
-                      if ((CEnd - CStart) > CTimeout)
-                      {
-                        bExit = true;
-                        strError = "Timeout expired.";
-                      }
                     }
-                    if (bResult && out.empty())
+                    else if (nReturn < 0)
                     {
-                      bResult = false;
-                      strError = "Failed to receive any data from the underlying service within the Service Junction.";
+                      stringstream ssError;
+                      bExit = true;
+                      ssError << "poll(" << errno << ") " << strerror(errno);
+                      strError = ssError.str();
                     }
-                    if (j == 0)
+                    time(&CEnd);
+                    if ((CEnd - CStart) > CTimeout)
                     {
-                      SSL_free(ssl);
+                      bExit = true;
+                      strError = "Timeout expired.";
                     }
-                    close(fdSocket);
                   }
-                  else if (j == 1)
+                  if (bResult && out.empty())
                   {
-                    stringstream ssError;
-                    if (!bConnected[0])
-                    {
-                      ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
-                    }
-                    else if (!bConnected[1])
-                    {
-                      ssError << "socket(" << errno << ") " << strerror(errno);
-                    }
-                    else if (!bConnected[2])
-                    {
-                      ssError << "connect(" << errno << ") " << strerror(errno);
-                    }
-                    else if (!bConnected[3])
-                    {
-                      ssError << "SSL_new() " << utility()->sslstrerror();
-                    }
-                    else if (!bConnected[4])
-                    {
-                      ssError << "SSL_set_fd() " << utility()->sslstrerror();
-                    }
-                    else
-                    {
-                      ssError << "SSL_connect() " << utility()->sslstrerror();
-                    }
-                    strError = ssError.str();
+                    bResult = false;
+                    strError = "Failed to receive any data from the underlying service within the Service Junction.";
                   }
                   if (j == 0)
                   {
-                    SSL_CTX_free(ctx);
+                    SSL_free(ssl);
                   }
+                  close(fdSocket);
                 }
                 else
                 {
                   stringstream ssError;
-                  ssError << "SSL_CTX_new() " << utility()->sslstrerror();
+                  if (!bConnected[0])
+                  {
+                    ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
+                  }
+                  else if (!bConnected[1])
+                  {
+                    ssError << "socket(" << errno << ") " << strerror(errno);
+                  }
+                  else if (!bConnected[2])
+                  {
+                    ssError << "connect(" << errno << ") " << strerror(errno);
+                  }
+                  else if (!bConnected[3])
+                  {
+                    ssError << "SSL_new() " << utility()->sslstrerror();
+                  }
+                  else if (!bConnected[4])
+                  {
+                    ssError << "SSL_set_fd() " << utility()->sslstrerror();
+                  }
+                  else
+                  {
+                    ssError << "SSL_connect() " << utility()->sslstrerror();
+                  }
                   strError = ssError.str();
                 }
               }
@@ -2172,6 +2156,10 @@ extern "C++"
             if (!bResult && strError.empty())
             {
               strError = "Service Junction request failed without returning an error message.";
+            }
+            if (ctx != NULL)
+            {
+              SSL_CTX_free(ctx);
             }
           }
           else
@@ -2203,7 +2191,16 @@ extern "C++"
     void ServiceJunction::requestThread()
     {
       size_t unSleep = 1;
+      SSL_CTX *ctx = NULL;
 
+      if (m_bUseSecureJunction)
+      {
+        SSL_METHOD *method = (SSL_METHOD *)TLS_client_method();
+        if ((ctx = SSL_CTX_new(method)) == NULL)
+        {
+          m_bUseSecureJunction = false;
+        }
+      }
       while (m_bUseSingleSocket)
       {
         list<string> server;
@@ -2219,73 +2216,55 @@ extern "C++"
         }
         if (!server.empty())
         {
-          SSL_METHOD *method = NULL;
-          SSL_CTX *ctx = NULL;
-          if (m_bUseSecureJunction)
+          for (list<string>::iterator i = server.begin(); m_bUseSingleSocket && i != server.end(); i++)
           {
-            method = (SSL_METHOD *)TLS_client_method();
-          }
-          if (!m_bUseSecureJunction || (ctx = SSL_CTX_new(method)) != NULL)
-          {
-            if (m_bUseSecureJunction)
+            bool bConnected = false;
+            int fdSocket = -1, nReturn = -1;
+            SSL *ssl = NULL;
+            string strServer;
+            unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
+            vector<string> junctionServer;
+            for (int k = 1; !m_manip.getToken(strServer, (*i), k, ",", true).empty(); k++)
             {
-              SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+              junctionServer.push_back(m_manip.trim(strServer, strServer));
             }
-            for (list<string>::iterator i = server.begin(); m_bUseSingleSocket && i != server.end(); i++)
+            srand(unSeed);
+            unPick = rand_r(&unSeed) % junctionServer.size();
+            while (m_bUseSingleSocket && !bConnected && unAttempt++ < junctionServer.size())
             {
-              bool bConnected = false;
-              int fdSocket = -1, nReturn = -1;
-              SSL *ssl = NULL;
-              string strServer;
-              unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
-              vector<string> junctionServer;
-              for (int k = 1; !m_manip.getToken(strServer, (*i), k, ",", true).empty(); k++)
+              addrinfo hints, *result;
+              if (unPick == junctionServer.size())
               {
-                junctionServer.push_back(m_manip.trim(strServer, strServer));
+                unPick = 0;
               }
-              srand(unSeed);
-              unPick = rand_r(&unSeed) % junctionServer.size();
-              while (m_bUseSingleSocket && !bConnected && unAttempt++ < junctionServer.size())
+              strServer = junctionServer[unPick];
+              memset(&hints, 0, sizeof(addrinfo));
+              hints.ai_family = AF_UNSPEC;
+              hints.ai_socktype = SOCK_STREAM;
+              hints.ai_flags = 0;
+              hints.ai_protocol = 0;
+              m_mutexGetAddrInfo.lock();
+              nReturn = getaddrinfo(strServer.c_str(), ((!m_bUseSecureJunction)?"5862":"5863"), &hints, &result);
+              m_mutexGetAddrInfo.unlock();
+              if (nReturn == 0)
               {
-                addrinfo hints, *result;
-                if (unPick == junctionServer.size())
+                addrinfo *rp;
+                for (rp = result; m_bUseSingleSocket && !bConnected && rp != NULL; rp = rp->ai_next)
                 {
-                  unPick = 0;
-                }
-                strServer = junctionServer[unPick];
-                memset(&hints, 0, sizeof(addrinfo));
-                hints.ai_family = AF_UNSPEC;
-                hints.ai_socktype = SOCK_STREAM;
-                hints.ai_flags = 0;
-                hints.ai_protocol = 0;
-                m_mutexGetAddrInfo.lock();
-                nReturn = getaddrinfo(strServer.c_str(), "5863", &hints, &result);
-                m_mutexGetAddrInfo.unlock();
-                if (nReturn == 0)
-                {
-                  addrinfo *rp;
-                  for (rp = result; m_bUseSingleSocket && !bConnected && rp != NULL; rp = rp->ai_next)
+                  if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                   {
-                    if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
+                    if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                     {
-                      if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                      if (!m_bUseSecureJunction || (ssl = SSL_new(ctx)) != NULL)
                       {
-                        if (!m_bUseSecureJunction || (ssl = SSL_new(ctx)) != NULL)
+                        if (!m_bUseSecureJunction || (SSL_set_fd(ssl, fdSocket) == 1 && SSL_connect(ssl) == 1))
                         {
-                          if (!m_bUseSecureJunction || (SSL_set_fd(ssl, fdSocket) == 1 && SSL_connect(ssl) == 1))
-                          {
-                            bConnected = true;
-                          }
-                          else
-                          {
-                            SSL_free(ssl);
-                            close(fdSocket);
-                          }
+                          bConnected = true;
                         }
                         else
                         {
+                          SSL_free(ssl);
                           close(fdSocket);
-                          fdSocket = -1;
                         }
                       }
                       else
@@ -2294,161 +2273,156 @@ extern "C++"
                         fdSocket = -1;
                       }
                     }
+                    else
+                    {
+                      close(fdSocket);
+                      fdSocket = -1;
+                    }
                   }
-                  freeaddrinfo(result);
                 }
-                unPick++;
+                freeaddrinfo(result);
               }
-              junctionServer.clear();
-              if (bConnected)
+              unPick++;
+            }
+            junctionServer.clear();
+            if (bConnected)
+            {
+              bool bExit = false;
+              list<string> response;
+              size_t unPosition;
+              string strBuffer[2], strLine, strTrim;
+              unSleep = 1;
+              while (m_bUseSingleSocket && !bExit)
               {
-                bool bExit = false;
-                list<string> response;
-                size_t unPosition;
-                string strBuffer[2], strLine, strTrim;
-                unSleep = 1;
-                while (m_bUseSingleSocket && !bExit)
+                size_t unIndex = 1;
+                pollfd *fds = new pollfd[m_requests.size() + 1];
+                m_mutexRequests.lock();
+                for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
                 {
-                  size_t unIndex = 1;
-                  pollfd *fds = new pollfd[m_requests.size() + 1];
-                  m_mutexRequests.lock();
-                  for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                  if (!j->second->bSent)
                   {
-                    if (!j->second->bSent)
-                    {
-                      j->second->bSent = true;
-                      strBuffer[1] += j->second->strBuffer[0] + "end\n";
-                    }
-                    if (j->second->fdSocket != -1 && !j->second->strBuffer[1].empty())
-                    {
-                      fds[unIndex].fd = j->second->fdSocket;
-                      fds[unIndex].events = POLLOUT;
-                      unIndex++;
-                    }
+                    j->second->bSent = true;
+                    strBuffer[1] += j->second->strBuffer[0] + "end\n";
                   }
-                  m_mutexRequests.unlock();
-                  fds[0].fd = fdSocket;
-                  fds[0].events = POLLIN;
-                  if (!strBuffer[1].empty())
+                  if (j->second->fdSocket != -1 && !j->second->strBuffer[1].empty())
                   {
-                    fds[0].events |= POLLOUT;
+                    fds[unIndex].fd = j->second->fdSocket;
+                    fds[unIndex].events = POLLOUT;
+                    unIndex++;
                   }
-                  if ((nReturn = poll(fds, unIndex, 250)) > 0)
+                }
+                m_mutexRequests.unlock();
+                fds[0].fd = fdSocket;
+                fds[0].events = POLLIN;
+                if (!strBuffer[1].empty())
+                {
+                  fds[0].events |= POLLOUT;
+                }
+                if ((nReturn = poll(fds, unIndex, 250)) > 0)
+                {
+                  if (fds[0].revents & POLLIN)
                   {
-                    if (fds[0].revents & POLLIN)
+                    if ((!m_bUseSecureJunction && utility()->fdread(fdSocket, strBuffer[0], nReturn)) || (m_bUseSecureJunction && utility()->sslread(ssl, strBuffer[0], nReturn)))
                     {
-                      if ((!m_bUseSecureJunction && utility()->fdread(fdSocket, strBuffer[0], nReturn)) || (m_bUseSecureJunction && utility()->sslread(ssl, strBuffer[0], nReturn)))
+                      while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                       {
-                        while ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                        strLine = strBuffer[0].substr(0, unPosition);
+                        strBuffer[0].erase(0, unPosition + 1);
+                        if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
                         {
-                          strLine = strBuffer[0].substr(0, unPosition);
-                          strBuffer[0].erase(0, unPosition + 1);
-                          if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
+                          if (strTrim == "end")
                           {
-                            if (strTrim == "end")
+                            if (!response.empty())
                             {
-                              if (!response.empty())
+                              Json *ptJson = new Json(response.front());
+                              if (ptJson->m.find("sjUniqueID") != ptJson->m.end() && !ptJson->m["sjUniqueID"]->v.empty())
                               {
-                                Json *ptJson = new Json(response.front());
-                                if (ptJson->m.find("sjUniqueID") != ptJson->m.end() && !ptJson->m["sjUniqueID"]->v.empty())
+                                size_t unUniqueID = atoi(ptJson->m["sjUniqueID"]->v.c_str());
+                                string strResponse;
+                                for (list<string>::iterator j = response.begin(); j != response.end(); j++)
                                 {
-                                  size_t unUniqueID = atoi(ptJson->m["sjUniqueID"]->v.c_str());
-                                  string strResponse;
-                                  for (list<string>::iterator j = response.begin(); j != response.end(); j++)
-                                  {
-                                    strResponse += (*j) + "\n";
-                                  }
-                                  m_mutexRequests.lock();
-                                  if (m_requests.find(unUniqueID) != m_requests.end())
-                                  {
-                                    m_requests[unUniqueID]->strBuffer[1] = strResponse;
-                                  }
-                                  m_mutexRequests.unlock();
+                                  strResponse += (*j) + "\n";
                                 }
-                                response.clear();
-                                delete ptJson;
+                                m_mutexRequests.lock();
+                                if (m_requests.find(unUniqueID) != m_requests.end())
+                                {
+                                  m_requests[unUniqueID]->strBuffer[1] = strResponse;
+                                }
+                                m_mutexRequests.unlock();
                               }
+                              response.clear();
+                              delete ptJson;
                             }
-                            else
-                            {
-                              response.push_back(strLine);
-                            }
+                          }
+                          else
+                          {
+                            response.push_back(strLine);
                           }
                         }
                       }
-                      else
-                      {
-                        bExit = true;
-                      }
                     }
-                    if (fds[0].revents & POLLOUT)
+                    else
                     {
-                      if ((!m_bUseSecureJunction && !utility()->fdwrite(fdSocket, strBuffer[1], nReturn)) || (m_bUseSecureJunction && !utility()->sslwrite(ssl, strBuffer[1], nReturn)))
-                      {
-                        bExit = true;
-                      }
+                      bExit = true;
                     }
-                    if (unIndex > 1)
+                  }
+                  if (fds[0].revents & POLLOUT)
+                  {
+                    if ((!m_bUseSecureJunction && !utility()->fdwrite(fdSocket, strBuffer[1], nReturn)) || (m_bUseSecureJunction && !utility()->sslwrite(ssl, strBuffer[1], nReturn)))
                     {
-                      m_mutexRequests.lock();
-                      for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                      bExit = true;
+                    }
+                  }
+                  if (unIndex > 1)
+                  {
+                    m_mutexRequests.lock();
+                    for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                    {
+                      for (size_t k = 1; k < unIndex; k++)
                       {
-                        for (size_t k = 1; k < unIndex; k++)
+                        if (fds[k].fd == j->second->fdSocket && fds[k].revents & POLLOUT)
                         {
-                          if (fds[k].fd == j->second->fdSocket && fds[k].revents & POLLOUT)
+                          if ((nReturn = write(j->second->fdSocket, j->second->strBuffer[1].c_str(), j->second->strBuffer[1].size())) > 0)
                           {
-                            if ((nReturn = write(j->second->fdSocket, j->second->strBuffer[1].c_str(), j->second->strBuffer[1].size())) > 0)
-                            {
-                              j->second->strBuffer[1].erase(0, nReturn);
-                              if (j->second->strBuffer[1].empty())
-                              {
-                                close(j->second->fdSocket);
-                                j->second->fdSocket = -1;
-                              }
-                            }
-                            else
+                            j->second->strBuffer[1].erase(0, nReturn);
+                            if (j->second->strBuffer[1].empty())
                             {
                               close(j->second->fdSocket);
                               j->second->fdSocket = -1;
                             }
                           }
+                          else
+                          {
+                            close(j->second->fdSocket);
+                            j->second->fdSocket = -1;
+                          }
                         }
                       }
-                      m_mutexRequests.unlock();
                     }
-                  }
-                  delete[] fds;
-                }
-                response.clear();
-                for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
-                {
-                  if (j->second->bSent)
-                  {
-                    if (j->second->fdSocket != -1)
-                    {
-                      close(j->second->fdSocket);
-                      j->second->fdSocket = -1;
-                    }
+                    m_mutexRequests.unlock();
                   }
                 }
-                if (m_bUseSecureJunction)
-                {
-                  SSL_free(ssl);
-                }
-                close(fdSocket);
-                fdSocket = -1;
+                delete[] fds;
               }
+              response.clear();
+              for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+              {
+                if (j->second->bSent)
+                {
+                  if (j->second->fdSocket != -1)
+                  {
+                    close(j->second->fdSocket);
+                    j->second->fdSocket = -1;
+                  }
+                }
+              }
+              if (m_bUseSecureJunction)
+              {
+                SSL_free(ssl);
+              }
+              close(fdSocket);
+              fdSocket = -1;
             }
-            if (m_bUseSecureJunction)
-            {
-              SSL_CTX_free(ctx);
-            }
-          }
-          else
-          {
-            stringstream ssError;
-            ssError << "SSL_CTX_new() " << utility()->sslstrerror();
-            strError = ssError.str();
           }
         }
         server.clear();
@@ -2471,6 +2445,10 @@ extern "C++"
           close(i->second->fdSocket);
           i->second->fdSocket = -1;
         }
+      }
+      if (ctx != NULL)
+      {
+        SSL_CTX_free(ctx);
       }
     }
     // }}}

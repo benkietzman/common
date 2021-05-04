@@ -452,7 +452,7 @@ extern "C++"
     }
     // }}}
     // {{{ sslDeinit()
-    void Utility::sslDeiInit()
+    void Utility::sslDeinit()
     {
       if (m_bSslInit)
       {

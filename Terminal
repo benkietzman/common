@@ -139,6 +139,7 @@ extern "C++"
       bool findPos(const string strData, const size_t unStartRow, size_t &unRow, size_t &unCol);
       bool findPos(const string strData, const size_t unStartRow, const size_t unEndRow, size_t &unRow, size_t &unCol);
       bool findPos(const string strData, const size_t unStartRow, const size_t unStartCol, const size_t unEndcol, size_t &unRow, size_t &unCol);
+      bool get(string &strData, const size_t unRow);
       bool get(string &strData, const size_t unRow, const size_t unStartCol, const size_t unEndcol);
       virtual bool getServer(const string strSystem, string &strServer, string &strPort);
       void getSocketTimeout(int &nShort, int &nLong);

@@ -512,6 +512,23 @@ extern "C++"
     }
     // }}}
     // {{{ get()
+    bool Terminal::get(string &strData, const size_t unRow)
+    {
+      bool bResult = false;
+
+      strData = "";
+      if (unRow < m_screen.size())
+      {
+        bResult = true;
+        strData = m_screen[unRow];
+      }
+      if (!bResult)
+      {
+        error("get()", "Failed to get data from provided positional arguments.");
+      }
+
+      return bResult;
+    }
     bool Terminal::get(string &strData, const size_t unRow, const size_t unStartCol, const size_t unEndCol)
     {
       bool bResult = false;
@@ -537,7 +554,6 @@ extern "C++"
       }
       if (!bResult)
       {
-        string strEncode;
         error("get()", "Failed to get data from provided positional arguments.");
       }
 

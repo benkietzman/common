@@ -2033,7 +2033,7 @@ extern "C++"
                     {
                       if (fds[0].fd == fdSocket && (fds[0].revents & POLLIN))
                       {
-                        if ((j == 0 && utility()->sslRead(ssl, strBuffer[0], nReturn)) || (j == 1 && utility()->fdread(fdSocket, strBuffer[0], nReturn)))
+                        if ((j == 0 && utility()->sslRead(ssl, strBuffer[0], nReturn)) || (j == 1 && utility()->fdRead(fdSocket, strBuffer[0], nReturn)))
                         {
                           while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                           {
@@ -2068,7 +2068,7 @@ extern "C++"
                           if (nReturn < 0)
                           {
                             stringstream ssError;
-                            ssError << "Utility::fdread(" << errno << ") " << strerror(errno);
+                            ssError << "Utility::fdRead(" << errno << ") " << strerror(errno);
                             strError = ssError.str();
                           }
                         }
@@ -2085,13 +2085,13 @@ extern "C++"
                             strError = ssError.str();
                           }
                         }
-                        else if (j == 1 && !utility()->fdwrite(fdSocket, strBuffer[1], nReturn))
+                        else if (j == 1 && !utility()->fdWrite(fdSocket, strBuffer[1], nReturn))
                         {
                           bExit = true;
                           if (nReturn < 0)
                           {
                             stringstream ssError;
-                            ssError << "Utility::fdwrite(" << errno << ") " << strerror(errno);
+                            ssError << "Utility::fdWrite(" << errno << ") " << strerror(errno);
                             strError = ssError.str();
                           }
                         }
@@ -2320,7 +2320,7 @@ extern "C++"
                 {
                   if (fds[0].revents & POLLIN)
                   {
-                    if ((!m_bUseSecureJunction && utility()->fdread(fdSocket, strBuffer[0], nReturn)) || (m_bUseSecureJunction && utility()->sslRead(ssl, strBuffer[0], nReturn)))
+                    if ((!m_bUseSecureJunction && utility()->fdRead(fdSocket, strBuffer[0], nReturn)) || (m_bUseSecureJunction && utility()->sslRead(ssl, strBuffer[0], nReturn)))
                     {
                       while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                       {
@@ -2366,7 +2366,7 @@ extern "C++"
                   }
                   if (fds[0].revents & POLLOUT)
                   {
-                    if ((!m_bUseSecureJunction && !utility()->fdwrite(fdSocket, strBuffer[1], nReturn)) || (m_bUseSecureJunction && !utility()->sslWrite(ssl, strBuffer[1], nReturn)))
+                    if ((!m_bUseSecureJunction && !utility()->fdWrite(fdSocket, strBuffer[1], nReturn)) || (m_bUseSecureJunction && !utility()->sslWrite(ssl, strBuffer[1], nReturn)))
                     {
                       bExit = true;
                     }

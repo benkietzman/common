@@ -511,12 +511,15 @@ extern "C++"
     }
     SSL_CTX *Utility::sslInitServer(const string strCertificate, const string strPrivateKey, string &strError)
     {
-      SSL_CTX *ctx = sslInitServer(strError);
+      SSL_CTX *ctx = NULL;
 
-      if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+      if ((ctx = sslInitServer(strError)) != NULL)
       {
-        SSL_CTX_free(ctx);
-        ctx = NULL;
+        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        {
+          SSL_CTX_free(ctx);
+          ctx = NULL;
+        }
       }
 
       return ctx;

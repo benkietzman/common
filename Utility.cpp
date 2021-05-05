@@ -509,39 +509,53 @@ extern "C++"
     {
       return sslInit(true, strError);
     }
+    SSL_CTX *Utility::sslInitServer(const string strCertificate, const string strPrivateKey, string &strError)
+    {
+      SSL_CTX *ctx = sslInitServer(strError);
+
+      if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+      {
+        SSL_CTX_free(ctx);
+        ctx = NULL;
+      }
+
+      return ctx;
+    }
     // }}}
     // }}}
     // {{{ sslLoadCertKey()
     bool Utility::sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
     {
-      bool bResult = true;
-      string strFunction;
+      bool bResult = false;
 
-      if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) <= 0)
+      if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) == 1)
       {
-        bResult = false;
-        strFunction = "SSL_CTX_use_certificate_file";
+        if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) == 1)
+        {
+          if (SSL_CTX_check_private_key(ctx) == 1)
+          {
+            bResult = true;
+          }
+          else
+          {
+            strError = (string)"SSL_CTX_check_private_key() " + sslstrerror();
+          }
+        }
+        else
+        {
+          strError = (string)"SSL_CTX_use_PrivateKey_file() " + sslstrerror();
+        }
       }
-      if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) <= 0)
+      else
       {
-        bResult = false;
-        strFunction = "SSL_CTX_use_PrivateKey_file";
-      }
-      if (!SSL_CTX_check_private_key(ctx))
-      {
-        bResult = false;
-        strFunction = "SSL_CTX_check_private_key";
-      }
-      if (!bResult)
-      {
-        strError = sslstrerror();
+        strError = (string)"SSL_CTX_use_certificate_file() " + sslstrerror();
       }
 
       return bResult;
     }
     // }}}
-    // {{{ sslread()
-    bool Utility::sslread(SSL *ssl, string &strBuffer, int &nReturn)
+    // {{{ sslRead()
+    bool Utility::sslRead(SSL *ssl, string &strBuffer, int &nReturn)
     {
       bool bBlocking = false, bDone = false, bResult = true;;
       char szBuffer[65536];
@@ -619,8 +633,8 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ sslwrite()
-    bool Utility::sslwrite(SSL *ssl, string &strBuffer, int &nReturn)
+    // {{{ sslWrite()
+    bool Utility::sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
     {
       bool bBlocking = false, bResult = true;;
       long lArg, lArgOrig;

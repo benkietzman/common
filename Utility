@@ -249,6 +249,14 @@ extern "C++"
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
       SSL_CTX *sslInitServer(string &strError);
+      /*! \fn SSL_CTX *sslInitServer(const string strCertificate, const string strPrivateKey, string &strError)
+      * \brief OpenSSL initialization for a server.
+      * \param strCertificate Contains the certificate.
+      * \param strPrivateKey Contains the private key.
+      * \param strError Returns an error message.
+      * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
+      */
+      SSL_CTX *sslInitServer(const string strCertificate, const string strPrivateKey, string &strError);
       /*! \fn bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
       * \brief Loads the SSL certificate and private key into the SSL CTX and then checks their consistency.
       * \param ctx Contains the SSL context.
@@ -257,22 +265,22 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError);
-      /*! \fn bool sslread(SSL *ssl, string &strBuffer, int &nReturn)
+      /*! \fn bool sslRead(SSL *ssl, string &strBuffer, int &nReturn)
       * \brief Read data from SSL handle and appends it onto the existing strBuffer.
       * \param ssl SSL handle.
       * \param strBuffer Data buffer.
       * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the SSL handle is still good.
       */
-      bool sslread(SSL *ssl, string &strBuffer, int &nReturn);
-      /*! \fn bool sslwrite(SSL *ssl, string &strBuffer, int &nReturn)
+      bool sslRead(SSL *ssl, string &strBuffer, int &nReturn);
+      /*! \fn bool sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
       * \brief Read data from SSL handle and appends it onto the existing strBuffer.
       * \param ssl SSL handle.
       * \param strBuffer Data buffer.
       * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the SSL handle is still good.
       */
-      bool sslwrite(SSL *ssl, string &strBuffer, int &nReturn);
+      bool sslWrite(SSL *ssl, string &strBuffer, int &nReturn);
       /*! \fn string sslstrerror()
       * \brief Obtain an SSL error message.
       * \return Returns the error string.

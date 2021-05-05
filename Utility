@@ -85,22 +85,22 @@ extern "C++"
       * \brief Turns the process into a system daemon.
       */
       void daemonize();
-      /*! \fn bool fdread(int fdSocket, string &strBuffer, int &nReturn)
+      /*! \fn bool fdRead(int fdSocket, string &strBuffer, int &nReturn)
       * \brief Read data from file descriptor and appends it onto the existing strBuffer.
       * \param fdSocket File descriprot.
       * \param strBuffer Data buffer.
       * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the file descriptor is still good.
       */
-      bool fdread(int fdSocket, string &strBuffer, int &nReturn);
-      /*! \fn bool fdwrite(int fdSocket, string &strBuffer, int &nReturn)
+      bool fdRead(int fdSocket, string &strBuffer, int &nReturn);
+      /*! \fn bool fdWrite(int fdSocket, string &strBuffer, int &nReturn)
       * \brief Read data from file descriptor and appends it onto the existing strBuffer.
       * \param fdSocket File descriprot.
       * \param strBuffer Data buffer.
       * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the file descriptor is still good.
       */
-      bool fdwrite(int fdSocket, string &strBuffer, int &nReturn);
+      bool fdWrite(int fdSocket, string &strBuffer, int &nReturn);
       /*! \fn string getConfPath()
       * \brief Gets the configuration storage path.
       * \return Returns the configuration storage path.

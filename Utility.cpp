@@ -83,8 +83,8 @@ extern "C++"
       signal(SIGTTIN, SIG_IGN);
     }
     // }}}
-    // {{{ fdread()
-    bool Utility::fdread(int fdSocket, string &strBuffer, int &nReturn)
+    // {{{ fdRead()
+    bool Utility::fdRead(int fdSocket, string &strBuffer, int &nReturn)
     {
       bool bResult = true;
       char szBuffer[65536];
@@ -102,8 +102,8 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ fdwrite()
-    bool Utility::fdwrite(int fdSocket, string &strBuffer, int &nReturn)
+    // {{{ fdWrite()
+    bool Utility::fdWrite(int fdSocket, string &strBuffer, int &nReturn)
     {
       bool bResult = true;
 

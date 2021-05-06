@@ -86,13 +86,21 @@ extern "C++"
     // {{{ fdRead()
     bool Utility::fdRead(int fdSocket, string &strBuffer, int &nReturn)
     {
+      string strRead;
+
+      return fdRead(fdSocket, strBuffer, strRead, nReturn);
+    }
+    bool Utility::fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn)
+    {
       bool bResult = true;
       char szBuffer[65536];
       int nSize = 65536;
 
+      strRead.clear();
       if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
       {
         strBuffer.append(szBuffer, nReturn);
+        strRead.append(szBuffer, nReturn);
       }
       else
       {
@@ -560,72 +568,57 @@ extern "C++"
     // {{{ sslRead()
     bool Utility::sslRead(SSL *ssl, string &strBuffer, int &nReturn)
     {
-      bool bBlocking = false, bDone = false, bResult = true;
+      string strRead;
+
+      return sslRead(ssl, strBuffer, strRead, nReturn);
+    }
+    bool Utility::sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
+    {
+      bool bBlocking = false, bResult = true;
       char szBuffer[65536];
       int nPending, nSize = 65536;
       long lArg, lArgOrig;
 
+      strRead.clear();
       if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
       {
         bBlocking = true;
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      while ((nPending = SSL_pending(ssl)) > 0)
+      if ((nReturn = SSL_read(ssl, szBuffer, nSize)) > 0)
       {
-        bDone = true;
-        if (nPending > nSize)
+        strBuffer.append(szBuffer, nReturn);
+        strRead.append(szBuffer, nReturn);
+        while ((nPending = SSL_pending(ssl)) > 0)
         {
-          nPending = nSize;
-        }
-        if ((nReturn = SSL_read(ssl, szBuffer, nPending)) > 0)
-        {
-          strBuffer.append(szBuffer, nReturn);
-        }
-        else
-        {
-          switch (SSL_get_error(ssl, nReturn))
+          if (nPending > nSize)
           {
-            case SSL_ERROR_ZERO_RETURN:
-            case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL: bResult = false; break;
+            nPending = nSize;
+          }
+          if ((nReturn = SSL_read(ssl, szBuffer, nPending)) > 0)
+          {
+            strBuffer.append(szBuffer, nReturn);
+            strRead.append(szBuffer, nReturn);
+          }
+          else
+          {
+            switch (SSL_get_error(ssl, nReturn))
+            {
+              case SSL_ERROR_ZERO_RETURN:
+              case SSL_ERROR_SYSCALL:
+              case SSL_ERROR_SSL: bResult = false; break;
+            }
           }
         }
       }
-      if (!bDone)
+      else
       {
-        if ((nReturn = SSL_read(ssl, szBuffer, nSize)) > 0)
+        switch (SSL_get_error(ssl, nReturn))
         {
-          strBuffer.append(szBuffer, nReturn);
-          while ((nPending = SSL_pending(ssl)) > 0)
-          {
-            if (nPending > nSize)
-            {
-              nPending = nSize;
-            }
-            if ((nReturn = SSL_read(ssl, szBuffer, nPending)) > 0)
-            {
-              strBuffer.append(szBuffer, nReturn);
-            }
-            else
-            {
-              switch (SSL_get_error(ssl, nReturn))
-              {
-                case SSL_ERROR_ZERO_RETURN:
-                case SSL_ERROR_SYSCALL:
-                case SSL_ERROR_SSL: bResult = false; break;
-              }
-            }
-          }
-        }
-        else
-        {
-          switch (SSL_get_error(ssl, nReturn))
-          {
-            case SSL_ERROR_ZERO_RETURN:
-            case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL: bResult = false; break;
-          }
+          case SSL_ERROR_ZERO_RETURN:
+          case SSL_ERROR_SYSCALL:
+          case SSL_ERROR_SSL: bResult = false; break;
         }
       }
       if (bBlocking)

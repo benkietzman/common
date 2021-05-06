@@ -88,11 +88,20 @@ extern "C++"
       /*! \fn bool fdRead(int fdSocket, string &strBuffer, int &nReturn)
       * \brief Read data from file descriptor and appends it onto the existing strBuffer.
       * \param fdSocket File descriprot.
-      * \param strBuffer Data buffer.
+      * \param strBuffer Appended data buffer.
       * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the file descriptor is still good.
       */
       bool fdRead(int fdSocket, string &strBuffer, int &nReturn);
+      /*! \fn bool fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn)
+      * \brief Read data from file descriptor and appends it onto the existing strBuffer.
+      * \param fdSocket File descriprot.
+      * \param strBuffer Appended data buffer.
+      * \param strRead Assigned data buffer.
+      * \param nReturn The number of bytes read.
+      * \return Returns a boolean true/false value of whether the file descriptor is still good.
+      */
+      bool fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn);
       /*! \fn bool fdWrite(int fdSocket, string &strBuffer, int &nReturn)
       * \brief Read data from file descriptor and appends it onto the existing strBuffer.
       * \param fdSocket File descriprot.
@@ -268,11 +277,20 @@ extern "C++"
       /*! \fn bool sslRead(SSL *ssl, string &strBuffer, int &nReturn)
       * \brief Read data from SSL handle and appends it onto the existing strBuffer.
       * \param ssl SSL handle.
-      * \param strBuffer Data buffer.
+      * \param strBuffer Appended data buffer.
       * \param nReturn The number of bytes read.
       * \return Returns a boolean true/false value of whether the SSL handle is still good.
       */
       bool sslRead(SSL *ssl, string &strBuffer, int &nReturn);
+      /*! \fn bool sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
+      * \brief Read data from SSL handle and appends it onto the existing strBuffer.
+      * \param ssl SSL handle.
+      * \param strBuffer Appended data buffer.
+      * \param strRead Assigned data buffer.
+      * \param nReturn The number of bytes read.
+      * \return Returns a boolean true/false value of whether the SSL handle is still good.
+      */
+      bool sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn);
       /*! \fn bool sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
       * \brief Read data from SSL handle and appends it onto the existing strBuffer.
       * \param ssl SSL handle.

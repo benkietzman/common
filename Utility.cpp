@@ -560,7 +560,7 @@ extern "C++"
     // {{{ sslRead()
     bool Utility::sslRead(SSL *ssl, string &strBuffer, int &nReturn)
     {
-      bool bBlocking = false, bDone = false, bResult = true;;
+      bool bBlocking = false, bDone = false, bResult = true;
       char szBuffer[65536];
       int nPending, nSize = 65536;
       long lArg, lArgOrig;
@@ -639,7 +639,7 @@ extern "C++"
     // {{{ sslWrite()
     bool Utility::sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
     {
-      bool bBlocking = false, bResult = true;;
+      bool bBlocking = false, bResult = true;
       long lArg, lArgOrig;
 
       if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))

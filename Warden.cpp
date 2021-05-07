@@ -64,6 +64,7 @@ extern "C++"
       string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
+      ptData->clear();
       ptRequest->insert("Module", "authn");
       if (request(ptRequest, ptResponse, strError))
       {
@@ -86,6 +87,7 @@ extern "C++"
       string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
+      ptData->clear();
       ptRequest->insert("Module", "authz");
       if (request(ptRequest, ptResponse, strError))
       {
@@ -108,6 +110,7 @@ extern "C++"
       string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
+      ptData->clear();
       ptRequest->insert("Module", "central");
       if (request(ptRequest, ptResponse, strError))
       {
@@ -141,6 +144,7 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
+      ptData->clear();
       ptRequest->insert("Module", "password");
       if (request(ptRequest, ptResponse, strError))
       {
@@ -777,6 +781,7 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
+      ptData->clear();
       ptRequest->insert("Module", "windows");
       if (request(ptRequest, ptResponse, strError))
       {

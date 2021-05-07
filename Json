@@ -111,6 +111,7 @@ extern "C++"
       string fcif(string &strFcif, const bool bAppend = false);
       void flatten(list<string> &jsonList);
       void flatten(map<string, string> &jsonMap, const bool bOverwrite = false, const bool bMultiLayer = true);
+      void clear();
       void clearError();
       string getError();
       bool good();

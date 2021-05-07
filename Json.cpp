@@ -183,6 +183,15 @@ extern "C++"
       v.clear();
     }
     // }}}
+    // {{{ Json::clear()
+    void Json::clear()
+    {
+      clearError();
+      clearList();
+      clearMap();
+      clearValue();
+    }
+    // }}}
     // {{{ Json::clearError()
     void Json::clearError()
     {

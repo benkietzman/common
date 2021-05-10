@@ -107,6 +107,7 @@ extern "C++"
     bool Warden::bridge(Json *ptData, string &strError)
     {
       bool bResult = false;
+      string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
       ptData->clear();
@@ -114,6 +115,10 @@ extern "C++"
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
+        if (ptResponse->m.find("Data") != ptResponse->m.end())
+        {
+          ptData->parse(ptResponse->m["Data"]->json(strJson));
+        }
       }
       delete ptRequest;
       delete ptResponse;
@@ -125,9 +130,7 @@ extern "C++"
       bool bResult = false;
       Json *ptData = new Json;
 
-      ptData->insert("User", strUser);
-      ptData->insert("Password", strPassword);
-      if (bridge(ptData, strError))
+      if (bridge(strUser, strPassword, ptData, strError))
       {
         bResult = true;
       }

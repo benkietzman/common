@@ -103,6 +103,52 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ bridge()
+    bool Warden::bridge(Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
+
+      ptData->clear();
+      ptRequest->insert("Module", "bridge");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    bool Warden::bridge(const string strUser, const string strPassword, string &strError)
+    {
+      bool bResult = false;
+      Json *ptData = new Json;
+
+      ptData->insert("User", strUser);
+      ptData->insert("Password", strPassword);
+      if (bridge(ptData, strError))
+      {
+        bResult = true;
+      }
+      delete ptData;
+
+      return bResult;
+    }
+    bool Warden::bridge(const string strUser, const string strPassword, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+
+      ptData->insert("User", strUser);
+      ptData->insert("Password", strPassword);
+      if (bridge(ptData, strError))
+      {
+        bResult = true;
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ central()
     bool Warden::central(Json *ptData, string &strError)
     {

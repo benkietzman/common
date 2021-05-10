@@ -92,6 +92,30 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool authz(Json *ptData, string &strError);
+      /*! \fn bool bridge(Json *ptData, string &strError)
+      * \brief Submits a bridge request.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool bridge(Json *ptData, string &strError);
+      /*! \fn bool bridge(const string strUser, const string strPassword, string &strError)
+      * \brief Submits a bridge request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool bridge(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool bridge(const string strUser, const string strPassword, Json *ptData, string &strError)
+      * \brief Submits a bridge request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool bridge(const string strUser, const string strPassword, Json *ptData, string &strError);
       /*! \fn bool central(Json *ptData, string &strError)
       * \brief Submits a central request.
       * \param ptData Contains the data.

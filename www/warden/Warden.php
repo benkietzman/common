@@ -120,11 +120,13 @@ class Warden
     $response = array();
     if (($handle = fsockopen('unix://'.$this->m_strUnix, -1, $nErrorNo, $strError)) !== false)
     {
+      $bExit = false;
       fwrite($handle, json_encode($request)."\n");
-      while (!$bResult && !feof($handle))
+      while (!$bExit && !feof($handle))
       {
         if (($strLine = fgets($handle)) !== false)
         {
+          $bExit = true;
           $response = json_decode($strLine, true);
           if (isset($response['Status']) && $response['Status'] == 'okay')
           {

@@ -142,7 +142,7 @@ class Warden
           }
         }
       }
-      if (!$bResult)
+      if (!$bResult && $this->getError() == '')
       {
         $this->setError('Failed to receive Warden response.');
       }

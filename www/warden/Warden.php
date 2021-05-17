@@ -125,8 +125,19 @@ class Warden
       {
         if (($strLine = fgets($handle)) !== false)
         {
-          $bResult = true;
           $response = json_decode($strLine, true);
+          if (isset($response['Status']) && $response['Status'] == 'okay')
+          {
+            $bResult = true;
+          }
+          else if (isset($response['Error']) && $response['Error'] != '')
+          {
+            $this->setError($response['Error']);
+          }
+          else
+          {
+            $this->setError('Encountered an unknown error.');
+          }
         }
       }
       if (!$bResult)

@@ -60,70 +60,19 @@ extern "C++"
     // {{{ authn()
     bool Warden::authn(Json *ptData, string &strError)
     {
-      bool bResult = false;
-      string strJson;
-      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
-
-      ptData->clear();
-      ptRequest->insert("Module", "authn");
-      if (request(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-        if (ptResponse->m.find("Data") != ptResponse->m.end())
-        {
-          ptData->parse(ptResponse->m["Data"]->json(strJson));
-        }
-      }
-      delete ptRequest;
-      delete ptResponse;
-
-      return bResult;
+      return generic("authn", ptData, strError);
     }
     // }}}
     // {{{ authz()
     bool Warden::authz(Json *ptData, string &strError)
     {
-      bool bResult = false;
-      string strJson;
-      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
-
-      ptData->clear();
-      ptRequest->insert("Module", "authz");
-      if (request(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-        if (ptResponse->m.find("Data") != ptResponse->m.end())
-        {
-          ptData->parse(ptResponse->m["Data"]->json(strJson));
-        }
-      }
-      delete ptRequest;
-      delete ptResponse;
-
-      return bResult;
+      return generic("authz", ptData, strError);
     }
     // }}}
     // {{{ bridge()
     bool Warden::bridge(Json *ptData, string &strError)
     {
-      bool bResult = false;
-      string strJson;
-      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
-
-      ptData->clear();
-      ptRequest->insert("Module", "bridge");
-      if (request(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-        if (ptResponse->m.find("Data") != ptResponse->m.end())
-        {
-          ptData->parse(ptResponse->m["Data"]->json(strJson));
-        }
-      }
-      delete ptRequest;
-      delete ptResponse;
-
-      return bResult;
+      return generic("bridge", ptData, strError);
     }
     bool Warden::bridge(const string strUser, const string strPassword, string &strError)
     {
@@ -155,24 +104,7 @@ extern "C++"
     // {{{ central()
     bool Warden::central(Json *ptData, string &strError)
     {
-      bool bResult = false;
-      string strJson;
-      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
-
-      ptData->clear();
-      ptRequest->insert("Module", "central");
-      if (request(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-        if (ptResponse->m.find("Data") != ptResponse->m.end())
-        {
-          ptData->parse(ptResponse->m["Data"]->json(strJson));
-        }
-      }
-      delete ptRequest;
-      delete ptResponse;
-
-      return bResult;
+      return generic("central", ptData, strError);
     }
     bool Warden::central(const string strUser, Json *ptData, string &strError)
     {
@@ -187,22 +119,33 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ password()
-    bool Warden::password(Json *ptData, string &strError)
+    // {{{ generic()
+    bool Warden::generic(const string strModule, Json *ptData, string &strError)
     {
       bool bResult = false;
+      string strJson;
       Json *ptRequest = new Json(ptData), *ptResponse = new Json;
 
       ptData->clear();
-      ptRequest->insert("Module", "password");
+      ptRequest->insert("Module", strModule);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
+        if (ptResponse->m.find("Data") != ptResponse->m.end())
+        {
+          ptData->parse(ptResponse->m["Data"]->json(strJson));
+        }
       }
       delete ptRequest;
       delete ptResponse;
 
       return bResult;
+    }
+    // }}}
+    // {{{ password()
+    bool Warden::password(Json *ptData, string &strError)
+    {
+      return generic("password", ptData, strError);
     }
     bool Warden::password(const string strUser, const string strPassword, string &strError)
     {
@@ -827,19 +770,7 @@ extern "C++"
     // {{{ windows()
     bool Warden::windows(Json *ptData, string &strError)
     {
-      bool bResult = false;
-      Json *ptRequest = new Json(ptData), *ptResponse = new Json;
-
-      ptData->clear();
-      ptRequest->insert("Module", "windows");
-      if (request(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-      }
-      delete ptRequest;
-      delete ptResponse;
-
-      return bResult;
+      return generic("windows", ptData, strError);
     }
     bool Warden::windows(const string strUser, const string strPassword, string &strError)
     {

@@ -74,6 +74,8 @@ extern "C++"
       thread *m_pThreadRequest;
       Utility *m_pUtility;
 
+      bool generic(const string strModule, Json *ptData, string &strError);
+
       public:
       Warden(const string strApplication, const string strUnix, string &strError);
       ~Warden();

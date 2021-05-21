@@ -54,28 +54,35 @@ class Warden
   // {{{ authn()
   public function authn(&$data)
   {
-    $bResult = false;
-
-    $request = $data;
-    $request['Module'] = 'authn';
-    $response = null;
-    if ($this->request($request, $response))
-    {
-      $bResult = true;
-    }
-    unset($request);
-    unset($response);
-
-    return $bResult;
+    return $this->generic('authn', $data);
   }
   // }}}
   // {{{ authz()
   public function authz(&$data)
   {
+    return $this->generic('authz', $data);
+  }
+  // }}}
+  // {{{ bridge()
+  public function bridge(&$data)
+  {
+    return $this->generic('bridge', $data);
+  }
+  // }}}
+  // {{{ central()
+  public function central(&$data)
+  {
+    return $this->generic('central', $data);
+  }
+  // }}}
+  // {{{ generic()
+  protected function generic($strModule, &$data)
+  {
     $bResult = false;
 
     $request = $data;
-    $request['Module'] = 'authz';
+    $data = [];
+    $request['Module'] = $strModule;
     $response = null;
     if ($this->request($request, $response))
     {
@@ -94,19 +101,7 @@ class Warden
   // {{{ password()
   public function password($data)
   {
-    $bResult = false;
-
-    $request = $data;
-    $request['Module'] = 'password';
-    $response = null;
-    if ($this->request($request, $response))
-    {
-      $bResult = true;
-    }
-    unset($request);
-    unset($response);
-
-    return $bResult;
+    return $this->generic('password', $data);
   }
   // }}}
   // {{{ request()
@@ -117,7 +112,7 @@ class Warden
     $nErrorNo = null;
     $strError = null;
 
-    $response = array();
+    $response = [];
     if (($handle = fsockopen('unix://'.$this->m_strUnix, -1, $nErrorNo, $strError)) !== false)
     {
       $bExit = false;
@@ -244,43 +239,11 @@ class Warden
   }
   // }}}
   // }}}
-  // {{{ windows
   // {{{ windows()
-  public function windows($strFunction, $data)
+  public function windows($data)
   {
-    $bResult = false;
-
-    $request = $data;
-    $request['Module'] = 'windows';
-    $request['Function'] = $strFunction;
-    $response = null;
-    if ($this->request($request, $response))
-    {
-      $bResult = true;
-    }
-    unset($request);
-    unset($response);
-
-    return $bResult;
+    return $this->generic('windows', $data);
   }
-  // }}}
-  // {{{ windowsLogin()
-  public function windowsLogin($strUser, $strPassword)
-  {
-    $bResult = false;
-
-    $data = [];
-    $data['User'] = $strUser;
-    $data['Password'] = $strPassword;
-    if ($this->windows('login', $data))
-    {
-      $bResult = true;
-    }
-    unset($data);
-
-    return $bResult;
-  }
-  // }}}
   // }}}
 }
 ?>

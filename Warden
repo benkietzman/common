@@ -41,6 +41,7 @@
 #include <thread>
 using namespace std;
 #include "Json"
+#include "ServiceJunction"
 #include "Utility"
 // }}}
 extern "C++"
@@ -72,9 +73,8 @@ extern "C++"
       string m_strTimeout;
       string m_strUnix;
       thread *m_pThreadRequest;
+      ServiceJunction *m_pJunction;
       Utility *m_pUtility;
-
-      bool generic(const string strModule, Json *ptData, string &strError);
 
       public:
       Warden(const string strApplication, const string strUnix, string &strError);
@@ -114,6 +114,7 @@ extern "C++"
       * \brief Submits a bridge request.
       * \param strUser Contains the user.
       * \param strPassword Contains the password.
+      * \param ptData Contains the data.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
@@ -140,14 +141,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool password(Json *ptData, string &strError);
-      /*! \fn bool password(const string strUser, const string strPassword, string &strError)
-      * \brief Submits a password request.
-      * \param strUser Contains the user.
-      * \param strPassword Contains the password.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
-      bool password(const string strUser, const string strPassword, string &strError);
       /*! \fn bool password(const string strApplication, const string strUser, const string strPassword, const string strType, string &strError)
       * \brief Submits a password request.
       * \param strApplication Contains the application.
@@ -158,6 +151,22 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool password(const string strApplication, const string strUser, const string strPassword, const string strType, string &strError);
+      /*! \fn bool password(const string strUser, const string strPassword, string &strError)
+      * \brief Submits a password request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool password(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool request(const string strModule, Json *ptData, string &strError)
+      * \brief Submits a Warden request.
+      * \param strModule Contains the module.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool request(const string strModule, Json *ptData, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Warden request.
       * \param ptRequest Contains the request.

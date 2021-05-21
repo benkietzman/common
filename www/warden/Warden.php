@@ -54,29 +54,104 @@ class Warden
   // {{{ authn()
   public function authn(&$data)
   {
-    return $this->generic('authn', $data);
+    return $this->request('authn', $data);
   }
   // }}}
   // {{{ authz()
   public function authz(&$data)
   {
-    return $this->generic('authz', $data);
+    return $this->request('authz', $data);
   }
   // }}}
+  // {{{ bridge
   // {{{ bridge()
   public function bridge(&$data)
   {
-    return $this->generic('bridge', $data);
+    return $this->request('bridge', $data);
   }
   // }}}
+  // {{{ bridgeAuthn()
+  public function bridgeAuthn($strUser, $strPassword)
+  {
+    $bResult = false;
+
+    $data = [];
+    $bResult = $this->bridgeAuthz($strUser, $strPassword, $data);
+    unset($data);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ bridgeAuthz()
+  public function bridgeAuthz($strUser, $strPassword, &$data)
+  {
+    $data['User'] = $strUser;
+    $data['Password'] = $strPassword;
+
+    return $this->bridge($data);
+  }
+  // }}}
+  // }}}
+  // {{{ central
   // {{{ central()
   public function central(&$data)
   {
-    return $this->generic('central', $data);
+    return $this->request('central', $data);
   }
   // }}}
-  // {{{ generic()
-  protected function generic($strModule, &$data)
+  // {{{ centralUser()
+  public function centralUser($strUser, &$data)
+  {
+    $data['User'] = $strUser;
+
+    return $this->central($data);
+  }
+  // }}}
+  // }}}
+  // {{{ password
+  // {{{ password()
+  public function password(&$data)
+  {
+    return $this->request('password', $data);
+  }
+  // }}}
+  // {{{ passwordApplication()
+  public function passwordApplication($strApplication, $strUser, $strPassword, $strType)
+  {
+    $bResult = false;
+
+    $data = [];
+    $data['Application'] = $strApplication;
+    $data['User'] = $strUser;
+    $data['Password'] = $strPassword;
+    if ($strType != '')
+    {
+      $data['Type'] = $strType;
+    }
+    $bResult = $this->password($data);
+    unset($data);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ passwordUser()
+  public function passwordUser($strUser, $strPassword)
+  {
+    $bResult = false;
+
+    $data = [];
+    $data['User'] = $strUser;
+    $data['Password'] = $strPassword;
+    $bResult = $this->password($data);
+    unset($data);
+
+    return $bResult;
+  }
+  // }}}
+  // }}}
+  // {{{ request
+  // {{{ request()
+  public function request($strModule, &$data)
   {
     $bResult = false;
 
@@ -84,7 +159,7 @@ class Warden
     $data = [];
     $request['Module'] = $strModule;
     $response = null;
-    if ($this->request($request, $response))
+    if ($this->requestFull($request, $response))
     {
       $bResult = true;
       if (is_array($response) && isset($response['Data']))
@@ -98,14 +173,8 @@ class Warden
     return $bResult;
   }
   // }}}
-  // {{{ password()
-  public function password($data)
-  {
-    return $this->generic('password', $data);
-  }
-  // }}}
-  // {{{ request()
-  public function request($request, &$response)
+  // {{{ requestFull()
+  public function requestFull($request, &$response)
   {
     $bResult = false;
     $handle = null;
@@ -155,6 +224,7 @@ class Warden
     return $bResult;
   }
   // }}}
+  // }}}
   // {{{ setApplication()
   public function setApplication($strApplication)
   {
@@ -172,38 +242,29 @@ class Warden
   public function vault($strFunction, $keys, &$data)
   {
     $bResult = false;
+    $subData = $data;
 
+    $data = [];
     if ($this->m_strApplication != '')
     {
-      $request = [];
-      $request['Module'] = 'vault';
-      $request['Function'] = $strFunction;
+      $data['Function'] = $strFunction;
       if (!is_array($keys))
       {
         $keys = [];
       }
       array_unshift($keys, $this->m_strApplication);
-      $request['Keys'] = $keys;
-      if ($data != null)
+      $data['Keys'] = $keys;
+      if ($subData != null)
       {
-        $request['Data'] = $data;
+        $data['Data'] = $subData;
       }
-      $response = null;
-      if ($this->request($request, $response))
-      {
-        $bResult = true;
-        if (is_array($response) && isset($response['Data']))
-        {
-          $data = $response['Data'];
-        }
-      }
-      unset($request);
-      unset($response);
+      $bResult = $this->request('vault', $data);
     }
     else
     {
       $this->setError('Please provide the Application.');
     }
+    unset($subData);
 
     return $bResult;
   }
@@ -239,11 +300,27 @@ class Warden
   }
   // }}}
   // }}}
+  // {{{ windows
   // {{{ windows()
-  public function windows($data)
+  public function windows(&$data)
   {
-    return $this->generic('windows', $data);
+    return $this->request('windows', $data);
   }
+  // }}}
+  // {{{ windowsUser()
+  public function windowsUser($strUser, $strPassword)
+  {
+    $bResult = false;
+
+    $data = [];
+    $data['User'] = $strUser;
+    $data['Password'] = $strPassword;
+    $bResult = $this->windows($data);
+    unset($data);
+
+    return $bResult;
+  }
+  // }}}
   // }}}
 }
 ?>

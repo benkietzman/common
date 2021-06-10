@@ -459,6 +459,72 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ sslAccept()
+    SSL *Utility::sslAccept(SSL_CTX *ctx, int fdSocket, string &strError)
+    {
+      bool bGood = false;
+      SSL *ssl = NULL;
+ 
+      ERR_clear_error();
+      if ((ssl = SSL_new(ctx)) == NULL)
+      {
+        strError = (string)"SSL_new() " + sslstrerror();
+      }
+      else if (!SSL_set_fd(ssl, fdSocket))
+      {
+        strError = (string)"SSL_set_fd() " + sslstrerror();
+      }
+      else if (SSL_accept(ssl) <= 0)
+      {
+        strError = (string)"SSL_accept() " + sslstrerror();
+      }
+      else
+      {
+        bGood = true;
+      }
+      if (!bGood)
+      {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        ssl = NULL;
+      }
+
+      return (ssl);
+    }
+    // }}}
+    // {{{ sslConnect()
+    SSL *Utility::sslConnect(SSL_CTX *ctx, int fdSocket, string &strError)
+    {
+      bool bGood = false;
+      SSL *ssl = NULL;
+ 
+      ERR_clear_error();
+      if ((ssl = SSL_new(ctx)) == NULL)
+      {
+        strError = (string)"SSL_new() " + sslstrerror();
+      }
+      else if (!SSL_set_fd(ssl, fdSocket))
+      {
+        strError = (string)"SSL_set_fd() " + sslstrerror();
+      }
+      else if (SSL_connect(ssl) != 1)
+      {
+        strError = (string)"SSL_connect() " + sslstrerror();
+      }
+      else
+      {
+        bGood = true;
+      }
+      if (!bGood)
+      {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        ssl = NULL;
+      }
+
+      return (ssl);
+    }
+    // }}}
     // {{{ sslDeinit()
     void Utility::sslDeinit()
     {

@@ -231,6 +231,22 @@ extern "C++"
       *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
       */
       bool socketType(int fdSocket, common_socket_type &eType, string &strError);
+      /*! \fn SSL *sslAccept(SSL_CTX *ctx, int fdSocket, string &strError)
+      * \brief OpenSSL SSL_accept() wrapper function.
+      * \param ctx Contains the SSL context.
+      * \param fdSocket Contains the socket descriptor.
+      * \param strError Returns an error message.
+      * \return SSL contains the SSL handle.
+      */
+      SSL *sslAccept(SSL_CTX *ctx, int fdSocket, string &strError);
+      /*! \fn SSL *sslConnect(SSL_CTX *ctx, int fdSocket, string &strError)
+      * \brief OpenSSL SSL_connect() wrapper function.
+      * \param ctx Contains the SSL context.
+      * \param fdSocket Contains the socket descriptor.
+      * \param strError Returns an error message.
+      * \return SSL contains the SSL handle.
+      */
+      SSL *sslConnect(SSL_CTX *ctx, int fdSocket, string &strError);
       /*! \fn void sslDeinit()
       * \brief OpenSSL deinitialization.
       */

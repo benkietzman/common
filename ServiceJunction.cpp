@@ -2293,8 +2293,8 @@ extern "C++"
               while (m_bUseSingleSocket && !bExit)
               {
                 size_t unIndex = 1;
-                pollfd *fds = new pollfd[m_requests.size() + 1];
                 m_mutexRequests.lock();
+                pollfd *fds = new pollfd[m_requests.size() + 1];
                 for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
                 {
                   if (!j->second->bSent)
@@ -2403,6 +2403,7 @@ extern "C++"
                 delete[] fds;
               }
               response.clear();
+              m_mutexRequests.lock();
               for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
               {
                 if (j->second->bSent)
@@ -2414,6 +2415,7 @@ extern "C++"
                   }
                 }
               }
+              m_mutexRequests.unlock();
               if (m_bUseSecureJunction)
               {
                 SSL_free(ssl);
@@ -2436,6 +2438,7 @@ extern "C++"
           }
         }
       }
+      m_mutexRequests.lock();
       for (map<int, sjreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
       {
         if (i->second->fdSocket != -1)
@@ -2444,6 +2447,7 @@ extern "C++"
           i->second->fdSocket = -1;
         }
       }
+      m_mutexRequests.unlock();
       if (ctx != NULL)
       {
         SSL_CTX_free(ctx);

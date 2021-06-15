@@ -1,5 +1,7 @@
-import socket
+import json
+import logging
 import os
+import socket
 
 
 class Warden:
@@ -9,6 +11,7 @@ class Warden:
     m_error = None
 
     def __init__(self, application, unixsock):
+        self.logger = logging.getLogger('warden')
         self.m_application = application
         self.m_unixsock = unixsock
 
@@ -68,6 +71,7 @@ class Warden:
 
 
     def send(self, request: dict) -> tuple:
+        bResult = False
         if os.path.exists(self.m_unixsock):
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
                 sock.connect(self.m_unixsock)
@@ -83,27 +87,15 @@ class Warden:
                         strBuff += str(recBytes, 'utf-8')
                         if strBuff.find("\n") != -1:
                             outargs = json.loads(strBuff[0:strBuff.find("\n")])
-                            strBuff = strBuff[strBuff.find("\n")+1:]
-                            # self.logger.debug("full response: "+json.dumps(outargs))
-                            if len(strBuff) <= 0:
-                                bExit = True
+                            bExit = True
                             if outargs.get("Status") == "okay":
                                 bResult = True
-                            if outargs.get("Response"):
-                                return (True, outargs["Response"])
-                            if outargs.get("Error"):
-                                if type(outargs["Error"]) is dict:
-                                    self.logger.error(outargs["Error"])
-                                    return (False, {"Type": "Bridge", "SubType": "request",
-                                                    "Message": outargs["Error"]})
                     else:
                         bExit = True
-
-            return (False, {"Type": "Warden", "SubType": "request",
-                            "Message": "found multiple response lines."})
         else:
-            return (False, {"Type": "Warden", "SubType": "request",
-                            "Message": "Could not connect Warden socket."})
+            request["Error"] = "Could not connect Warden socket."
+            outargs = request
+        return (bResult, outargs)
 
 
     def set_application(self, application: str) -> None:

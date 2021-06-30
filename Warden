@@ -245,6 +245,14 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool vaultRemove(string &strError);
+      /*! \fn bool vaultRetrieve(list<string> keys, string &strData, string &strError)
+      * \brief Submits a vault retrieve request.
+      * \param keys Contains the keys.
+      * \param strData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool vaultRetrieve(list<string> keys, string &strData, string &strError);
       /*! \fn bool vaultRetrieve(list<string> keys, Json *ptData, string &strError)
       * \brief Submits a vault retrieve request.
       * \param keys Contains the keys.

@@ -685,6 +685,19 @@ extern "C++"
     }
     // }}}
     // {{{ vaultRetrieve()
+    bool Warden::vaultRetrieve(list<string> keys, string &strData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptData = new Json;
+
+      if (vault("retrieve", keys, ptData, strError))
+      {
+        strData = ptData->v;
+      }
+      delete ptData;
+
+      return bResult;
+    }
     bool Warden::vaultRetrieve(list<string> keys, Json *ptData, string &strError)
     {
       return vault("retrieve", keys, ptData, strError);

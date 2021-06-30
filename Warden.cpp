@@ -692,6 +692,7 @@ extern "C++"
 
       if (vault("retrieve", keys, ptData, strError))
       {
+        bResult = true;
         strData = ptData->v;
       }
       delete ptData;

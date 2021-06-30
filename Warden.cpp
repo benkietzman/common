@@ -153,14 +153,8 @@ extern "C++"
         bResult = true;
         if (ptResponse->m.find("Data") != ptResponse->m.end())
         {
-          if (!ptResponse->m["Data"]->l.empty() || !ptResponse->m["Data"]->m.empty())
-          {
-            ptData->parse(ptResponse->m["Data"]->json(strJson));
-          }
-          else
-          {
-            ptData->value(ptResponse->m["Data"]->v, ptResponse->m["Data"]->t);
-          }
+          ptData->clear();
+          ptData->merge(ptResponse->m["Data"], true, false);
         }
       }
       delete ptRequest;

@@ -6,6 +6,7 @@
 // copyright  : kietzman.org
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
+ini_set('max_execution_time', '300');
 include(dirname(__FILE__).'/../ServiceJunction.php');
 $junction = new ServiceJunction;
 $request = [];

@@ -690,7 +690,7 @@ extern "C++"
       bool bResult = false;
       Json *ptData = new Json;
 
-      if (vault("retrieve", keys, ptData, strError))
+      if (vaultRetrieve(keys, ptData, strError))
       {
         bResult = true;
         strData = ptData->v;

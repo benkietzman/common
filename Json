@@ -122,6 +122,8 @@ extern "C++"
       void insert(const string strKey, const string strValue, const char cType = 's');
       void insert(const string strKey, Json *ptJson);
       void insert(const string strValue, const char cType = 's');
+      string j(string &strJson, const bool bAppend = false);
+      ostream &j(ostream &os);
       string json(string &strJson, const bool bAppend = false);
       ostream &json(ostream &os);
       bool match(Json *ptJson);
@@ -138,6 +140,7 @@ extern "C++"
       void push_front(Json *ptJson);
       void setError(const string strError);
       void value(const string strValue, const char cType = 's');
+      string x(string &strXml, const bool bAppend = false);
       string xml(string &strXml, const bool bAppend = false);
 
       friend ostream & operator<<(ostream &os, Json &tJson);

@@ -464,10 +464,6 @@ extern "C++"
     {
       return json(strJson, bAppend);
     }
-    ostream &Json::j(ostream &os)
-    {
-      return json(os);
-    }
     // }}}
     // {{{ Json::json()
     string Json::json(string &strJson, const bool bAppend)

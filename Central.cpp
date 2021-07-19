@@ -304,7 +304,7 @@ extern "C++"
             }
           }
           m_mutexAlert.unlock();
-          if (m_alert.find(strApplication) != m_alert.end() && !m_alert.empty())
+          if (m_alert.find(strApplication) != m_alert.end() && !m_alert[strApplication].empty())
           {
             bResult = true;
             for (list<string>::iterator i = m_alert[strApplication].begin(); i != m_alert[strApplication].end(); i++)

@@ -1909,7 +1909,7 @@ extern "C++"
             SSL_CTX *ctx = NULL;
             if (m_bUseSecureJunction)
             {
-              SSL_METHOD *method = (SSL_METHOD *)TLS_client_method();
+              SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
               if ((ctx = SSL_CTX_new(method)) == NULL)
               {
                 m_bUseSecureJunction = false;
@@ -2195,7 +2195,7 @@ extern "C++"
 
       if (m_bUseSecureJunction)
       {
-        SSL_METHOD *method = (SSL_METHOD *)TLS_client_method();
+        SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
         if ((ctx = SSL_CTX_new(method)) == NULL)
         {
           m_bUseSecureJunction = false;

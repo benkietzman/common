@@ -557,7 +557,7 @@ extern "C++"
       SSL_METHOD *method;
 
       sslInit();
-      method = (SSL_METHOD *)((bSslServer)?TLS_server_method():TLS_client_method());
+      method = (SSL_METHOD *)((bSslServer)?SSLv23_server_method():SSLv23_client_method());
       ERR_clear_error();
       ctx = SSL_CTX_new(method);
       if (ctx == NULL)

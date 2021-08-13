@@ -745,7 +745,7 @@ extern "C++"
         else if (m_database[strName]->credentials["Type"] == "mssql")
         {
           result = new list<map<string, string> >;
-          if (acorn()->mssqlQuery(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], ((m_database[strName]->credentials.find("ServerRead") != m_database[strName]->credentials.end())?m_database[strName]->credentials["ServerRead"]:m_database[strName]->credentials["Server"]), strQuery, *result, strError))
+          if (junction()->mssqlQuery(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], ((m_database[strName]->credentials.find("ServerRead") != m_database[strName]->credentials.end())?m_database[strName]->credentials["ServerRead"]:m_database[strName]->credentials["Server"]), strQuery, *result, strError))
           {
             ullRows = result->size();
             if (result->empty())
@@ -770,7 +770,7 @@ extern "C++"
               strError = "No rows returned.";
             }
           }
-          else if (acorn()->mysqlQuery(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], ((m_database[strName]->credentials.find("ServerRead") != m_database[strName]->credentials.end())?m_database[strName]->credentials["ServerRead"]:m_database[strName]->credentials["Server"]), m_database[strName]->credentials["Database"], strQuery, *result, strError))
+          else if (junction()->mysqlQuery(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], ((m_database[strName]->credentials.find("ServerRead") != m_database[strName]->credentials.end())?m_database[strName]->credentials["ServerRead"]:m_database[strName]->credentials["Server"]), m_database[strName]->credentials["Database"], strQuery, *result, strError))
           {
             ullRows = result->size();
             if (result->empty())
@@ -787,7 +787,7 @@ extern "C++"
         else if (m_database[strName]->credentials["Type"] == "oracle")
         {
           result = new list<map<string, string> >;
-          if (acorn()->oracleQuery(m_database[strName]->credentials["Schema"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["tnsName"], strQuery, *result, strError))
+          if (junction()->oracleQuery(m_database[strName]->credentials["Schema"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["tnsName"], strQuery, *result, strError))
           {
             ullRows = result->size();
             if (result->empty())
@@ -997,7 +997,7 @@ extern "C++"
         }
         else if (m_database[strName]->credentials["Type"] == "mssql")
         {
-          if (acorn()->mssqlUpdate(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["Server"], strUpdate, strError))
+          if (junction()->mssqlUpdate(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["Server"], strUpdate, strError))
           {
             bResult = true;
           }
@@ -1009,7 +1009,7 @@ extern "C++"
           {
             bResult = true;
           }
-          else if (acorn()->mysqlUpdate(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["Server"], m_database[strName]->credentials["Database"], strUpdate, strID, strRows, strError))
+          else if (junction()->mysqlUpdate(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["Server"], m_database[strName]->credentials["Database"], strUpdate, strID, strRows, strError))
           {
             stringstream ssID(strID), ssRows(strRows);
             bResult = true;
@@ -1020,7 +1020,7 @@ extern "C++"
         else if (m_database[strName]->credentials["Type"] == "oracle")
         {
           string strID, strRows;
-          if (acorn()->oracleUpdate(m_database[strName]->credentials["Schema"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["tnsName"], strUpdate, strID, strRows, strError))
+          if (junction()->oracleUpdate(m_database[strName]->credentials["Schema"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["tnsName"], strUpdate, strID, strRows, strError))
           {
             stringstream ssID(strID), ssRows(strRows);
             bResult = true;

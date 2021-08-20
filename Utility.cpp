@@ -557,7 +557,7 @@ extern "C++"
       SSL_METHOD *method;
 
       sslInit();
-      method = (SSL_METHOD *)((bSslServer)?TLS_server_method():TLS_client_method());
+      method = (SSL_METHOD *)((bSslServer)?SSLv23_server_method():SSLv23_client_method());
       ERR_clear_error();
       ctx = SSL_CTX_new(method);
       if (ctx == NULL)
@@ -707,7 +707,7 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), strBuffer.size())) > 0)
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 65536)?strBuffer.size():65536))) > 0)
       {
         strBuffer.erase(0, nReturn);
       }

@@ -514,7 +514,7 @@ extern "C++"
     void ChatBot::setForm(const string strAction, map<string, string> arguments, const string strHeader, const string strFooter)
     {
       m_strFormAction = strAction;
-      if (m_formArguments.empty())
+      if (!arguments.empty())
       {
         m_formArguments = arguments;
       }

@@ -286,7 +286,7 @@ extern "C++"
               list<map<string, string> > getUser;
               string strError;
               stringstream ssQuery;
-              ssQuery << "select distinct d.userid from application a, application_contact b, contact_type c, person d where a.id=b.application_id and b.type_id=c.id and b.contact_id=d.id and a.name = '" << m_strApplication << "' and b.notify = 1 and (c.type = 'Primary Developer' or c.type = 'Backup Developer') and d.userid is not null";
+              ssQuery << "select distinct d.userid from application a, application_contact b, contact_type c, person d where a.id=b.application_id and b.type_id=c.id and b.contact_id=d.id and a.name = '" << strApplication << "' and b.notify = 1 and (c.type = 'Primary Developer' or c.type = 'Backup Developer') and d.userid is not null";
               if (junction()->mysqlQuery(utility()->conf()->m["Database User"]->v, utility()->conf()->m["Database Password"]->v, utility()->conf()->m["Database Server"]->v, utility()->conf()->m["Database"]->v, ssQuery.str(), getUser, strError))
               {
                 for (list<map<string, string> >::iterator i = getUser.begin(); i != getUser.end(); i++)
@@ -304,12 +304,12 @@ extern "C++"
             }
           }
           m_mutexAlert.unlock();
-          if (m_alert.find(strApplication) != m_alert.end() && !m_alert.empty())
+          if (m_alert.find(strApplication) != m_alert.end() && !m_alert[strApplication].empty())
           {
             bResult = true;
             for (list<string>::iterator i = m_alert[strApplication].begin(); i != m_alert[strApplication].end(); i++)
             {
-              if (!junction()->page((*i), m_strApplication + (string)":  " + strMessage, strError))
+              if (!junction()->page((*i), strApplication + (string)":  " + strMessage, strError))
               {
                 bResult = false;
               }

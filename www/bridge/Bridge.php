@@ -48,7 +48,7 @@ class Bridge
   {
     if ($this->m_bRegistered)
     {
-      $this->unregistere();
+      $this->unregister();
     }
     if ($this->m_fdSocket != -1)
     {

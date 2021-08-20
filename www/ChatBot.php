@@ -32,6 +32,7 @@ class ChatBot
   protected $m_bDebug;
   protected $m_bQuit;
   protected $m_fdSocket;
+  protected $m_formArguments;
   protected $m_messages;
   protected $m_rooms;
   protected $m_strBuffer;
@@ -48,6 +49,7 @@ class ChatBot
     $this->m_bDebug = false;
     $this->m_bQuit = false;
     $this->m_fdSocket = -1;
+    $this->m_formArguments = [];
     $this->m_pMessage = null;
     $this->m_messages = [];
     $this->m_rooms = [];
@@ -61,6 +63,7 @@ class ChatBot
     {
       $this->disconnect();
     }
+    unset($this->m_formArguments);
     unset($this->m_messages);
     unset($this->m_rooms);
     unset($this->m_strBuffer);
@@ -255,10 +258,18 @@ class ChatBot
   }
   // }}}
   // {{{ form()
-  public function form($strIdent, $strForm, $strHeader, $strFooter)
+  public function form($strIdent, $strForm, $arguments = [], $strHeader = '', $strFooter = '')
   {
     $ssForm = '<form onsubmit="fetch(\''.$this->m_strFormAction.'\', {method: \'POST\', cache: \'no-cache\', body: new URLSearchParams(new FormData(this))}).then(response =&gt; {}); return false;">';
     $ssForm .= '<input type="hidden" name="botIdent" value="'.$strIdent.'">';
+    foreach ($this->m_formArguments as $key => $value)
+    {
+      $ssForm .= '<input type="hidden" name="'.$key.'" value="'.$value.'">';
+    }
+    foreach ($arguments as $key => $value)
+    {
+      $ssForm .= '<input type="hidden" name="'.$key.'" value="'.$value.'">';
+    }
     $ssForm .= '<div style="border-style: solid; border-width: 1px; border-color: #4e5964; border-radius: 10px; background: #2c3742; padding: 10px; color: white;">';
     if ($this->m_strFormHeader != '')
     {
@@ -476,6 +487,42 @@ class ChatBot
   public function setDebug($bDebug)
   {
     $this->m_bDebug = $bDebug;
+  }
+  // }}}
+  // {{{ setForm()
+  public function setForm($strAction, $arguments = [], $strHeader = '', $strFooter = '')
+  {
+    $this->m_strFormAction = $strAction;
+    if (sizeof($arguments) > 0)
+    {
+      $this->m_formArguments = $arguments;
+    }
+    if ($strHeader != '')
+    {
+      $this->m_strFormHeader = $strHeader;
+    }
+    if ($strFooter != '')
+    {
+      $this->m_strFormFooter = $strFooter;
+    }
+  }
+  // }}}
+  // {{{ setFormArguments()
+  public function setFormArguments($arguments)
+  {
+    $this->m_formArguments = $arguments;
+  } 
+  // }}}
+  // {{{ setFormFooter()
+  public function setFormFooter($strFooter)
+  {
+    $this->m_strFormFooter = $strFooter;
+  } 
+  // }}}
+  // {{{ setFormHeader()
+  public function setFormHeader($strHeader)
+  {
+    $this->m_strFormHeader = $strHeader;
   }
   // }}}
   // {{{ setMessage()

@@ -459,6 +459,12 @@ extern "C++"
       }
     }
     // }}}
+    // {{{ Json::j()
+    string Json::j(string &strJson, const bool bAppend)
+    {
+      return json(strJson, bAppend);
+    }
+    // }}}
     // {{{ Json::json()
     string Json::json(string &strJson, const bool bAppend)
     {

@@ -1770,10 +1770,10 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by name';
-    if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+    if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
     {
-      $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
-      $nOffset = $request['Page'] * $nNumPerPage;
+      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+      $nOffset = $request['page'] * $nNumPerPage;
       $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
     }
     $getApplication = $this->m_centraldb->parse($strQuery);
@@ -2584,10 +2584,10 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
-      if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+      if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
       {
-        $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
-        $nOffset = $request['Page'] * $nNumPerPage;
+        $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+        $nOffset = $request['page'] * $nNumPerPage;
         $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
       }
       $getContact = $this->m_centraldb->parse($strQuery);
@@ -3247,10 +3247,10 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by name';
-    if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+    if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
     {
-      $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
-      $nOffset = $request['Page'] * $nNumPerPage;
+      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+      $nOffset = $request['page'] * $nNumPerPage;
       $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
     }
     $getServer = $this->m_centraldb->parse($strQuery);
@@ -4002,10 +4002,10 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
-      if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+      if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
       {
-        $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
-        $nOffset = $request['Page'] * $nNumPerPage;
+        $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+        $nOffset = $request['page'] * $nNumPerPage;
         $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
       }
       $getContact = $this->m_centraldb->parse($strQuery);
@@ -4283,10 +4283,10 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by last_name, first_name, userid';
-    if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+    if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
     {
-      $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
-      $nOffset = $request['Page'] * $nNumPerPage;
+      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+      $nOffset = $request['page'] * $nNumPerPage;
       $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
     }
     $getUser = $this->m_centraldb->parse($strQuery);

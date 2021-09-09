@@ -1770,9 +1770,9 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by name';
-    if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
+    if (isset($request['page']) && $request['page'] != '')
     {
-      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '')?$request['numPerPage']:25);
       $nOffset = $request['page'] * $nNumPerPage;
       $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
     }
@@ -2584,9 +2584,9 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
-      if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
+      if (isset($request['page']) && $request['page'] != '')
       {
-        $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+        $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '')?$request['numPerPage']:25);
         $nOffset = $request['page'] * $nNumPerPage;
         $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
       }
@@ -3247,9 +3247,9 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by name';
-    if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
+    if (isset($request['page']) && $request['page'] != '')
     {
-      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '')?$request['numPerPage']:25);
       $nOffset = $request['page'] * $nNumPerPage;
       $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
     }
@@ -4002,9 +4002,9 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
-      if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
+      if (isset($request['page']) && $request['page'] != '')
       {
-        $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+        $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '')?$request['numPerPage']:25);
         $nOffset = $request['page'] * $nNumPerPage;
         $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
       }
@@ -4283,9 +4283,9 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by last_name, first_name, userid';
-    if (isset($request['page']) && $request['page'] != '' && is_numeric($request['page']))
+    if (isset($request['page']) && $request['page'] != '')
     {
-      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '' && is_numeric($request['numPerPage']))?$request['numPerPage']:25);
+      $nNumPerPage = ((isset($request['numPerPage']) && $request['numPerPage'] != '')?$request['numPerPage']:25);
       $nOffset = $request['page'] * $nNumPerPage;
       $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
     }

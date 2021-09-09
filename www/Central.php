@@ -4269,7 +4269,27 @@ class Central extends Secure
     $cLetter = ((isset($request['letter']) && $request['letter'] != '')?$request['letter']:null);
     $response = array();
 
-    $getUser = $this->m_centraldb->parse('select id, last_name, first_name, userid, email, pager, active, admin, locked from person'.(($cLetter != '')?' where '.(($request['letter'] == '#')?' last_name regexp \'^[ -@[-`{-~]\'':' upper(last_name) like \''.$request['letter'].'%\''):'').' order by last_name, first_name, userid');
+    $strQuery = 'select id, last_name, first_name, userid, email, pager, active, admin, locked from person';
+    if ($cLetter != '')
+    {
+      $strQuery .= ' where ';
+      if ($request['letter'] == '#')
+      {
+        $strQuery .= ' last_name regexp \'^[ -@[-`{-~]\'';
+      }
+      else
+      {
+        $strQuery .= ' upper(last_name) like \''.$request['letter'].'%\'';
+      }
+    }
+    $strQuery .= ' order by last_name, first_name, userid';
+    if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+    {
+      $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
+      $nOffset = $request['Page'] * $nNumPerPage;
+      $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+    }
+    $getUser = $this->m_centraldb->parse($strQuery);
     if ($getUser->execute())
     {
       $bResult = true;

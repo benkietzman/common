@@ -1770,6 +1770,12 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by name';
+    if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+    {
+      $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
+      $nOffset = $request['Page'] * $nNumPerPage;
+      $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+    }
     $getApplication = $this->m_centraldb->parse($strQuery);
     if ($getApplication->execute())
     {
@@ -2578,6 +2584,12 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
+      if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+      {
+        $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
+        $nOffset = $request['Page'] * $nNumPerPage;
+        $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+      }
       $getContact = $this->m_centraldb->parse($strQuery);
       if ($getContact->execute())
       {
@@ -3221,7 +3233,27 @@ class Central extends Secure
     $cLetter = ((isset($request['letter']) && $request['letter'] != '')?$request['letter']:null);
     $response = array();
 
-    $getServer = $this->m_centraldb->parse('select id, name from server'.(($cLetter != '')?' where '.(($request['letter'] == '#')?' name regexp \'^[ -@[-`{-~]\'':' upper(name) like \''.$request['letter'].'%\''):'').' order by name');
+    $strQuery = 'select id, name from server';
+    if ($cLetter != '')
+    {
+      $strQuery .= ' where';
+      if ($request['letter'] == '#')
+      {
+        $strQuery .= ' name regexp \'^[ -@[-`{-~]\'';
+      }
+      else
+      {
+        $strQuery .= ' upper(name) like \''.$request['letter'].'%\'';
+      }
+    }
+    $strQuery .= ' order by name';
+    if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+    {
+      $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
+      $nOffset = $request['Page'] * $nNumPerPage;
+      $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+    }
+    $getServer = $this->m_centraldb->parse($strQuery);
     if ($getServer->execute())
     {
       $bResult = true;
@@ -3970,6 +4002,12 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
+      if (isset($request['Page']) && $request['Page'] != '' && is_numeric($request['Page']))
+      {
+        $nNumPerPage = ((isset($request['NumPerPage']) && $request['NumPerPage'] != '' && is_numeric($request['NumPerPage']))?$request["NumPerPage"]:25);
+        $nOffset = $request['Page'] * $nNumPerPage;
+        $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+      }
       $getContact = $this->m_centraldb->parse($strQuery);
       if ($getContact->execute())
       {

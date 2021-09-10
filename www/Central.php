@@ -455,6 +455,12 @@ class Central extends Secure
           $strQuery .= 'aes_decrypt(from_base64(password), sha2(\''.addslashes($request['aes']).'\', 512)) decrypted_password, ';
         }
         $strQuery .= 'type_id, description from application_account where application_id = '.$request['application_id'].' order by user_id';
+        if (isset($request['page']))
+        {
+          $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+          $nOffset = $request['page'] * $nNumPerPage;
+          $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+        }
         $getAccount = $this->m_centraldb->parse($strQuery);
         if ($getAccount->execute())
         {

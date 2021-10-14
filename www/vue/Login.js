@@ -8,13 +8,24 @@
 export default
 {
   // {{{ data
-  data()
+  data() {return {common: common};},
+  // }}}
+  // {{{ methods
+  methods:
   {
-    let data =
+    // {{{ submit()
+    submit()
     {
-    };
-    common.menuSet('Login', null);
-    return data;
+      common.processLogin(common.login);
+    }
+    // }}}
+  },
+  // }}}
+  // {{{ mounted()
+  mounted()
+  {
+    common.setMenu('Login', null);
+    common.processLogin(null);
   },
   // }}}
   // {{{ template
@@ -26,8 +37,8 @@ export default
       <div v-show="common.login.showForm" class="row" style="width:50%;">
         <h3 class="page-header">{{common.login.login.title}}</h3>
         <div class="col-md-5" style="padding:10px;"><input class="form-control" type="text" id="login_userid" v-model="common.login.login.userid" maxlength="20" v-on:keyup="$event.keyCode == 13 && submit()" placeholder="User"></div>
-        <div class="col-md-5" style="padding:10px;"><input class="form-control" type="password" v-model="common.login.login.password" maxlength="64" v-on:keyup="$event.keyCode == 13 && common.loginProcess()" placeholder="Password"></div>
-        <div class="col-md-2" style="padding:10px;"><button class="btn btn-primary" v-on:click="common.loginProcess()" style="float:right;">Login</button></div>
+        <div class="col-md-5" style="padding:10px;"><input class="form-control" type="password" v-model="common.login.login.password" maxlength="64" v-on:keyup="$event.keyCode == 13 && common.processLogin()" placeholder="Password"></div>
+        <div class="col-md-2" style="padding:10px;"><button class="btn btn-primary" v-on:click="common.processLogin()" style="float:right;">Login</button></div>
       </div>
     </div>
   `

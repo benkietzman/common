@@ -12,10 +12,13 @@ class Common
   constructor(options)
   {
     this.bridgeStatus = {stat: false};
-    this.centralMenu = {};
+    this.centralMenu = {show: false};
     this.footer = {engineer: false};
+    this.login = {login: false};
+    this.logout = false;
     this.menu = {left: [], right: []};
-    this.submenu = {left: [], right: []};
+    this.submenu = false;
+    this.m_ws = {};
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -98,44 +101,46 @@ class Common
       if (wsJwt)
       {
         let request = {Section: 'secure', 'Function': 'auth', wsJwt: wsJwt, Request: {}};
+        var _this = this;
         this.wsRequest('bridge', request).then((response) =>
         {
           let error = {};
-          if (this.wsResponse(response, error))
+          if (_this.wsResponse(response, error))
           {
-            this.m_auth = response.Response;
-            this.m_bHaveAuth = true;
-            if (this.isValid())
+            _this.m_auth = response.Response;
+            _this.m_bHaveAuth = true;
+            _this.dispatchEvent('commonAuthReady', null);
+            if (_this.isValid())
             {
-              this.m_menu.right[this.m_menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
-              if (!this.m_wsRequestID && !this.m_bConnecting)
+              //_this.menu.right[_this.menu.right.length] = {value: 'Logout as ' + _this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
+              if (!_this.m_wsRequestID && !_this.m_bConnecting)
               {
-                this.m_bConnecting = true;
+                _this.m_bConnecting = true;
                 let request = {Section: 'bridge', 'Function': 'connect'};
                 request.Request = {};
-                this.wsRequest('bridge', request).then((response) =>
+                _this.wsRequest('bridge', request).then((response) =>
                 {
                   let error = {};
-                  if (this.wsResponse(response, error))
+                  if (_this.wsResponse(response, error))
                   {
-                    this.m_wsRequestID = response.wsRequestID;
-                    this.m_bConnecting = false;
+                    _this.m_wsRequestID = response.wsRequestID;
+                    _this.m_bConnecting = false;
                   }
                 });
               }
             }
             else
             {
-              this.m_menu.right[this.m_menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
-              if (this.m_wsRequestID)
+              //_this.menu.right[_this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
+              if (_this.m_wsRequestID)
               {
-                this.m_bConnecting = true;
-                let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
+                _this.m_bConnecting = true;
+                let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: _this.m_wsRequestID};
                 request.Request = {};
-                this.wsRequest('bridge', request).then((response) =>
+                _this.wsRequest('bridge', request).then((response) =>
                 {
-                  this.m_wsRequestID = null;
-                  this.m_bConnecting = false;
+                  _this.m_wsRequestID = null;
+                  _this.m_bConnecting = false;
                 });
               }
             }
@@ -144,13 +149,14 @@ class Common
       }
       else
       {
-        if (this.isValid())
+        this.dispatchEvent('commonAuthReady', null);
+        if (this.isValid(null))
         {
-          this.m_menu.right[this.m_menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
+          //this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
         }
         else
         {
-          this.m_menu.right[this.m_menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
+          //this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
         }
       }
     }
@@ -164,24 +170,44 @@ class Common
         {
           _this.m_auth = response.Response.out;
           _this.m_bHaveAuth = true;
+          _this.dispatchEvent('commonAuthReady', null);
           if (_this.isValid())
           {
-            _this.m_menu.right[_this.m_menu.right.length] = {value: 'Logout as ' + _this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
+            //_this.menu.right[_this.menu.right.length] = {value: 'Logout as ' + _this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
           }
           else
           {
-            _this.m_menu.right[_this.m_menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
+            //_this.menu.right[_this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
           }
         }
       });
     }
   }
   // }}}
+  // {{{ clearMenu()
+  clearMenu()
+  {
+    this.menu = null;
+    this.menu = {left: [], right: []};
+  }
+  // }}}
   // {{{ dispatchEvent()
   dispatchEvent(strHandle, data)
   {
-    let eventHandle = new CustomEvent(strHandle, data);
+    let eventHandle = new CustomEvent(strHandle, {'detail': data});
     document.dispatchEvent(eventHandle);
+  }
+  // }}}
+  // {{{ enableJwt()
+  enableJwt(bEnable)
+  {
+    this.m_bJwt = bEnable;
+  }
+  // }}}
+  // {{{ enableJwtInclusion()
+  enableJwtInclusion(bEnable)
+  {
+    this.m_bJwtInclusion = bEnable;
   }
   // }}}
   // {{{ getCookie()
@@ -189,7 +215,7 @@ class Common
   {
     let bFound = false;
     let strValue = '';
-    let strSubName = strtName+'=';
+    let strSubName = strName+'=';
     let strCookies = decodeURIComponent(document.cookie);
     let cookies = strCookies.split(';');
 
@@ -238,7 +264,7 @@ class Common
   isCookie(strName)
   {
     let bFound = false;
-    let strSubName = strtName+'=';
+    let strSubName = strName+'=';
     let strCookies = decodeURIComponent(document.cookie);
     let cookies = strCookies.split(';');
 
@@ -310,8 +336,8 @@ class Common
     return bResult;
   }
   // }}}
-  // {{{ loginProcess()
-  loginProcess(login)
+  // {{{ processLogin()
+  processLogin(login)
   {
     if (!this.isDefined(login) || login == null)
     {
@@ -328,90 +354,96 @@ class Common
           'Content-Type': 'application/json'
         }
       })
-      .then(response => response.json())
       .then((response) =>
       {
+        let data = {};
+        if (response.status == 200)
+        {
+          data = response.json();
+        }
         let request = null;
         request = {Section: 'secure', 'Function': 'process', Request: login};
-        request.Request.Type = this.m_strLoginType;
-        if (_this.isDefined(response.data[_this.m_strLoginType]) && _this.isDefined(response.data[_this.m_strLoginType]['cookie']) && _this.isCookie(response.data[_this.m_strLoginType]['cookie']))
+        request.Request.Type = _this.m_strLoginType;
+        if (_this.isDefined(data[_this.m_strLoginType]) && _this.isDefined(data[_this.m_strLoginType]['cookie']) && _this.isCookie(data[_this.m_strLoginType]['cookie']))
         {
-          request.Request.Data = _this.getCookie(response.data[_this.m_strLoginType]['cookie']);
+          request.Request.Data = _this.getCookie(data[_this.m_strLoginType]['cookie']);
         }
-        this.wsRequest('bridge', request).then(function (response)
+        _this.wsRequest('bridge', request).then(function (response)
         {
           var error = {};
-          if (this.wsResponse(response, error))
+          if (_this.wsResponse(response, error))
           {
-            if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
+            if (_this.isDefined(response.Error) && _this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
             {
-              this.login.message = response.Error.Message;
+              _this.login.message = response.Error.Message;
             }
-            if (this.isDefined(response.Response.auth))
+            if (_this.isDefined(response.Response.auth))
             {
-              this.m_auth = response.Response.auth;
-              this.m_bHaveAuth = true;
-              if (this.isDefined(response.Response.jwt))
+              _this.m_auth = response.Response.auth;
+              _this.m_bHaveAuth = true;
+              if (_this.isDefined(response.Response.jwt))
               {
-                if (this.m_sessionStorage)
+                if (_this.m_sessionStorage)
                 {
-                  this.m_sessionStorage.sl_wsJwt = response.Response.jwt;
+                  _this.m_sessionStorage.sl_wsJwt = response.Response.jwt;
                 }
                 else if (response.Response.jwt.length > 4096)
                 {
-                  this.m_wsJwt = response.Response.jwt;
+                  _this.m_wsJwt = response.Response.jwt;
                 }
                 else
                 {
-                  this.setCookie('sl_commonWsJwt', response.Response.jwt);
+                  _this.setCookie('sl_commonWsJwt', response.Response.jwt);
                 }
               }
-              if (this.isDefined(this.m_auth.login_title))
+              if (_this.isDefined(_this.m_auth.login_title))
               {
-                if (!this.isDefined(this.login.login) || this.login.login == null)
+                if (!_this.isDefined(_this.login.login) || !_this.login.login)
                 {
-                  this.login.login = {};
+                  _this.login.login = {};
                 }
-                this.login.login.title = this.m_auth.login_title;
-                if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                _this.login.login.title = _this.m_auth.login_title;
+                if (_this.login.login.title.length <= 30 || _this.login.login.title.substr(_this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
                 {
-                  this.login.showForm = true;
+                  _this.login.showForm = true;
                 }
               }
-              if (this.isValid(null))
+              if (_this.isValid(null))
               {
-                document.location.href = this.m_strRedirectPath;
+                _this.dispatchEvent('resetMenu', null);
+                document.location.href = _this.m_strRedirectPath;
               }
               else
               {
                 var request = {Section: 'secure', 'Function': 'login'};
-                request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                this.wsRequest('bridge', request).then(function (response)
+                request.Request = {Type: _this.m_strLoginType, Return: document.location.href};
+                _this.wsRequest('bridge', request).then(function (response)
                 {
                   var error = {};
-                  this.login.info = null;
-                  if (this.wsResponse(response, error))
+                  _this.login.info = null;
+                  if (_this.wsResponse(response, error))
                   {
-                    if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                    if (_this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                     {
+                      _this.dispatchEvent('resetMenu', null);
                       document.location.href = response.Response.Redirect;
                     }
                   }
                   else
                   {
-                    this.login.message = error.message;
+                    _this.login.message = error.message;
                   }
                 });
               }
             }
-            if (this.isDefined(error.message))
+            if (_this.isDefined(error.message))
             {
-              this.login.message = error.message;
+              _this.login.message = error.message;
             }
           }
           else
           {
-            this.login.message = error.message;
+            _this.login.message = error.message;
           }
         });
       });
@@ -444,6 +476,7 @@ class Common
           }
           if (this.isValid(null))
           {
+            this.dispatchEvent('resetMenu', null);
             document.location.href = this.m_strRedirectPath;
           }
           else
@@ -465,6 +498,7 @@ class Common
                 {
                   if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
+                    this.dispatchEvent('resetMenu', null);
                     document.location.href = result.data.Response.out.Redirect;
                   }
                 }
@@ -492,22 +526,187 @@ class Common
     }
   }
   // }}}
-  // {{{ menuReset()
-  menuReset(menu)
+  // {{{ processLogout()
+  processLogout()
   {
-    this.menu = menu;
+    this.logout.info = 'Processing logout...';
+    if (this.isValid(null))
+    {
+      if (this.m_bJwt)
+      {
+        var request = {Section: 'secure', 'Function': 'logout'};
+        request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+        var _this = this;
+        this.wsRequest('bridge', request).then(function (response)
+        {
+          var error = {};
+          _this.logout.info = null;
+          if (_this.wsResponse(response, error))
+          {
+            if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+            {
+              _this.m_bHaveAuth = false;
+              _this.m_auth = null;
+              _this.m_auth = {admin: false, apps: {}};
+              if (_this.m_sessionStorage && _this.m_sessionStorage.sl_wsJwt)
+              {
+                _this.m_sessionStorage.sl_wsJwt = null;
+              }
+              else if (_this.m_wsJwt)
+              {
+                _this.m_wsJwt = null;
+              }
+              else
+              {
+                _this.setCookie('sl_commonWsJwt', '');
+              }
+              _this.dispatchEvent('resetMenu', null);
+              document.location.href = response.Response.Redirect;
+            }
+          }
+          else
+          {
+            _this.logout.message = error.message;
+          }
+        });
+      }
+      else
+      {
+        var logout = {};
+        logout.Application = this.getApplication();
+        if (this.m_strLoginType != '')
+        {
+          logout.LoginType = this.m_strLoginType;
+        }
+        logout.Redirect = this.getRedirectPath();
+        this.request('authLogout', logout, function (result)
+        {
+          var error = {};
+          this.logout.info = null;
+          if (this.response(result, error))
+          {
+            if (common.isDefined(result.data.Response.out.Status) && result.data.Response.out.Status == 'okay')
+            {
+              if (common.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
+              {
+                this.dispatchEvent('resetMenu', null);
+                document.location.href = result.data.Response.out.Redirect;
+              }
+              else
+              {
+                this.logout.message = 'Redirect not found.';
+              }
+            }
+            else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)
+            {
+              this.logout.message = result.data.Response.out.Error;
+            }
+            else
+            {
+              this.logout.message = 'Encountered an unknown error.';
+            }
+          }
+          else
+          {
+            this.logout.message = error.message;
+          }
+        });
+      }
+    }
+    else
+    {
+      this.m_bHaveAuth = false;
+      this.m_auth = null;
+      this.m_auth = {admin: false, apps: {}};
+      if (this.m_bJwt)
+      {
+        if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
+        {
+          this.m_sessionStorage.sl_wsJwt = null;
+        }
+        else if (this.m_wsJwt)
+        {
+          this.m_wsJwt = null;
+        }
+        else
+        {
+          this.setCookie('sl_commonWsJwt', '');
+        }
+      }
+      this.dispatchEvent('resetMenu', null);
+      document.location.href = this.m_strRedirectPath;
+    }
+  }
+  // }}}
+  // {{{ resetMenu()
+  resetMenu()
+  {
     if (this.isValid(''))
-    { 
+    {
       this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
     }
     else
-    { 
+    {
       this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
     }
   }
   // }}}
-  // {{{ menuSet()
-  menuSet(strMenu, strSubMenu)
+  // {{{ request()
+  request(strFunction, request, callback)
+  {
+    if (this.isDefined(this.script))
+    {
+      let data = {'Function': strFunction};
+      if (request != null)
+      {
+        data.Arguments = request;
+      }
+      fetch(this.script,
+      {
+        method: 'POST',
+        headers:
+        {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(callback);
+    }
+  }
+  // }}}
+  // {{{ response()
+  response(response, error)
+  {
+    let bResult = false;
+
+    if (this.isDefined(response.Status) && response.Status == 'okay')
+    {
+      bResult = true;
+    }
+    else if (this.isDefined(response.Error))
+    {
+      error.message = response.Error;
+    }
+    else
+    {
+      error.message = 'Encountered an unknown error.';
+    }
+
+    return bResult;
+  }
+  // }}}
+  // {{{ setCookie()
+  setCookie(strName, strValue)
+  {
+    const d = new Date();
+    d.setTime(d.getTime()+(365*24*60*60*1000));
+    let strExpires = 'expires'+d.toUTCString();
+    document.cookie = strName+'='+strValue+';'+strExpires+';path=/';
+  }
+  // }}}
+  // {{{ setMenu()
+  setMenu(strMenu, strSubMenu)
   {
     let nActiveLeft = -1;
     this.strPrevMenu = this.strMenu;
@@ -599,59 +798,33 @@ class Common
     }
   }
   // }}}
-  // {{{ request()
-  request(strFunction, request, callback)
+  // {{{ setRedirectPath()
+  setRedirectPath(strPath)
   {
-    if (this.isDefined(this.script))
-    {
-      let data = {'Function': strFunction};
-      if (request != null)
-      {
-        data.Arguments = request;
-      }
-      fetch(this.script,
-      {
-        method: 'POST',
-        headers:
-        {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.json())
-      .then(callback);
-    }
-  }  
-  // }}}
-  // {{{ response()
-  response(response, error)
-  {   
-    let bResult = false;
-      
-    if (this.isDefined(response.Status) && response.Status == 'okay')
-    {
-      bResult = true;
-    }
-    else if (this.isDefined(response.Error))
-    {
-      error.message = response.Error;
-    }
-    else
-    {
-      error.message = 'Encountered an unknown error.';
-    }
-
-    return bResult;
+    this.m_strRedirectPath = strPath;
   }
   // }}}
-  // {{{ setCookie()
-  setCookie(strName, strValue)
+  // {{{ setRequestPath()
+  setRequestPath(strPath)
   {
-    const d = new Date();
-    d.setTime(d.getTime()+(365*24*60*60*1000));
-    let strExpires = 'expires'+d.toUTCString();
-    document.cookie = strName+'='+strValue+';'+strExpires+';path=/';
+    this.m_strRequestPath = strPath;
   }
+  // }}}
+  // {{{ setSecureLogin()
+  setSecureLogin(bSecureLogin)
+  {
+    this.m_bSecureLogin = bSecureLogin;
+    if (bSecureLogin && document.location.protocol !== 'https')
+    {
+      document.location.protocol = 'https';
+    }
+  };
+  // }}}
+  // {{{ setSecurity()
+  setSecurity(strLoginType)
+  {
+    this.m_strLoginType = strLoginType;
+  };
   // }}}
   // {{{ wsCreate()
   wsCreate(strName, strServer, strPort, bSecure, strProtocol)
@@ -662,7 +835,7 @@ class Common
     {
       let date = new Date();
       if (!this.isDefined(this.m_ws[strName]))
-      { 
+      {
         this.m_ws[strName] = {};
       }
       this.m_ws[strName].Application = this.application;
@@ -673,9 +846,12 @@ class Common
       this.m_ws[strName].Secure = bSecure;
       this.m_ws[strName].Server = strServer;
       this.m_ws[strName].Unique = 0;
-      let socket = new WebSocket(((bSecure)?'wss':'ws')+'://'+strServer+':'+strPort+'/'+strProtocol);
-      socket.onopen = (e) =>
+      this.m_ws[strName].ws = new WebSocket(((bSecure)?'wss':'ws')+'://'+strServer+':'+strPort, [strProtocol]);
+      // {{{ WebSocket::onopen()
+      this.m_ws[strName].ws.onopen = (e) =>
       {
+        this.dispatchEvent('commonWsReady_' + this.application, null);
+        this.dispatchEvent('commonWsReady_' + this.application + '_' + strName, null);
         this.m_ws[strName].Attempts = 1;
         if (this.m_ws[strName].modalInstance != null)
         {
@@ -685,13 +861,17 @@ class Common
         this.m_ws[strName].Connected = true;
         this.auth(null);
       };
-      socket.onclose = (e) =>
+      // }}}
+      // {{{ WebSocket::onclose()
+      this.m_ws[strName].ws.onclose = (e) =>
       {
         let maxInterval = (Math.pow(2, this.m_wsAttempts) - 1) * 1000;
-        console.log(ev);
+        console.log(e);
         this.m_bConnecting = false;
         this.m_bSentJwt = false;
         this.m_wsRequestID = null;
+        this.dispatchEvent('commonWsClose_' + this.application, e);
+        this.dispatchEvent('commonWsClose_' + this.application + '_' + strName, e);
         if (this.m_ws[strName].Connected)
         {
           this.m_ws[strName].Connected = false;
@@ -706,13 +886,19 @@ class Common
           this.wsCreate(this.application, strName, strServer, strPort, bSecure, strProtocol);
         }, (Math.random() * maxInterval));
       };
-      socket.onerror = (e) =>
+      // }}}
+      // {{{ WebSocket::onerror()
+      this.m_ws[strName].ws.onerror = (e) =>
       {
-        console.log(ev);
+        console.log(e);
+        this.dispatchEvent('commonWsError_' + this.application, e);
+        this.dispatchEvent('commonWsError_' + this.application + '_' + strName, e);
       };
-      socket.onmessage = (e) =>
+      // }}}
+      // {{{ WebSocket::onmessage()
+      this.m_ws[strName].ws.onmessage = (e) =>
       {
-        let response = JSON.parse(event.data);
+        let response = JSON.parse(e.data);
         if (this.m_bJwt && strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp')
         {
           response.Error.Message = 'Session expired.  Please login again.';
@@ -736,6 +922,8 @@ class Common
           delete response.wsRequestID;
           delete response.Response;
           delete response.Status;
+          this.dispatchEvent('commonAuthReady', null);
+          this.dispatchEvent('resetMenu', null);
         }
         else if (!this.m_bJwt && strProtocol == 'bridge' && this.m_ws[strName].SetBridgeCredentials && this.m_ws[strName].SetBridgeCredentials.Script && this.m_ws[strName].SetBridgeCredentials.Script.length > 0 && this.m_ws[strName].SetBridgeCredentials['Function'] && this.m_ws[strName].SetBridgeCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && ((response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Your access has been denied.') || (response.Error.SubType == 'requestSocket' && response.Error.Message && response.Error.Message == 'Please provide the User.')))
         {
@@ -776,9 +964,12 @@ class Common
         {
           if (this.isDefined(response.wsController))
           {
+            this.dispatchEvent(response.wsController, response);
           }
           else
           {
+            this.dispatchEvent('commonWsMessage_' + this.application, response);
+            this.dispatchEvent('commonWsMessage_' + this.application + '_' + strName, response);
           }
           if (response.wsRequestID && response.wsRequestID == this.m_wsRequestID && response.Action)
           {
@@ -838,8 +1029,10 @@ class Common
         }
         if (response.bridgePurpose && response.bridgePurpose == 'status')
         {
+          this.dispatchEvent('bridgePurpose_status', response);
         }
       };
+      // }}}
     }
 
     return bResult;
@@ -857,14 +1050,14 @@ class Common
     deferred.promise = promise;
     if (this.isDefined(this.m_ws[strName]))
     {
-      let strHandle = strName+'_ws_'+this.wsUnique(strName);
-      this.wsSend(strName, strHandle, request);
-      this.attachEvent(strHandle, (data) =>
-      { 
-        deferred.resolve(data);
+      let unHandle = this.wsUnique(strName);
+      this.wsSend(strName, unHandle, request);
+      this.attachEvent(unHandle, (data) =>
+      {
+        deferred.resolve(data.detail);
       });
-    }   
-          
+    }
+
     return deferred.promise;
   }
   // }}}
@@ -872,15 +1065,15 @@ class Common
   wsResponse(response, error)
   {
     let bResult = false;
-          
+
     if (response.Status && response.Status == 'okay')
-    { 
+    {
       bResult = true;
     }
-    else if (error != null) 
-    {   
+    else if (error != null)
+    {
       if (response.Error)
-      { 
+      {
         if (response.Error != 'Please provide the wsJwt.')
         {
           error.message = response.Error;

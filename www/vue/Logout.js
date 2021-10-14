@@ -8,13 +8,13 @@
 export default
 {
   // {{{ data
-  data()
+  data() {return {common: common};},
+  // }}}
+  // {{{ mounted()
+  mounted()
   {
-    let data =
-    {
-    };
-    common.menuSet('Logout as '+common.getFirstName(), null);
-    return data;
+    common.setMenu('Logout as '+common.getFirstName(), null);
+    common.processLogout();
   },
   // }}}
   // {{{ template

@@ -36,7 +36,7 @@ Vue.component('commonBridgeStatus',
 Vue.component('commonCentralMenu',
 {
   // {{{ data
-  data: () => {return {common: common, show: false};},
+  data: () => {return {common: common};},
   // }}}
   // {{{ methods
   methods:
@@ -50,7 +50,7 @@ Vue.component('commonCentralMenu',
     // {{{ slideMenu()
     slideMenu()
     {
-      this.show = !this.show;
+      common.centralMenu.show = !common.centralMenu.show;
     }
     // }}}
   },
@@ -61,7 +61,7 @@ Vue.component('commonCentralMenu',
     <div style="position: relative; z-index: 1000;">
       <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 120px; right: 0px; border-style: solid; border-width: 1px; border-color: #777777;">
         <button id="central-slide-opener" class="btn btn-success glyphicon glyphicon-align-justify" v-on:click="slideMenu()" style="float: left; margin: 0px 0px 0px -40px; border-radius: 10px 0px 00px 10px;"></button>
-        <div v-show="show" id="central-slide-content" style="padding: 10px;">
+        <div v-show="common.centralMenu.show" id="central-slide-content" style="padding: 10px;">
           <select class="form-control input-sm" v-on:change="go()" v-model="common.centralMenu.application">
             <option v-for="app in common.centralMenu.applications" :value="app">{{app.name}}</option>
           </select>

@@ -13,7 +13,7 @@ export default
     let data =
     {
     };
-    app.$refs.menu.set('Login', null);
+    common.menuSet('Logout as '+common.getFirstName(), null);
     return data;
   },
   // }}}

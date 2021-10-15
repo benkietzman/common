@@ -14,7 +14,7 @@ class Common
     this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
     this.footer = {engineer: false};
-    this.login = {login: false};
+    this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
     this.logout = false;
     this.menu = {left: [], right: []};
     this.submenu = false;
@@ -337,12 +337,8 @@ class Common
   }
   // }}}
   // {{{ processLogin()
-  processLogin(login)
+  processLogin()
   {
-    if (!this.isDefined(login) || login == null)
-    {
-      login = {};
-    }
     if (this.m_bJwt)
     {
       var _this = this;
@@ -362,7 +358,7 @@ class Common
           data = response.json();
         }
         let request = null;
-        request = {Section: 'secure', 'Function': 'process', Request: login};
+        request = {Section: 'secure', 'Function': 'process', Request: _this.login.login};
         request.Request.Type = _this.m_strLoginType;
         if (_this.isDefined(data[_this.m_strLoginType]) && _this.isDefined(data[_this.m_strLoginType]['cookie']) && _this.isCookie(data[_this.m_strLoginType]['cookie']))
         {
@@ -450,12 +446,12 @@ class Common
     }
     else
     {
-      login.Application = this.application;
+      this.login.Application = this.application;
       if (this.m_strLoginType != '')
       {
-        login.LoginType = this.m_strLoginType;
+        this.login.LoginType = this.m_strLoginType;
       }
-      this.request('authProcessLogin', login, function (result)
+      this.request('authProcessLogin', this.login.login, function (result)
       {
         var error = {};
         if (this.response(result, error))
@@ -464,10 +460,6 @@ class Common
           this.m_bHaveAuth = true;
           if (this.isDefined(this.m_auth.login_title))
           {
-            if (!this.isDefined(this.login.login) || this.login.login == null)
-            {
-              this.login.login = {};
-            }
             this.login.login.title = this.m_auth.login_title;
             if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
             {

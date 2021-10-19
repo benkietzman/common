@@ -37,7 +37,7 @@ class Common
         _this.centralMenu.applications = [];
         for (var i = 0; i < data.Response.out.length; i++)
         {
-          if (((data.Response.out[i].menu_id == 1 && _this.isValid('')) || data.Response.out[i].menu_id == 2) && (data.Response.out[i].retirement_date == null || data.Response.out[i].retirement_date == '0000-00-00 00:00:00'))
+          if (((data.Response.out[i].menu_id == 1 && _this.isValid()) || data.Response.out[i].menu_id == 2) && (data.Response.out[i].retirement_date == null || data.Response.out[i].retirement_date == '0000-00-00 00:00:00'))
           {
             _this.centralMenu.applications.push(data.Response.out[i]);
           }
@@ -85,22 +85,9 @@ class Common
   {
     if (this.m_bJwt)
     {
-      let wsJwt = null;
-      if (this.m_wsJwt)
+      if (window.localStorage.getItem('sl_wsJwt'))
       {
-        wsJwt = this.m_wsJwt;
-      }
-      else if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
-      {
-        wsJwt = this.m_sessionStorage.sl_wsJwt;
-      }
-      else
-      {
-        wsJwt = this.getCookie('sl_commonWsJwt');
-      }
-      if (wsJwt)
-      {
-        let request = {Section: 'secure', 'Function': 'auth', wsJwt: wsJwt, Request: {}};
+        let request = {Section: 'secure', 'Function': 'auth', wsJwt: window.localStorage.getItem('sl_wsJwt'), Request: {}};
         var _this = this;
         this.wsRequest('bridge', request).then((response) =>
         {
@@ -110,9 +97,9 @@ class Common
             _this.m_auth = response.Response;
             _this.m_bHaveAuth = true;
             _this.dispatchEvent('commonAuthReady', null);
+            _this.dispatchEvent('resetMenu', null);
             if (_this.isValid())
             {
-              //_this.menu.right[_this.menu.right.length] = {value: 'Logout as ' + _this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
               if (!_this.m_wsRequestID && !_this.m_bConnecting)
               {
                 _this.m_bConnecting = true;
@@ -129,20 +116,16 @@ class Common
                 });
               }
             }
-            else
+            else if (_this.m_wsRequestID)
             {
-              //_this.menu.right[_this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
-              if (_this.m_wsRequestID)
+              _this.m_bConnecting = true;
+              let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: _this.m_wsRequestID};
+              request.Request = {};
+              _this.wsRequest('bridge', request).then((response) =>
               {
-                _this.m_bConnecting = true;
-                let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: _this.m_wsRequestID};
-                request.Request = {};
-                _this.wsRequest('bridge', request).then((response) =>
-                {
-                  _this.m_wsRequestID = null;
-                  _this.m_bConnecting = false;
-                });
-              }
+                _this.m_wsRequestID = null;
+                _this.m_bConnecting = false;
+              });
             }
           }
         });
@@ -150,14 +133,7 @@ class Common
       else
       {
         this.dispatchEvent('commonAuthReady', null);
-        if (this.isValid(null))
-        {
-          //this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
-        }
-        else
-        {
-          //this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
-        }
+        this.dispatchEvent('resetMenu', null);
       }
     }
     else
@@ -171,14 +147,7 @@ class Common
           _this.m_auth = response.Response.out;
           _this.m_bHaveAuth = true;
           _this.dispatchEvent('commonAuthReady', null);
-          if (_this.isValid())
-          {
-            //_this.menu.right[_this.menu.right.length] = {value: 'Logout as ' + _this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
-          }
-          else
-          {
-            //_this.menu.right[_this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
-          }
+          _this.dispatchEvent('resetMenu', null);
         }
       });
     }
@@ -379,18 +348,7 @@ class Common
               _this.m_bHaveAuth = true;
               if (_this.isDefined(response.Response.jwt))
               {
-                if (_this.m_sessionStorage)
-                {
-                  _this.m_sessionStorage.sl_wsJwt = response.Response.jwt;
-                }
-                else if (response.Response.jwt.length > 4096)
-                {
-                  _this.m_wsJwt = response.Response.jwt;
-                }
-                else
-                {
-                  _this.setCookie('sl_commonWsJwt', response.Response.jwt);
-                }
+                window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
               }
               if (_this.isDefined(_this.m_auth.login_title))
               {
@@ -404,7 +362,7 @@ class Common
                   _this.login.showForm = true;
                 }
               }
-              if (_this.isValid(null))
+              if (_this.isValid())
               {
                 _this.dispatchEvent('resetMenu', null);
                 document.location.href = _this.m_strRedirectPath;
@@ -466,7 +424,7 @@ class Common
               this.login.showForm = true;
             }
           }
-          if (this.isValid(null))
+          if (this.isValid())
           {
             this.dispatchEvent('resetMenu', null);
             document.location.href = this.m_strRedirectPath;
@@ -522,7 +480,7 @@ class Common
   processLogout()
   {
     this.logout.info = 'Processing logout...';
-    if (this.isValid(null))
+    if (this.isValid())
     {
       if (this.m_bJwt)
       {
@@ -540,18 +498,7 @@ class Common
               _this.m_bHaveAuth = false;
               _this.m_auth = null;
               _this.m_auth = {admin: false, apps: {}};
-              if (_this.m_sessionStorage && _this.m_sessionStorage.sl_wsJwt)
-              {
-                _this.m_sessionStorage.sl_wsJwt = null;
-              }
-              else if (_this.m_wsJwt)
-              {
-                _this.m_wsJwt = null;
-              }
-              else
-              {
-                _this.setCookie('sl_commonWsJwt', '');
-              }
+              window.localStorage.removeItem('sl_wsJwt');
               _this.dispatchEvent('resetMenu', null);
               document.location.href = response.Response.Redirect;
             }
@@ -612,18 +559,7 @@ class Common
       this.m_auth = {admin: false, apps: {}};
       if (this.m_bJwt)
       {
-        if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
-        {
-          this.m_sessionStorage.sl_wsJwt = null;
-        }
-        else if (this.m_wsJwt)
-        {
-          this.m_wsJwt = null;
-        }
-        else
-        {
-          this.setCookie('sl_commonWsJwt', '');
-        }
+        window.localStorage.removeItem('sl_wsJwt');
       }
       this.dispatchEvent('resetMenu', null);
       document.location.href = this.m_strRedirectPath;
@@ -633,7 +569,7 @@ class Common
   // {{{ resetMenu()
   resetMenu()
   {
-    if (this.isValid(''))
+    if (this.isValid())
     {
       this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
     }
@@ -851,7 +787,7 @@ class Common
           this.m_ws[strName].modalInstance = null;
         }
         this.m_ws[strName].Connected = true;
-        this.auth(null);
+        this.auth();
       };
       // }}}
       // {{{ WebSocket::onclose()
@@ -897,18 +833,7 @@ class Common
           this.m_auth = null;
           this.m_auth = {admin: false, apps: {}};
           this.m_bSentJwt = false;
-          if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
-          {
-            this.m_sessionStorage.sl_wsJwt = null;
-          }
-          else if (this.m_wsJwt)
-          {
-            this.m_wsJwt = null;
-          }
-          else
-          {
-            this.setCookie('sl_commonWsJwt', '');
-          }
+          window.localStorage.removeItem('sl_wsJwt');
           delete response.Error;
           delete response.wsJwt;
           delete response.wsRequestID;
@@ -1089,20 +1014,10 @@ class Common
       request.wsController = strController;
       if (this.m_bJwt && (this.m_bJwtInclusion || !this.m_bSentJwt))
       {
-        if (this.m_wsJwt)
+        if (window.localStorage.getItem('sl_wsJwt'))
         {
           this.m_bSentJwt = true;
-          request.wsJwt = this.m_wsJwt;
-        }
-        else if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
-        {
-          this.m_bSentJwt = true;
-          request.wsJwt = this.m_sessionStorage.sl_wsJwt;
-        }
-        else if (this.getCookie('sl_commonWsJwt'))
-        {
-          this.m_bSentJwt = true;
-          request.wsJwt = this.getCookie('sl_commonWsJwt');
+          request.wsJwt = window.localStorage.getItem('sl_wsJwt');
         }
       }
       if (this.isDefined(this.m_wsSessionID))

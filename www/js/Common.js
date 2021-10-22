@@ -736,9 +736,9 @@ class Common
   setSecureLogin(bSecureLogin)
   {
     this.m_bSecureLogin = bSecureLogin;
-    if (bSecureLogin && document.location.protocol !== 'https')
+    if (bSecureLogin && document.location.protocol !== 'https:')
     {
-      document.location.protocol = 'https';
+      document.location.protocol = 'https:';
     }
   };
   // }}}

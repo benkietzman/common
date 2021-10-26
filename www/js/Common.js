@@ -16,9 +16,10 @@ class Common
     this.footer = {engineer: false};
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
     this.logout = false;
+    this.m_store = {};
+    this.m_ws = {};
     this.menu = {left: [], right: []};
     this.submenu = false;
-    this.m_ws = {};
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -175,6 +176,19 @@ class Common
     this.m_bJwtInclusion = bEnable;
   }
   // }}}
+  // {{{ existStore()
+  existStore(controller)
+  {
+    let bResult = false;
+
+    if (this.isDefined(this.m_store[controller]))
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
   // {{{ getCookie()
   getCookie(strName)
   {
@@ -199,6 +213,17 @@ class Common
     }
 
     return strValue;
+  }
+  // }}}
+  // {{{ getStore()
+  getStore(controller)
+  {
+    if (!this.isDefined(this.m_store[controller]))
+    {
+      this.putStore(controller, {});
+    }
+
+    return this.m_store[controller];
   }
   // }}}
   // {{{ getUserEmail()
@@ -560,6 +585,12 @@ class Common
     }
   }
   // }}}
+  // {{{ putStore()
+  putStore(controller, data)
+  {
+    this.m_store[controller] = data;
+  }
+  // }}}
   // {{{ resetMenu()
   resetMenu()
   {
@@ -747,6 +778,17 @@ class Common
   {
     this.m_strLoginType = strLoginType;
   };
+  // }}}
+  // {{{ store()
+  store(controller, data)
+  {
+    if (!this.existStore(controller))
+    {
+      this.putStore(controller, data);
+    }
+
+    return this.getStore(controller);
+  }
   // }}}
   // {{{ wsCreate()
   wsCreate(strName, strServer, strPort, bSecure, strProtocol)

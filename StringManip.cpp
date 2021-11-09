@@ -690,7 +690,7 @@ extern "C++"
         bResult = true;
         for (size_t i = 0; bResult && i < strValue.size(); i++)
         {
-          if (!isdigit(strValue[i]))
+          if ((i != 0 || strValue[i] != '-') && !isdigit(strValue[i]))
           {
             bResult = false;
           }

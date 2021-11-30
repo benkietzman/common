@@ -482,14 +482,14 @@ extern "C++"
       {
         bGood = true;
       }
-      if (!bGood)
+      if (!bGood && ssl != NULL)
       {
         SSL_shutdown(ssl);
         SSL_free(ssl);
         ssl = NULL;
       }
 
-      return (ssl);
+      return ssl;
     }
     // }}}
     // {{{ sslConnect()
@@ -515,14 +515,14 @@ extern "C++"
       {
         bGood = true;
       }
-      if (!bGood)
+      if (!bGood && ssl != NULL)
       {
         SSL_shutdown(ssl);
         SSL_free(ssl);
         ssl = NULL;
       }
 
-      return (ssl);
+      return ssl;
     }
     // }}}
     // {{{ sslDeinit()

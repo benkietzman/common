@@ -463,6 +463,7 @@ extern "C++"
     SSL *Utility::sslAccept(SSL_CTX *ctx, int fdSocket, string &strError)
     {
       bool bGood = false;
+      int nReturn;
       SSL *ssl = NULL;
  
       ERR_clear_error();
@@ -474,9 +475,9 @@ extern "C++"
       {
         strError = (string)"SSL_set_fd() " + sslstrerror();
       }
-      else if (SSL_accept(ssl) <= 0)
+      else if ((nReturn = SSL_accept(ssl)) <= 0)
       {
-        strError = (string)"SSL_accept() " + sslstrerror();
+        strError = (string)"SSL_accept() " + sslstrerror(ssl, nReturn);
       }
       else
       {
@@ -496,6 +497,7 @@ extern "C++"
     SSL *Utility::sslConnect(SSL_CTX *ctx, int fdSocket, string &strError)
     {
       bool bGood = false;
+      int nReturn;
       SSL *ssl = NULL;
  
       ERR_clear_error();
@@ -507,9 +509,9 @@ extern "C++"
       {
         strError = (string)"SSL_set_fd() " + sslstrerror();
       }
-      else if (SSL_connect(ssl) != 1)
+      else if ((nReturn = SSL_connect(ssl)) != 1)
       {
-        strError = (string)"SSL_connect() " + sslstrerror();
+        strError = (string)"SSL_connect() " + sslstrerror(ssl, nReturn);
       }
       else
       {
@@ -760,6 +762,7 @@ extern "C++"
       if (ssError.str().empty())
       {
         int nError;
+        ssError.str("");
         switch ((nError = SSL_get_error(ssl, nReturn)))
         {
           case SSL_ERROR_NONE : ssError << "[SSL_ERROR_NONE] The TLS/SSL I/O operation completed."; break;
@@ -783,8 +786,12 @@ extern "C++"
             break;
           }
           case SSL_ERROR_SSL : ssError << "[SSL_ERROR_SSL] A failure in the SSL library occurred, usually a protocol error."; break;
-          default : ssError << " [" << nError << "] Caught an unknown error.";
         }
+      }
+      if (ssError.str().empty())
+      {
+        ssError.str("");
+        ssError << " [" << errno << "] " << strerror(errno);
       }
 
       return ssError.str();

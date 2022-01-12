@@ -150,7 +150,7 @@ class PdoQuery extends DatabaseQuery
   {
     if ($this->m_query)
     {
-      $this->m_query->free();
+      $this->m_query->closeCursor();
     }
   }
   // }}}

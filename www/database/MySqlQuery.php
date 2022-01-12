@@ -130,7 +130,7 @@ class MySqlQuery extends DatabaseQuery
   // {{{ free()
   public function free()
   {
-    if ($this->m_query !== false)
+    if ($this->m_query !== false && $this->m_query !== true)
     {
       $this->m_query->free();
     }

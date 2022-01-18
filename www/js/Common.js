@@ -56,7 +56,6 @@ class Common
     if (this.isDefined(options.footer))
     {
       this.footer = {...this.footer, ...options.footer};
-      this.footer._script = this.centralScript;
       this.request('footer', this.footer, (response) =>
       {
         let error = {};

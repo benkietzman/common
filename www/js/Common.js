@@ -617,6 +617,7 @@ class Common
     if (request && this.isDefined(request._script))
     {
       strScript = request._script;
+      delete request._script;
     }
     if (this.isDefined(strScript))
     {
@@ -625,7 +626,7 @@ class Common
       {
         data.Arguments = request;
       }
-      fetch(this.script,
+      fetch(strScript,
       {
         method: 'POST',
         headers:

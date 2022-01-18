@@ -29,7 +29,7 @@ class Common
     {
       this.script = options.script;
     }
-    this.request('applications', null, (data) =>
+    this.request('applications', {_script: this.centralScript}, (data) =>
     {
       let error = {};
       if (this.response(data, error))
@@ -56,6 +56,7 @@ class Common
     if (this.isDefined(options.footer))
     {
       this.footer = {...this.footer, ...options.footer};
+      this.footer._script = this.centralScript;
       this.request('footer', this.footer, (response) =>
       {
         let error = {};

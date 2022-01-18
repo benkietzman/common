@@ -190,6 +190,8 @@ Vue.component('commonMessages',
         <button class="close" data-dismiss="alert" aria-label="close" v-on:click="close(message.Index)">&times;</button>
         <strong v-show="message.Title">{{message.Title}}<br></strong>
         {{message.Body}}
+        <br>
+        <div class="pull-right"><i>{{message.Time}}</i></div>
       </div>
     </div>
   `

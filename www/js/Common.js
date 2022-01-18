@@ -614,7 +614,7 @@ class Common
     {
       strScript = this.script;
     }
-    if (this.isDefined(request._script))
+    if (this.isDefined(request) && this.isDefined(request._script))
     {
       strScript = request._script;
     }

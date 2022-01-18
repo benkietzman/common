@@ -55,7 +55,7 @@ class Common
     });
     if (this.isDefined(options.footer))
     {
-      let data = {'Function': strFunction};
+      let data = {'Function': 'footer'};
       data.Arguments = {...this.footer, ...options.footer};
       fetch('/central/include/Central.php',
       {

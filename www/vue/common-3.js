@@ -177,7 +177,7 @@ Vue.component('commonMessages',
     {
     },
     // }}}
-    messages()
+    getMessages()
     {
       return common.m_messages;
     }
@@ -190,7 +190,7 @@ Vue.component('commonMessages',
   template:
   `
     <div>
-      <div v-for="message in messages()" :class="'alert alert-' + message.Class + ' alert-dismissible fade in'">
+      <div v-for="message in getMessages()" :class="'alert alert-' + message.Class + ' alert-dismissible fade in'">
         <button class="close" data-dismiss="alert" aria-label="close" v-on:click="close(message.Index)">&times;</button>
         <strong v-show="message.Title">{{message.Title}}<br></strong>
         {{message.Body}}

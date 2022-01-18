@@ -55,8 +55,19 @@ class Common
     });
     if (this.isDefined(options.footer))
     {
-      this.footer = {...this.footer, ...options.footer};
-      this.request('footer', this.footer, (response) =>
+      let data = {'Function': strFunction};
+      data.Arguments = {...this.footer, ...options.footer};
+      fetch('/central/include/Central.php',
+      {
+        method: 'POST',
+        headers:
+        {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then((response) =>
       {
         let error = {};
         if (this.response(response, error))

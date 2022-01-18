@@ -55,18 +55,9 @@ class Common
     });
     if (this.isDefined(options.footer))
     {
-      let data = {'Function': 'footer', Arguments: {...this.footer, ...options.footer}};
-      fetch('/central/include/Central.php',
-      {
-        method: 'POST',
-        headers:
-        {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.json())
-      .then((response) =>
+      this.footer = {...this.footer, ...options.footer};
+      this.footer._script = this.centralScript;
+      this.request('footer', this.footer, (response) =>
       {
         let error = {};
         if (this.response(response, error))
@@ -618,7 +609,16 @@ class Common
   // {{{ request()
   request(strFunction, request, callback)
   {
+    let strScript = null;
     if (this.isDefined(this.script))
+    {
+      strScript = this.script;
+    }
+    if (this.isDefined(request._script))
+    {
+      strScript = request._script;
+    }
+    if (this.isDefined(strScript))
     {
       let data = {'Function': strFunction};
       if (request != null)

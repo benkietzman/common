@@ -25,6 +25,10 @@ class Common
     {
       this.application = options.application;
     }
+    if (this.isDefined(options.centralScript))
+    {
+      this.centralScript = options.centralScript;
+    }
     if (this.isDefined(options.script))
     {
       this.script = options.script;

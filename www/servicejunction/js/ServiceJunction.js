@@ -8,11 +8,6 @@
 
 class ServiceJunction
 {
-  // {{{ constructor()
-  constructor()
-  {
-  }
-  // }}}
   // {{{ batch()
   batch(request, bSecure, callback)
   {

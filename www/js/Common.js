@@ -98,6 +98,7 @@ class Common
           let error = {};
           if (this.wsResponse(response, error))
           {
+            this.m_auth = null;
             this.m_auth = response.Response;
             this.m_bHaveAuth = true;
             this.dispatchEvent('commonAuthReady', null);
@@ -147,6 +148,7 @@ class Common
         let error = {};
         if (this.response(response, error))
         {
+          this.m_auth = null;
           this.m_auth = response.Response.out;
           this.m_bHaveAuth = true;
           this.dispatchEvent('commonAuthReady', null);
@@ -370,6 +372,7 @@ class Common
             }
             if (this.isDefined(response.Response.auth))
             {
+              this.m_auth = null;
               this.m_auth = response.Response.auth;
               this.m_bHaveAuth = true;
               if (this.isDefined(response.Response.jwt))
@@ -440,6 +443,7 @@ class Common
         var error = {};
         if (this.response(result, error))
         {
+          this.m_auth = null;
           this.m_auth = result.data.Response.out;
           this.m_bHaveAuth = true;
           if (this.isDefined(this.m_auth.login_title))

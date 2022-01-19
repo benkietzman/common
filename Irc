@@ -40,6 +40,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 using namespace std;
+#include "Utility"
 // }}}
 
 extern int errno;
@@ -72,6 +73,7 @@ extern "C++"
       string m_strServer;
       string m_strUser;
       unsigned int m_unIndex;
+      Utility *m_pUtility;
 
       /*! \fn list<string>::iterator findRoom(const string strRoom)
       * \brief Finds a room in the list of joined rooms.
@@ -103,7 +105,7 @@ extern "C++"
       ssize_t write(const char *pszBuffer, size_t nSize, string &strError);
 
       public:
-      Irc();
+      Irc(string &strError);
       ~Irc();
 
       /*! \fn bool chat(const string strLocation, const string strMessage, string &strError)

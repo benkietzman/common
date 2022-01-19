@@ -31,11 +31,13 @@ extern "C++"
   namespace common
   {
     // {{{ Irc()
-    Irc::Irc()
+    Irc::Irc(string &strError)
     {
       m_bConnected = false;
       m_bSSL = false;
       m_unIndex = 0;
+      m_pUtility = new Utility(strError);
+      m_ctx = m_pUtility->sslInitClient(strError);
     }
     // }}}
     // {{{ ~Irc()
@@ -53,6 +55,8 @@ extern "C++"
         quit(strError);
         disconnect(strError);
       }
+      SSL_CTX_free(m_ctx);
+      m_pUtility->sslDeinit();
     }
     // }}}
     // {{{ chat()
@@ -119,69 +123,22 @@ extern "C++"
             {
               if (::connect(m_fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
               {
-                if (!m_bSSL || (m_method = (SSL_METHOD *)SSLv23_client_method()) != NULL)
+                if (!m_bSSL || (m_ssl = m_pUtility->sslConnect(m_ctx, m_fdSocket, strError)) != NULL)
                 {
-                  if (!m_bSSL || (m_ctx = SSL_CTX_new(m_method)) != NULL)
+                  string strMessage;
+                  m_bConnected = true;
+                  if (read(strMessage, strError))
                   {
-                    if (!m_bSSL || (m_ssl = SSL_new(m_ctx)) != NULL)
-                    {
-                      if (!m_bSSL || SSL_set_fd(m_ssl, m_fdSocket) == 1)
-                      {
-                        if (!m_bSSL || SSL_connect(m_ssl) == 1)
-                        {
-                          string strMessage;
-                          m_bConnected = true;
-                          if (read(strMessage, strError))
-                          {
-                            m_message.push_back(strMessage);
-                          }
-                          else
-                          {
-                            m_bConnected = false;
-                          }
-                        }
-                        else
-                        {
-                          if (m_bSSL)
-                          {
-                            SSL_free(m_ssl);
-                            SSL_CTX_free(m_ctx);
-                          }
-                          close(m_fdSocket);
-                          strError = "Failed to connect the SSL handle.";
-                        }
-                      }
-                      else
-                      {
-                        if (m_bSSL)
-                        {
-                          SSL_free(m_ssl);
-                          SSL_CTX_free(m_ctx);
-                        }
-                        close(m_fdSocket);
-                        strError = "Failed to set the SSL file descriptor.";
-                      }
-                    }
-                    else
-                    {
-                      if (m_bSSL)
-                      {
-                        SSL_CTX_free(m_ctx);
-                      }
-                      close(m_fdSocket);
-                      strError = "Failed to create the SSL handle.";
-                    }
+                    m_message.push_back(strMessage);
                   }
                   else
                   {
-                    close(m_fdSocket);
-                    strError = "Failed to establish the SSL context.";
+                    m_bConnected = false;
                   }
                 }
                 else
                 {
                   close(m_fdSocket);
-                  strError = "Failed to establish the SSL method.";
                 }
               }
               else
@@ -218,8 +175,8 @@ extern "C++"
         m_message.clear();
         if (m_bSSL)
         {
+          SSL_shutdown(m_ssl);
           SSL_free(m_ssl);
-          SSL_CTX_free(m_ctx);
         }
         close(m_fdSocket);
         m_bConnected = false;
@@ -489,7 +446,6 @@ extern "C++"
       strMessage.clear();
       if (m_bConnected)
       {
-        char szBuffer[1024];
         int nReturn;
         size_t nPosition;
         while (m_bConnected && !bResult)
@@ -501,9 +457,8 @@ extern "C++"
           {
             if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLIN))
             {
-              if ((!m_bSSL && (nReturn = ::read(m_fdSocket, szBuffer, 1024)) > 0) || (m_bSSL && (nReturn = SSL_read(m_ssl, szBuffer, 1024)) > 0))
+              if ((!m_bSSL && m_pUtility->fdRead(m_fdSocket, m_strBuffer, nReturn)) || (m_bSSL && m_pUtility->sslRead(m_ssl, m_strBuffer, nReturn)))
               {
-                m_strBuffer.append(szBuffer, nReturn);
                 while ((nPosition = m_strBuffer.find("\r", 0)) != string::npos)
                 {
                   m_strBuffer.erase(nPosition, 1);
@@ -523,7 +478,7 @@ extern "C++"
               }
               else
               {
-                strError = strerror(errno);
+                strError = ((!m_bSSL)?strerror(errno):m_pUtility->sslstrerror(m_ssl, nReturn));
                 disconnect(strError);
               }
             }

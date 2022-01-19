@@ -70,6 +70,7 @@ class Common
       this.request('footer', this.footer, (response) =>
       {
         let error = {};
+        this.dispatchEvent('commonFooterReady', null);
         if (this.response(response, error))
         {
           this.footer = response.Response.out;

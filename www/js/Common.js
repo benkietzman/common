@@ -347,19 +347,15 @@ class Common
           'Content-Type': 'application/json'
         }
       })
+      .then(response => response.json())
       .then((response) =>
       {
-        let data = {};
-        if (response.status == 200)
-        {
-          data = response.json();
-        }
         let request = null;
         request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
         request.Request.Type = this.m_strLoginType;
-        if (this.isDefined(data[this.m_strLoginType]) && this.isDefined(data[this.m_strLoginType]['cookie']) && this.isCookie(data[this.m_strLoginType]['cookie']))
+        if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
         {
-          request.Request.Data = this.getCookie(data[this.m_strLoginType]['cookie']);
+          request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
         }
         this.wsRequest('bridge', request).then((response) =>
         {

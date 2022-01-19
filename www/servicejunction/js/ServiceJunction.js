@@ -25,7 +25,6 @@ class ServiceJunction
   {
     let bResult = false;
 
-console.log(response);
     if (response.Status && response.Status == 'okay')
     {
       if (response.data['Function'] == 'batch')

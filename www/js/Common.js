@@ -223,6 +223,12 @@ class Common
     return strValue;
   }
   // }}}
+  // {{{ getRedirectPath()
+  getRedirectPath()
+  {
+    return this.m_strRedirectPath;
+  }
+  // }}}
   // {{{ getStore()
   getStore(controller)
   {

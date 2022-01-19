@@ -11,6 +11,7 @@ class Common
   // {{{ constructor()
   constructor(options)
   {
+    this.activeMenu = null;
     this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
     this.footer = {engineer: false};
@@ -22,6 +23,10 @@ class Common
     this.m_ws = {};
     this.menu = {left: [], right: []};
     this.submenu = false;
+    this.strMenu = null;
+    this.strPrevMenu = null;
+    this.strPrevSubMenu = null;
+    this.strSubMenu = null;
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -685,93 +690,99 @@ class Common
   setMenu(strMenu, strSubMenu)
   {
     let nActiveLeft = -1;
+    let menu = this.menu;
+    let submenu = this.submenu;
+    this.menu = null;
+    this.submenu = null;
     this.strPrevMenu = this.strMenu;
     this.strPrevSubMenu = this.strSubMenu;
     this.strMenu = strMenu;
     this.strSubMenu = strSubMenu;
-    for (let i = 0; i < this.menu.left.length; i++)
+    for (let i = 0; i < menu.left.length; i++)
     {
-      if (this.menu.left[i].value == strMenu)
+      if (menu.left[i].value == strMenu)
       {
         nActiveLeft = i;
-        this.menu.left[i].active = 'active';
+        menu.left[i].active = 'active';
         this.activeMenu = strMenu;
       }
       else
       {
-        this.menu.left[i].active = null;
+        menu.left[i].active = null;
       }
     }
     let nActiveRight = -1;
-    for (let i = 0; i < this.menu.right.length; i++)
+    for (let i = 0; i < menu.right.length; i++)
     {
-      if (this.menu.right[i].value == strMenu)
+      if (menu.right[i].value == strMenu)
       {
         nActiveRight = i;
-        this.menu.right[i].active = 'active';
+        menu.right[i].active = 'active';
         this.activeMenu = strMenu;
       }
       else
       {
-        this.menu.right[i].active = null;
+        menu.right[i].active = null;
       }
     }
-    if (nActiveLeft >= 0 && this.menu.left[nActiveLeft].submenu)
+    if (nActiveLeft >= 0 && menu.left[nActiveLeft].submenu)
     {
-      this.submenu = this.menu.left[nActiveLeft].submenu;
-      for (var i = 0; i < this.submenu.left.length; i++)
+      submenu = menu.left[nActiveLeft].submenu;
+      for (var i = 0; i < submenu.left.length; i++)
       {
-        if (this.submenu.left[i].value == strSubMenu)
+        if (submenu.left[i].value == strSubMenu)
         {
-          this.submenu.left[i].active = 'active';
+          submenu.left[i].active = 'active';
         }
         else
         {
-          this.submenu.left[i].active = null;
+          submenu.left[i].active = null;
         }
       }
-      for (let i = 0; i < this.submenu.right.length; i++)
+      for (let i = 0; i < submenu.right.length; i++)
       {
-        if (this.submenu.right[i].value == strSubMenu)
+        if (submenu.right[i].value == strSubMenu)
         {
-          this.submenu.right[i].active = 'active';
+          submenu.right[i].active = 'active';
         }
         else
         {
-          this.submenu.right[i].active = null;
+          submenu.right[i].active = null;
         }
       }
     }
-    else if (nActiveRight >= 0 && this.menu.right[nActiveRight].submenu)
+    else if (nActiveRight >= 0 && menu.right[nActiveRight].submenu)
     {
-      this.submenu = this.menu.right[nActiveRight].submenu;
-      for (let i = 0; i < this.submenu.left.length; i++)
+      submenu = menu.right[nActiveRight].submenu;
+      for (let i = 0; i < submenu.left.length; i++)
       {
-        if (this.submenu.left[i].value == strSubMenu)
+        if (submenu.left[i].value == strSubMenu)
         {
-          this.submenu.left[i].active = 'active';
+          submenu.left[i].active = 'active';
         }
         else
         {
-          this.submenu.left[i].active = null;
+          submenu.left[i].active = null;
         }
       }
-      for (let i = 0; i < this.submenu.right.length; i++)
+      for (let i = 0; i < submenu.right.length; i++)
       {
-        if (this.submenu.right[i].value == strSubMenu)
+        if (submenu.right[i].value == strSubMenu)
         {
-          this.submenu.right[i].active = 'active';
+          submenu.right[i].active = 'active';
         }
         else
         {
-          this.submenu.right[i].active = null;
+          submenu.right[i].active = null;
         }
       }
     }
     else
     {
-      this.submenu = false;
+      submenu = false;
     }
+    this.menu = menu;
+    this.submenu = submenu;
   }
   // }}}
   // {{{ setRedirectPath()

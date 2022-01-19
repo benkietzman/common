@@ -524,7 +524,7 @@ class Common
           this.logout.info = null;
           if (this.wsResponse(response, error))
           {
-            if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+            if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
             {
               this.m_bHaveAuth = false;
               this.m_auth = null;

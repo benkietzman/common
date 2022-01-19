@@ -27,21 +27,21 @@ class ServiceJunction
 
     if (response.Status && response.Status == 'okay')
     {
-      if (response.data['Function'] == 'batch')
+      if (response['Function'] == 'batch')
       {
         bResult = true;
       }
-      else if (response.data['Function'] == 'request')
+      else if (response['Function'] == 'request')
       {
-        if (response.data.Response.length > 0)
+        if (response.Response.length > 0)
         {
-          if (response.data.Response[0].Status && response.data.Response[0].Status == 'okay')
+          if (response.Response[0].Status && response.Response[0].Status == 'okay')
           {
             bResult = true;
           }
-          else if (response.data.Response[0].Error && response.data.Response[0].Error.length > 0)
+          else if (response.Response[0].Error && response.Response[0].Error.length > 0)
           {
-            error.message = response.data.Response[0].Error;
+            error.message = response.Response[0].Error;
           }
           else
           {
@@ -60,9 +60,9 @@ class ServiceJunction
     }
     else if (error != null)
     {
-      if (response.data && response.data.Error && response.data.Error.length > 0)
+      if (response.Error && response.Error.length > 0)
       {
-        error.message = response.data.Error;
+        error.message = response.Error;
       }
       else
       {

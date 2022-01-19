@@ -13,7 +13,7 @@ factories.junction = function ($http)
   // {{{ batch()
   factory.batch = function (request, bSecure, callback)
   {
-    $http.post('/common/servicejunction/angularjs/serviceJunctionWorker.php', {'Function': 'batch', Transport: ((bSecure)?'secure':'standard'), Request: request}).then(callback);
+    $http.post('/include/common/servicejunction/angularjs/serviceJunctionWorker.php', {'Function': 'batch', Transport: ((bSecure)?'secure':'standard'), Request: request}).then(callback);
   };
   // }}}
   // {{{ request()

@@ -11,13 +11,13 @@ class ServiceJunction
   // {{{ batch()
   batch(request, bSecure, callback)
   {
-    fetch('/common/servicejunction/angularjs/serviceJunctionWorker.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'Function': 'batch', Transport: ((bSecure)?'secure':'standard'), Request: request})}).then(response => response.json()).then(callback);
+    fetch('/include/common/servicejunction/angularjs/serviceJunctionWorker.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'Function': 'batch', Transport: ((bSecure)?'secure':'standard'), Request: request})}).then(response => response.json()).then(callback);
   }
   // }}}
   // {{{ request()
   request(request, bSecure, callback)
   {
-    fetch('/common/servicejunction/angularjs/serviceJunctionWorker.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'Function': 'request', Transport: ((bSecure)?'secure':'standard'), Request: request})}).then(response => response.json()).then(callback);
+    fetch('/include/common/servicejunction/angularjs/serviceJunctionWorker.php', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({'Function': 'request', Transport: ((bSecure)?'secure':'standard'), Request: request})}).then(response => response.json()).then(callback);
   }
   // }}}
   // {{{ response()

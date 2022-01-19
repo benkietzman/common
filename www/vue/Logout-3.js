@@ -13,7 +13,7 @@ export default
   // {{{ mounted()
   mounted()
   {
-    common.setMenu('Logout as '+common.getFirstName(), null);
+    common.setMenu('Logout as '+common.getUserFirstName(), null);
     common.processLogout();
   },
   // }}}

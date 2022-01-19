@@ -621,6 +621,7 @@ class Common
     {
       this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
     }
+    this.setMenu(this.strMenu, this.strSubMenu);
   }
   // }}}
   // {{{ request()

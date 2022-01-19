@@ -25,7 +25,7 @@ class ServiceJunction
   {
     let bResult = false;
 
-    if (this.isDefined(response.Status) && response.Status == 'okay')
+    if (response.Status && response.Status == 'okay')
     {
       if (response.data['Function'] == 'batch')
       {

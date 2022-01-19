@@ -15,7 +15,7 @@ class Common
     this.centralMenu = {show: false};
     this.footer = {engineer: false};
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
-    this.logout = false;
+    this.logout = {info: false, message: false};
     this.m_messages = [];
     this.m_store = {};
     this.m_ws = {};

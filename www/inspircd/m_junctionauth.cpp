@@ -127,7 +127,15 @@ class ModuleJunctionAuth : public Module
             std::string strBuffer[2], strLine, strResponse;
             time_t CEnd, CStart, CTimeout = 30;
             time(&CStart);
-            strBuffer[1] += m_strRequest + "end\n";
+            strBuffer[1] = m_strRequest + "\nend\n";
+            while ((unPosition = strBuffer[1].find("$nick")) != std::string::npos)
+            {
+              strBuffer[1].replace(unPosition, 5, user->nick);
+            }
+            while ((unPosition = strBuffer[1].find("$pass")) != std::string::npos)
+            {
+              strBuffer[1].replace(unPosition, 5, user->password);
+            }
             while ((unPosition = strBuffer[1].find("\\n")) != std::string::npos)
             {
               strBuffer[1][unPosition] = '\n';

@@ -19,6 +19,9 @@
 *                                                                         *
 **************************************************************************/
 
+/// $CompilerFlags: find_compiler_flags("openssl" "")
+/// $LinkerFlags: find_linker_flags("openssl" "-lssl -lcrypto")
+
 /*! \file m_junctionauth.cpp
 * \brief ModuleJunctionAuth Class
 */

@@ -1,3 +1,3 @@
-Add the following URL to the end of the sources.list file within the inspircd cloned directory:  https://kietzman.org/inspircd/modules.lst
+Add the following URL to the end of the sources.list file within the inspircd cloned directory:  https://kietzman.org/include/common/inspircd/modules.lst
 
 Run the following command from within the inspircd cloned directory:  ./modulemanager install m_junctionauth

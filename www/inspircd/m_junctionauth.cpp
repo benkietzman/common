@@ -131,7 +131,7 @@ class ModuleJunctionAuth : public Module
             while ((unPosition = strBuffer[1].find("$ident")) != std::string::npos)
             {
               std::string strIdent = user->ident;
-              if ((unPosition = strIdent.find("@")) != string::npos)
+              if ((unPosition = strIdent.find("@")) != std::string::npos)
               {
                 strIdent.erase(unPosition, (strIdent.size() - unPosition));
               }

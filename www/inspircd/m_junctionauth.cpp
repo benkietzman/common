@@ -130,7 +130,12 @@ class ModuleJunctionAuth : public Module
             strBuffer[1] = m_strRequest + "\nend\n";
             while ((unPosition = strBuffer[1].find("$ident")) != std::string::npos)
             {
-              strBuffer[1].replace(unPosition, 6, user->ident);
+              std::string strIdent = user->ident;
+              if ((unPosition = strIdent.find("@")) != string::npos)
+              {
+                strIdent.erase(unPosition, (strIdent.size() - unPosition));
+              }
+              strBuffer[1].replace(unPosition, 6, strIdent);
             }
             while ((unPosition = strBuffer[1].find("$nick")) != std::string::npos)
             {

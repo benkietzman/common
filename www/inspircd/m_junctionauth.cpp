@@ -75,9 +75,15 @@ class ModuleJunctionAuth : public Module
   {
     // {{{ prep work
     bool bResult = false;
+    size_t unPosition;
+    std::string strIdent = user->ident;
     ConfigTag* tag = user->MyClass->config;
+    if ((unPosition = strIdent.find("@")) != std::string::npos)
+    {
+      strIdent.erase(unPosition, (strIdent.size() - unPosition));
+    }
     // }}}
-    if (tag->getBool("usejunctionauth", true) && (m_strAllowPattern.empty() || InspIRCd::Match(user->nick, m_strAllowPattern)) && !pendingExt.get(user))
+    if (tag->getBool("usejunctionauth", true) && (m_strAllowPattern.empty() || InspIRCd::Match(strIdent, m_strAllowPattern)) && !pendingExt.get(user))
     {
       std::string strError;
       SSL_CTX *ctx = NULL;
@@ -123,18 +129,12 @@ class ModuleJunctionAuth : public Module
           if (bConnected[2])
           {
             bool bExit = false;
-            size_t unPosition;
             std::string strBuffer[2], strLine, strResponse;
             time_t CEnd, CStart, CTimeout = 30;
             time(&CStart);
             strBuffer[1] = m_strRequest + "\nend\n";
             while ((unPosition = strBuffer[1].find("$ident")) != std::string::npos)
             {
-              std::string strIdent = user->ident;
-              if ((unPosition = strIdent.find("@")) != std::string::npos)
-              {
-                strIdent.erase(unPosition, (strIdent.size() - unPosition));
-              }
               strBuffer[1].replace(unPosition, 6, strIdent);
             }
             while ((unPosition = strBuffer[1].find("$nick")) != std::string::npos)

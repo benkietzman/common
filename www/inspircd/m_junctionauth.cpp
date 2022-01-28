@@ -128,9 +128,9 @@ class ModuleJunctionAuth : public Module
             time_t CEnd, CStart, CTimeout = 30;
             time(&CStart);
             strBuffer[1] = m_strRequest + "\nend\n";
-            while ((unPosition = strBuffer[1].find("$nick")) != std::string::npos)
+            while ((unPosition = strBuffer[1].find("$ident")) != std::string::npos)
             {
-              strBuffer[1].replace(unPosition, 5, user->nick);
+              strBuffer[1].replace(unPosition, 6, user->ident);
             }
             while ((unPosition = strBuffer[1].find("$pass")) != std::string::npos)
             {

@@ -20,6 +20,7 @@ class Common
     this.m_auth = {};
     this.m_messages = [];
     this.m_store = {};
+    this.m_strLoginType = null;
     this.m_ws = {};
     this.menu = {left: [], right: []};
     this.submenu = false;
@@ -352,91 +353,104 @@ class Common
   {
     if (this.m_bJwt)
     {
-      fetch('/include/common_addons/auth/modules.json',
+      let request = null;
+      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      this.wsRequest('bridge', request).then((response) =>
       {
-        method: 'GET',
-        headers:
+        if (this.m_strLoginType == null)
         {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then((response) =>
-      {
-        let request = null;
-        request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
-        request.Request.Type = this.m_strLoginType;
-        if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
-        {
-          request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
-        }
-        this.wsRequest('bridge', request).then((response) =>
-        {
-          var error = {};
-          if (this.wsResponse(response, error))
+          this.m_strLoginType = 'password';
+          if (this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
-            if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
+            this.m_strLoginType = response.Response.Module;
+          }
+        }
+        fetch('/include/common_addons/auth/modules.json',
+        {
+          method: 'GET',
+          headers:
+          {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then((response) =>
+        {
+          let request = null;
+          request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
+          request.Request.Type = this.m_strLoginType;
+          if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
+          {
+            request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
+          }
+          this.wsRequest('bridge', request).then((response) =>
+          {
+            var error = {};
+            if (this.wsResponse(response, error))
             {
-              this.login.message = response.Error.Message;
-            }
-            if (this.isDefined(response.Response.auth))
-            {
-              this.m_auth = null;
-              this.m_auth = response.Response.auth;
-              this.m_bHaveAuth = true;
-              if (this.isDefined(response.Response.jwt))
+              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
               {
-                window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
+                this.login.message = response.Error.Message;
               }
-              if (this.isDefined(this.m_auth.login_title))
+              if (this.isDefined(response.Response.auth))
               {
-                if (!this.isDefined(this.login.login) || !this.login.login)
+                this.m_auth = null;
+                this.m_auth = response.Response.auth;
+                this.m_bHaveAuth = true;
+                if (this.isDefined(response.Response.jwt))
                 {
-                  this.login.login = {};
+                  window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
                 }
-                this.login.login.title = this.m_auth.login_title;
-                if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                if (this.isDefined(this.m_auth.login_title))
                 {
-                  this.login.showForm = true;
-                }
-              }
-              if (this.isValid())
-              {
-                this.dispatchEvent('resetMenu', null);
-                document.location.href = this.m_strRedirectPath;
-              }
-              else
-              {
-                var request = {Section: 'secure', 'Function': 'login'};
-                request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                this.wsRequest('bridge', request).then((response) =>
-                {
-                  var error = {};
-                  this.login.info = null;
-                  if (this.wsResponse(response, error))
+                  if (!this.isDefined(this.login.login) || !this.login.login)
                   {
-                    if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                    this.login.login = {};
+                  }
+                  this.login.login.title = this.m_auth.login_title;
+                  if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                  {
+                    this.login.showForm = true;
+                  }
+                }
+                if (this.isValid())
+                {
+                  this.dispatchEvent('resetMenu', null);
+                  document.location.href = this.m_strRedirectPath;
+                }
+                else
+                {
+                  var request = {Section: 'secure', 'Function': 'login'};
+                  request.Request = {Type: this.m_strLoginType, Return: document.location.href};
+                  this.wsRequest('bridge', request).then((response) =>
+                  {
+                    var error = {};
+                    this.login.info = null;
+                    if (this.wsResponse(response, error))
                     {
-                      this.dispatchEvent('resetMenu', null);
-                      document.location.href = response.Response.Redirect;
+                      if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                      {
+                        this.dispatchEvent('resetMenu', null);
+                        document.location.href = response.Response.Redirect;
+                      }
                     }
-                  }
-                  else
-                  {
-                    this.login.message = error.message;
-                  }
-                });
+                    else
+                    {
+                      this.login.message = error.message;
+                    }
+                  });
+                }
+              }
+              if (this.isDefined(error.message))
+              {
+                this.login.message = error.message;
               }
             }
-            if (this.isDefined(error.message))
+            else
             {
               this.login.message = error.message;
             }
-          }
-          else
-          {
-            this.login.message = error.message;
-          }
+          });
         });
       });
     }
@@ -523,28 +537,41 @@ class Common
     {
       if (this.m_bJwt)
       {
-        var request = {Section: 'secure', 'Function': 'logout'};
-        request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+        let request = null;
+        request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
         this.wsRequest('bridge', request).then((response) =>
         {
-          var error = {};
-          this.logout.info = null;
-          if (this.wsResponse(response, error))
+          if (this.m_strLoginType == null)
           {
-            if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+            this.m_strLoginType = 'password';
+            if (this.isDefined(response.Response.Module) && response.Response.Module != '')
             {
-              this.m_bHaveAuth = false;
-              this.m_auth = null;
-              this.m_auth = {admin: false, apps: {}};
-              window.localStorage.removeItem('sl_wsJwt');
-              this.dispatchEvent('resetMenu', null);
-              document.location.href = response.Response.Redirect;
+              this.m_strLoginType = response.Response.Module;
             }
           }
-          else
+          var request = {Section: 'secure', 'Function': 'logout'};
+          request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+          this.wsRequest('bridge', request).then((response) =>
           {
-            this.logout.message = error.message;
-          }
+            var error = {};
+            this.logout.info = null;
+            if (this.wsResponse(response, error))
+            {
+              if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+              {
+                this.m_bHaveAuth = false;
+                this.m_auth = null;
+                this.m_auth = {admin: false, apps: {}};
+                window.localStorage.removeItem('sl_wsJwt');
+                this.dispatchEvent('resetMenu', null);
+                document.location.href = response.Response.Redirect;
+              }
+            }
+            else
+            {
+              this.logout.message = error.message;
+            }
+          });
         });
       }
       else

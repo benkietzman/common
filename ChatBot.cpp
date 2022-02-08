@@ -328,12 +328,16 @@ extern "C++"
     }
     // }}}
     // {{{ message()
-    void ChatBot::message(const string strTarget, const string strMessage)
+    void ChatBot::message(const string strTarget, const string strMessage, const string strText)
     {
       Json *ptMessage = new Json;
 
       ptMessage->insert("Target", strTarget);
       ptMessage->insert("Message", strMessage);
+      if (!strText.empty())
+      {
+        ptMessage->insert("Text", strText);
+      }
       putMessage("message", ptMessage);
     }
     // }}}

@@ -313,7 +313,7 @@ class ChatBot
   }
   // }}}
   // {{{ message()
-  public function message($strTarget, $strMessage)
+  public function message($strTarget, $strMessage, $strText = '')
   {
     $message = [];
 
@@ -321,6 +321,10 @@ class ChatBot
     $message['Request'] = [];
     $message['Request']['Target'] = $strTarget;
     $message['Request']['Message'] = $strMessage;
+    if ($strText != '')
+    {
+      $message['Request']['Text'] = $strText;
+    }
     $this->putMessage($message);
   }
   // }}}

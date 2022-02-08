@@ -80,7 +80,7 @@ extern "C++"
       string form(const string strIdent, const string strForm, map<string, string> arguments, const string strHeader = "", const string strFooter = "");
       string ident(const string strUser);
       void join(const string strRoom);
-      void message(const string strTarget, const string strMessage);
+      void message(const string strTarget, const string strMessage, const string strText = "");
       void part(const string strRoom);
       void ping();
       bool process(int nTimeout, string &strError);

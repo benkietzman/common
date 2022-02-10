@@ -78,7 +78,7 @@ class ModuleJunctionAuth : public Module
     size_t unPosition;
     ConfigTag* tag = user->MyClass->config;
     // }}}
-    if (tag->getBool("usejunctionauth", true) && (m_strAllowPattern.empty() || InspIRCd::Match(user->ident, m_strAllowPattern)) && !pendingExt.get(user))
+    if (tag->getBool("usejunctionauth", true) && (m_strAllowPattern.empty() || !InspIRCd::Match(user->ident, m_strAllowPattern)) && !pendingExt.get(user))
     {
       std::string strError;
       SSL_CTX *ctx = NULL;

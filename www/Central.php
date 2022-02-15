@@ -589,6 +589,194 @@ class Central extends Secure
     return $bResult;
   }
   // }}}
+  // {{{ applicationBotLink()
+  public function applicationBotLink($request, &$response, &$strError)
+  { 
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['id']) && $request['id'] != '')
+    {
+      $getApplicationBotLink = $this->m_centraldb->parse('select id, application_id, chat_room, bot_link_remote_system_id, remote_chat_room from application_bot_link where id = '.$request['id']);
+      if ($getApplicationBotLink->execute())
+      {
+        $bResult = true;
+        if (($getApplicationBotLinkRow = $getApplicationBotLink->fetch('assoc')))
+        {
+          $botlinkRemoteSystemRequest = array('id'=>$getApplicationBotLinkRow['bot_link_remote_system_id']);
+          $botlinkRemoteSystemResponse = null;
+          if ($this->botLinkRemoteSystem($botlinkRemoteSystemRequest, $botlinkRemoteSystemResponse, $strError))
+          {
+            $getApplicationBotLinkRow['bot_link_remote_system'] = $botlinkRemoteSystemResponse;
+          }
+          unset($botlinkRemoteSystemRequest);
+          unset($botlinkRemoteSystemResponse);
+          $response = $getApplicationBotLinkRow;
+        }
+      }
+      else
+      {
+        $strError = $getApplicationBotLink->getError();
+      }
+      $this->m_centraldb->free($getApplicationBotLink);
+    }
+    else
+    {
+      $strError = 'Please provide the id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLinkAdd()
+  public function applicationBotLinkAdd($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['application_id']) && $request['application_id'] != '')
+    {
+      $applicationrequest = array('id'=>$request['application_id']);
+      $applicationresponse = null;
+      if ($this->application($applicationrequest, $applicationresponse, $strError))
+      {
+        $devrequest = array('id'=>$request['application_id']);
+        $devresponse = null;
+        if ($this->isGlobalAdmin() || $this->isApplicationDeveloper($devrequest, $devresponse, $strError))
+        {
+          if (isset($request['chat_room']) && $request['chat_room'] != '')
+          {
+            if (isset($request['bot_link_remote_system']) && is_array($request['bot_link_remote_system']) && isset($request['bot_link_remote_system']['id']) && $request['bot_link_remote_system']['id'] != '')
+            {
+              if (isset($request['remote_chat_room']) && $request['remote_chat_room'] != '')
+              {
+                $insertApplicationBotLink = $this->m_centraldb->parse('insert into application_bot_link (application_id, chat_room, bot_link_remote_system_id, remote_chat_room) values ('.$request['application_id'].', \''.addslashes($request['chat_room']).'\', '.$request['bot_link_remote_system']['id'].', \''.addslashes($request['remote_chat_room']).'\')');
+                if ($insertApplicationBotLink->execute())
+                {
+                  $bResult = true;
+                }
+                else
+                {
+                  $strError = $insertApplicationBotLink->getError();
+                }
+              }
+              else
+              {
+                $strError = 'Please provide the remote_chat_room.';
+              }
+            }
+            else
+            {
+              $strError = 'Please provide the bot_link_remote_system.id.';
+            }
+          }
+          else
+          {
+            $strError = 'Please provide the chat_room.';
+          }
+        }
+        else
+        {
+          $strError = 'You are not authorized to perform this action.';
+        }
+        unset($devrequest);
+        unset($devresponse);
+      }
+      unset($applicationrequest);
+      unset($applicationresponse);
+    }
+    else
+    {
+      $strError = 'Please provide the application_id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLinkRemove()
+  public function applicationBotLinkRemove($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['id']) && $request['id'] != '')
+    {
+      $applicationbotlinkrequest = array('id'=>$request['id']);
+      $applicationbotlinkresponse = null;
+      if ($this->applicationBotLink($applicationbotlinkrequest, $applicationbotlinkresponse, $strError))
+      {
+        $devrequest = array('id'=>$applicationbotlinkresponse['application_id']);
+        $devresponse = null;
+        if ($this->isGlobalAdmin() || $this->isApplicationDeveloper($devrequest, $devresponse, $strError))
+        {
+          $deleteApplicationBotLink = $this->m_centraldb->parse('delete from application_bot_link where id = '.$request['id']);
+          if ($deleteApplicationBotLink->execute())
+          {
+            $bResult = true;
+          }
+          else
+          {
+            $strError = $deleteApplicationBotLink->getError();
+          }
+        }
+        else
+        {
+          $strError = 'You are not authorized to perform this action.';
+        }
+        unset($devrequest);
+        unset($devresponse);
+      }
+      unset($applicationbotlinkrequest);
+      unset($applicationbotlinkresponse);
+    }
+    else
+    {
+      $strError = 'Please provide the id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLinksByApplicationID()
+  public function applicationBotLinksByApplicationID($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['application_id']) && $request['application_id'] != '')
+    {
+      $getApplicationBotLink = $this->m_centraldb->parse('select id, application_id, chat_room, bot_link_remote_system_id, remote_chat_room from application_bot_link where application_id = '.$request['application_id']);
+      if ($getApplicationBotLink->execute())
+      {
+        $bResult = true;
+        $response = array();
+        while (($getApplicationBotLinkRow = $getApplicationBotLink->fetch('assoc')))
+        {
+          $botlinkRemoteSystemRequest = array('id'=>$getApplicationBotLinkRow['bot_link_remote_system_id']);
+          $botlinkRemoteSystemResponse = null;
+          if ($this->botLinkRemoteSystem($botlinkRemoteSystemRequest, $botlinkRemoteSystemResponse, $strError))
+          {
+            $getApplicationBotLinkRow['bot_link_remote_system'] = $botlinkRemoteSystemResponse;
+          }
+          unset($botlinkRemoteSystemRequest);
+          unset($botlinkRemoteSystemResponse);
+          $response[] = $getApplicationBotLinkRow;
+        }
+      }
+      else
+      {
+        $strError = $getApplicationBotLink->getError();
+      }
+      $this->m_centraldb->free($getApplicationBotLink);
+    }
+    else
+    {
+      $strError = 'Please provide the application_id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
   // {{{ applicationDepend()
   public function applicationDepend($request, &$response, &$strError)
   {

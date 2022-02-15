@@ -2818,6 +2818,61 @@ class Central extends Secure
     return $bResult;
   }
   // }}}
+  // {{{ botLinkRemoteSystem()
+  public function botLinkRemoteSystem($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+    
+    if (isset($request['id']) && $request['id'] != '')
+    {
+      $getBotLinkRemoteSystem = $this->m_centraldb->parse('select id, name, description from bot_link_remote_system where id = '.$request['id']);
+      if ($getBotLinkRemoteSystem->execute())
+      {
+        if (($getBotLinkRemoteSystemRow = $getBotLinkRemoteSystem->fetch('assoc')))
+        {
+          $bResult = true;
+          $response = $getBotLinkRemoteSystemRow;
+        }
+      }
+      else
+      {
+        $strError = $getBotLinkRemoteSystem->getError();
+      }
+      $this->m_centraldb->free($getBotLinkRemoteSystem);
+    }
+    else
+    {
+      $strError = 'Please provide the id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ botLinkRemoteSystems()
+  public function botLinkRemoteSystems($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    $getBotLinkRemoteSystem = $this->m_centraldb->parse('select id, name, description from bot_link_remote_system order by name');
+    if ($getBotLinkRemoteSystem->execute())
+    {
+      $bResult = true;
+      while (($getBotLinkRemoteSystemRow = $getBotLinkRemoteSystem->fetch('assoc')))
+      {
+        $response[] = $getBotLinkRemoteSystemRow;
+      }
+    }
+    else
+    {
+      $strError = $getBotLinkRemoteSystem->getError();
+    }
+    $this->m_centraldb->free($getBotLinkRemoteSystem);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ contactType()
   public function contactType($request, &$response, &$strError)
   {

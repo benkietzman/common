@@ -47,7 +47,11 @@ extern "C++"
     {
       m_bAuthenticated = false;
       m_bFailed = false;
+      m_bUseSecureBridge = true;
+      m_ctx = NULL;
+      m_eSocketType = COMMON_SOCKET_UNKNOWN;
       m_fdSocket = -1;
+      m_ssl = NULL;
       #ifdef COMMON_LINUX
       sem_init(&m_semaBridgeRequestLock, 0, 10);
       #endif
@@ -139,9 +143,9 @@ extern "C++"
               }
               if (!server.empty())
               {
-                bool bAddrInfo = false, bConnected = false, bSocket = false;
+                bool bConnected[4] = {false, false, false, false}, bGood = false;
                 int fdSocket = -1, nReturn = -1;
-                for (list<string>::iterator i = server.begin(); !bConnected && i != server.end(); i++)
+                for (list<string>::iterator i = server.begin(); !bGood && i != server.end(); i++)
                 {
                   string strServer;
                   unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
@@ -152,10 +156,10 @@ extern "C++"
                   }
                   srand(unSeed);
                   unPick = rand_r(&unSeed) % bridgeServer.size();
-                  while (!bConnected && unAttempt++ < bridgeServer.size())
+                  while (!bGood && unAttempt++ < bridgeServer.size())
                   {
                     addrinfo hints, *result;
-                    bAddrInfo = bSocket = false;
+                    bConnected[0] = false;
                     if (unPick == bridgeServer.size())
                     {
                       unPick = 0;
@@ -170,16 +174,30 @@ extern "C++"
                     if (nReturn == 0)
                     {
                       addrinfo *rp;
-                      bAddrInfo = true;
-                      for (rp = result; !bConnected && rp != NULL; rp = rp->ai_next)
+                      bConnected[0] = true;
+                      for (rp = result; !bGood && rp != NULL; rp = rp->ai_next)
                       {
-                        bSocket = false;
+                        bConnected[1] = bConnected[2] = false;
                         if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                         {
-                          bSocket = true;
+                          bConnected[1] = true;
                           if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                           {
-                            bConnected = true;
+                            bConnected[2] = true;
+                            if (m_bUseSecureBridge)  
+                            {
+                              if ((m_ssl = utility()->sslConnect(m_ctx, fdSocket, strError)) != NULL) 
+                              {
+                                m_eSocketType = COMMON_SOCKET_ENCRYPTED;
+                                bConnected[3] = true;
+                                bGood = true;
+                              }
+                            }
+                            else
+                            {
+                              m_eSocketType = COMMON_SOCKET_UNENCRYPTED;
+                              bGood = true;
+                            }
                           }
                           else
                           {
@@ -193,7 +211,7 @@ extern "C++"
                   }
                   bridgeServer.clear();
                 }
-                if (bConnected)
+                if (bGood)
                 {
                   string strJson;
                   Json *ptRequest = new Json;
@@ -214,13 +232,17 @@ extern "C++"
                 else
                 {
                   stringstream ssError;
-                  if (!bAddrInfo)
+                  if (!bConnected[0])
                   {
                     ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
                   }
+                  else if (!bConnected[2])
+                  {
+                    ssError << ((!bConnected[1])?"socket":"connect") << "(" << errno << ") " << strerror(errno);
+                  }
                   else
                   {
-                    ssError << ((!bSocket)?"socket":"connect") << "(" << errno << ") " << strerror(errno);
+                    ssError << "Central::utilty()->sslConnect() error [" << strError << "]  ";
                   }
                   strError = ssError.str();
                 }
@@ -357,6 +379,12 @@ extern "C++"
           strError = strerror(errno);
         }
         m_fdSocket = -1;
+        if (m_eSocketType == COMMON_SOCKET_ENCRYPTED)
+        {
+          SSL_shutdown(m_ssl);
+          SSL_free(m_ssl);
+        }
+        m_eSocketType = COMMON_SOCKET_UNKNOWN;
       }
       m_bAuthenticated = false;
       m_strBuffer[0].clear();
@@ -366,6 +394,14 @@ extern "C++"
       }
       m_strBuffer[1].clear();
       m_strLine.clear();
+
+      if ((m_eSocketType == COMMON_SOCKET_ENCRYPTED) && (m_ssl != NULL))
+      {
+        SSL_shutdown(m_ssl);
+        SSL_free(m_ssl);
+        m_ssl = NULL;
+      }
+      m_eSocketType = COMMON_SOCKET_UNKNOWN;
 
       return bResult;
     }
@@ -394,6 +430,12 @@ extern "C++"
       bool bResult = false;
 
       m_mutexResource.lock();
+      if ((m_fdSocket == -1) && (m_bUseSecureBridge) && (m_ctx == NULL))
+      {
+        strError = "SSL CTX is not initialized.";
+        bResult = false;
+      }
+      else
       if (m_fdSocket != -1 || connect(strError))
       {
         time(&(m_CTime[1]));
@@ -404,7 +446,6 @@ extern "C++"
         else
         {
           bool bClose = false, bExit = false;
-          char szBuffer[32768];
           int nReturn;
           size_t unPosition;
           string strLine;
@@ -428,9 +469,8 @@ extern "C++"
             {
               if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLIN))
               {
-                if ((nReturn = read(m_fdSocket, szBuffer, 32768)) > 0)
+                if (((m_eSocketType == COMMON_SOCKET_ENCRYPTED) && utility()->sslRead(m_ssl, m_strBuffer[0], nReturn)) || ((m_eSocketType == COMMON_SOCKET_UNENCRYPTED) && utility()->fdRead(m_fdSocket, m_strBuffer[0], nReturn)))
                 {
-                  m_strBuffer[0].append(szBuffer, nReturn);
                   while ((unPosition = m_strBuffer[0].find("\n")) != string::npos)
                   {
                     if (m_bAuthenticated)
@@ -496,13 +536,20 @@ extern "C++"
                 {
                   stringstream ssError;
                   bClose = bExit = true;
-                  ssError << "read(" << errno << ") " << strerror(errno);
+                  if (m_eSocketType == COMMON_SOCKET_ENCRYPTED)
+                  {
+                    ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror();
+                  }
+                  else
+                  {
+                    ssError << "Central::utility()->fdRead(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
+                  }
                   strError = ssError.str();
                 }
               }
               if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLOUT))
               {
-                if ((nReturn = write(m_fdSocket, m_strBuffer[1].c_str(), m_strBuffer[1].size())) > 0)
+                if (((m_eSocketType == COMMON_SOCKET_ENCRYPTED) && utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn)) || ((m_eSocketType == COMMON_SOCKET_UNENCRYPTED) && utility()->fdWrite(m_fdSocket, m_strBuffer[1], nReturn)))
                 {
                   m_strBuffer[1].erase(0, nReturn);
                 }
@@ -510,7 +557,15 @@ extern "C++"
                 {
                   stringstream ssError;
                   bClose = bExit = true;
-                  ssError << "write(" << errno << ") " << strerror(errno);
+                  if (m_eSocketType == COMMON_SOCKET_ENCRYPTED)
+                  {
+                    ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " <<  utility()->sslstrerror();
+                  }
+                  else
+                  {
+                    ssError << "Central::utility()->fdWrite(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
+                  }
+
                   strError = ssError.str();
                 }
               }
@@ -567,6 +622,11 @@ extern "C++"
       list<string> server;
       time_t CEnd, CStart;
 
+      if (m_bUseSecureBridge && (m_ctx == NULL))
+      {
+        strError = "SSL CTX is not initialized.";
+        return (false);
+      }
       if (!m_strUser.empty() && (ptRequest->m.find("User") == ptRequest->m.end() || ptRequest->m["User"]->v.empty()))
       {
         ptRequest->insert("User", m_strUser);
@@ -614,7 +674,7 @@ extern "C++"
         bool bDone = false;
         for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
         {
-          bool bConnected = false, bAddrInfo = false, bSocket = false;
+          bool bConnected[4] = {false, false, false, false}, bGood = false;
           int fdSocket = -1, nReturn = -1;
           string strServer;
           unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
@@ -631,10 +691,10 @@ extern "C++"
           #ifdef COMMON_SOLARIS
           sema_wait(&m_semaBridgeRequestLock);
           #endif
-          while (!bConnected && unAttempt++ < bridgeServer.size())
+          while (!bGood && unAttempt++ < bridgeServer.size())
           {
             addrinfo hints, *result;
-            bAddrInfo = bSocket = false;
+            bConnected[0] = false;
             if (unPick == bridgeServer.size())
             {
               unPick = 0;
@@ -649,16 +709,30 @@ extern "C++"
             if (nReturn == 0)
             {
               addrinfo *rp;
-              bAddrInfo = true;
-              for (rp = result; !bConnected && rp != NULL; rp = rp->ai_next)
+              bConnected[0] = true;
+              for (rp = result; !bGood && rp != NULL; rp = rp->ai_next)
               {
-                bSocket = false;
+                bConnected[1] = bConnected[2] = bConnected[3] = false;
                 if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                 {
-                  bSocket = true;
+                  bConnected[1] = true;
                   if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                   {
-                    bConnected = true;
+                    bConnected[2] = true;
+                    if (m_bUseSecureBridge)
+                    {
+                      if ((m_ssl = utility()->sslConnect(m_ctx, fdSocket, strError)) != NULL)
+                      {
+                        bConnected[3] = true;
+                        bGood = true;
+                        m_eSocketType = COMMON_SOCKET_ENCRYPTED;
+                      }
+                    }
+                    else
+                    {
+                      bGood = true;
+                      m_eSocketType = COMMON_SOCKET_UNENCRYPTED;
+                    }
                   }
                   else
                   {
@@ -677,10 +751,9 @@ extern "C++"
           sema_post(&m_semaBridgeRequestLock);
           #endif
           bridgeServer.clear();
-          if (bConnected)
+          if (bGood)
           {
             bool bExit = false;
-            char szBuffer[32768];
             size_t unPosition;
             string strBuffer[2], strLine;
             bDone = true;
@@ -699,9 +772,8 @@ extern "C++"
               {
                 if (fds[0].fd == fdSocket && (fds[0].revents & POLLIN))
                 {
-                  if ((nReturn = read(fdSocket, szBuffer, 32768)) > 0)
+                  if (((m_eSocketType == COMMON_SOCKET_ENCRYPTED) && utility()->sslRead(m_ssl, strBuffer[0], nReturn)) || ((m_eSocketType == COMMON_SOCKET_UNENCRYPTED) && utility()->fdRead(fdSocket, strBuffer[0], nReturn)))
                   {
-                    strBuffer[0].append(szBuffer, nReturn);
                     if ((unPosition = strBuffer[0].find("\n")) != string::npos)
                     {
                       bExit = true;
@@ -738,14 +810,21 @@ extern "C++"
                     if (nReturn < 0)
                     {
                       stringstream ssError;
-                      ssError << "read(" << errno << ") " << strerror(errno);
+                      if (m_eSocketType == COMMON_SOCKET_ENCRYPTED)
+                      {
+                        ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror();
+                      }
+                      else
+                      {
+                        ssError << "Central::utility()->fdRead(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
+                      }
                       strError = ssError.str();
                     }
                   }
                 }
                 if (fds[0].fd == fdSocket && (fds[0].revents & POLLOUT))
                 {
-                  if ((nReturn = write(fdSocket, strBuffer[1].c_str(), strBuffer[1].size())) > 0)
+                  if (((m_eSocketType == COMMON_SOCKET_ENCRYPTED) && utility()->sslWrite(m_ssl, strBuffer[1], nReturn)) || ((m_eSocketType == COMMON_SOCKET_UNENCRYPTED) && utility()->fdWrite(fdSocket, strBuffer[1], nReturn)))
                   {
                     strBuffer[1].erase(0, nReturn);
                   }
@@ -755,7 +834,14 @@ extern "C++"
                     if (nReturn < 0)
                     {
                       stringstream ssError;
-                      ssError << "write(" << errno << ") " << strerror(errno);
+                      if (m_eSocketType == COMMON_SOCKET_ENCRYPTED)
+                      {
+                        ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << fdSocket << "]:  " <<  utility()->sslstrerror();
+                      }
+                      else
+                      {
+                        ssError << "Central::utility()->fdWrite(" << errno << ") error [" << fdSocket << "]:  " << strerror(errno);
+                      }
                       strError = ssError.str();
                     }
                   }
@@ -780,13 +866,17 @@ extern "C++"
           else
           {
             stringstream ssError;
-            if (!bAddrInfo)
+            if (!bConnected[0])
             {
               ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
             }
+            else if (!bConnected[2])
+            {
+              ssError << ((!bConnected[1])?"socket":"connect") << "(" << errno << ") " << strerror(errno);
+            }
             else
             {
-              ssError << ((!bSocket)?"socket":"connect") << "(" << errno << ") " << strerror(errno);
+              ssError << "Central::utilty()->sslConnect() error [" << strError << "]  ";
             }
             strError = ssError.str();
           }
@@ -885,6 +975,13 @@ extern "C++"
       delete ptResponse;
 
       return bResult;
+    }
+    // }}}
+    // {{{ useSecureBridge()
+    void Bridge::useSecureBridge(bool bUseSecureBridge, SSL_CTX *ctx)
+    {
+      m_bUseSecureBridge = bUseSecureBridge;
+      m_ctx = ctx;
     }
     // }}}
     // {{{ utility()

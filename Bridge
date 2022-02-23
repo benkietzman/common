@@ -67,6 +67,8 @@ extern "C++"
       protected:
       bool m_bAuthenticated;
       bool m_bFailed;
+      bool m_bUseSecureBridge;
+      common_socket_type m_eSocketType;
       int m_fdSocket;
       list<string> m_buffer[2];
       size_t m_unThrottle;
@@ -82,6 +84,8 @@ extern "C++"
       time_t m_CTime[2];
       File m_file;
       StringManip m_manip;
+      SSL *m_ssl;
+      SSL_CTX *m_ctx;
       Utility *m_pUtility;
 
       /*! \fn bool connect(string &strError)
@@ -213,6 +217,12 @@ extern "C++"
       * \param strTimeout Contains the timeout.
       */
       void setTimeout(const string strTimeout);
+      /*! \fn void useSecureBridge(bool bUseSecureBridge, SSL_CTX *ctx)
+      * \brief Set the use secure bridge flag and the SSL CTX.
+      * \param bUseSecureBridge Contains the flag.
+      * \param ctx Contains the object needed for the SSL connection.
+      */
+      void useSecureBridge(bool bUseSecureBridge, SSL_CTX *ctx);
       /*! \fn Utility *utility()
       * \brief Interfaces with the Utility class.
       * \return Returns a pointer to the Utility class.

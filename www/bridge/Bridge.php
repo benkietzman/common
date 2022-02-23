@@ -12,10 +12,14 @@ class Bridge
   // {{{ variables
   protected $m_bAuthenticated;
   protected $m_buffer;
+  protected $m_bUseStream;
   protected $m_conf;
   protected $m_CTime;
   protected $m_bFailed;
   protected $m_fdSocket;
+  protected $m_fdStream;
+  protected $m_port;
+  protected $m_streamContext;
   protected $m_strBuffer;
   protected $m_strConf;
   protected $m_strError;
@@ -24,6 +28,7 @@ class Bridge
   protected $m_strUser;
   protected $m_strUserID;
   protected $m_ulModifyTime;
+  protected $m_pUtility; // Note: The calling program needs to include 'common/www/Utility.php'.
   // }}}
   // {{{ __construct()
   public function __construct($strConf = null)
@@ -32,15 +37,20 @@ class Bridge
     $this->m_bFailed = false;
     $this->m_bRegistered = false;
     $this->m_buffer = [[], []];
+    $this->m_bUseStream = false;
     $this->m_CTime = [0, 0];
     $this->m_fdSocket = -1;
+    $this->m_fdStream = false;
+    $this->m_port = 12199;
     $this->m_strBuffer = [null, null];
+    $this->m_streamContext = null;
     $this->m_strConf = (($strConf != '')?$strConf:'/etc/central.conf');
     $this->m_ulModifyTime = 0;
     if ($strConf != '')
     {
       $this->m_strConf = $strConf;
     }
+    $this->m_pUtility = new \Utility;
   }
   // }}}
   // {{{ __destruct()
@@ -50,7 +60,7 @@ class Bridge
     {
       $this->unregister();
     }
-    if ($this->m_fdSocket != -1)
+    if (($this->m_fdSocket != -1) || ($this->m_fdStream !== false))
     {
       $this->disconnect();
     }
@@ -87,7 +97,7 @@ class Bridge
   {
     $bResult = false;
 
-    if ($this->m_fdSocket == -1)
+    if ((!$this->m_bUseStream && $this->m_fdSocket == -1) || ($this->m_bUseStream && $this->m_fdStream === false))
     {
       $this->m_CTime[1] = time();
       if ($this->m_bFailed || ($this->m_CTime[1] - $this->m_CTime[0]) > 30)
@@ -119,13 +129,9 @@ class Bridge
           $fdSocket = null;
           $unAttempt = 0;
           $unPick = rand(0, ($unSize - 1));
-          while (!$bConnected && $unAttempt++ < $unSize)
+          // {{{ define constants
+          if (!$this->m_bUseStream)
           {
-            if ($unPick == $unSize)
-            {
-              $unPick = 0;
-            }
-            $strServer = $servers[$unPick];
             if (!defined('AF_INET'))
             {
               define('AF_INET', 2);
@@ -145,9 +151,22 @@ class Bridge
             {
               define('SOL_TCP', 6);
             }
-            if (($fdSocket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) !== false)
+          }
+          // }}}
+          while (!$bConnected && $unAttempt++ < $unSize)
+          {
+            if ($unPick == $unSize)
             {
-              if (socket_connect($fdSocket, $strServer, 12199) !== false)
+              $unPick = 0;
+            }
+            $strServer = $servers[$unPick];
+            if ($this->m_bUseStream && (($fdStream = $this->m_pUtility->createClientStream($strServer, $this->m_port, $this->m_streamContext, $strError)) !== false))
+            {
+              $bConnected = true;
+            }
+            elseif (!$this->m_bUseStream && ($fdSocket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) !== false)
+            {
+              if (socket_connect($fdSocket, $strServer, $this->m_port) !== false)
               {
                 $bConnected = true;
               }
@@ -159,12 +178,26 @@ class Bridge
           }
           if ($bConnected)
           {
+            if ($this->m_bUseStream)
+            {
+              $this->m_fdStream = $fdStream;
+            }
+            else
+            {
+              $this->m_fdSocket = $fdSocket;
+            }
             $bResult = true;
-            $this->m_fdSocket = $fdSocket;
           }
           else
           {
-            $this->setError(socket_strerror(socket_last_error()));
+            if ($this->m_bUseStream)
+            {
+              $this->setError(var_dump(error_get_last()));
+            }
+            else
+            {
+              $this->setError(socket_strerror(socket_last_error()));
+            }
           }
         }
         else
@@ -285,13 +318,22 @@ class Bridge
   {
     $bResult = false;
 
-    if ($this->m_fdSocket != -1)
+    if ($this->m_bUseStream)
     {
-      if (socket_close($this->m_fdSocket) !== false)
+      if ($this->m_fdStream === false || stream_socket_shutdown($this->m_fdStream, STREAM_SHUT_RDWR) !== false)
       {
         $bResult = true;
       }
-      $this->m_fdSocket = -1;
+      $this->m_fdStream = false;
+    }
+    else
+    {
+      if ($this->m_fdSocket != -1)
+      {
+        socket_close($this->m_fdSocket);
+        $this->m_fdSocket = -1;
+      }
+      $bResult = true;
     }
 
     return $bResult;
@@ -331,7 +373,7 @@ class Bridge
   {
     $bResult = false;
 
-    if ($this->m_fdSocket != -1 || $this->connect())
+    if (((!$this->m_bUseStream && $this->m_fdSocket != -1)) || (($this->m_bUseStream && $this->m_fdStream)) || $this->connect())
     {
       if ($this->m_bRegistered || $this->register())
       {
@@ -347,7 +389,7 @@ class Bridge
           $this->m_CTime[0] = $this->m_CTime[1];
           while (!$bExit)
           {
-            $readfds = array($this->m_fdSocket);
+            $readfds = ($this->m_bUseStream)?[$this->m_fdStream]:[$this->m_fdSocket];
             $writefds = array();
             if ($this->m_strBuffer[1] == '' && sizeof($this->m_buffer[1]) > 0)
             {
@@ -356,14 +398,14 @@ class Bridge
             }
             if ($this->m_strBuffer[1] != '')
             {
-              $writefds[] = $this->m_fdSocket;
+              $writefds = ($this->m_bUseStream)?[$this->m_fdStream]:[$this->m_fdSocket];
             }
             $errorfds = null;
-            if (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
+            if ((!$this->m_bUseStream && (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)) || ($this->m_bUseStream && (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)))
             {
-              if (in_array($this->m_fdSocket, $readfds))
+              if ((!$this->m_bUseStream && in_array($this->m_fdSocket, $readfds)) || ($this->m_bUseStream && in_array($this->m_fdStream, $readfds)))
               {
-                if (($strBuffer = socket_read($this->m_fdSocket, 65536)) !== false)
+                if ((!$this->m_bUseStream && ($strBuffer = socket_read($this->m_fdSocket, 65536)) !== false) || ( $this->m_bUseStream && ($strBuffer = fread($this->m_fdStream, 65536)) !== false))
                 {
                   $this->m_strBuffer[0] .= $strBuffer;
                   while (($unPosition = strpos($this->m_strBuffer[0], "\n")) !== false)
@@ -435,33 +477,57 @@ class Bridge
                 else
                 {
                   $bClose = $bExit = true;
-                  $this->setError(socket_strerror(socket_last_error()));
+                  if ($this->m_bUseStream)
+                  {
+                    $strError = 'fread() ' . var_dump(error_get_last());
+                  }
+                  else
+                  {
+                    $strError = 'socket_read('.socket_last_error($fdSocket).') '.socket_strerror(socket_last_error($fdSocket));
+                  }
+                  $this->setError($strError);
                 }
               }
-              if (in_array($this->m_fdSocket, $writefds))
+              if ((!$this->m_bUseStream && in_array($this->m_fdSocket, $writefds)) || ($this->m_bUseStream && in_array($this->m_fdStream, $writefds)))
               {
-                if (($nReturn = socket_write($this->m_fdSocket, $this->m_strBuffer[1])) !== false)
+                if ((!$this->m_bUseStream && ($nReturn = socket_write($this->m_fdSocket, $this->m_strBuffer[1])) !== false) || ( $this->m_bUseStream && ($nReturn = fwrite($this->m_fdStream, $this->m_strBuffer[1])) !== false))
                 {
                   $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
                 }
                 else
                 {
                   $bClose = $bExit = true;
-                  $this->setError(socket_strerror(socket_last_error()));
+                  if ($this->m_bUseStream)
+                  {
+                    $strError = 'fwrite() ' . var_dump(error_get_last());
+                  }
+                  else
+                  {
+                    $strError = 'socket_write('.socket_last_error($fdSocket).') '.socket_strerror(socket_last_error($fdSocket));
+                  }
+                  $this->setError($strError);
                 }
               }
             }
             else if ($nReturn === false)
             {
               $bClose = $bExit = true;
-              $this->setError(socket_strerror(socket_last_error()));
+              if ($this->m_bUseStream)
+              {
+                $strError = 'stream_select() ' . var_dump(error_get_last());
+                $this->setError($strError);
+              }
+              else
+              {
+                $this->setError(socket_strerror(socket_last_error()));
+              }
             }
             else
             {
               $bExit = $bResult = true;
             }
-            unset($read);
-            unset($write);
+            unset($readfds);
+            unset($writefds);
           }
           if ($bClose)
           {
@@ -511,8 +577,7 @@ class Bridge
   protected function register()
   {
     $bResult = false;
-
-    if ($this->m_fdSocket != -1)
+    if ((!$this->m_bUseStream && $this->m_fdSocket != -1) || ($this->m_bUseStream && $this->m_fdStream))
     {
       if ($this->m_strUser != '')
       {
@@ -589,13 +654,8 @@ class Bridge
       $fdSocket = null;
       $unAttempt = 0;
       $unPick = rand(0, ($unSize - 1));
-      while (!$bConnected && $unAttempt++ < $unSize)
+      if (!$this->m_bUseStream)
       {
-        if ($unPick == $unSize)
-        {
-          $unPick = 0;
-        }
-        $strServer = $servers[$unPick];
         if (!defined('AF_INET'))
         {
           define('AF_INET', 2);
@@ -615,9 +675,21 @@ class Bridge
         {
           define('SOL_TCP', 6);
         }
-        if (($fdSocket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) !== false)
+      }
+      while (!$bConnected && $unAttempt++ < $unSize)
+      {
+        if ($unPick == $unSize)
         {
-          if (socket_connect($fdSocket, $strServer, 12199) !== false)
+          $unPick = 0;
+        }
+        $strServer = $servers[$unPick];
+        if ($this->m_bUseStream && (($fdStream = $this->m_pUtility->createClientStream($strServer, $this->m_port, $this->m_streamContext, $strError)) !== false))
+        {
+          $bConnected = true;
+        }
+        elseif (!$this->m_bUseStream && ($fdSocket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) !== false)
+        {
+          if (socket_connect($fdSocket, $strServer, $this->m_port) !== false)
           {
             $bConnected = true;
           }
@@ -633,18 +705,18 @@ class Bridge
         $strBuffer = array(null, json_encode($request)."\n");
         while (!$bExit)
         {
-          $readfds = array($fdSocket);
+          $readfds = ($this->m_bUseStream)?[$fdStream]:[$fdSocket];
           $writefds = array();
           if ($strBuffer[1] != '')
           {
-            $writefds[] = $fdSocket;
+            $writefds = ($this->m_bUseStream)?[$fdStream]:[$fdSocket];
           }
           $errorfds = null;
-          if (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
+          if ((!$this->m_bUseStream && (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)) || ($this->m_bUseStream && (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)))
           {
-            if (in_array($fdSocket, $readfds))
+            if ((!$this->m_bUseStream && in_array($fdSocket, $readfds)) || ($this->m_bUseStream && in_array($fdStream, $readfds)))
             {
-              if (($strData = socket_read($fdSocket, 65536)) !== false)
+              if ((!$this->m_bUseStream && ($strData = socket_read($fdSocket, 65536)) !== false) || ( $this->m_bUseStream && ($strData = fread($fdStream, 65536)) !== false))
               {
                 if ($strData != '')
                 {
@@ -694,35 +766,78 @@ class Bridge
               else
               {
                 $bExit = true;
-                $this->setError(socket_strerror(socket_last_error()));
+                if ($this->m_bUseStream)
+                {
+                  $strError = 'fread() ' . var_dump(error_get_last());
+                }
+                else
+                {
+                  $strError = 'socket_read('.socket_last_error($fdSocket).') '.socket_strerror(socket_last_error($fdSocket));
+                }
+                $this->setError($strError);
               }
             }
-            if (in_array($fdSocket, $writefds))
+            if ((!$this->m_bUseStream && in_array($fdSocket, $writefds)) || ($this->m_bUseStream && in_array($fdStream, $writefds)))
             {
-              if (($nReturn = socket_write($fdSocket, $strBuffer[1])) !== false)
+              if ((!$this->m_bUseStream && ($nReturn = socket_write($fdSocket, $strBuffer[1])) !== false) || ( $this->m_bUseStream && ($nReturn = fwrite($fdStream, $strBuffer[1])) !== false))
               {
                 $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
               }
               else
               {
                 $bExit = true;
-                $this->setError(socket_strerror(socket_last_error()));
+                if ($this->m_bUseStream)
+                {
+                  $strError = 'fwrite() ' . var_dump(error_get_last());
+                }
+                else
+                {
+                  $strError = 'socket_write('.socket_last_error($fdSocket).') '.socket_strerror(socket_last_error($fdSocket));
+                }
+                $this->setError($strError);
+
               }
             }
           }
           else if ($nReturn === false)
           {
             $bExit = true;
-            $this->setError(socket_strerror(socket_last_error()));
+            if ($this->m_bUseStream)
+            {
+              $strError = 'stream_select() ' . var_dump(error_get_last());
+              $this->setError($strError);
+            }
+            else
+            {
+              $this->setError(socket_strerror(socket_last_error()));
+            }
           }
-          unset($read);
-          unset($write);
+          unset($readfds);
+          unset($writefds);
         }
-        socket_close($fdSocket);
+        if ($this->m_bUseStream)
+        {
+          if (stream_socket_shutdown($fdStream, STREAM_SHUT_RDWR) === false)
+          {
+            $strError = 'stream_socket_shutdown() ' . var_dump(error_get_last());
+            $this->setError($strError);
+          }
+        }
+        else
+        {
+          socket_close($fdSocket);
+        }
       }
       else
       {
-        $this->setError(socket_strerror(socket_last_error()));
+        if ($this->m_bUseStream)
+        {
+          $this->setError(var_dump(error_get_last()));
+        }
+        else
+        {
+          $this->setError(socket_strerror(socket_last_error()));
+        }
       }
     }
     else
@@ -763,6 +878,13 @@ class Bridge
     $this->m_strLine = null;
 
     return $bResult;
+  }
+  // }}}
+  // {{{ useStream()
+  public function useStream($bUseStream, $streamContext)
+  {
+    $this->m_bUseStream = $bUseStream;
+    $this->m_streamContext = $streamContext;
   }
   // }}}
 }

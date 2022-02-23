@@ -31,16 +31,21 @@ class ChatBot
   protected $m_bConnected;
   protected $m_bDebug;
   protected $m_bQuit;
+  protected $m_bUseStream;
   protected $m_fdSocket;
+  protected $m_fdStream;
   protected $m_formArguments;
   protected $m_messages;
+  protected $m_port;
   protected $m_rooms;
   protected $m_strBuffer;
   protected $m_strFormAction;
   protected $m_strFormFooter;
   protected $m_strFormHeader;
   protected $m_strUser;
+  protected $m_streamContext;
   protected $m_pMessage;
+  protected $m_pUtility;
   // }}}
   // {{{ __construct()
   public function __construct()
@@ -48,12 +53,17 @@ class ChatBot
     $this->m_bConnected = false;
     $this->m_bDebug = false;
     $this->m_bQuit = false;
+    $this->m_bUseStream = false;
     $this->m_fdSocket = -1;
+    $this->m_fdStream = false;
     $this->m_formArguments = [];
     $this->m_pMessage = null;
     $this->m_messages = [];
+    $this->m_port = 12199;
     $this->m_rooms = [];
+    $this->m_streamContext = null;
     $this->m_strBuffer = [null, null];
+    $this->m_pUtility = new Utility; // Note: The calling program needs to include 'common/www/Utility.php'.
   }
   // }}}
   // {{{ __destruct()
@@ -66,6 +76,7 @@ class ChatBot
     unset($this->m_formArguments);
     unset($this->m_messages);
     unset($this->m_rooms);
+    unset($this->m_pUtility);
     unset($this->m_strBuffer);
   }
   // }}}
@@ -173,15 +184,30 @@ class ChatBot
     $bResult = false;
 
     $this->m_bConnected = false;
-    if ($this->m_fdSocket == -1 || socket_close($this->m_fdSocket) !== false)
+    if ($this->m_bUseStream)
     {
-      $bResult = true;
+      if ($this->m_fdStream === false || stream_socket_shutdown($this->m_fdStream, STREAM_SHUT_RDWR) !== false)
+      {
+        $bResult = true;
+      }
+      else
+      {
+        $strError = 'stream_socket_shutdown() ' . var_dump(error_get_last());
+      }
+      $this->m_fdStream = false;
     }
     else
     {
-      $strError = 'close('.socket_last_error($this->m_fdSocket).') '.socket_strerror(socket_last_error($this->m_fdSocket));
+      if ($this->m_fdSocket == -1 || socket_close($this->m_fdSocket) !== false)
+      {
+        $bResult = true;
+      }
+      else
+      {
+        $strError = 'close('.socket_last_error($this->m_fdSocket).') '.socket_strerror(socket_last_error($this->m_fdSocket));
+      }
+      $this->m_fdSocket = -1;
     }
-    $this->m_fdSocket = -1;
     unset($this->m_messages);
 
     return $bResult;
@@ -192,42 +218,61 @@ class ChatBot
   {
     $bResult = false;
     $bSocket = false;
-
     $this->m_strUser = $strUser;
-    if (!defined('AF_INET'))
+
+    if ($this->m_bUseStream)
     {
-      define('AF_INET', 2);
-    }
-    if (!defined('SOCK_STREAM'))
-    {
-      if (PHP_OS == 'Linux')
+      if (!$this->m_streamContext) 
       {
-        define('SOCK_STREAM', 1);
+        $strError = 'Stream context is not created.';
+        return $bResult;
       }
-      else if (PHP_OS == 'SunOS')
+      else 
       {
-        define('SOCK_STREAM', 2);
-      }
-    }
-    if (!defined('SOL_TCP'))
-    {
-      define('SOL_TCP', 6);
-    }
-    if (($fdSocket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) !== false)
-    {
-      $bSocket = true;
-      if (socket_connect($fdSocket, $strServer, 12199) !== false)
-      {
-        $this->m_fdSocket = $fdSocket;
-      }
-      else
-      {
-        socket_close($fdSocket);
+        if (($this->m_fdStream = $this->m_pUtility->createClientStream($strServer, $this->m_port, $this->m_streamContext, $strError)) !== false)
+        {
+          $bResult = true;
+        }
       }
     }
-    if ($this->m_fdSocket != -1)
+    else
     {
-      $bResult = true;
+      if (!defined('AF_INET'))
+      {
+        define('AF_INET', 2);
+      }
+      if (!defined('SOCK_STREAM'))
+      {
+        if (PHP_OS == 'Linux')
+        {
+          define('SOCK_STREAM', 1);
+        }
+        else if (PHP_OS == 'SunOS')
+        {
+          define('SOCK_STREAM', 2);
+        }
+      }
+      if (!defined('SOL_TCP'))
+      {
+        define('SOL_TCP', 6);
+      }
+
+      if (($fdSocket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) !== false)
+      {
+        $bSocket = true;
+        if (socket_connect($fdSocket, $strServer, $this->m_port) !== false)
+        {
+          $this->m_fdSocket = $fdSocket;
+          $bResult = true;
+        }
+        else
+        {
+          socket_close($fdSocket);
+        }
+      }
+    }
+    if ($bResult)
+    {
       $message = [];
       $message['Section'] = 'chat';
       $message['Function'] = 'connect';
@@ -240,7 +285,10 @@ class ChatBot
     }
     else
     {
-      $strError = (($bSocket)?'socket_connect':'socket_create').'('.socket_last_error().') '.socket_strerror(socket_last_error());
+      if (!$this->m_bUseStream)
+      {
+        $strError = (($bSocket)?'socket_connect':'socket_create').'('.socket_last_error().') '.socket_strerror(socket_last_error());
+      }
     }
 
     return $bResult;
@@ -352,20 +400,20 @@ class ChatBot
   {
     $bResult = false;
 
-    if ($this->m_fdSocket != -1)
+    if ((!$this->m_bUseStream && $this->m_fdSocket != -1) || ($this->m_bUseStream && $this->m_fdStream))
     {
-      $readfds = [$this->m_fdSocket];
+      $readfds = ($this->m_bUseStream)?[$this->m_fdStream]:[$this->m_fdSocket];
       $writefds = [];
       if ($this->m_strBuffer[1] != '')
       {
-        $writefds[] = $this->m_fdSocket;
+        $writefds = ($this->m_bUseStream)?[$this->m_fdStream]:[$this->m_fdSocket];
       }
       else if (sizeof($this->m_messages) > 0)
       {
         $debug = $this->m_messages[0];
         if ($this->m_bConnected || (is_array($debug) && isset($debug['Function']) && $debug['Function'] == 'connect'))
         {
-          $writefds[] = $this->m_fdSocket;
+          $writefds = ($this->m_bUseStream)?[$this->m_fdStream]:[$this->m_fdSocket];
           if ($this->m_bDebug)
           {
             if (is_array($debug) && isset($debug['Password']))
@@ -387,12 +435,13 @@ class ChatBot
         }
         unset($debug);
       }
+
       $errorfds = null;
-      if (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, ($nTimeout * 1000))) > 0)
+      if ((!$this->m_bUseStream && (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, ($nTimeout * 1000))) > 0)) || ($this->m_bUseStream && (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, ($nTimeout * 1000))) > 0)))
       {
-        if (in_array($this->m_fdSocket, $readfds))
+        if ((!$this->m_bUseStream && in_array($this->m_fdSocket, $readfds)) || ($this->m_bUseStream && in_array($this->m_fdStream, $readfds)))
         {
-          if (($strBuffer = socket_read($this->m_fdSocket, 65536)) !== false)
+          if ((!$this->m_bUseStream && ($strBuffer = socket_read($this->m_fdSocket, 65536)) !== false) || ($this->m_bUseStream && ($strBuffer = fread($this->m_fdStream, 65536)) !== false))
           {
             if ($strBuffer != '')
             {
@@ -419,25 +468,46 @@ class ChatBot
           }
           else
           {
-            $strError = 'read('.socket_last_error($this->m_fdSocket).') '.socket_strerror(socket_last_error($this->m_fdSocket));
+            if ($this->m_bUseStream)
+            {
+              $strError = 'fread() ' . var_dump(error_get_last());
+            }
+            else
+            {
+              $strError = 'socket_read('.socket_last_error($this->m_fdSocket).') '.socket_strerror(socket_last_error($this->m_fdSocket));
+            }
           }
         }
-        if (in_array($this->m_fdSocket, $writefds))
+        if ((!$this->m_bUseStream && in_array($this->m_fdSocket, $writefds)) || ($this->m_bUseStream && in_array($this->m_fdStream, $writefds)))
         {
-          if (($nReturn = socket_write($this->m_fdSocket, $this->m_strBuffer[1])) !== false)
+          if ((!$this->m_bUseStream && ($nReturn = socket_write($this->m_fdSocket, $this->m_strBuffer[1])) !== false) || ($this->m_bUseStream && ($nReturn = fwrite($this->m_fdStream, $this->m_strBuffer[1])) !== false))
           {
             $bResult = true;
             $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
           }
           else
           {
-            $strError = 'write('.socket_last_error($this->m_fdSocket).') '.socket_strerror(socket_last_error($this->m_fdSocket));
+            if ($this->m_bUseStream)
+            {
+              $strError = 'fwrite() ' . var_dump(error_get_last());
+            }
+            else
+            {
+              $strError = 'socket_write('.socket_last_error($this->m_fdSocket).') '.socket_strerror(socket_last_error($this->m_fdSocket));
+            }
           }
         }
       }
       else if ($nReturn === false)
       {
-        $strError = 'socket_select('.socket_last_error().') '.socket_strerror(socket_last_error());
+        if ($this->m_bUseStream)
+        {
+          $strError = 'stream_select() ' . var_dump(error_get_last());
+        }
+        else
+        {
+          $strError = 'socket_select('.socket_last_error().') '.socket_strerror(socket_last_error());
+        }
       }
       else
       {
@@ -450,10 +520,16 @@ class ChatBot
     }
     else
     {
-      $strError = 'Please provide the socket file descriptor.';
+      if ($this->m_bUseStream)
+      {
+        $strError = 'Please provide the stream resource.';
+      }
+      else
+      {
+        $strError = 'Please provide the socket file descriptor.';
+      }
       $this->close($strError);
     }
-
     return $bResult;
   }
   // }}}
@@ -529,6 +605,13 @@ class ChatBot
   public function setMessage($pMessage)
   {
     $this->m_pMessage = $pMessage;
+  }
+  // }}}
+  // {{{ useStream()
+  public function useStream($bUseStream, $streamContext)
+  {
+    $this->m_bUseStream = $bUseStream;
+    $this->m_streamContext = $streamContext;
   }
   // }}}
 }

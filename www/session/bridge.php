@@ -19,6 +19,9 @@
 *
 * Provides functions for load balancing session variables via a database. 
 */
+// {{{ includes
+// include_once('../Utility.php');
+// }}}
 // {{{ sessionOpen()
 /*! \fn sessionOpen($strSavePath, $strSessionName)
 * \brief Open the session.
@@ -40,43 +43,25 @@ function sessionClose()
 }
 // }}}
 // {{{ sessionRead()
-/*! \fn sessionRead($strSessionID)
-* \brief Read the session (socket only).
+/*! \fn sessionRead($strSessionID, $sessionStreamContext)
+* \brief Read the session
 * \param $strSessionID Contains the session id.
-*/
-function sessionRead($strSessionID)
-{
-  $strResult = sessionReadData($strSessionID, false, NULL);
-  return $strResult;
-}
-// }}}
-// {{{ sessionReadData()
-/*! \fn sessionReadData($strSessionID, $bSessionUseStream, $sessionStreamContext)
-* \brief Read the session (stream or socket).
-* \param $strSessionID Contains the session id.
-* \param $bSessionUseStream Contains boolean for stream (true) or socket (false) connections.
 * \param $sessionStreamContext Contains stream context needed for stream connection.
 */
-function sessionReadData($strSessionID, $bSessionUseStream, $sessionStreamContext)
+function sessionRead($strSessionID, $sessionStreamContext)
 {
   $strResult = '';
   $port = 12199;
 
-  if ($bSessionUseStream)
+  if ($sessionStreamContext === NULL)
   {
-    if ( $sessionStreamContext !== NULL )
-    {
-      $sessionUtility = new Utility; // Note: The calling program needs to include 'common/www/Utility.php'.
-    }
-    else
-    {
-      echo 'sessionReadData()->error:  stream context is NULL.';
-      unset($port);
-      return $strResult;
-    }
+    echo 'sessionRead()->error:  stream context is NULL.';
+    unset($port);
+    return $strResult;
   }
 
-  if ((!$bSessionUseStream && ($handle = fsockopen($GLOBALS['sess_server'], $port)) !== false) || ( $bSessionUseStream && ($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)) 
+  $sessionUtility = new Utility;
+  if (($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)
   {
     $request = array();
     $request['Section'] = 'session';
@@ -100,86 +85,57 @@ function sessionReadData($strSessionID, $bSessionUseStream, $sessionStreamContex
         }
         else if (isset($response['Error']) && is_array($response['Error']))
         {
-          echo 'sessionReadData() error:  '.json_encode($response['Error']);
+          echo 'sessionRead() error:  '.json_encode($response['Error']);
         }
         else
         {
-          echo 'sessionReadData() error:  Encountered an unknown error.';
+          echo 'sessionRead() error:  Encountered an unknown error.';
         }
         unset($response);
       }
       else
       {
-        echo 'sessionReadData()->fgets() error:  Failed to read response.';
+        echo 'sessionRead()->fgets() error:  Failed to read response.';
       }
     }
     else
     {
-      echo 'sessionReadData()->fwrite() error:  Failed to write request.';
+      echo 'sessionRead()->fwrite() error:  Failed to write request.';
     }
     fclose($handle);
   }
   else
   {
-    if ($bSessionUseStream)
-    {
-      echo 'sessionReadData()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
-    }
-    else
-    {
-      echo 'sessionReadData()->fsockopen() error:  Failed to open socket connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
-    }
+    echo 'sessionRead()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
   unset($port);
   unset($request);
-  if ($bSessionUseStream)
-  {
-    unset($sessionUtility);
-  }
+  unset($sessionUtility);
   
   return $strResult;
 }
 // }}}
 // {{{ sessionWrite()
-/*! \fn sessionWrite($strSessionID, $strSessionData)
-* \brief Write the session (socket only).
+/*! \fn sessionWrite($strSessionID, $strSessionData, $sessionStreamContext)
+* \brief Write the session
 * \param $strSessionID Contains the session id.
 * \param $strSessionData Contains the session data.
-*/
-function sessionWrite($strSessionID, $strSessionData)
-{
-  $bResult = sessionWriteData($strSessionID, $strSessionData, false, NULL);
-  return $bResult;
-}
-// }}}
-// {{{ sessionWriteData()
-/*! \fn sessionWriteData($strSessionID, $strSessionData, $bSessionUseStream, $sessionStreamContext)
-* \brief Write the session (stream or socket).
-* \param $strSessionID Contains the session id.
-* \param $strSessionData Contains the session data.
-* \param $bSessionUseStream Contains boolean for stream (true) or socket (false) connections.
 * \param $sessionStreamContext Contains stream context needed for stream connection.
 */
-function sessionWriteData($strSessionID, $strSessionData, $bSessionUseStream, $sessionStreamContext)
+function sessionWrite($strSessionID, $strSessionData, $sessionStreamContext)
 {
   $bResult = false;
   $port = 12199;
 
-  if ( $bSessionUseStream )
+  if ($sessionStreamContext === NULL)
   {
-    if ( $sessionStreamContext !== NULL )
-    {
-      $sessionUtility = new Utility;
-    }
-    else
-    {
-      echo 'sessionWriteData()->error:  stream context is NULL.';
-      unset($port);
-      return $bResult;
-    }
+    echo 'sessionWrite()->error:  stream context is NULL.';
+    unset($port);
+    return $bResult;
   }
 
-  if ((!$bSessionUseStream && ($handle = fsockopen($GLOBALS['sess_server'], $port)) !== false) || ( $bSessionUseStream && ($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false))
+  $sessionUtility = new Utility;
+  if (($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)
   {
     $request = array();
     $request['Section'] = 'session';
@@ -200,84 +156,56 @@ function sessionWriteData($strSessionID, $strSessionData, $bSessionUseStream, $s
         }
         else if (isset($response['Error']) && is_array($response['Error']))
         {
-          echo 'sessionWriteData() error:  '.json_encode($response['Error']);
+          echo 'sessionWrite() error:  '.json_encode($response['Error']);
         }
         else
         {
-          echo 'sessionWriteData() error:  Encountered an unknown error.';
+          echo 'sessionWrite() error:  Encountered an unknown error.';
         }
         unset($response);
       }
       else
       {
-        echo 'sessionWriteData()->fgets() error:  Failed to read response.';
+        echo 'sessionWrite()->fgets() error:  Failed to read response.';
       }
     }
     else
     {
-      echo 'sessionWriteData()->fwrite() error:  Failed to write request.';
+      echo 'sessionWrite()->fwrite() error:  Failed to write request.';
     }
     fclose($handle);
   }
   else
   {
-    if ($bSessionUseStream)
-    {
-      echo 'sessionWriteData()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
-    }
-    else
-    {
-      echo 'sessionWriteData()->fsockopen() error:  Failed to open socket connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
-    }
+    echo 'sessionWrite()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
   unset($port);
   unset($request);
-  if ($bSessionUseStream)
-  {
-    unset($sessionUtility);
-  }
+  unset($sessionUtility);
 
   return $bResult;
 }
 // }}}
 // {{{ sessionDestroy()
-/*! \fn sessionDestroy($strSessionID)
-* \brief Destroy the session (socket only).
-* \param $strSessionID Contains the session id.
-*/
-function sessionDestroy($strSessionID)
-{
-  $bResult = sessionDestroyAll($strSessionID, false, NULL);
-  return $bResult;
-}
-// }}}
-// {{{ sessionDestroyAll()
-/*! \fn sessionDestroy($strSessionID, $bSessionUseStream, $sessionStreamContext)
+/*! \fn sessionDestroy($strSessionID, $sessionStreamContext)
 * \brief Destroy the session (stream or socket).
 * \param $strSessionID Contains the session id.
-* \param $bSessionUseStream Contains boolean for stream (true) or socket (false) connections.
 * \param $sessionStreamContext Contains stream context needed for stream connection.
 */
-function sessionDestroyAll($strSessionID, $bSessionUseStream, $sessionStreamContext)
+function sessionDestroy($strSessionID, $sessionStreamContext)
 {
   $bResult = false;
   $port = 12199;
 
-  if ( $bSessionUseStream )
+  if ($sessionStreamContext === NULL)
   {
-    if ( $sessionStreamContext !== NULL )
-    {
-      $sessionUtility = new Utility;
-    }
-    else
-    {
-      echo 'sessionDestroyAll()->error:  stream context is NULL.';
-      unset($port);
-      return $bResult;
-    }
+    echo 'sessionDestroy()->error:  stream context is NULL.';
+    unset($port);
+    return $bResult;
   }
 
-  if ((!$bSessionUseStream && ($handle = fsockopen($GLOBALS['sess_server'], $port)) !== false) || ( $bSessionUseStream && ($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false))
+  $sessionUtility = new Utility;
+  if (($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)
   {
     $request = array();
     $request['Section'] = 'session';
@@ -298,42 +226,32 @@ function sessionDestroyAll($strSessionID, $bSessionUseStream, $sessionStreamCont
         }
         else if (isset($response['Error']) && is_array($response['Error']))
         {
-          echo 'sessionDestroyAll() error:  '.json_encode($response['Error']);
+          echo 'sessionDestroy() error:  '.json_encode($response['Error']);
         }
         else
         {
-          echo 'sessionDestroyAll() error:  Encountered an unknown error.';
+          echo 'sessionDestroy() error:  Encountered an unknown error.';
         }
         unset($response);
       }
       else
       {
-        echo 'sessionDestroyAll()->fgets() error:  Failed to read response.';
+        echo 'sessionDestroy()->fgets() error:  Failed to read response.';
       }
     }
     else
     {
-      echo 'sessionDestroyAll()->fwrite() error:  Failed to write request.';
+      echo 'sessionDestroy()->fwrite() error:  Failed to write request.';
     }
     fclose($handle);
   }
   else
   {
-    if ($bSessionUseStream)
-    {
-      echo 'sessionDestroyAll()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
-    }
-    else
-    {
-      echo 'sessionDestroyAll()->fsockopen() error:  Failed to open socket connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
-    }
+    echo 'sessionDestroy()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
   unset($port);
   unset($request);
-  if ($bSessionUseStream)
-  {
-    unset($sessionUtility);
-  }
+  unset($sessionUtility);
 
   return $bResult;
 }
@@ -349,7 +267,7 @@ function sessionGC($nMaxLifetime)
 }
 // }}}
 
-if (session_set_save_handler('sessionOpen', 'sessionClose', 'sessionReadData', 'sessionWriteData', 'sessionDestroyAll', 'sessionGC') === false)
+if (session_set_save_handler('sessionOpen', 'sessionClose', 'sessionRead', 'sessionWrite', 'sessionDestroy', 'sessionGC') === false)
 {
   echo 'session_set_save_hander() error:  Failed to set session handler.<br>';
 }

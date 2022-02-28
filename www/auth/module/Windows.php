@@ -253,7 +253,7 @@ class bk_Windows
             $request['Password'] = $strPassword;
             $request['Domain'] = 'itservices.sbc.com';
             $request['reqApp'] = 'Common Library';
-            $in[] = $request;
+            $in[] = json_encode($request);
             unset($request);
             if ($this->m_junction->request($in, $out))
             {

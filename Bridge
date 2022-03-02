@@ -78,6 +78,7 @@ extern "C++"
       string m_strBuffer[2];
       string m_strLine;
       string m_strPassword;
+      string m_strPort;
       string m_strTimeout;
       string m_strUser;
       string m_strUserID;
@@ -217,12 +218,11 @@ extern "C++"
       * \param strTimeout Contains the timeout.
       */
       void setTimeout(const string strTimeout);
-      /*! \fn void useSecureBridge(bool bUseSecureBridge, SSL_CTX *ctx)
-      * \brief Set the use secure bridge flag and the SSL CTX.
-      * \param bUseSecureBridge Contains the flag.
-      * \param ctx Contains the object needed for the SSL connection.
+      /*! \fn void useSecureBridge(bool bUseSecureBridge)
+      * \brief Set the use secure bridge flag.
+      * \param bUseSecureBridge Contains a boolean value for the flag.
       */
-      void useSecureBridge(bool bUseSecureBridge, SSL_CTX *ctx);
+      void useSecureBridge(bool bUseSecureBridge);
       /*! \fn Utility *utility()
       * \brief Interfaces with the Utility class.
       * \return Returns a pointer to the Utility class.

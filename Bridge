@@ -68,7 +68,6 @@ extern "C++"
       bool m_bAuthenticated;
       bool m_bFailed;
       bool m_bUseSecureBridge;
-      common_socket_type m_eSocketType;
       int m_fdSocket;
       list<string> m_buffer[2];
       size_t m_unThrottle;

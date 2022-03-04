@@ -35,7 +35,6 @@ class ChatBot
   protected $m_formArguments;
   protected $m_handle;
   protected $m_messages;
-  protected $m_port;
   protected $m_rooms;
   protected $m_strBuffer;
   protected $m_streamContext;
@@ -56,7 +55,6 @@ class ChatBot
     $this->m_handle = false;
     $this->m_pMessage = null;
     $this->m_messages = [];
-    $this->m_port = 12199;
     $this->m_rooms = [];
     $this->m_strBuffer = [null, null];
     $context = array();

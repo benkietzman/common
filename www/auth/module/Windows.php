@@ -251,9 +251,17 @@ class bk_Windows
             $request['Function'] = 'login';
             $request['User'] = $strUserID;
             $request['Password'] = $strPassword;
-            $request['Domain'] = 'itservices.sbc.com';
+            if (($strJson = file_get_contents(dirname(__FILE__).'/../../../common_addons/www/auth/modules.json')) !== false)
+            {
+              $modules = json_decode($strJson, true);
+              if (isset($modules['windows']) && isset($modules['windows']['domain']) && $modules['windows']['domain'] != '')
+              {
+                $request['Domain'] = $modules['windows']['domain'];
+              }
+              unset($modules);
+            }
             $request['reqApp'] = 'Common Library';
-            $in[] = $request;
+            $in[] = json_encode($request);
             unset($request);
             if ($this->m_junction->request($in, $out))
             {

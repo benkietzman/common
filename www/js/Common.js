@@ -11,24 +11,36 @@ class Common
   // {{{ constructor()
   constructor(options)
   {
+    this.activeMenu = null;
     this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
     this.footer = {engineer: false};
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
-    this.logout = false;
+    this.logout = {info: false, message: false};
+    this.m_auth = {};
+    this.m_messages = [];
     this.m_store = {};
+    this.m_strLoginType = null;
     this.m_ws = {};
     this.menu = {left: [], right: []};
     this.submenu = false;
+    this.strMenu = null;
+    this.strPrevMenu = null;
+    this.strPrevSubMenu = null;
+    this.strSubMenu = null;
     if (this.isDefined(options.application))
     {
       this.application = options.application;
+    }
+    if (this.isDefined(options.centralScript))
+    {
+      this.centralScript = options.centralScript;
     }
     if (this.isDefined(options.script))
     {
       this.script = options.script;
     }
-    this.request('applications', null, (data) =>
+    this.request('applications', {_script: this.centralScript}, (data) =>
     {
       let error = {};
       if (this.response(data, error))
@@ -55,9 +67,11 @@ class Common
     if (this.isDefined(options.footer))
     {
       this.footer = {...this.footer, ...options.footer};
+      this.footer._script = this.centralScript;
       this.request('footer', this.footer, (response) =>
       {
         let error = {};
+        this.dispatchEvent('commonFooterReady', null);
         if (this.response(response, error))
         {
           this.footer = response.Response.out;
@@ -92,6 +106,7 @@ class Common
           let error = {};
           if (this.wsResponse(response, error))
           {
+            this.m_auth = null;
             this.m_auth = response.Response;
             this.m_bHaveAuth = true;
             this.dispatchEvent('commonAuthReady', null);
@@ -141,6 +156,7 @@ class Common
         let error = {};
         if (this.response(response, error))
         {
+          this.m_auth = null;
           this.m_auth = response.Response.out;
           this.m_bHaveAuth = true;
           this.dispatchEvent('commonAuthReady', null);
@@ -213,6 +229,12 @@ class Common
     }
 
     return strValue;
+  }
+  // }}}
+  // {{{ getRedirectPath()
+  getRedirectPath()
+  {
+    return this.m_strRedirectPath;
   }
   // }}}
   // {{{ getStore()
@@ -331,94 +353,104 @@ class Common
   {
     if (this.m_bJwt)
     {
-      fetch('/include/common_addons/auth/modules.json',
+      let request = null;
+      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      this.wsRequest('bridge', request).then((response) =>
       {
-        method: 'GET',
-        headers:
+        if (this.m_strLoginType == null)
         {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then((response) =>
-      {
-        let data = {};
-        if (response.status == 200)
-        {
-          data = response.json();
-        }
-        let request = null;
-        request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
-        request.Request.Type = this.m_strLoginType;
-        if (this.isDefined(data[this.m_strLoginType]) && this.isDefined(data[this.m_strLoginType]['cookie']) && this.isCookie(data[this.m_strLoginType]['cookie']))
-        {
-          request.Request.Data = this.getCookie(data[this.m_strLoginType]['cookie']);
-        }
-        this.wsRequest('bridge', request).then((response) =>
-        {
-          var error = {};
-          if (this.wsResponse(response, error))
+          this.m_strLoginType = 'password';
+          if (this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
-            if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
+            this.m_strLoginType = response.Response.Module;
+          }
+        }
+        fetch('/include/common_addons/auth/modules.json',
+        {
+          method: 'GET',
+          headers:
+          {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then((response) =>
+        {
+          let request = null;
+          request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
+          request.Request.Type = this.m_strLoginType;
+          if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
+          {
+            request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
+          }
+          this.wsRequest('bridge', request).then((response) =>
+          {
+            var error = {};
+            if (this.wsResponse(response, error))
             {
-              this.login.message = response.Error.Message;
-            }
-            if (this.isDefined(response.Response.auth))
-            {
-              this.m_auth = response.Response.auth;
-              this.m_bHaveAuth = true;
-              if (this.isDefined(response.Response.jwt))
+              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
               {
-                window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
+                this.login.message = response.Error.Message;
               }
-              if (this.isDefined(this.m_auth.login_title))
+              if (this.isDefined(response.Response.auth))
               {
-                if (!this.isDefined(this.login.login) || !this.login.login)
+                this.m_auth = null;
+                this.m_auth = response.Response.auth;
+                this.m_bHaveAuth = true;
+                if (this.isDefined(response.Response.jwt))
                 {
-                  this.login.login = {};
+                  window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
                 }
-                this.login.login.title = this.m_auth.login_title;
-                if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                if (this.isDefined(this.m_auth.login_title))
                 {
-                  this.login.showForm = true;
-                }
-              }
-              if (this.isValid())
-              {
-                this.dispatchEvent('resetMenu', null);
-                document.location.href = this.m_strRedirectPath;
-              }
-              else
-              {
-                var request = {Section: 'secure', 'Function': 'login'};
-                request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                this.wsRequest('bridge', request).then((response) =>
-                {
-                  var error = {};
-                  this.login.info = null;
-                  if (this.wsResponse(response, error))
+                  if (!this.isDefined(this.login.login) || !this.login.login)
                   {
-                    if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                    this.login.login = {};
+                  }
+                  this.login.login.title = this.m_auth.login_title;
+                  if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                  {
+                    this.login.showForm = true;
+                  }
+                }
+                if (this.isValid())
+                {
+                  this.dispatchEvent('resetMenu', null);
+                  document.location.href = this.m_strRedirectPath;
+                }
+                else
+                {
+                  var request = {Section: 'secure', 'Function': 'login'};
+                  request.Request = {Type: this.m_strLoginType, Return: document.location.href};
+                  this.wsRequest('bridge', request).then((response) =>
+                  {
+                    var error = {};
+                    this.login.info = null;
+                    if (this.wsResponse(response, error))
                     {
-                      this.dispatchEvent('resetMenu', null);
-                      document.location.href = response.Response.Redirect;
+                      if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                      {
+                        this.dispatchEvent('resetMenu', null);
+                        document.location.href = response.Response.Redirect;
+                      }
                     }
-                  }
-                  else
-                  {
-                    this.login.message = error.message;
-                  }
-                });
+                    else
+                    {
+                      this.login.message = error.message;
+                    }
+                  });
+                }
+              }
+              if (this.isDefined(error.message))
+              {
+                this.login.message = error.message;
               }
             }
-            if (this.isDefined(error.message))
+            else
             {
               this.login.message = error.message;
             }
-          }
-          else
-          {
-            this.login.message = error.message;
-          }
+          });
         });
       });
     }
@@ -434,6 +466,7 @@ class Common
         var error = {};
         if (this.response(result, error))
         {
+          this.m_auth = null;
           this.m_auth = result.data.Response.out;
           this.m_bHaveAuth = true;
           if (this.isDefined(this.m_auth.login_title))
@@ -504,28 +537,41 @@ class Common
     {
       if (this.m_bJwt)
       {
-        var request = {Section: 'secure', 'Function': 'logout'};
-        request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+        let request = null;
+        request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
         this.wsRequest('bridge', request).then((response) =>
         {
-          var error = {};
-          this.logout.info = null;
-          if (this.wsResponse(response, error))
+          if (this.m_strLoginType == null)
           {
-            if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+            this.m_strLoginType = 'password';
+            if (this.isDefined(response.Response.Module) && response.Response.Module != '')
             {
-              this.m_bHaveAuth = false;
-              this.m_auth = null;
-              this.m_auth = {admin: false, apps: {}};
-              window.localStorage.removeItem('sl_wsJwt');
-              this.dispatchEvent('resetMenu', null);
-              document.location.href = response.Response.Redirect;
+              this.m_strLoginType = response.Response.Module;
             }
           }
-          else
+          var request = {Section: 'secure', 'Function': 'logout'};
+          request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+          this.wsRequest('bridge', request).then((response) =>
           {
-            this.logout.message = error.message;
-          }
+            var error = {};
+            this.logout.info = null;
+            if (this.wsResponse(response, error))
+            {
+              if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+              {
+                this.m_bHaveAuth = false;
+                this.m_auth = null;
+                this.m_auth = {admin: false, apps: {}};
+                window.localStorage.removeItem('sl_wsJwt');
+                this.dispatchEvent('resetMenu', null);
+                document.location.href = response.Response.Redirect;
+              }
+            }
+            else
+            {
+              this.logout.message = error.message;
+            }
+          });
         });
       }
       else
@@ -602,19 +648,30 @@ class Common
     {
       this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
     }
+    this.setMenu(this.strMenu, this.strSubMenu);
   }
   // }}}
   // {{{ request()
   request(strFunction, request, callback)
   {
+    let strScript = null;
     if (this.isDefined(this.script))
+    {
+      strScript = this.script;
+    }
+    if (request && this.isDefined(request._script))
+    {
+      strScript = request._script;
+      delete request._script;
+    }
+    if (this.isDefined(strScript))
     {
       let data = {'Function': strFunction};
       if (request != null)
       {
         data.Arguments = request;
       }
-      fetch(this.script,
+      fetch(strScript,
       {
         method: 'POST',
         headers:
@@ -662,93 +719,99 @@ class Common
   setMenu(strMenu, strSubMenu)
   {
     let nActiveLeft = -1;
+    let menu = this.menu;
+    let submenu = this.submenu;
+    this.menu = null;
+    this.submenu = null;
     this.strPrevMenu = this.strMenu;
     this.strPrevSubMenu = this.strSubMenu;
     this.strMenu = strMenu;
     this.strSubMenu = strSubMenu;
-    for (let i = 0; i < this.menu.left.length; i++)
+    for (let i = 0; i < menu.left.length; i++)
     {
-      if (this.menu.left[i].value == strMenu)
+      if (menu.left[i].value == strMenu)
       {
         nActiveLeft = i;
-        this.menu.left[i].active = 'active';
+        menu.left[i].active = 'active';
         this.activeMenu = strMenu;
       }
       else
       {
-        this.menu.left[i].active = null;
+        menu.left[i].active = null;
       }
     }
     let nActiveRight = -1;
-    for (let i = 0; i < this.menu.right.length; i++)
+    for (let i = 0; i < menu.right.length; i++)
     {
-      if (this.menu.right[i].value == strMenu)
+      if (menu.right[i].value == strMenu)
       {
         nActiveRight = i;
-        this.menu.right[i].active = 'active';
+        menu.right[i].active = 'active';
         this.activeMenu = strMenu;
       }
       else
       {
-        this.menu.right[i].active = null;
+        menu.right[i].active = null;
       }
     }
-    if (nActiveLeft >= 0 && this.menu.left[nActiveLeft].submenu)
+    if (nActiveLeft >= 0 && menu.left[nActiveLeft].submenu)
     {
-      this.submenu = this.menu.left[nActiveLeft].submenu;
-      for (var i = 0; i < this.submenu.left.length; i++)
+      submenu = menu.left[nActiveLeft].submenu;
+      for (var i = 0; i < submenu.left.length; i++)
       {
-        if (this.submenu.left[i].value == strSubMenu)
+        if (submenu.left[i].value == strSubMenu)
         {
-          this.submenu.left[i].active = 'active';
+          submenu.left[i].active = 'active';
         }
         else
         {
-          this.submenu.left[i].active = null;
+          submenu.left[i].active = null;
         }
       }
-      for (let i = 0; i < this.submenu.right.length; i++)
+      for (let i = 0; i < submenu.right.length; i++)
       {
-        if (this.submenu.right[i].value == strSubMenu)
+        if (submenu.right[i].value == strSubMenu)
         {
-          this.submenu.right[i].active = 'active';
+          submenu.right[i].active = 'active';
         }
         else
         {
-          this.submenu.right[i].active = null;
+          submenu.right[i].active = null;
         }
       }
     }
-    else if (nActiveRight >= 0 && this.menu.right[nActiveRight].submenu)
+    else if (nActiveRight >= 0 && menu.right[nActiveRight].submenu)
     {
-      this.submenu = this.menu.right[nActiveRight].submenu;
-      for (let i = 0; i < this.submenu.left.length; i++)
+      submenu = menu.right[nActiveRight].submenu;
+      for (let i = 0; i < submenu.left.length; i++)
       {
-        if (this.submenu.left[i].value == strSubMenu)
+        if (submenu.left[i].value == strSubMenu)
         {
-          this.submenu.left[i].active = 'active';
+          submenu.left[i].active = 'active';
         }
         else
         {
-          this.submenu.left[i].active = null;
+          submenu.left[i].active = null;
         }
       }
-      for (let i = 0; i < this.submenu.right.length; i++)
+      for (let i = 0; i < submenu.right.length; i++)
       {
-        if (this.submenu.right[i].value == strSubMenu)
+        if (submenu.right[i].value == strSubMenu)
         {
-          this.submenu.right[i].active = 'active';
+          submenu.right[i].active = 'active';
         }
         else
         {
-          this.submenu.right[i].active = null;
+          submenu.right[i].active = null;
         }
       }
     }
     else
     {
-      this.submenu = false;
+      submenu = false;
     }
+    this.menu = menu;
+    this.submenu = submenu;
   }
   // }}}
   // {{{ setRedirectPath()
@@ -953,6 +1016,16 @@ class Common
             }
             else if (response.Action == 'message')
             {
+              var date = null;
+              if (this.isDefined(response.Time) && response.Time != '')
+              {
+                date = new Date(response.Time * 1000);
+              }
+              else
+              {
+                date = new Date();
+              }
+              response.Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
               this.m_messages.push(response);
               this.m_messages[this.m_messages.length - 1].Index = (this.m_messages.length - 1);
             }

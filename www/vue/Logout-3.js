@@ -13,7 +13,7 @@ export default
   // {{{ mounted()
   mounted()
   {
-    common.setMenu('Logout as '+common.getFirstName(), null);
+    common.setMenu('Logout as '+common.getUserFirstName(), null);
     common.processLogout();
   },
   // }}}
@@ -21,8 +21,8 @@ export default
   template: `
     <div>
       <br><br><br>
-      <div v-show="message" style="color:red;font-weight:bold;"><br><br>{{message}}<br><br></div>
-      <div v-show="info" style="color:orange;"><br><br>{{info}}<br><br></div>
+      <div v-show="common.logout.message" style="color:red;font-weight:bold;"><br><br>{{common.logout.message}}<br><br></div>
+      <div v-show="common.logout.info" style="color:orange;"><br><br>{{common.logout.info}}<br><br></div>
     </div>
   `
   // }}}

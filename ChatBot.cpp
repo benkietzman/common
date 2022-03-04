@@ -33,11 +33,17 @@ extern "C++"
     // {{{ ChatBot()
     ChatBot::ChatBot()
     {
+      string strError;
+
       m_bConnected = false;
       m_bDebug = false;
       m_bQuit = false;
+      m_bSecure = true;
+      m_ctx = NULL;
       m_fdSocket = -1;
       m_pMessage = NULL;
+      m_pUtility = new Utility(strError);
+      m_ssl = NULL;
     }
     // }}}
     // {{{ ~ChatBot()
@@ -48,6 +54,7 @@ extern "C++"
         disconnect();
       }
       m_formArguments.clear();
+      delete m_pUtility;
     }
     // }}}
     // {{{ analyze()
@@ -154,17 +161,31 @@ extern "C++"
       stringstream ssError;
 
       m_bConnected = false;
-      if (m_fdSocket == -1 || ::close(m_fdSocket) == 0)
+      if (m_ssl != NULL)
       {
-        bResult = true;
+        SSL_shutdown(m_ssl);
+        SSL_free(m_ssl);
+        m_ssl = NULL;
       }
-      else
+      if (m_ctx != NULL)
       {
-        ssError.str("");
-        ssError << "close(" << errno << ") " << strerror(errno);
-        strError = ssError.str();
+        SSL_CTX_free(m_ctx);
+        m_ctx = NULL;
       }
-      m_fdSocket = -1;
+      if (m_fdSocket == -1)
+      {
+        if (::close(m_fdSocket) == 0)
+        {
+          bResult = true;
+        }
+        else
+        {
+          ssError.str("");
+          ssError << "close(" << errno << ") " << strerror(errno);
+          strError = ssError.str();
+        }
+        m_fdSocket = -1;
+      }
       while (!m_messages.empty())
       {
         delete m_messages.front();
@@ -192,6 +213,14 @@ extern "C++"
       memset(&hints, 0, sizeof(addrinfo));
       hints.ai_family = AF_UNSPEC;
       hints.ai_socktype = SOCK_STREAM;
+      if (m_bSecure)
+      {
+        SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
+        if ((m_ctx = SSL_CTX_new(method)) == NULL)
+        {
+          m_bSecure = false;
+        }
+      }
       if ((nReturn = getaddrinfo(strServer.c_str(), strPort.c_str(), &hints, &result)) == 0)
       {
         bool bSocket = false;
@@ -204,7 +233,14 @@ extern "C++"
             bSocket = true;
             if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
             {
-              m_fdSocket = fdSocket;
+              if (!m_bSecure || (m_ssl = m_pUtility->sslConnect(m_ctx, fdSocket, strError)) != NULL)
+              {
+                m_fdSocket = fdSocket;
+              }
+              else
+              {
+                ::close(fdSocket);
+              }
             }
             else
             {
@@ -360,7 +396,6 @@ extern "C++"
 
       if (m_fdSocket != -1)
       {
-        char szBuffer[65536];
         int nReturn;
         pollfd fds[1];
         size_t unPosition;
@@ -396,10 +431,9 @@ extern "C++"
         {
           if (fds[0].revents & POLLIN)
           {
-            if ((nReturn = read(m_fdSocket, szBuffer, 65536)) > 0)
+            if ((m_ssl != NULL && m_pUtility->sslRead(m_ssl, m_strBuffer[0], nReturn)) || (m_ssl == NULL && m_pUtility->fdRead(m_fdSocket, m_strBuffer[0], nReturn)))
             {
               bResult = true;
-              m_strBuffer[0].append(szBuffer, nReturn);
               while ((unPosition = m_strBuffer[0].find("\n")) != string::npos)
               {
                 Json *ptMessage = new Json(m_strBuffer[0].substr(0, unPosition));
@@ -421,21 +455,34 @@ extern "C++"
             else
             {
               ssError.str("");
-              ssError << "read(" << errno << ") " << strerror(errno);
+              if (m_ssl != NULL)
+              {
+                ssError << "Utility::sslRead(" << nReturn << ") " << m_pUtility->sslstrerror(m_ssl, nReturn);
+              }
+              else
+              {
+                ssError << "Utility::fdRead(" << errno << ") " << strerror(errno);
+              }
               strError = ssError.str();
             }
           }
           if (fds[0].revents & POLLOUT)
           {
-            if ((nReturn = write(m_fdSocket, m_strBuffer[1].c_str(), m_strBuffer[1].size())) > 0)
+            if ((m_ssl != NULL && m_pUtility->sslWrite(m_ssl, m_strBuffer[1], nReturn)) || (m_ssl == NULL && m_pUtility->fdWrite(m_fdSocket, m_strBuffer[1], nReturn)))
             {
               bResult = true;
-              m_strBuffer[1].erase(0, nReturn);
             }
             else
             {
               ssError.str("");
-              ssError << "write(" << errno << ") " << strerror(errno);
+              if (m_ssl != NULL)
+              {
+                ssError << "Utility::sslWrite(" << nReturn << ") " << m_pUtility->sslstrerror(m_ssl, nReturn);
+              }
+              else
+              {
+                ssError << "Utility::fdWrite(" << errno << ") " << strerror(errno);
+              }
               strError = ssError.str();
             }
           }

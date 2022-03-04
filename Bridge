@@ -33,6 +33,8 @@
 #include <list>
 #include <mutex>
 #include <netdb.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
 #include <poll.h>
 #include <pthread.h>
 #ifdef COMMON_LINUX

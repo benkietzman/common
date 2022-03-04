@@ -33,7 +33,9 @@
 #include <list>
 #include <map>
 #include <netdb.h>
+#include <openssl/err.h>
 #include <openssl/md5.h>
+#include <openssl/ssl.h>
 #include <poll.h>
 #include <sstream>
 #include <string>
@@ -42,6 +44,7 @@
 #include <unistd.h>
 using namespace std;
 #include "Json"
+#include "Utility"
 // }}}
 extern "C++"
 {
@@ -54,12 +57,16 @@ extern "C++"
       bool m_bConnected;
       bool m_bDebug;
       bool m_bQuit;
+      bool m_bSecure;
       int m_fdSocket;
       list<string> m_rooms;
       list<Json *> m_messages;
       string m_strBuffer[2];
       string m_strUser;
       void (*m_pMessage)(Json *);
+      SSL *m_ssl;
+      SSL_CTX *m_ctx;
+      Utility *m_pUtility;
 
       void analyze(Json *ptMessage);
 
@@ -88,6 +95,7 @@ extern "C++"
       void putMessage(const string strFunction, Json *ptMessage = NULL);
       void quit();
       list<string> rooms();
+      void secure(const bool bSecure = true);
       void setArguments(map<string, string> arguments);
       void setDebug(const bool bDebug);
       void setForm(const string strAction, const string strHeader = "", const string strFooter = "");

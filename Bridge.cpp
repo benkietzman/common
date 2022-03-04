@@ -664,7 +664,6 @@ extern "C++"
         for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
         {
           bool bConnected[4] = {false, false, false, false};
-          common_socket_type eSocketType = COMMON_SOCKET_UNKNOWN;
           int fdSocket = -1, nReturn = -1;
           string strServer;
           unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
@@ -756,7 +755,7 @@ extern "C++"
               {
                 if (fds[0].fd == fdSocket && (fds[0].revents & POLLIN))
                 {
-                  if (((eSocketType == COMMON_SOCKET_ENCRYPTED) && utility()->sslRead(ssl, strBuffer[0], nReturn)) || ((eSocketType == COMMON_SOCKET_UNENCRYPTED) && utility()->fdRead(fdSocket, strBuffer[0], nReturn)))
+                  if ((ssl != NULL && utility()->sslRead(ssl, strBuffer[0], nReturn)) || (ssl == NULL && utility()->fdRead(fdSocket, strBuffer[0], nReturn)))
                   {
                     if ((unPosition = strBuffer[0].find("\n")) != string::npos)
                     {
@@ -794,7 +793,7 @@ extern "C++"
                     if (nReturn < 0)
                     {
                       stringstream ssError;
-                      if (eSocketType == COMMON_SOCKET_ENCRYPTED)
+                      if (ssl != NULL)
                       {
                         ssError << "Central::utility()->sslRead(" << SSL_get_error(ssl, nReturn) << ") error [" << fdSocket << "]:  " << utility()->sslstrerror();
                       }
@@ -808,13 +807,13 @@ extern "C++"
                 }
                 if (fds[0].fd == fdSocket && (fds[0].revents & POLLOUT))
                 {
-                  if (!((eSocketType == COMMON_SOCKET_ENCRYPTED) && utility()->sslWrite(ssl, strBuffer[1], nReturn)) && !((eSocketType == COMMON_SOCKET_UNENCRYPTED) && utility()->fdWrite(fdSocket, strBuffer[1], nReturn)))
+                  if (!(ssl != NULL && utility()->sslWrite(ssl, strBuffer[1], nReturn)) && !(ssl == NULL && utility()->fdWrite(fdSocket, strBuffer[1], nReturn)))
                   {
                     bExit = true;
                     if (nReturn < 0)
                     {
                       stringstream ssError;
-                      if (eSocketType == COMMON_SOCKET_ENCRYPTED)
+                      if (ssl != NULL)
                       {
                         ssError << "Central::utility()->sslWrite(" << SSL_get_error(ssl, nReturn) << ") error [" << fdSocket << "]:  " <<  utility()->sslstrerror();
                       }

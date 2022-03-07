@@ -36,13 +36,14 @@ class Bridge
     $this->m_bUseSecureBridge = true;
     $this->m_buffer = [[], []];
     $this->m_CTime = [0, 0];
-    $this->m_fdSocket = -1;
     $this->m_handle = false;
     $this->m_strBuffer = [null, null];
     $this->m_strConf = (($strConf != '')?$strConf:'/etc/central.conf');
     $context = array();
     $context['ssl'] = array();
+    $context['ssl']['allow_self_signed'] = true;
     $context['ssl']['verify_peer'] = false;
+    $context['ssl']['verify_peer_name'] = false;
     $this->m_streamContext = stream_context_create($context);
     unset($context);
     $this->m_ulModifyTime = 0;

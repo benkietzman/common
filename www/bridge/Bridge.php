@@ -128,6 +128,7 @@ class Bridge
           $bConnected = false;
           $handle = null;
           $nErrorNo = null;
+          $port = 12199;
           $strError = null;
           $unAttempt = 0;
           for ($i = (($this->m_bUseSecureBridge)?0:1); !$bConnected && $i < 2; $i++)
@@ -141,7 +142,7 @@ class Bridge
                 $unPick = 0;
               }
               $strServer = $servers[$unPick];
-              if ($handle = stream_socket_client((($i == 0)?'tls://':'').$strServer.':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+              if ($handle = stream_socket_client((($i == 0)?'tls://':'').$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
               {
                 $bConnected = true;
               }
@@ -275,11 +276,12 @@ class Bridge
   {
     $bResult = false;
 
-    if ($this->m_handle === false || stream_socket_shutdown($this->m_handle, STREAM_SHUT_RDWR) !== false)
+    if ($this->m_handle !== false)
     {
+      fclose($this->m_handle);
+      $this->m_handle = false;
       $bResult = true;
     }
-    $this->m_handle = false;
 
     return $bResult;
   }
@@ -577,6 +579,7 @@ class Bridge
       $bConnected = false;
       $handle = null;
       $nErrorNo = null;
+      $port = 12199;
       $strError = null;
       $unAttempt = 0;
       for ($i = (($this->m_bUseSecureBridge)?0:1); !$bConnected && $i < 2; $i++)
@@ -590,7 +593,7 @@ class Bridge
             $unPick = 0;
           }
           $strServer = $servers[$unPick];
-          if ($handle = stream_socket_client((($i == 0)?'tls://':'').$strServer.':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+          if ($handle = stream_socket_client((($i == 0)?'tls://':'').$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
           { 
             $bConnected = true;
           }
@@ -691,11 +694,7 @@ class Bridge
           unset($readfds);
           unset($writefds);
         }
-        if (stream_socket_shutdown($handle, STREAM_SHUT_RDWR) === false)
-        {
-          $strError = 'stream_socket_shutdown() '.var_dump(error_get_last());
-          $this->setError($strError);
-        }
+        fclose($handle);
       }
       else
       {

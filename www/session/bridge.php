@@ -19,9 +19,6 @@
 *
 * Provides functions for load balancing session variables via a database. 
 */
-// {{{ includes
-// include_once('../Utility.php');
-// }}}
 // {{{ sessionOpen()
 /*! \fn sessionOpen($strSavePath, $strSessionName)
 * \brief Open the session.
@@ -43,25 +40,26 @@ function sessionClose()
 }
 // }}}
 // {{{ sessionRead()
-/*! \fn sessionRead($strSessionID, $sessionStreamContext)
+/*! \fn sessionRead($strSessionID)
 * \brief Read the session
 * \param $strSessionID Contains the session id.
-* \param $sessionStreamContext Contains stream context needed for stream connection.
 */
-function sessionRead($strSessionID, $sessionStreamContext)
+function sessionRead($strSessionID)
 {
-  $strResult = '';
   $port = 12199;
+  $strResult = '';
 
-  if ($sessionStreamContext === NULL)
-  {
-    echo 'sessionRead()->error:  stream context is NULL.';
-    unset($port);
-    return $strResult;
-  }
+  $context = array();
+  $context['ssl'] = array();
+  $context['ssl']['verify_peer'] = false;
+  $context['ssl']['verify_peer_name'] = false;
+  $context['ssl']['allow_self_signed'] = true;
+  $streamContext = stream_context_create($context);
 
-  $sessionUtility = new Utility;
-  if (($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)
+  $handle = null;
+  $nErrorNo = null;
+  $strError = null;
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -106,36 +104,37 @@ function sessionRead($strSessionID, $sessionStreamContext)
   }
   else
   {
-    echo 'sessionRead()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
+    echo 'sessionRead()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
+  unset($context);
   unset($port);
   unset($request);
-  unset($sessionUtility);
   
   return $strResult;
 }
 // }}}
 // {{{ sessionWrite()
-/*! \fn sessionWrite($strSessionID, $strSessionData, $sessionStreamContext)
+/*! \fn sessionWrite($strSessionID, $strSessionData)
 * \brief Write the session
 * \param $strSessionID Contains the session id.
 * \param $strSessionData Contains the session data.
-* \param $sessionStreamContext Contains stream context needed for stream connection.
 */
-function sessionWrite($strSessionID, $strSessionData, $sessionStreamContext)
+function sessionWrite($strSessionID, $strSessionData)
 {
   $bResult = false;
   $port = 12199;
 
-  if ($sessionStreamContext === NULL)
-  {
-    echo 'sessionWrite()->error:  stream context is NULL.';
-    unset($port);
-    return $bResult;
-  }
+  $context = array();
+  $context['ssl'] = array();
+  $context['ssl']['verify_peer'] = false;
+  $context['ssl']['verify_peer_name'] = false;
+  $context['ssl']['allow_self_signed'] = true;
+  $streamContext = stream_context_create($context);
 
-  $sessionUtility = new Utility;
-  if (($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)
+  $handle = null;
+  $nErrorNo = null;
+  $strError = null;
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -177,35 +176,36 @@ function sessionWrite($strSessionID, $strSessionData, $sessionStreamContext)
   }
   else
   {
-    echo 'sessionWrite()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
+    echo 'sessionWrite()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
+  unset($context);
   unset($port);
   unset($request);
-  unset($sessionUtility);
 
   return $bResult;
 }
 // }}}
 // {{{ sessionDestroy()
-/*! \fn sessionDestroy($strSessionID, $sessionStreamContext)
-* \brief Destroy the session (stream or socket).
+/*! \fn sessionDestroy($strSessionID)
+* \brief Destroy the session.
 * \param $strSessionID Contains the session id.
-* \param $sessionStreamContext Contains stream context needed for stream connection.
 */
-function sessionDestroy($strSessionID, $sessionStreamContext)
+function sessionDestroy($strSessionID)
 {
   $bResult = false;
   $port = 12199;
 
-  if ($sessionStreamContext === NULL)
-  {
-    echo 'sessionDestroy()->error:  stream context is NULL.';
-    unset($port);
-    return $bResult;
-  }
+  $context = array();
+  $context['ssl'] = array();
+  $context['ssl']['verify_peer'] = false;
+  $context['ssl']['verify_peer_name'] = false;
+  $context['ssl']['allow_self_signed'] = true;
+  $streamContext = stream_context_create($context);
 
-  $sessionUtility = new Utility;
-  if (($handle = $sessionUtility->createClientStream($GLOBALS['sess_server'], $port, $sessionStreamContext, $strError)) !== false)
+  $handle = null;
+  $nErrorNo = null;
+  $strError = null;
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -247,11 +247,11 @@ function sessionDestroy($strSessionID, $sessionStreamContext)
   }
   else
   {
-    echo 'sessionDestroy()->createClientStream() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
+    echo 'sessionDestroy()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
+  unset($context);
   unset($port);
   unset($request);
-  unset($sessionUtility);
 
   return $bResult;
 }

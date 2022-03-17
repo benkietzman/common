@@ -334,7 +334,7 @@ class bk_Password
     }
     else
     {
-      echo "<div style='font-size:12px;font-weight:bold;'>Central Login</div><br>";
+      echo "<div style='font-size:16px;font-weight:bold;'>Central Login</div><br>";
       echo "<form name='bk_login_formlogin' action='".$_SERVER['REQUEST_URI']."' method='post' onSubmit='return bk_login_checklogin();'>";
       echo "<table class='std_form'>";
       echo "<tr><td>";

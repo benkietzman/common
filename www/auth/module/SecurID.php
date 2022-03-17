@@ -342,7 +342,7 @@ class bk_SecurID
     $strUserID = (isset($_POST['bk_login_user_id']))?$_POST['bk_login_user_id']:"";
     $strPassword = (isset($_POST['bk_login_password']))?$_POST['bk_login_password']:"";
     $strMessage = (isset($_SESSION['sl_message']))?$_SESSION['sl_message']:"&nbsp;";
-    echo "<div style='font-size:12px;font-weight:bold;'>Please login using your<br>SecurID PIN and password.</div><br>";
+    echo "<div style='font-size:12px;font-weight:bold;'>SecurID Login</div><br>";
     echo "<form name='bk_login_formlogin' method='post' onSubmit='return bk_login_checklogin();'>";
     echo "<table class='std_form'>";
     echo "<tr><td>";

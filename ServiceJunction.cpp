@@ -798,7 +798,10 @@ extern "C++"
       delete ptJson;
       ptJson = new Json;
       ptJson->insert("Signer", strSigner);
-      ptJson->insert("Secret", strSecret);
+      if (!strSecret.empty())
+      {
+        ptJson->insert("Secret", strSecret);
+      }
       if (bDecode)
       {
         ptJson->insert("Payload", strPayload);

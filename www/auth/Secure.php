@@ -607,6 +607,25 @@ class Secure extends Basic
       setcookie(session_name(), '', time()-42000, '/');
     }
     session_destroy();
+    if ($bJson)
+    {
+      if (!is_array($response))
+      {
+        $response = array();
+      }
+      if (!isset($response['Status']))
+      {
+        $response['Status'] = 'okay';
+      }
+      if ($strRetPath != '' && !isset($response['Redirect']))
+      {
+        $response['Redirect'] = $strRetPath;
+      }
+    }
+    else if ($strRetPath != '')
+    {
+      echo '<script type="text/javascript">document.location.href="'.$strRetPath.'";</script>';
+    }
 
     return $response;
   }

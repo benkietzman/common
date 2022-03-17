@@ -378,6 +378,7 @@ class bk_SecurID
   */
   public function logout($strRetPath = null, $bJson = false)
   {
+    return null;
   }
   // }}}
 }

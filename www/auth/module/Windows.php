@@ -430,18 +430,7 @@ class bk_Windows
   */
   public function logout($strRetPath = null, $bJson = false)
   {
-    $response = array();
-
-    if ($bJson)
-    {
-      $response['Status'] = 'okay';
-      if ($strRetPath != '')
-      {
-        $response['Redirect'] = $strRetPath;
-      }
-    }
-
-    return $response;
+    return null;
   }
   // }}}
 }

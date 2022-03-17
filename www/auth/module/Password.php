@@ -307,18 +307,6 @@ class bk_Password
         }
         $this->m_readdb->free($getPerson);
       }
-      else if ($strUserID == '')
-      {
-        $strError = 'Provide UserID';
-      }
-      else if ($strPassword == '')
-      {
-        $strError = 'Provide Password.';
-      }
-      else
-      {
-        $strError = 'Unknown Error';
-      }
     }
     else
     {

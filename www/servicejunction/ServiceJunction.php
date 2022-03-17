@@ -499,6 +499,111 @@ class ServiceJunction
     return $bResult;
   }
   // }}}
+  // {{{ jwt()
+  public function jwt($strSigner, $strSecret, &$strPayload, &$payload)
+  {
+    $bDecode = false;
+    $bResult = false;
+
+    $request = array();
+    if ($this->m_strApplication != '')
+    {
+      $request['reqApp'] = $this->m_strApplication;
+    }
+    if ($this->m_strProgram != '')
+    {
+      $req['reqProg'] = $this->m_strProgram;
+    }
+    $request['Service'] = 'jwt';
+    if ($strPayload != '')
+    {
+      $bDecode = true;
+      $request['Function'] = 'decode';
+    }
+    else
+    {
+      $request['Function'] = 'encode';
+    }
+    $in = array();
+    $in[] = $request;
+    unset($request);
+    $request = array();
+    $request['Signer'] = $strSigner;
+    if ($strSecret != '')
+    {
+      $request['Secret'] = $strSecret;
+    }
+    if ($bDecode)
+    {
+      $request['Payload'] = $strPayload;
+    }
+    else
+    {
+      $request['Payload'] = $payload;
+    }
+    $in[] = $json_encode($request);
+    unset($request);
+    $out = null;
+    if ($this->request($in, $out))
+    {
+      $nSize = sizeof($out);
+      if ($nSize >= 1)
+      {
+        $status = json_decode($out[0], true);
+        if (isset($status['Status']) && $status['Status'] == 'okay')
+        {
+          if ($nSize == 2)
+          {
+            $data = json_decode($out[1], true);
+            if (isset($data['Payload']))
+            {
+              if ($bDecode)
+              {
+                $bResult = true;
+                $payload = $data['Payload'];
+              }
+              else if ($data['Payload'] != '')
+              {
+                $bResult = true;
+                $strPayload = $data['Payload'];
+              }
+              else
+              {
+                $this->setError('Payload was empty within data.');
+              }
+            }
+            else
+            {
+              $this->setError('Failed to find Payload within data.');
+            }
+            unset($data);
+          }
+          else
+          {
+            $this->setError('Failed to receive data.');
+          }
+        }
+        else if (isset($status['Error']) && $status['Error'] != '')
+        {
+          $this->setError($status['Error']);
+        }
+        else
+        {
+          $this->setError('Encountered an unknown error.');
+        }
+        unset($status);
+      }
+      else
+      {
+        $this->setError('Failed to receive response.');
+      }
+    }
+    unset($in);
+    unset($out);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ location()
   public function location($strState, $strCity, $strAddress, &$result)
   {

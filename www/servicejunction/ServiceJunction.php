@@ -81,7 +81,7 @@ class ServiceJunction
     $request = array();
     $request['Secret'] = $strSecret;
     $request['Payload'] = base64_encode((($bDecrypt)?$strEncrypted:$strDecrypted));
-    $in[] = $json_encode($request);
+    $in[] = json_encode($request);
     unset($request);
     $out = null;
     if ($this->request($in, $out))
@@ -630,7 +630,7 @@ class ServiceJunction
     {
       $request['Payload'] = $payload;
     }
-    $in[] = $json_encode($request);
+    $in[] = json_encode($request);
     unset($request);
     $out = null;
     if ($this->request($in, $out))

@@ -25,6 +25,7 @@ include_once(dirname(__FILE__).'/../Basic.php');
 include_once(dirname(__FILE__).'/../database/CommonDatabase.php');
 include_once(dirname(__FILE__).'/../Syslog.php');
 include_once(dirname(__FILE__).'/../servicejunction/ServiceJunction.php');
+include_once(dirname(__FILE__).'/../warden/Warden.php');
 if (($mod_handle = opendir(dirname(__FILE__).'/module/')))
 {
   while (($mod_file = readdir($mod_handle)) !== false)
@@ -396,53 +397,46 @@ class Secure extends Basic
 
     if ($strJwt != '')
     {
-      if (($handle = fopen('/data/acorn/.cred/jwt', 'r')) !== false || ($handle = fopen('/data/bridge/.cred/jwt', 'r')) !== false || ($handle = fopen('/data/servicejunction/jwt/.cred', 'r')) !== false || ($handle = fopen('/opt/app/workload/data/acorn/.cred/jwt', 'r')) !== false || ($handle = fopen('/opt/app/workload/data/bridge/.cred/jwt', 'r')) !== false || ($handle = fopen('/opt/app/workload/data/servicejunction/jwt/.cred', 'r')) !== false)
+      $warden = new Warden('Bridge', '/data/warden/socket');
+      $secret = null;
+      if ($warden->vaultRetrieve(['jwt'], $secret))
       {
-        if (($strSecret = fgets($handle)) !== false)
+        if (isset($secret['Secret']) && $secret['Secret'] != '')
         {
-          $secret = json_decode(trim($strSecret), true);
-          if (isset($secret['Secret']) && $secret['Secret'] != '')
+          if (isset($secret['Signer']) && $secret['Signer'] != '')
           {
-            if (isset($secret['Signer']) && $secret['Signer'] != '')
+            $strPayload = null;
+            $strEncrypted = base64_decode($strJwt);
+            $this->m_junction->aes($secret['Secret'], $strPayload, $strEncrypted);
+            if ($strPayload == '')
             {
-              $strPayload = null;
-              $strEncrypted = base64_decode($strJwt);
-              $this->m_junction->aes($secret['Secret'], $strPayload, $strEncrypted);
-              if ($strPayload == '')
-              {
-                $strPayload = $strJwt;
-              }
-              $payload = null;
-              if ($this->m_junction->jwt($secret['Signer'], $secret['Secret'], $strPayload, $payload))
-              {
-                $_SESSION = $payload;
-              }
-              else
-              {
-                $strError = $this->m_junction->getError();
-              }
+              $strPayload = $strJwt;
+            }
+            $payload = null;
+            if ($this->m_junction->jwt($secret['Signer'], $secret['Secret'], $strPayload, $payload))
+            {
+              $_SESSION = $payload;
             }
             else
             {
-              $strError = 'Failed to find JWT signer.';
+              $strError = $this->m_junction->getError();
             }
           }
           else
           {
-            $strError = 'Failed to find JWT secret.';
+            $strError = 'Failed to find JWT signer.';
           }
-          unset($secret);
         }
         else
         {
-          $strError = 'Failed to read JWT secret.';
+          $strError = 'Failed to find JWT secret.';
         }
-        fclose($handle);
       }
       else
       {
-        $strError = 'Failed to open JWT secret.';
+        $strError = $warden->getError();
       }
+      unset($secret);
     }
     else
     {

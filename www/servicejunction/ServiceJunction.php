@@ -76,7 +76,7 @@ class ServiceJunction
       $request['Function'] = 'decrypt';
     }
     $in = array();
-    $in[] = $request;
+    $in[] = json_encode($request);
     unset($request);
     $request = array();
     $request['Secret'] = $strSecret;
@@ -614,7 +614,7 @@ class ServiceJunction
       $request['Function'] = 'encode';
     }
     $in = array();
-    $in[] = $request;
+    $in[] = json_encode($request);
     unset($request);
     $request = array();
     $request['Signer'] = $strSigner;

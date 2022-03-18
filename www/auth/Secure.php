@@ -405,59 +405,16 @@ class Secure extends Basic
           {
             if (isset($secret['Signer']) && $secret['Signer'] != '')
             {
-              $in = array();
-              $request = array();
-              $request['Service'] = 'jwt';
-              $request['Function'] = 'decode';
-              $in[] = json_encode($request);
-              unset($request);
-              $request = array();
-              $request['Signer'] = $secret['Signer'];
-              $request['Secret'] = $secret['Secret'];
-              $request['Payload'] = $strJwt;
-              $in[] = json_encode($request);
-              unset($request);
-              $out = null;
-              if ($this->m_junction->request($in, $out))
+              $strPayload = null;
+              $junction->aes($secret['Secret'], $strPayload, base64_decode($strJwt));
+              if ($strPayload == '')
               {
-                if (sizeof($out) >= 1)
-                {
-                  $status = json_decode($out[0], true);
-                  if (isset($status['Status']) && $status['Status'] == 'okay')
-                  {
-                    if (sizeof($out) == 2)
-                    {
-                      $data = json_decode($out[1], true);
-                      if (isset($data['Payload']))
-                      {
-                        $bResult = true;
-                        $_SESSION = $data['Payload'];
-                      }
-                      else
-                      {
-                        $strError = 'Failed to find Payload in response.';
-                      }
-                      unset($data);
-                    }
-                    else
-                    {
-                      $strError = 'Invalid number of lines in response.';
-                    }
-                  }
-                  else if (isset($status['Error']) && $status['Error'] != '')
-                  {
-                    $strError = $status['Error'];
-                  }
-                  else
-                  {
-                    $strError = 'Encountered an unknown error.';
-                  }
-                  unset($status);
-                }
-                else
-                {
-                  $strError = 'Invalid number of lines in response.';
-                }
+                $strPayload = $strJwt;
+              }
+              $payload = null;
+              if ($this->m_junction->jwt($secret['Signer'], $secret['Secret'], $strPayload, $payload))
+              {
+                $_SESSION = $payload;
               }
               else
               {

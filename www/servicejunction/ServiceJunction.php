@@ -53,7 +53,7 @@ class ServiceJunction
   // {{{ aes()
   public function aes($strSecret, &$strDecrypted, &$strEncrypted)
   {
-    $bDecode = true;
+    $bDecrypt = true;
     $bResult = false;
 
     $request = array();
@@ -68,7 +68,7 @@ class ServiceJunction
     $request['Service'] = 'aes';
     if ($strDecrypted != '')
     {
-      $bDecode = false;
+      $bDecrypt = false;
       $request['Function'] = 'encrypt';
     }
     else

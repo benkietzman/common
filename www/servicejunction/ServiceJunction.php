@@ -80,7 +80,7 @@ class ServiceJunction
     unset($request);
     $request = array();
     $request['Secret'] = $strSecret;
-    $request['Payload'] = (($bDecrypt)?$strEncrypted:$strDecrypted);
+    $request['Payload'] = base64_encode((($bDecrypt)?$strEncrypted:$strDecrypted));
     $in[] = $json_encode($request);
     unset($request);
     $out = null;
@@ -100,11 +100,11 @@ class ServiceJunction
               $bResult = true;
               if ($bDecrypt)
               {
-                $strDecrypted = $data['Payload'];
+                $strDecrypted = base64_decode($data['Payload']);
               }
               else
               {
-                $strEncrypted = $data['Payload'];
+                $strEncrypted = base64_decode($data['Payload']);
               }
             }
             else

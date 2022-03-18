@@ -412,10 +412,10 @@ class Secure extends Basic
             {
               $strPayload = $strJwt;
             }
-echo 'PAYLOAD:  '.$strPayload."\n";
             $payload = null;
             if ($this->m_junction->jwt($secret['Signer'], $secret['Secret'], $strPayload, $payload))
             {
+              $bResult = true;
               $_SESSION = $payload;
             }
             else

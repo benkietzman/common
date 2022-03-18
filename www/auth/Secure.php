@@ -406,7 +406,8 @@ class Secure extends Basic
             if (isset($secret['Signer']) && $secret['Signer'] != '')
             {
               $strPayload = null;
-              $this->m_junction->aes($secret['Secret'], $strPayload, base64_decode($strJwt));
+              $strEncrypted = base64_decode($strJwt);
+              $this->m_junction->aes($secret['Secret'], $strPayload, $strEncrypted);
               if ($strPayload == '')
               {
                 $strPayload = $strJwt;

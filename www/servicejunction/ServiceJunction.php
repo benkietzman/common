@@ -50,6 +50,95 @@ class ServiceJunction
   {
   }
   // }}}
+  // {{{ aes()
+  public function aes($strSecret, &$strDecrypted, &$strEncrypted)
+  {
+    $bDecode = true;
+    $bResult = false;
+
+    $request = array();
+    if ($this->m_strApplication != '')
+    {
+      $request['reqApp'] = $this->m_strApplication;
+    }
+    if ($this->m_strProgram != '')
+    {
+      $req['reqProg'] = $this->m_strProgram;
+    }
+    $request['Service'] = 'aes';
+    if ($strDecrypted != '')
+    {
+      $bDecode = false;
+      $request['Function'] = 'encrypt';
+    }
+    else
+    {
+      $request['Function'] = 'decrypt';
+    }
+    $in = array();
+    $in[] = $request;
+    unset($request);
+    $request = array();
+    $request['Secret'] = $strSecret;
+    $request['Payload'] = (($bDecrypt)?$strEncrypted:$strDecrypted);
+    $in[] = $json_encode($request);
+    unset($request);
+    $out = null;
+    if ($this->request($in, $out))
+    {
+      $nSize = sizeof($out);
+      if ($nSize >= 1)
+      {
+        $status = json_decode($out[0], true);
+        if (isset($status['Status']) && $status['Status'] == 'okay')
+        {
+          if ($nSize == 2)
+          {
+            $data = json_decode($out[1], true);
+            if (isset($data['Payload']))
+            {
+              $bResult = true;
+              if ($bDecrypt)
+              {
+                $strDecrypted = $data['Payload'];
+              }
+              else
+              {
+                $strEncrypted = $data['Payload'];
+              }
+            }
+            else
+            {
+              $this->setError('Failed to find Payload within data.');
+            }
+            unset($data);
+          }
+          else
+          {
+            $this->setError('Failed to receive data.');
+          }
+        }
+        else if (isset($status['Error']) && $status['Error'] != '')
+        {
+          $this->setError($status['Error']);
+        }
+        else
+        {
+          $this->setError('Encountered an unknown error.');
+        }
+        unset($status);
+      }
+      else
+      {
+        $this->setError('Failed to receive response.');
+      }
+    }
+    unset($in);
+    unset($out);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ batch()
   public function batch($request, &$response)
   {

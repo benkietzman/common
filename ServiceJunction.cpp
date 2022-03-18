@@ -798,7 +798,10 @@ extern "C++"
       delete ptJson;
       ptJson = new Json;
       ptJson->insert("Signer", strSigner);
-      ptJson->insert("Secret", strSecret);
+      if (!strSecret.empty())
+      {
+        ptJson->insert("Secret", strSecret);
+      }
       if (bDecode)
       {
         ptJson->insert("Payload", strPayload);
@@ -1919,7 +1922,7 @@ extern "C++"
             {
               for (int j = ((m_bUseSecureJunction)?0:1); !bDone && j < 2; j++)
               {
-                bool bConnected[6] = {false, false, false, false, false, false};
+                bool bConnected[4] = {false, false, false, false};
                 int fdSocket = -1, nReturn = -1;
                 SSL *ssl = NULL;
                 string strServer;
@@ -1937,10 +1940,10 @@ extern "C++"
                 #ifdef COMMON_SOLARIS
                 sema_wait(&m_semaServiceJunctionRequestLock);
                 #endif
-                while (!bConnected[5] && unAttempt++ < junctionServer.size())
+                while (!bConnected[3] && unAttempt++ < junctionServer.size())
                 {
                   addrinfo hints, *result;
-                  bConnected[0] = bConnected[1] = false;
+                  bConnected[0] = bConnected[1] = bConnected[2] = false;
                   if (unPick == junctionServer.size())
                   {
                     unPick = 0;
@@ -1958,34 +1961,16 @@ extern "C++"
                     bConnected[0] = true;
                     for (rp = result; !bConnected[5] && rp != NULL; rp = rp->ai_next)
                     {
-                      bConnected[1] = false;
+                      bConnected[1] = bConnected[2] = false;
                       if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                       {
                         bConnected[1] = true;
                         if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                         {
                           bConnected[2] = true;
-                          if (j == 1 || (ssl = SSL_new(ctx)) != NULL)
+                          if (j == 1 || (ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
                           {
                             bConnected[3] = true;
-                            if (j == 1 || SSL_set_fd(ssl, fdSocket) == 1)
-                            {
-                              bConnected[4] = true;
-                              if (j == 1 || SSL_connect(ssl) == 1)
-                              {
-                                bConnected[5] = true;
-                              }
-                              else
-                              {
-                                SSL_free(ssl);
-                                close(fdSocket);
-                              }
-                            }
-                            else
-                            {
-                              SSL_free(ssl);
-                              close(fdSocket);
-                            }
                           }
                           else
                           {
@@ -2009,7 +1994,7 @@ extern "C++"
                 sema_post(&m_semaServiceJunctionRequestLock);
                 #endif
                 junctionServer.clear();
-                if (bConnected[5])
+                if (bConnected[3])
                 {
                   bool bExit = false;
                   size_t unPosition;
@@ -2118,6 +2103,7 @@ extern "C++"
                   }
                   if (j == 0)
                   {
+                    SSL_shutdown(ssl);
                     SSL_free(ssl);
                   }
                   close(fdSocket);
@@ -2137,17 +2123,9 @@ extern "C++"
                   {
                     ssError << "connect(" << errno << ") " << strerror(errno);
                   }
-                  else if (!bConnected[3])
-                  {
-                    ssError << "SSL_new() " << utility()->sslstrerror();
-                  }
-                  else if (!bConnected[4])
-                  {
-                    ssError << "SSL_set_fd() " << utility()->sslstrerror();
-                  }
                   else
                   {
-                    ssError << "SSL_connect() " << utility()->sslstrerror();
+                    ssError << "Utility::sslConnect() " << strError;
                   }
                   strError = ssError.str();
                 }
@@ -2253,17 +2231,9 @@ extern "C++"
                   {
                     if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                     {
-                      if (!m_bUseSecureJunction || (ssl = SSL_new(ctx)) != NULL)
+                      if (!m_bUseSecureJunction || (ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
                       {
-                        if (!m_bUseSecureJunction || (SSL_set_fd(ssl, fdSocket) == 1 && SSL_connect(ssl) == 1))
-                        {
-                          bConnected = true;
-                        }
-                        else
-                        {
-                          SSL_free(ssl);
-                          close(fdSocket);
-                        }
+                        bConnected = true;
                       }
                       else
                       {
@@ -2418,6 +2388,7 @@ extern "C++"
               m_mutexRequests.unlock();
               if (m_bUseSecureJunction)
               {
+                SSL_shutdown(ssl);
                 SSL_free(ssl);
               }
               close(fdSocket);

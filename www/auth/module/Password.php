@@ -307,18 +307,6 @@ class bk_Password
         }
         $this->m_readdb->free($getPerson);
       }
-      else if ($strUserID == '')
-      {
-        $strError = 'Provide UserID';
-      }
-      else if ($strPassword == '')
-      {
-        $strError = 'Provide Password.';
-      }
-      else
-      {
-        $strError = 'Unknown Error';
-      }
     }
     else
     {
@@ -346,6 +334,7 @@ class bk_Password
     }
     else
     {
+      echo "<div style='font-size:16px;font-weight:bold;'>Login</div><br>";
       echo "<form name='bk_login_formlogin' action='".$_SERVER['REQUEST_URI']."' method='post' onSubmit='return bk_login_checklogin();'>";
       echo "<table class='std_form'>";
       echo "<tr><td>";
@@ -385,18 +374,7 @@ class bk_Password
   */
   public function logout($strRetPath = null, $bJson = false)
   {
-    $response = array();
-
-    if ($bJson)
-    {
-      $response['Status'] = 'okay';
-      if ($strRetPath != '')
-      {
-        $response['Redirect'] = $strRetPath;
-      }
-    }
-
-    return $response;
+    return null;
   }
   // }}}
 }

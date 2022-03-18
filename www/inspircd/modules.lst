@@ -1,0 +1,6 @@
+module update-your-server 0.0.0 https://404.example.com
+ depends core 1-2
+ description The version of InspIRCd you are using is EOL. Please upgrade!
+module m_junctionauth 3.752 https://kietzman.org/include/common/inspircd/m_junctionauth.cpp
+ description A module to authorize via Service Junction.
+ depends core 3

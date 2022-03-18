@@ -41,14 +41,25 @@ function sessionClose()
 // }}}
 // {{{ sessionRead()
 /*! \fn sessionRead($strSessionID)
-* \brief Read the session.
+* \brief Read the session
 * \param $strSessionID Contains the session id.
 */
 function sessionRead($strSessionID)
 {
+  $port = 12199;
   $strResult = '';
 
-  if (($handle = fsockopen($GLOBALS['sess_server'], 12199)) !== false)
+  $context = array();
+  $context['ssl'] = array();
+  $context['ssl']['verify_peer'] = false;
+  $context['ssl']['verify_peer_name'] = false;
+  $context['ssl']['allow_self_signed'] = true;
+  $streamContext = stream_context_create($context);
+
+  $handle = null;
+  $nErrorNo = null;
+  $strError = null;
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -82,7 +93,7 @@ function sessionRead($strSessionID)
       }
       else
       {
-        echo 'sessionRead()->fread() error:  Failed to read response.';
+        echo 'sessionRead()->fgets() error:  Failed to read response.';
       }
     }
     else
@@ -93,24 +104,37 @@ function sessionRead($strSessionID)
   }
   else
   {
-    echo 'sessionRead()->fsockopen() error:  Failed to open socket connection to '.$GLOBALS['sess_server'].'.';
+    echo 'sessionRead()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
+  unset($context);
+  unset($port);
   unset($request);
-
+  
   return $strResult;
 }
 // }}}
 // {{{ sessionWrite()
 /*! \fn sessionWrite($strSessionID, $strSessionData)
-* \brief Write the session.
+* \brief Write the session
 * \param $strSessionID Contains the session id.
 * \param $strSessionData Contains the session data.
 */
 function sessionWrite($strSessionID, $strSessionData)
 {
   $bResult = false;
+  $port = 12199;
 
-  if (($handle = fsockopen($GLOBALS['sess_server'], 12199)) !== false)
+  $context = array();
+  $context['ssl'] = array();
+  $context['ssl']['verify_peer'] = false;
+  $context['ssl']['verify_peer_name'] = false;
+  $context['ssl']['allow_self_signed'] = true;
+  $streamContext = stream_context_create($context);
+
+  $handle = null;
+  $nErrorNo = null;
+  $strError = null;
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -141,7 +165,7 @@ function sessionWrite($strSessionID, $strSessionData)
       }
       else
       {
-        echo 'sessionWrite()->fread() error:  Failed to read response.';
+        echo 'sessionWrite()->fgets() error:  Failed to read response.';
       }
     }
     else
@@ -152,8 +176,10 @@ function sessionWrite($strSessionID, $strSessionData)
   }
   else
   {
-    echo 'sessionWrite()->fsockopen() error:  Failed to open socket connection to '.$GLOBALS['sess_server'].'.';
+    echo 'sessionWrite()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
+  unset($context);
+  unset($port);
   unset($request);
 
   return $bResult;
@@ -167,8 +193,19 @@ function sessionWrite($strSessionID, $strSessionData)
 function sessionDestroy($strSessionID)
 {
   $bResult = false;
+  $port = 12199;
 
-  if (($handle = fsockopen($GLOBALS['sess_server'], 12199)) !== false)
+  $context = array();
+  $context['ssl'] = array();
+  $context['ssl']['verify_peer'] = false;
+  $context['ssl']['verify_peer_name'] = false;
+  $context['ssl']['allow_self_signed'] = true;
+  $streamContext = stream_context_create($context);
+
+  $handle = null;
+  $nErrorNo = null;
+  $strError = null;
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -199,7 +236,7 @@ function sessionDestroy($strSessionID)
       }
       else
       {
-        echo 'sessionDestroy()->fread() error:  Failed to read response.';
+        echo 'sessionDestroy()->fgets() error:  Failed to read response.';
       }
     }
     else
@@ -210,10 +247,11 @@ function sessionDestroy($strSessionID)
   }
   else
   {
-    echo 'sessionDestroy()->fsockopen() error:  Failed to open socket connection to '.$GLOBALS['sess_server'].'.';
+    echo 'sessionDestroy()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
   }
+  unset($context);
+  unset($port);
   unset($request);
-
 
   return $bResult;
 }

@@ -65,7 +65,7 @@ extern "C++"
     {
       private:
       bool m_bSslInit;
-      mutex m_mutexConf;
+      std::mutex m_mutexConf;
       time_t m_ulModifyTime;
       File m_file;
 

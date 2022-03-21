@@ -67,8 +67,8 @@ extern "C++"
       bool m_bUseSingleSocket;
       map<int, wardenreqdata *> m_requests;
       size_t m_unUniqueID;
-      mutex m_mutexRequests;
-      mutex m_mutexUnique;
+      std::mutex m_mutexRequests;
+      std::mutex m_mutexUnique;
       string m_strApplication;
       string m_strTimeout;
       string m_strUnix;

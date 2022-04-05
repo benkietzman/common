@@ -46,20 +46,19 @@ function sessionClose()
 */
 function sessionRead($strSessionID)
 {
-  $port = 12199;
   $strResult = '';
 
   $context = array();
   $context['ssl'] = array();
+  $context['ssl']['allow_self_signed'] = true;
   $context['ssl']['verify_peer'] = false;
   $context['ssl']['verify_peer_name'] = false;
-  $context['ssl']['allow_self_signed'] = true;
   $streamContext = stream_context_create($context);
 
   $handle = null;
   $nErrorNo = null;
   $strError = null;
-  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -104,10 +103,9 @@ function sessionRead($strSessionID)
   }
   else
   {
-    echo 'sessionRead()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
+    echo 'sessionRead()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'.';
   }
   unset($context);
-  unset($port);
   unset($request);
   
   return $strResult;
@@ -122,7 +120,6 @@ function sessionRead($strSessionID)
 function sessionWrite($strSessionID, $strSessionData)
 {
   $bResult = false;
-  $port = 12199;
 
   $context = array();
   $context['ssl'] = array();
@@ -134,7 +131,7 @@ function sessionWrite($strSessionID, $strSessionData)
   $handle = null;
   $nErrorNo = null;
   $strError = null;
-  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -176,10 +173,9 @@ function sessionWrite($strSessionID, $strSessionData)
   }
   else
   {
-    echo 'sessionWrite()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
+    echo 'sessionWrite()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'.';
   }
   unset($context);
-  unset($port);
   unset($request);
 
   return $bResult;
@@ -193,7 +189,6 @@ function sessionWrite($strSessionID, $strSessionData)
 function sessionDestroy($strSessionID)
 {
   $bResult = false;
-  $port = 12199;
 
   $context = array();
   $context['ssl'] = array();
@@ -205,7 +200,7 @@ function sessionDestroy($strSessionID)
   $handle = null;
   $nErrorNo = null;
   $strError = null;
-  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
+  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -247,10 +242,9 @@ function sessionDestroy($strSessionID)
   }
   else
   {
-    echo 'sessionDestroy()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'(port '.$port.').';
+    echo 'sessionDestroy()->stream_socket_client() error:  Failed to open stream connection to '.$GLOBALS['sess_server'].'.';
   }
   unset($context);
-  unset($port);
   unset($request);
 
   return $bResult;

@@ -204,6 +204,30 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
     return this.m_strApplication;
   };
   // }}}
+  // {{{ getJwt()
+  factory.getJwt = function ()
+  {
+    var wsJwt = null;
+
+    if (this.m_bJwt)
+    {
+      if (this.m_wsJwt)
+      {
+        wsJwt = this.m_wsJwt;
+      }
+      else if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
+      {
+        wsJwt = this.m_sessionStorage.sl_wsJwt;
+      }
+      else if (angular.isDefined($cookies.get('sl_commonWsJwt')) && $cookies.get('sl_commonWsJwt'))
+      {
+        wsJwt = $cookies.get('sl_commonWsJwt');
+      }
+    }
+
+    return wsJwt;
+  };
+  // }}}
   // {{{ getRedirectPath()
   factory.getRedirectPath = function ()
   {

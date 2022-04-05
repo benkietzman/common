@@ -155,7 +155,7 @@ class Bridge
           }
           else
           {
-            $this->setError(var_dump(error_get_last()));
+            $this->setError('stream_socket_client() '.$strError);
           }
         }
         else
@@ -424,7 +424,7 @@ class Bridge
                 else
                 {
                   $bClose = $bExit = true;
-                  $strError = 'fread() '.var_dump(error_get_last());
+                  $strError = 'fread() Failed to read.');
                   $this->setError($strError);
                 }
               }
@@ -437,7 +437,7 @@ class Bridge
                 else
                 {
                   $bClose = $bExit = true;
-                  $strError = 'fwrite() '.var_dump(error_get_last());
+                  $strError = 'fwrite() Failed to write.');
                   $this->setError($strError);
                 }
               }
@@ -445,7 +445,7 @@ class Bridge
             else if ($nReturn === false)
             {
               $bClose = $bExit = true;
-              $strError = 'stream_select() '.var_dump(error_get_last());
+              $strError = 'stream_select() Failed to select.');
               $this->setError($strError);
             }
             else
@@ -666,7 +666,7 @@ class Bridge
               else
               {
                 $bExit = true;
-                $strError = 'fread() '.var_dump(error_get_last());
+                $strError = 'fread() Failed to read.');
                 $this->setError($strError);
               }
             }
@@ -679,7 +679,7 @@ class Bridge
               else
               {
                 $bExit = true;
-                $strError = 'fwrite() '.var_dump(error_get_last());
+                $strError = 'fwrite() Failed to write.');
                 $this->setError($strError);
 
               }
@@ -688,7 +688,7 @@ class Bridge
           else if ($nReturn === false)
           {
             $bExit = true;
-            $strError = 'stream_select() '.var_dump(error_get_last());
+            $strError = 'stream_select() Failed to select.');
             $this->setError($strError);
           }
           unset($readfds);
@@ -698,7 +698,7 @@ class Bridge
       }
       else
       {
-        $this->setError(var_dump(error_get_last()));
+        $this->setError('stream_socket_client() '.$strError);
       }
     }
     else

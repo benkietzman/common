@@ -187,7 +187,7 @@ class ChatBot
     }
     else
     {
-      $strError = 'stream_socket_shutdown() Failed to shutdown.');
+      $strError = 'stream_socket_shutdown() Failed to shutdown.';
     }
     $this->m_handle = false;
     unset($this->m_messages);
@@ -217,7 +217,7 @@ class ChatBot
     }
     else
     {
-      $strError = 'stream_socket_client() '.$strError);
+      $strError = 'stream_socket_client() '.$strError;
     }
 
     return $bResult;
@@ -400,7 +400,7 @@ class ChatBot
           }
           else
           {
-            $strError = 'fread() Failed to read.');
+            $strError = 'fread() Failed to read.';
           }
         }
         if (in_array($this->m_handle, $writefds))
@@ -412,13 +412,13 @@ class ChatBot
           }
           else
           {
-            $strError = 'fwrite() Failed to write.');
+            $strError = 'fwrite() Failed to write.';
           }
         }
       }
       else if ($nReturn === false)
       {
-        $strError = 'stream_select() Failed to select.');
+        $strError = 'stream_select() Failed to select.';
       }
       else
       {

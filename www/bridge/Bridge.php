@@ -424,7 +424,7 @@ class Bridge
                 else
                 {
                   $bClose = $bExit = true;
-                  $strError = 'fread() Failed to read.');
+                  $strError = 'fread() Failed to read.';
                   $this->setError($strError);
                 }
               }
@@ -437,7 +437,7 @@ class Bridge
                 else
                 {
                   $bClose = $bExit = true;
-                  $strError = 'fwrite() Failed to write.');
+                  $strError = 'fwrite() Failed to write.';
                   $this->setError($strError);
                 }
               }
@@ -445,7 +445,7 @@ class Bridge
             else if ($nReturn === false)
             {
               $bClose = $bExit = true;
-              $strError = 'stream_select() Failed to select.');
+              $strError = 'stream_select() Failed to select.';
               $this->setError($strError);
             }
             else
@@ -666,7 +666,7 @@ class Bridge
               else
               {
                 $bExit = true;
-                $strError = 'fread() Failed to read.');
+                $strError = 'fread() Failed to read.';
                 $this->setError($strError);
               }
             }
@@ -679,7 +679,7 @@ class Bridge
               else
               {
                 $bExit = true;
-                $strError = 'fwrite() Failed to write.');
+                $strError = 'fwrite() Failed to write.';
                 $this->setError($strError);
 
               }
@@ -688,7 +688,7 @@ class Bridge
           else if ($nReturn === false)
           {
             $bExit = true;
-            $strError = 'stream_select() Failed to select.');
+            $strError = 'stream_select() Failed to select.';
             $this->setError($strError);
           }
           unset($readfds);

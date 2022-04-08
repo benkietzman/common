@@ -1959,7 +1959,7 @@ extern "C++"
                   {
                     addrinfo *rp;
                     bConnected[0] = true;
-                    for (rp = result; !bConnected[5] && rp != NULL; rp = rp->ai_next)
+                    for (rp = result; !bConnected[3] && rp != NULL; rp = rp->ai_next)
                     {
                       bConnected[1] = bConnected[2] = false;
                       if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)

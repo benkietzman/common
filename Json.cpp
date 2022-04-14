@@ -887,10 +887,18 @@ extern "C++"
         {
           enum json_error nReturn;
           json_t *root = NULL;
+          strTrim = (string)"{\"json\":" + strTrim + (string)"}";
           if ((nReturn = json_parse_document(&root, (char *)strTrim.c_str())) == JSON_OK && root != NULL)
           {
             bResult = true;
             parse(root);
+            if (m.find("json") != m.end())
+            {
+              Json *ptJson = new Json(m["json"]);
+              clearMap();
+              merge(ptJson, true, false);
+              delete ptJson;
+            }
           }
           else
           {

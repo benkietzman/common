@@ -379,6 +379,10 @@ class Common
           let request = null;
           request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
           request.Request.Type = this.m_strLoginType;
+          if (window.localStorage.getItem('sl_uniqueID'))
+          {
+            request.Request.UniqueID = window.localStorage.getItem('sl_uniqueID');
+          }
           if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
           {
             request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
@@ -428,6 +432,10 @@ class Common
                     this.login.info = null;
                     if (this.wsResponse(response, error))
                     {
+                      if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                      {
+                        window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
+                      }
                       if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                       {
                         this.dispatchEvent('resetMenu', null);
@@ -563,6 +571,7 @@ class Common
                 this.m_auth = null;
                 this.m_auth = {admin: false, apps: {}};
                 window.localStorage.removeItem('sl_wsJwt');
+                window.localStorage.removeItem('sl_uniqueID');
                 this.dispatchEvent('resetMenu', null);
                 document.location.href = response.Response.Redirect;
               }
@@ -625,6 +634,7 @@ class Common
       if (this.m_bJwt)
       {
         window.localStorage.removeItem('sl_wsJwt');
+        window.localStorage.removeItem('sl_uniqueID');
       }
       this.dispatchEvent('resetMenu', null);
       document.location.href = this.m_strRedirectPath;
@@ -933,6 +943,7 @@ class Common
           this.m_auth = {admin: false, apps: {}};
           this.m_bSentJwt = false;
           window.localStorage.removeItem('sl_wsJwt');
+          window.localStorage.removeItem('sl_uniqueID');
           delete response.Error;
           delete response.wsJwt;
           delete response.wsRequestID;

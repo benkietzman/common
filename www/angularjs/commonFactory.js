@@ -31,7 +31,6 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   factory.m_strRequestPath = null;
   factory.m_strPrevMenu = 'Home';
   factory.m_strPrevSubMenu = null;
-  factory.m_strUniqueID = null;
   factory.m_strSubMenu = null;
   factory.m_submenu = null;
   factory.m_ws = {};

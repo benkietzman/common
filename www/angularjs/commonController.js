@@ -74,6 +74,10 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
         var request = null;
         request = {Section: 'secure', 'Function': 'process', Request: login};
         request.Request.Type = common.m_strLoginType;
+        if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+        {
+          request.Request.UniqueID = $cookies.get('sl_commonUniqueID');
+        }
         if (data)
         {
           request.Request.Data = data;
@@ -133,6 +137,10 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
                   $scope.info = null;
                   if (common.wsResponse(response, error))
                   {
+                    if (angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                    {
+                      $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
+                    }
                     if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                     {
                       $scope.$root.$broadcast('resetMenu', null);
@@ -294,6 +302,10 @@ controllers.Logout = function ($cookies, $location, $scope, common)
               {
                 $cookies.put('sl_commonWsJwt', '');
               }
+              if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+              {
+                $cookies.put('sl_commonUniqueID', '');
+              }
               $scope.$root.$broadcast('resetMenu', null);
               document.location.href = response.Response.Redirect;
             }
@@ -366,6 +378,10 @@ controllers.Logout = function ($cookies, $location, $scope, common)
       else
       {
         $cookies.put('sl_commonWsJwt', '');
+      }
+      if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+      {
+        $cookies.put('sl_commonUniqueID', '');
       }
     }
     $scope.$root.$broadcast('resetMenu', null);

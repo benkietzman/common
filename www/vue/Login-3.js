@@ -14,7 +14,11 @@ export default
   mounted()
   {
     common.setMenu('Login', null);
-    common.processLogin(null);
+    common.attachEvent('commonWsReady_' + common.application, (data) =>
+    {
+      common.processLogin();
+    });
+    common.processLogin();
   },
   // }}}
   // {{{ template

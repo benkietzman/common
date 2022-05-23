@@ -887,6 +887,7 @@ class Common
       // {{{ WebSocket::onopen()
       this.m_ws[strName].ws.onopen = (e) =>
       {
+        this.m_ws[strName].Connected = true;
         this.dispatchEvent('commonWsReady_' + this.application, null);
         this.dispatchEvent('commonWsReady_' + this.application + '_' + strName, null);
         this.m_ws[strName].Attempts = 1;
@@ -895,7 +896,6 @@ class Common
           this.m_ws[strName].modalInstance.close();
           this.m_ws[strName].modalInstance = null;
         }
-        this.m_ws[strName].Connected = true;
         this.auth();
       };
       // }}}
@@ -1128,7 +1128,7 @@ class Common
   // {{{ wsSend()
   wsSend(strName, strController, request)
   {
-    if (this.isDefined(this.m_ws[strName]))
+    if (this.isDefined(this.m_ws[strName]) && this.isDefined(this.m_ws[strName].Connected) && this.m_ws[strName].Connected)
     {
       request.reqApp = this.application;
       request.wsController = strController;

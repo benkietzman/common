@@ -1518,7 +1518,7 @@ class Central extends Secure
       $bFirst = true;
       if ($bOpen && $strDisplay != 'all')
       {
-        $strQuery .= (($bFirst)?' where':' and').' (close_date is null or date_format(close_date, \'%Y-%m-%d\') = \'0000-00-00\')';
+        $strQuery .= (($bFirst)?' where':' and').' close_date is null';
         $bFirst = false;
       }
       if ($strOpenDateStart != '')
@@ -1541,7 +1541,7 @@ class Central extends Secure
         $strQuery .= (($bFirst)?' where':' and').' date_format(close_date, \'%Y-%m-%d\') <= \''.$strCloseDateEnd.'\'';
         $bFirst = false;
       }
-      $strQuery .= ' order by (due_date is null or date_format(due_date, \'%Y-%m-%d\') = \'0000-00-00\'), due_date, priority desc, id';
+      $strQuery .= ' order by due_date is null, due_date, priority desc, id';
     }
     $getIssue = $this->m_centraldb->parse($strQuery);
     if ($getIssue->execute())
@@ -1641,7 +1641,7 @@ class Central extends Secure
 
     if (isset($request['application_id']) && $request['application_id'] != '')
     {
-      $getIssue = $this->m_centraldb->parse('select id, date_format(open_date, \'%Y-%m-%d\') open_date, date_format(close_date, \'%Y-%m-%d\') close_date, date_format(due_date, \'%Y-%m-%d\') due_date, hold, priority from application_issue where application_id = '.$request['application_id'].(($bOpen)?' and (close_date is null or date_format(close_date, \'%Y-%m-%d\') = \'0000-00-00\')':'').' order by close_date, open_date, id');
+      $getIssue = $this->m_centraldb->parse('select id, date_format(open_date, \'%Y-%m-%d\') open_date, date_format(close_date, \'%Y-%m-%d\') close_date, date_format(due_date, \'%Y-%m-%d\') due_date, hold, priority from application_issue where application_id = '.$request['application_id'].(($bOpen)?' and close_date is null':'').' order by close_date, open_date, id');
       if ($getIssue->execute())
       {
         $bResult = true;
@@ -2022,7 +2022,7 @@ class Central extends Secure
       $strQuery = 'select a.id, b.id application_id, b.name from application_server a, application b where a.application_id = b.id and a.server_id = '.$request['server_id'];
       if (!$bRetired)
       {
-        $strQuery .= ' and (b.retirement_date is null or date_format(b.retirement_date, \'%Y-%m-%d %H:%i:%s\') = \'0000-00-00 00:00:00\')';
+        $strQuery .= ' and b.retirement_date is null';
       }
       $strQuery .= ' order by b.name';
       $getApplication = $this->m_centraldb->parse($strQuery);

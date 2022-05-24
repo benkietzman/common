@@ -66,6 +66,8 @@ class Secure extends Basic
   protected $m_strLoginTitle;
   //! Stores the login type
   protected $m_strLoginType;
+  //! storage the unique prefix
+  protected $m_strUniquePrefix;
   //! Stores the module
   protected $m_module;
   //! Stores the database class instantiation
@@ -784,6 +786,16 @@ class Secure extends Basic
       $this->m_module = new $strLoginType(array('write'=>$this->m_db, 'read'=>$this->m_readdb), $this->m_strApplication, $this->m_bCheckAccount);
       $this->m_strLoginTitle = $this->m_module->getLoginTitle();
     }
+  }
+  // }}}
+  // {{{ setUniquePrefix()
+  /*! \fn setUniquePrefix($strPrefix)
+  * \brief Sets the unique prefix.
+  * \param $strUniquePrefix Contains the unique prefix.
+  */
+  public function setUniquePrefix($strPrefix)
+  {
+    $this->m_strUniquePrefix = $strPrefix;
   }
   // }}}
   // {{{ syslog()

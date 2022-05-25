@@ -39,6 +39,10 @@ if (!isset($wgCentralDatabase))
 {
   $wgCentralDatabase = 'central';
 }
+if (!isset($wgBasePath))
+{
+  $wgBasePath = '/wiki/';
+}
 if (!isset($wgReturnPath))
 {
   $wgReturnPath = null;
@@ -54,7 +58,7 @@ if (!$secure->isValid())
   $secure->processLogin($_POST, $strError);
   if ($secure->isValid())
   {
-    echo '<html><head><script type="text/javascript">document.location.href="'.(($strPassThru != '')?$strPassThru:'/wiki/').'";</script></head></html>';
+    echo '<html><head><script type="text/javascript">document.location.href="'.(($strPassThru != '')?$strPassThru:$strBasePath).'";</script></head></html>';
     exit();
   }
 }
@@ -62,11 +66,11 @@ if ($secure->isValid())
 {
   if ($strPassThru == '')
   {
-    $secure->logout('http'.((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')?'s':'').'://'.$_SERVER['SERVER_NAME'].'/wiki/');
+    $secure->logout('http'.((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')?'s':'').'://'.$_SERVER['SERVER_NAME'].$strBasePath);
     echo "<h1 class='center'>System Notification</h1>";
     echo "<p style='text-align:center;'>";
     echo "You have been logged out of the website.<br><br>";
-    echo "<a href='/wiki/login.php'>Login Again</a>";
+    echo "<a href='".$strBasePath."login.php'>Login Again</a>";
     echo "</p>";
   }
   else

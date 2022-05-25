@@ -50,6 +50,10 @@ if (!isset($wgCentralDatabase))
 {
   $wgCentralDatabase = 'central';
 }
+if (!isset($wgBasePath))
+{
+  $wgBasePath = '/wiki/';
+}
 if (!isset($wgReturnPath))
 {
   $wgReturnPath = null;
@@ -159,13 +163,13 @@ function AutoAuthenticateCentral($user)
           $secure->processLogin($_POST, $strError);
           if ($secure->isValid())
           {
-            echo '<html><head><script type="text/javascript">document.location.href="/wiki/";</script></head></html>';
+            echo '<html><head><script type="text/javascript">document.location.href="'.$wgBasePath.'";</script></head></html>';
             exit();
           }
         }
         if ($secure->isValid())
         {
-          echo '<html><head><script type="text/javascript">document.location.href="/wiki/";</script></head></html>';
+          echo '<html><head><script type="text/javascript">document.location.href="'.$wgBasePath.'";</script></head></html>';
           exit();
         }
         else

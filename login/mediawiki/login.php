@@ -51,7 +51,7 @@ $strPassThru = $secure->getParam('pass');
 if (!$secure->isValid())
 {
   $strError = null;
-  $secure->processLogin(null, $strError);
+  $secure->processLogin($_POST, $strError);
   if ($secure->isValid())
   {
     echo '<html><head><script type="text/javascript">document.location.href="'.(($strPassThru != '')?$strPassThru:'/wiki/').'";</script></head></html>';

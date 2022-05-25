@@ -39,9 +39,13 @@ if (!isset($wgCentralDatabase))
 {
   $wgCentralDatabase = 'central';
 }
+if (!isset($wgReturnPath))
+{
+  $wgReturnPath = null;
+}
 session_name($wgSessionName);
 session_start();
-$secure = new Secure($wgCentralUser, $wgCentralPassword, $wgCentralHost, $wgCentralDatabase);
+$secure = new Secure($wgCentralUser, $wgCentralPassword, $wgCentralHost, $wgCentralDatabase, $wgReturnPath);
 $secure->setApplication($wgCentralSite);
 $strPassThru = $secure->getParam('pass');
 if (!$secure->isValid())

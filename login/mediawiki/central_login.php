@@ -156,7 +156,7 @@ function AutoAuthenticateCentral($user)
         if (!$secure->isValid())
         {
           $strError = null;
-          $secure->processLogin(null, $strError);
+          $secure->processLogin($_POST, $strError);
           if ($secure->isValid())
           {
             echo '<html><head><script type="text/javascript">document.location.href="/wiki/";</script></head></html>';

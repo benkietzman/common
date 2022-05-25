@@ -43,13 +43,14 @@ class bk_Windows
   private $m_junction;
   // }}}
   // {{{ __construct()
-  /*! \fn __construct($db = null, $strApplication = null, $bCheckAccount = true)
+  /*! \fn __construct($db = null, $strApplication = null, $bCheckAccount = true, $strReturnPath = null)
   * \brief Instantiates the member variables.
   * \param $db Contains the database handle.
   * \param $strApplication Contains the application name.
   * \param $bCheckAccount Determines whether to perform an account check.
+  * \param $strReturnPath Contains the return path of the resultant data.
   */
-  public function __construct($db = null, $strApplication = null, $bCheckAccount = true)
+  public function __construct($db = null, $strApplication = null, $bCheckAccount = true, $strReturnPath = null)
   {
     if (is_array($db))
     {

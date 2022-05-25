@@ -66,6 +66,8 @@ class Secure extends Basic
   protected $m_strLoginTitle;
   //! Stores the login type
   protected $m_strLoginType;
+  //! Stores the return path of the resultant data
+  protected $m_strReturnPath;
   //! storage the unique prefix
   protected $m_strUniquePrefix;
   //! Stores the module
@@ -80,14 +82,15 @@ class Secure extends Basic
   private $m_syslog;
   // }}}
   // {{{ __construct()
-  /*! \fn __construct($strUser, $strPassword, $strHost, $strDB)
+  /*! \fn __construct($strUser, $strPassword, $strHost, $strDB, $strReturnPath = 'secure')
   * \brief Instantiates the member variables.
   * \param $strUser Contains the database user.
   * \param $strPassword Contains the database password.
   * \param $strHost Contains the database host.
   * \param $strDB Contains the database name.
+  * \param $strReturnPath Contains the return path of the resultant data.
   */
-  public function __construct($strUser = 'central', $strPassword = 'central', $strHost = 'localhost', $strDB = 'central')
+  public function __construct($strUser = 'central', $strPassword = 'central', $strHost = 'localhost', $strDB = 'central', $strReturnPath = 'secure')
   {
     parent::__construct();
     $this->m_bCheckAccount = true;
@@ -127,6 +130,7 @@ class Secure extends Basic
     $this->m_junction->useSecureJunction(false);
     $this->m_junction->setApplication('Common');
     $this->m_syslog = new Syslog('Common Library', 'Secure.php');
+    $this->m_strReturnPath = $strReturnPath;
   }
   // }}}
   // {{{ __destruct()
@@ -783,7 +787,7 @@ class Secure extends Basic
       unset($this->m_module);
       $this->m_strLoginType = $strLoginType;
       $strLoginType = 'bk_'.$strLoginType;
-      $this->m_module = new $strLoginType(array('write'=>$this->m_db, 'read'=>$this->m_readdb), $this->m_strApplication, $this->m_bCheckAccount);
+      $this->m_module = new $strLoginType(array('write'=>$this->m_db, 'read'=>$this->m_readdb), $this->m_strApplication, $this->m_bCheckAccount, $this->m_strReturnPath);
       $this->m_strLoginTitle = $this->m_module->getLoginTitle();
     }
   }

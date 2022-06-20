@@ -192,7 +192,7 @@ class Terminal extends Bridge
         {
           if (in_array($this->m_handle, $readfds))
           {
-            if (($strData = fread($this->m_handle, 1024)) !== false)
+            if (($strData = fread($this->m_handle, 65536)) !== false)
             {
               if ($strData != '')
               {

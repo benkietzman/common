@@ -528,7 +528,7 @@ extern "C++"
                   bClose = bExit = true;
                   if (m_ssl != NULL)
                   {
-                    ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror();
+                    ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror(m_ssl, nReturn);
                   }
                   else
                   {
@@ -545,7 +545,7 @@ extern "C++"
                   bClose = bExit = true;
                   if (m_ssl != NULL)
                   {
-                    ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " <<  utility()->sslstrerror();
+                    ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " <<  utility()->sslstrerror(m_ssl, nReturn);
                   }
                   else
                   {
@@ -795,7 +795,7 @@ extern "C++"
                       stringstream ssError;
                       if (ssl != NULL)
                       {
-                        ssError << "Central::utility()->sslRead(" << SSL_get_error(ssl, nReturn) << ") error [" << fdSocket << "]:  " << utility()->sslstrerror();
+                        ssError << "Central::utility()->sslRead(" << SSL_get_error(ssl, nReturn) << ") error [" << fdSocket << "]:  " << utility()->sslstrerror(ssl, nReturn);
                       }
                       else
                       {
@@ -815,7 +815,7 @@ extern "C++"
                       stringstream ssError;
                       if (ssl != NULL)
                       {
-                        ssError << "Central::utility()->sslWrite(" << SSL_get_error(ssl, nReturn) << ") error [" << fdSocket << "]:  " <<  utility()->sslstrerror();
+                        ssError << "Central::utility()->sslWrite(" << SSL_get_error(ssl, nReturn) << ") error [" << fdSocket << "]:  " <<  utility()->sslstrerror(ssl, nReturn);
                       }
                       else
                       {

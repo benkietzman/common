@@ -697,7 +697,7 @@ class Bridge
       }
       else
       {
-        $this->setError('stream_socket_client() '.$strError);
+        $this->setError('stream_socket_client('.$nErrorNo.') '.$strError);
       }
     }
     else

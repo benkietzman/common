@@ -681,7 +681,6 @@ class Bridge
                 $bExit = true;
                 $strError = 'fwrite() Failed to write.';
                 $this->setError($strError);
-
               }
             }
           }

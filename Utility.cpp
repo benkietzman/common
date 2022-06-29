@@ -700,9 +700,8 @@ extern "C++"
     // {{{ sslWrite()
     bool Utility::sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
     {
-      bool bBlocking = false, bResult = true, bRetry = true;
+      bool bBlocking = false, bResult = true;
       long lArg, lArgOrig;
-      size_t unAttempts = 0;
 
       if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
       {
@@ -710,24 +709,17 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      while (bRetry && unAttempts++ < 5)
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 65536)?strBuffer.size():65536))) > 0)
       {
-        bResult = true;
-        bRetry = false;
-        if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 65536)?strBuffer.size():65536))) > 0)
+        strBuffer.erase(0, nReturn);
+      }
+      else
+      {
+        switch (SSL_get_error(ssl, nReturn))
         {
-          strBuffer.erase(0, nReturn);
-        }
-        else
-        {
-          switch (SSL_get_error(ssl, nReturn))
-          {
-            case SSL_ERROR_WANT_READ:
-            case SSL_ERROR_WANT_WRITE: bResult = false; bRetry = true; break;
-            case SSL_ERROR_ZERO_RETURN:
-            case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL: bResult = false; break;
-          }
+          case SSL_ERROR_ZERO_RETURN:
+          case SSL_ERROR_SYSCALL:
+          case SSL_ERROR_SSL: bResult = false; break;
         }
       }
       if (bBlocking)

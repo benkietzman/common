@@ -102,7 +102,7 @@ class Common
       if (window.localStorage.getItem('sl_wsJwt'))
       {
         let request = {Interface: 'secure', Section: 'secure', 'Function': 'auth', wsJwt: window.localStorage.getItem('sl_wsJwt'), Request: {}};
-        this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+        this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
         {
           let error = {};
           if (this.wsResponse(response, error))
@@ -119,7 +119,7 @@ class Common
                 this.m_bConnecting = true;
                 let request = {Section: 'bridge', 'Function': 'connect'};
                 request.Request = {};
-                this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+                this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                 {
                   let error = {};
                   if (this.wsResponse(response, error))
@@ -135,7 +135,7 @@ class Common
               this.m_bConnecting = true;
               let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
               request.Request = {};
-              this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+              this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
               {
                 this.m_wsRequestID = null;
                 this.m_bConnecting = false;
@@ -356,7 +356,7 @@ class Common
     {
       let request = null;
       request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-      this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+      this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
         if (this.m_strLoginType == null)
         {
@@ -388,7 +388,7 @@ class Common
           {
             request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
           }
-          this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+          this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
             var error = {};
             if (this.wsResponse(response, error))
@@ -427,7 +427,7 @@ class Common
                 {
                   var request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
                   request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                  this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+                  this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                   {
                     var error = {};
                     this.login.info = null;
@@ -548,7 +548,7 @@ class Common
       {
         let request = null;
         request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-        this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+        this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
         {
           if (this.m_strLoginType == null)
           {
@@ -560,7 +560,7 @@ class Common
           }
           var request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
           request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
-          this.wsRequest(this.m_strAutProtocol, request).then((response) =>
+          this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
             var error = {};
             this.logout.info = null;
@@ -941,7 +941,7 @@ class Common
       this.m_ws[strName].ws.onmessage = (e) =>
       {
         let response = JSON.parse(e.data);
-        if (this.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error = 'Failed: exp')))
+        if (this.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error == 'Failed: exp')))
         {
           response.Error.Message = 'Session expired.  Please login again.';
           this.m_auth = null;

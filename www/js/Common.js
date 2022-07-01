@@ -20,6 +20,7 @@ class Common
     this.m_auth = {};
     this.m_messages = [];
     this.m_store = {};
+    this.m_strAuthProtocol = null;
     this.m_strLoginType = null;
     this.m_ws = {};
     this.menu = {left: [], right: []};
@@ -100,8 +101,8 @@ class Common
     {
       if (window.localStorage.getItem('sl_wsJwt'))
       {
-        let request = {Section: 'secure', 'Function': 'auth', wsJwt: window.localStorage.getItem('sl_wsJwt'), Request: {}};
-        this.wsRequest('bridge', request).then((response) =>
+        let request = {Interface: 'secure', Section: 'secure', 'Function': 'auth', wsJwt: window.localStorage.getItem('sl_wsJwt'), Request: {}};
+        this.wsRequest(this.m_strAutProtocol, request).then((response) =>
         {
           let error = {};
           if (this.wsResponse(response, error))
@@ -118,7 +119,7 @@ class Common
                 this.m_bConnecting = true;
                 let request = {Section: 'bridge', 'Function': 'connect'};
                 request.Request = {};
-                this.wsRequest('bridge', request).then((response) =>
+                this.wsRequest(this.m_strAutProtocol, request).then((response) =>
                 {
                   let error = {};
                   if (this.wsResponse(response, error))
@@ -134,7 +135,7 @@ class Common
               this.m_bConnecting = true;
               let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
               request.Request = {};
-              this.wsRequest('bridge', request).then((response) =>
+              this.wsRequest(this.m_strAutProtocol, request).then((response) =>
               {
                 this.m_wsRequestID = null;
                 this.m_bConnecting = false;
@@ -354,8 +355,8 @@ class Common
     if (this.m_bJwt)
     {
       let request = null;
-      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-      this.wsRequest('bridge', request).then((response) =>
+      request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      this.wsRequest(this.m_strAutProtocol, request).then((response) =>
       {
         if (this.m_strLoginType == null)
         {
@@ -377,7 +378,7 @@ class Common
         .then((response) =>
         {
           let request = null;
-          request = {Section: 'secure', 'Function': 'process', Request: this.login.login};
+          request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.login.login};
           request.Request.Type = this.m_strLoginType;
           if (window.localStorage.getItem('sl_uniqueID'))
           {
@@ -387,7 +388,7 @@ class Common
           {
             request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
           }
-          this.wsRequest('bridge', request).then((response) =>
+          this.wsRequest(this.m_strAutProtocol, request).then((response) =>
           {
             var error = {};
             if (this.wsResponse(response, error))
@@ -424,9 +425,9 @@ class Common
                 }
                 else
                 {
-                  var request = {Section: 'secure', 'Function': 'login'};
+                  var request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
                   request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                  this.wsRequest('bridge', request).then((response) =>
+                  this.wsRequest(this.m_strAutProtocol, request).then((response) =>
                   {
                     var error = {};
                     this.login.info = null;
@@ -546,8 +547,8 @@ class Common
       if (this.m_bJwt)
       {
         let request = null;
-        request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-        this.wsRequest('bridge', request).then((response) =>
+        request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+        this.wsRequest(this.m_strAutProtocol, request).then((response) =>
         {
           if (this.m_strLoginType == null)
           {
@@ -557,9 +558,9 @@ class Common
               this.m_strLoginType = response.Response.Module;
             }
           }
-          var request = {Section: 'secure', 'Function': 'logout'};
+          var request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
           request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
-          this.wsRequest('bridge', request).then((response) =>
+          this.wsRequest(this.m_strAutProtocol, request).then((response) =>
           {
             var error = {};
             this.logout.info = null;
@@ -880,6 +881,10 @@ class Common
       this.m_ws[strName].Connected = false;
       this.m_ws[strName].Port = strPort;
       this.m_ws[strName].Protocol = strProtocol;
+      if (this.m_strAuthProtocol == null || strProtocol == 'radial')
+      {
+        this.m_strAuthProtocol = strProtocol;
+      }
       this.m_ws[strName].Secure = bSecure;
       this.m_ws[strName].Server = strServer;
       this.m_ws[strName].Unique = 0;
@@ -936,7 +941,7 @@ class Common
       this.m_ws[strName].ws.onmessage = (e) =>
       {
         let response = JSON.parse(e.data);
-        if (this.m_bJwt && strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp')
+        if (this.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error = 'Failed: exp')))
         {
           response.Error.Message = 'Session expired.  Please login again.';
           this.m_auth = null;
@@ -952,11 +957,11 @@ class Common
           this.dispatchEvent('commonAuthReady', null);
           this.dispatchEvent('resetMenu', null);
         }
-        else if (!this.m_bJwt && strProtocol == 'bridge' && this.m_ws[strName].SetBridgeCredentials && this.m_ws[strName].SetBridgeCredentials.Script && this.m_ws[strName].SetBridgeCredentials.Script.length > 0 && this.m_ws[strName].SetBridgeCredentials['Function'] && this.m_ws[strName].SetBridgeCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && ((response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Your access has been denied.') || (response.Error.SubType == 'requestSocket' && response.Error.Message && response.Error.Message == 'Please provide the User.')))
+        else if (!this.m_bJwt && ((strProtocol == 'bridge' && this.m_ws[strName].SetBridgeCredentials && this.m_ws[strName].SetBridgeCredentials.Script && this.m_ws[strName].SetBridgeCredentials.Script.length > 0 && this.m_ws[strName].SetBridgeCredentials['Function'] && this.m_ws[strName].SetBridgeCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && ((response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Your access has been denied.') || (response.Error.SubType == 'requestSocket' && response.Error.Message && response.Error.Message == 'Please provide the User.'))) || (strProtocol == 'radial' && this.m_ws[strName].SetRadialCredentials && this.m_ws[strName].SetRadialCredentials.Script && this.m_ws[strName].SetRadialCredentials.Script.length > 0 && this.m_ws[strName].SetRadialCredentials['Function'] && this.m_ws[strName].SetRadialCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && (response.Error == 'Your access has been denied.' || response.Error == 'Please provide the User.'))))
         {
           if (this.isCookie('PHPSESSID'))
           {
-            if (!this.m_bSetBridgeCredentials)
+            if (strProtocol == 'bridge' && !this.m_bSetBridgeCredentials)
             {
               this.m_bSetBridgeCredentials = true;
               fetch(this.m_ws[strName].SetBridgeCredentials['Script'],
@@ -972,6 +977,24 @@ class Common
               .then((response) =>
               {
                 this.m_bSetBridgeCredentials = false;
+              });
+            }
+            else if (strProtocol == 'radial' && !this.m_bSetRadialCredentials)
+            {
+              this.m_bSetRadialCredentials = true;
+              fetch(this.m_ws[strName].SetRadialCredentials['Script'],
+              {
+                method: 'POST',
+                headers:
+                {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'Function': this.m_ws[strName].SetRadialCredentials['Function']})
+              })
+              .then(response => response.json())
+              .then((response) =>
+              {
+                this.m_bSetRadialCredentials = false;
               });
             }
             delete response.Error;
@@ -1164,6 +1187,16 @@ class Common
       this.m_ws[strName] = {};
     }
     this.m_ws[strName].SetBridgeCredentials = {Script: strScript, 'Function': strFunction};
+  }
+  // }}}
+  // {{{ wsSetRadialCredentials()
+  wsSetRadialCredentials(strName, strScript, strFunction)
+  {
+    if (!this.isDefined(this.m_ws[strName]))
+    {
+      this.m_ws[strName] = {};
+    }
+    this.m_ws[strName].SetRadialCredentials = {Script: strScript, 'Function': strFunction};
   }
   // }}}
   // {{{ wsUnique()

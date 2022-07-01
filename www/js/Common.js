@@ -374,10 +374,10 @@ class Common
             'Content-Type': 'application/json'
           }
         })
-        .then(response => response.json())
         .then((response) =>
         {
           let request = null;
+          response = response.json();
           request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.login.login};
           request.Request.Type = this.m_strLoginType;
           if (window.localStorage.getItem('sl_uniqueID'))
@@ -433,14 +433,17 @@ class Common
                     this.login.info = null;
                     if (this.wsResponse(response, error))
                     {
-                      if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                      if (common.isDefined(response.Response))
                       {
-                        window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
-                      }
-                      if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
-                      {
-                        this.dispatchEvent('resetMenu', null);
-                        document.location.href = response.Response.Redirect;
+                        if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                        {
+                          window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
+                        }
+                        if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                        {
+                          this.dispatchEvent('resetMenu', null);
+                          document.location.href = response.Response.Redirect;
+                        }
                       }
                     }
                     else

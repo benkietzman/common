@@ -597,6 +597,10 @@ class Secure extends Basic
   {
     $bResult = false;
 
+    if ($request == null && isset($_POST))
+    {
+      $request = $_POST;
+    }
     $getApplication = $this->m_readdb->parse('select * from application where name = \''.$this->m_strApplication.'\'');
     if ($getApplication->execute())
     {

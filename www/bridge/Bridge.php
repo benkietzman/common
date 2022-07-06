@@ -350,6 +350,19 @@ class Bridge
             $errorfds = null;
             if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
             {
+              if (in_array($this->m_handle, $writefds))
+              {
+                if (($nReturn = fwrite($this->m_handle, $this->m_strBuffer[1])) !== false)
+                {
+                  $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
+                }
+                else
+                {
+                  $bClose = $bExit = true;
+                  $strError = 'fwrite() Failed to write.';
+                  $this->setError($strError);
+                }
+              }
               if (in_array($this->m_handle, $readfds))
               {
                 if (($strBuffer = fread($this->m_handle, 65536)) !== false)
@@ -425,19 +438,6 @@ class Bridge
                 {
                   $bClose = $bExit = true;
                   $strError = 'fread() Failed to read.';
-                  $this->setError($strError);
-                }
-              }
-              if (in_array($this->m_handle, $writefds))
-              {
-                if (($nReturn = fwrite($this->m_handle, $this->m_strBuffer[1])) !== false)
-                {
-                  $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
-                }
-                else
-                {
-                  $bClose = $bExit = true;
-                  $strError = 'fwrite() Failed to write.';
                   $this->setError($strError);
                 }
               }
@@ -614,6 +614,19 @@ class Bridge
           $errorfds = null;
           if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
           {
+            if (in_array($handle, $writefds))
+            {
+              if (($nReturn = fwrite($handle, $strBuffer[1])) !== false)
+              {
+                $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
+              }
+              else
+              {
+                $bExit = true;
+                $strError = 'fwrite() Failed to write.';
+                $this->setError($strError);
+              }
+            }
             if (in_array($handle, $readfds))
             {
               if (($strData = fread($handle, 65536)) !== false)
@@ -667,19 +680,6 @@ class Bridge
               {
                 $bExit = true;
                 $strError = 'fread() Failed to read.';
-                $this->setError($strError);
-              }
-            }
-            if (in_array($handle, $writefds))
-            {
-              if (($nReturn = fwrite($handle, $strBuffer[1])) !== false)
-              {
-                $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
-              }
-              else
-              {
-                $bExit = true;
-                $strError = 'fwrite() Failed to write.';
                 $this->setError($strError);
               }
             }

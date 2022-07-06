@@ -371,6 +371,18 @@ class ChatBot
       $errorfds = null;
       if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, ($nTimeout * 1000))) > 0)
       {
+        if (in_array($this->m_handle, $writefds))
+        {
+          if (($nReturn = fwrite($this->m_handle, $this->m_strBuffer[1])) !== false)
+          {
+            $bResult = true;
+            $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
+          }
+          else
+          {
+            $strError = 'fwrite() Failed to write.';
+          }
+        }
         if (in_array($this->m_handle, $readfds))
         {
           if (($strBuffer = fread($this->m_handle, 65536)) !== false)
@@ -401,18 +413,6 @@ class ChatBot
           else
           {
             $strError = 'fread() Failed to read.';
-          }
-        }
-        if (in_array($this->m_handle, $writefds))
-        {
-          if (($nReturn = fwrite($this->m_handle, $this->m_strBuffer[1])) !== false)
-          {
-            $bResult = true;
-            $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
-          }
-          else
-          {
-            $strError = 'fwrite() Failed to write.';
           }
         }
       }

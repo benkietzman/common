@@ -190,6 +190,18 @@ class Terminal extends Bridge
         $errorfds = null;
         if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
         {
+          if (in_array($this->m_handle, $writefds))
+          {
+            if (($nReturn = fwrite($this->m_handle, $strBuffer[1])) !== false)
+            {
+              $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
+            }
+            else
+            {
+              $bClose = $bExit = true;
+              $this->setError('fwrite() Failed to write.');
+            }
+          }
           if (in_array($this->m_handle, $readfds))
           {
             if (($strData = fread($this->m_handle, 65536)) !== false)
@@ -247,18 +259,6 @@ class Terminal extends Bridge
             {
               $bClose = $bExit = true;
               $this->setError('fread() Failed to read.');
-            }
-          }
-          if (in_array($this->m_handle, $writefds))
-          {
-            if (($nReturn = fwrite($this->m_handle, $strBuffer[1])) !== false)
-            {
-              $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
-            }
-            else
-            {
-              $bClose = $bExit = true;
-              $this->setError('fwrite() Failed to write.');
             }
           }
         }

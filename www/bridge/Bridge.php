@@ -642,6 +642,18 @@ class Bridge
           $errorfds = null;
           if (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
           {
+            if (in_array($fdSocket, $writefds))
+            {
+              if (($nReturn = socket_write($fdSocket, $strBuffer[1])) !== false)
+              {
+                $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
+              }
+              else
+              {
+                $bExit = true;
+                $this->setError(socket_strerror(socket_last_error()));
+              }
+            }
             if (in_array($fdSocket, $readfds))
             {
               if (($strData = socket_read($fdSocket, 65536)) !== false)
@@ -690,18 +702,6 @@ class Bridge
                 {
                   $bExit = true;
                 }
-              }
-              else
-              {
-                $bExit = true;
-                $this->setError(socket_strerror(socket_last_error()));
-              }
-            }
-            if (in_array($fdSocket, $writefds))
-            {
-              if (($nReturn = socket_write($fdSocket, $strBuffer[1])) !== false)
-              {
-                $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
               }
               else
               {

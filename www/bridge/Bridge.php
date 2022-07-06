@@ -614,9 +614,9 @@ class Bridge
           $errorfds = null;
           if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
           {
-            if (in_array($handle, $writefds))
+            if (in_array($fdSocket, $writefds))
             {
-              if (($nReturn = fwrite($handle, $strBuffer[1])) !== false)
+              if (($nReturn = socket_write($fdSocket, $strBuffer[1])) !== false)
               {
                 $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
               }

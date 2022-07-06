@@ -455,6 +455,12 @@ class Central extends Secure
           $strQuery .= 'aes_decrypt(from_base64(password), sha2(\''.addslashes($request['aes']).'\', 512)) decrypted_password, ';
         }
         $strQuery .= 'type_id, description from application_account where application_id = '.$request['application_id'].' order by user_id';
+        if (isset($request['page']))
+        {
+          $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+          $nOffset = $request['page'] * $nNumPerPage;
+          $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+        }
         $getAccount = $this->m_centraldb->parse($strQuery);
         if ($getAccount->execute())
         {
@@ -578,6 +584,194 @@ class Central extends Secure
     else
     {
       $strError = 'You are not authorized to perform this action.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLink()
+  public function applicationBotLink($request, &$response, &$strError)
+  { 
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['id']) && $request['id'] != '')
+    {
+      $getApplicationBotLink = $this->m_centraldb->parse('select id, application_id, chat_room, bot_link_remote_system_id, remote_chat_room from application_bot_link where id = '.$request['id']);
+      if ($getApplicationBotLink->execute())
+      {
+        $bResult = true;
+        if (($getApplicationBotLinkRow = $getApplicationBotLink->fetch('assoc')))
+        {
+          $botlinkRemoteSystemRequest = array('id'=>$getApplicationBotLinkRow['bot_link_remote_system_id']);
+          $botlinkRemoteSystemResponse = null;
+          if ($this->botLinkRemoteSystem($botlinkRemoteSystemRequest, $botlinkRemoteSystemResponse, $strError))
+          {
+            $getApplicationBotLinkRow['bot_link_remote_system'] = $botlinkRemoteSystemResponse;
+          }
+          unset($botlinkRemoteSystemRequest);
+          unset($botlinkRemoteSystemResponse);
+          $response = $getApplicationBotLinkRow;
+        }
+      }
+      else
+      {
+        $strError = $getApplicationBotLink->getError();
+      }
+      $this->m_centraldb->free($getApplicationBotLink);
+    }
+    else
+    {
+      $strError = 'Please provide the id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLinkAdd()
+  public function applicationBotLinkAdd($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['application_id']) && $request['application_id'] != '')
+    {
+      $applicationrequest = array('id'=>$request['application_id']);
+      $applicationresponse = null;
+      if ($this->application($applicationrequest, $applicationresponse, $strError))
+      {
+        $devrequest = array('id'=>$request['application_id']);
+        $devresponse = null;
+        if ($this->isGlobalAdmin() || $this->isApplicationDeveloper($devrequest, $devresponse, $strError))
+        {
+          if (isset($request['chat_room']) && $request['chat_room'] != '')
+          {
+            if (isset($request['bot_link_remote_system']) && is_array($request['bot_link_remote_system']) && isset($request['bot_link_remote_system']['id']) && $request['bot_link_remote_system']['id'] != '')
+            {
+              if (isset($request['remote_chat_room']) && $request['remote_chat_room'] != '')
+              {
+                $insertApplicationBotLink = $this->m_centraldb->parse('insert into application_bot_link (application_id, chat_room, bot_link_remote_system_id, remote_chat_room) values ('.$request['application_id'].', \''.addslashes($request['chat_room']).'\', '.$request['bot_link_remote_system']['id'].', \''.addslashes($request['remote_chat_room']).'\')');
+                if ($insertApplicationBotLink->execute())
+                {
+                  $bResult = true;
+                }
+                else
+                {
+                  $strError = $insertApplicationBotLink->getError();
+                }
+              }
+              else
+              {
+                $strError = 'Please provide the remote_chat_room.';
+              }
+            }
+            else
+            {
+              $strError = 'Please provide the bot_link_remote_system.id.';
+            }
+          }
+          else
+          {
+            $strError = 'Please provide the chat_room.';
+          }
+        }
+        else
+        {
+          $strError = 'You are not authorized to perform this action.';
+        }
+        unset($devrequest);
+        unset($devresponse);
+      }
+      unset($applicationrequest);
+      unset($applicationresponse);
+    }
+    else
+    {
+      $strError = 'Please provide the application_id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLinkRemove()
+  public function applicationBotLinkRemove($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['id']) && $request['id'] != '')
+    {
+      $applicationbotlinkrequest = array('id'=>$request['id']);
+      $applicationbotlinkresponse = null;
+      if ($this->applicationBotLink($applicationbotlinkrequest, $applicationbotlinkresponse, $strError))
+      {
+        $devrequest = array('id'=>$applicationbotlinkresponse['application_id']);
+        $devresponse = null;
+        if ($this->isGlobalAdmin() || $this->isApplicationDeveloper($devrequest, $devresponse, $strError))
+        {
+          $deleteApplicationBotLink = $this->m_centraldb->parse('delete from application_bot_link where id = '.$request['id']);
+          if ($deleteApplicationBotLink->execute())
+          {
+            $bResult = true;
+          }
+          else
+          {
+            $strError = $deleteApplicationBotLink->getError();
+          }
+        }
+        else
+        {
+          $strError = 'You are not authorized to perform this action.';
+        }
+        unset($devrequest);
+        unset($devresponse);
+      }
+      unset($applicationbotlinkrequest);
+      unset($applicationbotlinkresponse);
+    }
+    else
+    {
+      $strError = 'Please provide the id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ applicationBotLinksByApplicationID()
+  public function applicationBotLinksByApplicationID($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    if (isset($request['application_id']) && $request['application_id'] != '')
+    {
+      $getApplicationBotLink = $this->m_centraldb->parse('select id, application_id, chat_room, bot_link_remote_system_id, remote_chat_room from application_bot_link where application_id = '.$request['application_id']);
+      if ($getApplicationBotLink->execute())
+      {
+        $bResult = true;
+        $response = array();
+        while (($getApplicationBotLinkRow = $getApplicationBotLink->fetch('assoc')))
+        {
+          $botlinkRemoteSystemRequest = array('id'=>$getApplicationBotLinkRow['bot_link_remote_system_id']);
+          $botlinkRemoteSystemResponse = null;
+          if ($this->botLinkRemoteSystem($botlinkRemoteSystemRequest, $botlinkRemoteSystemResponse, $strError))
+          {
+            $getApplicationBotLinkRow['bot_link_remote_system'] = $botlinkRemoteSystemResponse;
+          }
+          unset($botlinkRemoteSystemRequest);
+          unset($botlinkRemoteSystemResponse);
+          $response[] = $getApplicationBotLinkRow;
+        }
+      }
+      else
+      {
+        $strError = $getApplicationBotLink->getError();
+      }
+      $this->m_centraldb->free($getApplicationBotLink);
+    }
+    else
+    {
+      $strError = 'Please provide the application_id.';
     }
 
     return $bResult;
@@ -1324,7 +1518,7 @@ class Central extends Secure
       $bFirst = true;
       if ($bOpen && $strDisplay != 'all')
       {
-        $strQuery .= (($bFirst)?' where':' and').' (close_date is null or date_format(close_date, \'%Y-%m-%d\') = \'0000-00-00\')';
+        $strQuery .= (($bFirst)?' where':' and').' close_date is null';
         $bFirst = false;
       }
       if ($strOpenDateStart != '')
@@ -1347,7 +1541,7 @@ class Central extends Secure
         $strQuery .= (($bFirst)?' where':' and').' date_format(close_date, \'%Y-%m-%d\') <= \''.$strCloseDateEnd.'\'';
         $bFirst = false;
       }
-      $strQuery .= ' order by (due_date is null or date_format(due_date, \'%Y-%m-%d\') = \'0000-00-00\'), due_date, priority desc, id';
+      $strQuery .= ' order by due_date is null, due_date, priority desc, id';
     }
     $getIssue = $this->m_centraldb->parse($strQuery);
     if ($getIssue->execute())
@@ -1447,7 +1641,7 @@ class Central extends Secure
 
     if (isset($request['application_id']) && $request['application_id'] != '')
     {
-      $getIssue = $this->m_centraldb->parse('select id, date_format(open_date, \'%Y-%m-%d\') open_date, date_format(close_date, \'%Y-%m-%d\') close_date, date_format(due_date, \'%Y-%m-%d\') due_date, hold, priority from application_issue where application_id = '.$request['application_id'].(($bOpen)?' and (close_date is null or date_format(close_date, \'%Y-%m-%d\') = \'0000-00-00\')':'').' order by close_date, open_date, id');
+      $getIssue = $this->m_centraldb->parse('select id, date_format(open_date, \'%Y-%m-%d\') open_date, date_format(close_date, \'%Y-%m-%d\') close_date, date_format(due_date, \'%Y-%m-%d\') due_date, hold, priority from application_issue where application_id = '.$request['application_id'].(($bOpen)?' and close_date is null':'').' order by close_date, open_date, id');
       if ($getIssue->execute())
       {
         $bResult = true;
@@ -1770,6 +1964,12 @@ class Central extends Secure
       }
     }
     $strQuery .= ' order by name';
+    if (isset($request['page']))
+    {
+      $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+      $nOffset = $request['page'] * $nNumPerPage;
+      $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+    }
     $getApplication = $this->m_centraldb->parse($strQuery);
     if ($getApplication->execute())
     {
@@ -1822,7 +2022,7 @@ class Central extends Secure
       $strQuery = 'select a.id, b.id application_id, b.name from application_server a, application b where a.application_id = b.id and a.server_id = '.$request['server_id'];
       if (!$bRetired)
       {
-        $strQuery .= ' and (b.retirement_date is null or date_format(b.retirement_date, \'%Y-%m-%d %H:%i:%s\') = \'0000-00-00 00:00:00\')';
+        $strQuery .= ' and b.retirement_date is null';
       }
       $strQuery .= ' order by b.name';
       $getApplication = $this->m_centraldb->parse($strQuery);
@@ -2578,6 +2778,12 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
+      if (isset($request['page']))
+      {
+        $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+        $nOffset = $request['page'] * $nNumPerPage;
+        $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+      }
       $getContact = $this->m_centraldb->parse($strQuery);
       if ($getContact->execute())
       {
@@ -2608,6 +2814,61 @@ class Central extends Secure
     {
       $strError = 'Please provide the application_id.';
     }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ botLinkRemoteSystem()
+  public function botLinkRemoteSystem($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+    
+    if (isset($request['id']) && $request['id'] != '')
+    {
+      $getBotLinkRemoteSystem = $this->m_centraldb->parse('select id, name, description from bot_link_remote_system where id = '.$request['id']);
+      if ($getBotLinkRemoteSystem->execute())
+      {
+        if (($getBotLinkRemoteSystemRow = $getBotLinkRemoteSystem->fetch('assoc')))
+        {
+          $bResult = true;
+          $response = $getBotLinkRemoteSystemRow;
+        }
+      }
+      else
+      {
+        $strError = $getBotLinkRemoteSystem->getError();
+      }
+      $this->m_centraldb->free($getBotLinkRemoteSystem);
+    }
+    else
+    {
+      $strError = 'Please provide the id.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ botLinkRemoteSystems()
+  public function botLinkRemoteSystems($request, &$response, &$strError)
+  {
+    $bResult = false;
+    $response = array();
+
+    $getBotLinkRemoteSystem = $this->m_centraldb->parse('select id, name, description from bot_link_remote_system order by name');
+    if ($getBotLinkRemoteSystem->execute())
+    {
+      $bResult = true;
+      while (($getBotLinkRemoteSystemRow = $getBotLinkRemoteSystem->fetch('assoc')))
+      {
+        $response[] = $getBotLinkRemoteSystemRow;
+      }
+    }
+    else
+    {
+      $strError = $getBotLinkRemoteSystem->getError();
+    }
+    $this->m_centraldb->free($getBotLinkRemoteSystem);
 
     return $bResult;
   }
@@ -3221,7 +3482,27 @@ class Central extends Secure
     $cLetter = ((isset($request['letter']) && $request['letter'] != '')?$request['letter']:null);
     $response = array();
 
-    $getServer = $this->m_centraldb->parse('select id, name from server'.(($cLetter != '')?' where '.(($request['letter'] == '#')?' name regexp \'^[ -@[-`{-~]\'':' upper(name) like \''.$request['letter'].'%\''):'').' order by name');
+    $strQuery = 'select id, name from server';
+    if ($cLetter != '')
+    {
+      $strQuery .= ' where';
+      if ($request['letter'] == '#')
+      {
+        $strQuery .= ' name regexp \'^[ -@[-`{-~]\'';
+      }
+      else
+      {
+        $strQuery .= ' upper(name) like \''.$request['letter'].'%\'';
+      }
+    }
+    $strQuery .= ' order by name';
+    if (isset($request['page']))
+    {
+      $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+      $nOffset = $request['page'] * $nNumPerPage;
+      $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+    }
+    $getServer = $this->m_centraldb->parse($strQuery);
     if ($getServer->execute())
     {
       $bResult = true;
@@ -3970,6 +4251,12 @@ class Central extends Secure
         $strQuery .= ')';
       }
       $strQuery .= ' order by c.last_name, c.first_name, c.userid';
+      if (isset($request['page']))
+      {
+        $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+        $nOffset = $request['page'] * $nNumPerPage;
+        $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+      }
       $getContact = $this->m_centraldb->parse($strQuery);
       if ($getContact->execute())
       {
@@ -4231,7 +4518,27 @@ class Central extends Secure
     $cLetter = ((isset($request['letter']) && $request['letter'] != '')?$request['letter']:null);
     $response = array();
 
-    $getUser = $this->m_centraldb->parse('select id, last_name, first_name, userid, email, pager, active, admin, locked from person'.(($cLetter != '')?' where '.(($request['letter'] == '#')?' last_name regexp \'^[ -@[-`{-~]\'':' upper(last_name) like \''.$request['letter'].'%\''):'').' order by last_name, first_name, userid');
+    $strQuery = 'select id, last_name, first_name, userid, email, pager, active, admin, locked from person';
+    if ($cLetter != '')
+    {
+      $strQuery .= ' where ';
+      if ($request['letter'] == '#')
+      {
+        $strQuery .= ' last_name regexp \'^[ -@[-`{-~]\'';
+      }
+      else
+      {
+        $strQuery .= ' upper(last_name) like \''.$request['letter'].'%\'';
+      }
+    }
+    $strQuery .= ' order by last_name, first_name, userid';
+    if (isset($request['page']))
+    {
+      $nNumPerPage = ((isset($request['numPerPage']))?$request['numPerPage']:10);
+      $nOffset = $request['page'] * $nNumPerPage;
+      $strQuery .= ' limit '.$nNumPerPage.' offset '.$nOffset;
+    }
+    $getUser = $this->m_centraldb->parse($strQuery);
     if ($getUser->execute())
     {
       $bResult = true;

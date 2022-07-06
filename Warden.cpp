@@ -139,6 +139,29 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ radial()
+    bool Warden::radial(Json *ptData, string &strError)
+    {
+      return request("radial", ptData, strError);
+    }
+    bool Warden::radial(const string strUser, const string strPassword, string &strError)
+    {
+      bool bResult = false;
+      Json *ptData = new Json;
+
+      bResult = radial(strUser, strPassword, ptData, strError);
+      delete ptData;
+
+      return bResult;
+    }
+    bool Warden::radial(const string strUser, const string strPassword, Json *ptData, string &strError)
+    {
+      ptData->insert("User", strUser);
+      ptData->insert("Password", strPassword);
+
+      return radial(ptData, strError);
+    }
+    // }}}
     // {{{ request()
     bool Warden::request(const string strModule, Json *ptData, string &strError)
     {

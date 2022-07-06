@@ -43,13 +43,14 @@ class bk_Windows
   private $m_junction;
   // }}}
   // {{{ __construct()
-  /*! \fn __construct($db = null, $strApplication = null, $bCheckAccount = true)
+  /*! \fn __construct($db = null, $strApplication = null, $bCheckAccount = true, $strReturnPath = null)
   * \brief Instantiates the member variables.
   * \param $db Contains the database handle.
   * \param $strApplication Contains the application name.
   * \param $bCheckAccount Determines whether to perform an account check.
+  * \param $strReturnPath Contains the return path of the resultant data.
   */
-  public function __construct($db = null, $strApplication = null, $bCheckAccount = true)
+  public function __construct($db = null, $strApplication = null, $bCheckAccount = true, $strReturnPath = null)
   {
     if (is_array($db))
     {
@@ -251,9 +252,17 @@ class bk_Windows
             $request['Function'] = 'login';
             $request['User'] = $strUserID;
             $request['Password'] = $strPassword;
-            $request['Domain'] = 'itservices.sbc.com';
+            if (($strJson = file_get_contents(dirname(__FILE__).'/../../../../common_addons/www/auth/modules.json')) !== false)
+            {
+              $modules = json_decode($strJson, true);
+              if (isset($modules['windows']) && isset($modules['windows']['domain']) && $modules['windows']['domain'] != '')
+              {
+                $request['Domain'] = $modules['windows']['domain'];
+              }
+              unset($modules);
+            }
             $request['reqApp'] = 'Common Library';
-            $in[] = $request;
+            $in[] = json_encode($request);
             unset($request);
             if ($this->m_junction->request($in, $out))
             {
@@ -383,7 +392,7 @@ class bk_Windows
     }
     else
     {
-      echo "<div style='font-size:12px;font-weight:bold;'>Please login using your normal Windows login.</div><br>";
+      echo "<div style='font-size:16px;font-weight:bold;'>Windows Login</div><br>";
       echo "<form name='bk_login_formlogin' method='post' onSubmit='return bk_login_checklogin();'>";
       echo "<table class='std_form'>";
       echo "<tr><td>";
@@ -422,18 +431,7 @@ class bk_Windows
   */
   public function logout($strRetPath = null, $bJson = false)
   {
-    $response = array();
-
-    if ($bJson)
-    {
-      $response['Status'] = 'okay';
-      if ($strRetPath != '')
-      {
-        $response['Redirect'] = $strRetPath;
-      }
-    }
-
-    return $response;
+    return null;
   }
   // }}}
 }

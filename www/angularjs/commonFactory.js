@@ -25,7 +25,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   factory.m_sessionStorage = null;
   factory.m_store = {};
   factory.m_strApplication = null;
-  factory.m_strLoginType = 'password';
+  factory.m_strLoginType = null;
   factory.m_strMenu = null;
   factory.m_strRedirectPath = null;
   factory.m_strRequestPath = null;
@@ -202,6 +202,30 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   factory.getApplication = function ()
   {
     return this.m_strApplication;
+  };
+  // }}}
+  // {{{ getJwt()
+  factory.getJwt = function ()
+  {
+    var wsJwt = null;
+
+    if (this.m_bJwt)
+    {
+      if (this.m_wsJwt)
+      {
+        wsJwt = this.m_wsJwt;
+      }
+      else if (this.m_sessionStorage && this.m_sessionStorage.sl_wsJwt)
+      {
+        wsJwt = this.m_sessionStorage.sl_wsJwt;
+      }
+      else if (angular.isDefined($cookies.get('sl_commonWsJwt')) && $cookies.get('sl_commonWsJwt'))
+      {
+        wsJwt = $cookies.get('sl_commonWsJwt');
+      }
+    }
+
+    return wsJwt;
   };
   // }}}
   // {{{ getRedirectPath()
@@ -672,6 +696,16 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
             }
             else if (response.Action == 'message')
             {
+              var date = null;
+              if (angular.isDefined(response.Time) && response.Time != '')
+              {
+                date = new Date(response.Time * 1000);
+              }
+              else
+              {
+                date = new Date();
+              }
+              response.Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
               factory.m_messages.push(response);
               factory.m_messages[factory.m_messages.length - 1].Index = (factory.m_messages.length - 1);
             }

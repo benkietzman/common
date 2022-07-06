@@ -32,7 +32,7 @@ class Terminal extends Bridge
   {
     $bResult = false;
 
-    if ($this->m_fdSocket != -1 || parent::connect())
+    if ($this->m_handle !== false || parent::connect())
     {
       $request = [];
       $request['Section'] = 'terminal';
@@ -175,24 +175,36 @@ class Terminal extends Bridge
   {
     $bResult = false;
 
-    if ($this->m_fdSocket != -1)
+    if ($this->m_handle !== false)
     {
       $bClose = $bExit = false;
       $strBuffer = array(null, json_encode($request)."\n");
       while (!$bExit)
       {
-        $readfds = array($this->m_fdSocket);
+        $readfds = array($this->m_handle);
         $writefds = array();
         if ($strBuffer[1] != '')
         {
-          $writefds[] = $this->m_fdSocket;
+          $writefds[] = $this->m_handle;
         }
         $errorfds = null;
-        if (($nReturn = socket_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
+        if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
         {
-          if (in_array($this->m_fdSocket, $readfds))
+          if (in_array($this->m_handle, $writefds))
           {
-            if (($strData = socket_read($this->m_fdSocket, 1024)) !== false)
+            if (($nReturn = fwrite($this->m_handle, $strBuffer[1])) !== false)
+            {
+              $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
+            }
+            else
+            {
+              $bClose = $bExit = true;
+              $this->setError('fwrite() Failed to write.');
+            }
+          }
+          if (in_array($this->m_handle, $readfds))
+          {
+            if (($strData = fread($this->m_handle, 65536)) !== false)
             {
               if ($strData != '')
               {
@@ -246,26 +258,14 @@ class Terminal extends Bridge
             else
             {
               $bClose = $bExit = true;
-              $this->setError(socket_strerror(socket_last_error()));
-            }
-          }
-          if (in_array($this->m_fdSocket, $writefds))
-          {
-            if (($nReturn = socket_write($this->m_fdSocket, $strBuffer[1])) !== false)
-            {
-              $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
-            }
-            else
-            {
-              $bClose = $bExit = true;
-              $this->setError(socket_strerror(socket_last_error()));
+              $this->setError('fread() Failed to read.');
             }
           }
         }
         else if ($nReturn === false)
         {
           $bClose = $bExit = true;
-          $this->setError(socket_strerror(socket_last_error()));
+          $this->setError('stream_select() Failed to select.');
         }
         unset($read);
         unset($write);

@@ -25,6 +25,7 @@ include_once(dirname(__FILE__).'/../Basic.php');
 include_once(dirname(__FILE__).'/../database/CommonDatabase.php');
 include_once(dirname(__FILE__).'/../Syslog.php');
 include_once(dirname(__FILE__).'/../servicejunction/ServiceJunction.php');
+include_once(dirname(__FILE__).'/../warden/Warden.php');
 if (($mod_handle = opendir(dirname(__FILE__).'/module/')))
 {
   while (($mod_file = readdir($mod_handle)) !== false)
@@ -65,6 +66,10 @@ class Secure extends Basic
   protected $m_strLoginTitle;
   //! Stores the login type
   protected $m_strLoginType;
+  //! Stores the return path of the resultant data
+  protected $m_strReturnPath;
+  //! storage the unique prefix
+  protected $m_strUniquePrefix;
   //! Stores the module
   protected $m_module;
   //! Stores the database class instantiation
@@ -77,14 +82,15 @@ class Secure extends Basic
   private $m_syslog;
   // }}}
   // {{{ __construct()
-  /*! \fn __construct($strUser, $strPassword, $strHost, $strDB)
+  /*! \fn __construct($strUser, $strPassword, $strHost, $strDB, $strReturnPath = 'secure')
   * \brief Instantiates the member variables.
   * \param $strUser Contains the database user.
   * \param $strPassword Contains the database password.
   * \param $strHost Contains the database host.
   * \param $strDB Contains the database name.
+  * \param $strReturnPath Contains the return path of the resultant data.
   */
-  public function __construct($strUser = 'central', $strPassword = 'central', $strHost = 'localhost', $strDB = 'central')
+  public function __construct($strUser = 'central', $strPassword = 'central', $strHost = 'localhost', $strDB = 'central', $strReturnPath = 'secure')
   {
     parent::__construct();
     $this->m_bCheckAccount = true;
@@ -124,6 +130,7 @@ class Secure extends Basic
     $this->m_junction->useSecureJunction(false);
     $this->m_junction->setApplication('Common');
     $this->m_syslog = new Syslog('Common Library', 'Secure.php');
+    $this->m_strReturnPath = $strReturnPath;
   }
   // }}}
   // {{{ __destruct()
@@ -396,95 +403,47 @@ class Secure extends Basic
 
     if ($strJwt != '')
     {
-      if (($handle = fopen('/data/acorn/.cred/jwt', 'r')) !== false || ($handle = fopen('/data/bridge/.cred/jwt', 'r')) !== false || ($handle = fopen('/data/servicejunction/jwt/.cred', 'r')) !== false || ($handle = fopen('/opt/app/workload/data/acorn/.cred/jwt', 'r')) !== false || ($handle = fopen('/opt/app/workload/data/bridge/.cred/jwt', 'r')) !== false || ($handle = fopen('/opt/app/workload/data/servicejunction/jwt/.cred', 'r')) !== false)
+      $warden = new Warden('Bridge', '/data/warden/socket');
+      $secret = null;
+      if ($warden->vaultRetrieve(['jwt'], $secret))
       {
-        if (($strSecret = fgets($handle)) !== false)
+        if (isset($secret['Secret']) && $secret['Secret'] != '')
         {
-          $secret = json_decode(trim($strSecret), true);
-          if (isset($secret['Secret']) && $secret['Secret'] != '')
+          if (isset($secret['Signer']) && $secret['Signer'] != '')
           {
-            if (isset($secret['Signer']) && $secret['Signer'] != '')
+            $strPayload = null;
+            $strEncrypted = base64_decode($strJwt);
+            $this->m_junction->aes($secret['Secret'], $strPayload, $strEncrypted);
+            if ($strPayload == '')
             {
-              $in = array();
-              $request = array();
-              $request['Service'] = 'jwt';
-              $request['Function'] = 'decode';
-              $in[] = json_encode($request);
-              unset($request);
-              $request = array();
-              $request['Signer'] = $secret['Signer'];
-              $request['Secret'] = $secret['Secret'];
-              $request['Payload'] = $strJwt;
-              $in[] = json_encode($request);
-              unset($request);
-              $out = null;
-              if ($this->m_junction->request($in, $out))
-              {
-                if (sizeof($out) >= 1)
-                {
-                  $status = json_decode($out[0], true);
-                  if (isset($status['Status']) && $status['Status'] == 'okay')
-                  {
-                    if (sizeof($out) == 2)
-                    {
-                      $data = json_decode($out[1], true);
-                      if (isset($data['Payload']))
-                      {
-                        $bResult = true;
-                        $_SESSION = $data['Payload'];
-                      }
-                      else
-                      {
-                        $strError = 'Failed to find Payload in response.';
-                      }
-                      unset($data);
-                    }
-                    else
-                    {
-                      $strError = 'Invalid number of lines in response.';
-                    }
-                  }
-                  else if (isset($status['Error']) && $status['Error'] != '')
-                  {
-                    $strError = $status['Error'];
-                  }
-                  else
-                  {
-                    $strError = 'Encountered an unknown error.';
-                  }
-                  unset($status);
-                }
-                else
-                {
-                  $strError = 'Invalid number of lines in response.';
-                }
-              }
-              else
-              {
-                $strError = $this->m_junction->getError();
-              }
+              $strPayload = $strJwt;
+            }
+            $payload = null;
+            if ($this->m_junction->jwt($secret['Signer'], $secret['Secret'], $strPayload, $payload))
+            {
+              $bResult = true;
+              $_SESSION = $payload;
             }
             else
             {
-              $strError = 'Failed to find JWT signer.';
+              $strError = $this->m_junction->getError();
             }
           }
           else
           {
-            $strError = 'Failed to find JWT secret.';
+            $strError = 'Failed to find JWT signer.';
           }
-          unset($secret);
         }
         else
         {
-          $strError = 'Failed to read JWT secret.';
+          $strError = 'Failed to find JWT secret.';
         }
-        fclose($handle);
       }
       else
       {
-        $strError = 'Failed to open JWT secret.';
+        $strError = $warden->getError();
       }
+      unset($secret);
     }
     else
     {
@@ -607,6 +566,25 @@ class Secure extends Basic
       setcookie(session_name(), '', time()-42000, '/');
     }
     session_destroy();
+    if ($bJson)
+    {
+      if (!is_array($response))
+      {
+        $response = array();
+      }
+      if (!isset($response['Status']))
+      {
+        $response['Status'] = 'okay';
+      }
+      if ($strRetPath != '' && !isset($response['Redirect']))
+      {
+        $response['Redirect'] = $strRetPath;
+      }
+    }
+    else if ($strRetPath != '')
+    {
+      echo '<script type="text/javascript">document.location.href="'.$strRetPath.'";</script>';
+    }
 
     return $response;
   }
@@ -809,9 +787,19 @@ class Secure extends Basic
       unset($this->m_module);
       $this->m_strLoginType = $strLoginType;
       $strLoginType = 'bk_'.$strLoginType;
-      $this->m_module = new $strLoginType(array('write'=>$this->m_db, 'read'=>$this->m_readdb), $this->m_strApplication, $this->m_bCheckAccount);
+      $this->m_module = new $strLoginType(array('write'=>$this->m_db, 'read'=>$this->m_readdb), $this->m_strApplication, $this->m_bCheckAccount, $this->m_strReturnPath);
       $this->m_strLoginTitle = $this->m_module->getLoginTitle();
     }
+  }
+  // }}}
+  // {{{ setUniquePrefix()
+  /*! \fn setUniquePrefix($strPrefix)
+  * \brief Sets the unique prefix.
+  * \param $strUniquePrefix Contains the unique prefix.
+  */
+  public function setUniquePrefix($strPrefix)
+  {
+    $this->m_strUniquePrefix = $strPrefix;
   }
   // }}}
   // {{{ syslog()

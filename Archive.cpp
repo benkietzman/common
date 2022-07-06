@@ -161,6 +161,10 @@ extern "C++"
       {
         bResult = false;
       }
+      if (bResult && !bKeepOriginal)
+      {
+        remove(strFile.c_str());
+      }
 
       return bResult;
     }

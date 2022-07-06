@@ -39,13 +39,14 @@ class bk_SecurID
   private $m_readdb;
   // }}}
   // {{{ __construct()
-  /*! \fn __construct($db = null, $strApplication = null, $bCheckAccount = true)
+  /*! \fn __construct($db = null, $strApplication = null, $bCheckAccount = true, $strReturnPath = null)
   * \brief Instantiates the member variables.
   * \param $db Contains the database handle.
   * \param $strApplication Contains the application name.
   * \param $bCheckAccount Determines whether to perform an account check.
+  * \param $strReturnPath Contains the return path of the resultant data.
   */
-  public function __construct($db = null, $strApplication = null, $bCheckAccount = true)
+  public function __construct($db = null, $strApplication = null, $bCheckAccount = true, $strReturnPath = null)
   {
     if (is_array($db))
     {
@@ -342,7 +343,7 @@ class bk_SecurID
     $strUserID = (isset($_POST['bk_login_user_id']))?$_POST['bk_login_user_id']:"";
     $strPassword = (isset($_POST['bk_login_password']))?$_POST['bk_login_password']:"";
     $strMessage = (isset($_SESSION['sl_message']))?$_SESSION['sl_message']:"&nbsp;";
-    echo "<div style='font-size:12px;font-weight:bold;'>Please login using your<br>SecurID PIN and password.</div><br>";
+    echo "<div style='font-size:16px;font-weight:bold;'>SecurID Login</div><br>";
     echo "<form name='bk_login_formlogin' method='post' onSubmit='return bk_login_checklogin();'>";
     echo "<table class='std_form'>";
     echo "<tr><td>";
@@ -378,6 +379,7 @@ class bk_SecurID
   */
   public function logout($strRetPath = null, $bJson = false)
   {
+    return null;
   }
   // }}}
 }

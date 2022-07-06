@@ -67,8 +67,8 @@ extern "C++"
       bool m_bUseSingleSocket;
       map<int, wardenreqdata *> m_requests;
       size_t m_unUniqueID;
-      mutex m_mutexRequests;
-      mutex m_mutexUnique;
+      std::mutex m_mutexRequests;
+      std::mutex m_mutexUnique;
       string m_strApplication;
       string m_strTimeout;
       string m_strUnix;
@@ -159,6 +159,31 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool password(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool radial(Json *ptData, string &strError)
+      * \brief Submits a radial request.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool radial(Json *ptData, string &strError);
+      /*! \fn bool radial(const string strUser, const string strPassword, string &strError)
+      * \brief Submits a radial request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool radial(const string strUser, const string strPassword, string &strError);
+      /*! \fn bool radial(const string strUser, const string strPassword, Json *ptData, string &strError)
+      * \brief Submits a radial request.
+      * \param strUser Contains the user.
+      * \param strPassword Contains the password.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool radial(const string strUser, const string strPassword, Json *ptData, string &strError);
       /*! \fn bool request(const string strModule, Json *ptData, string &strError)
       * \brief Submits a Warden request.
       * \param strModule Contains the module.

@@ -50,6 +50,14 @@ if (!isset($wgCentralDatabase))
 {
   $wgCentralDatabase = 'central';
 }
+if (!isset($wgBasePath))
+{
+  $wgBasePath = '/wiki/';
+}
+if (!isset($wgReturnPath))
+{
+  $wgReturnPath = null;
+}
 ///////////////////////////////////////
 
 $wgExtensionCredits['other'][] = array('name'=>'Central Login Authentication', 'description' => '[Hopefully] authenticates using central database', 'author' => 'Ben Kietzman');
@@ -141,27 +149,27 @@ function AutoAuthenticateCentral($user)
   }
   else
   {
-    global $wgCentralSite, $wgCentralHost, $wgCentralUser, $wgCentralPassword, $wgCentralDatabase;
+    global $wgCentralSite, $wgCentralHost, $wgCentralUser, $wgCentralPassword, $wgCentralDatabase, $wsReturnPath;
     if (isset($_GET['returnto']) && $_GET['returnto'] != '')
     {
       if (!isset($_SESSION['sl_login']) || $_SESSION['sl_login'] == '')
       {
-        include_once('/scripts/common/www/auth/Secure.php');
-        $secure = new Secure($wgCentralUser, $wgCentralPassword, $wgCentralHost, $wgCentralDatabase);
+        include_once(dirname(__FILE__).'/../../www/auth/Secure.php');
+        $secure = new Secure($wgCentralUser, $wgCentralPassword, $wgCentralHost, $wgCentralDatabase, $wsReturnPath);
         $secure->setApplication($wgCentralSite);
         if (!$secure->isValid())
         {
           $strError = null;
-          $secure->processLogin(null, $strError);
+          $secure->processLogin($_POST, $strError);
           if ($secure->isValid())
           {
-            echo '<html><head><script type="text/javascript">document.location.href="/wiki/";</script></head></html>';
+            echo '<html><head><script type="text/javascript">document.location.href="'.$wgBasePath.'";</script></head></html>';
             exit();
           }
         }
         if ($secure->isValid())
         {
-          echo '<html><head><script type="text/javascript">document.location.href="/wiki/";</script></head></html>';
+          echo '<html><head><script type="text/javascript">document.location.href="'.$wgBasePath.'";</script></head></html>';
           exit();
         }
         else

@@ -44,23 +44,40 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
     }
     if (common.m_bJwt)
     {
-      $http.get('/include/common_addons/auth/modules.json').then(function(response)
+      var request = null;
+      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      common.wsRequest('bridge', request).then(function (response)
       {
-        var data = null;
-        if (angular.isDefined(response.data[common.m_strLoginType]) && angular.isDefined(response.data[common.m_strLoginType]['cookie']) && angular.isDefined($cookies.get(response.data[common.m_strLoginType]['cookie'])))
+        if (common.m_strLoginType == null)
         {
-          data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
+          common.m_strLoginType = 'password';
+          if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
+          {
+            common.m_strLoginType = response.Response.Module;
+          }
         }
-        $scope.$root.$broadcast('commonAuthLogin', data);
-      }, function ()
-      {
-        $scope.$root.$broadcast('commonAuthLogin', null);
+        $http.get('/include/common_addons/auth/modules.json').then(function(response)
+        {
+          var data = null;
+          if (angular.isDefined(response.data[common.m_strLoginType]) && angular.isDefined(response.data[common.m_strLoginType]['cookie']) && angular.isDefined($cookies.get(response.data[common.m_strLoginType]['cookie'])))
+          {
+            data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
+          }
+          $scope.$root.$broadcast('commonAuthLogin', data);
+        }, function ()
+        {
+          $scope.$root.$broadcast('commonAuthLogin', null);
+        });
       });
       $scope.$on('commonAuthLogin', function (event, data)
       {
         var request = null;
         request = {Section: 'secure', 'Function': 'process', Request: login};
         request.Request.Type = common.m_strLoginType;
+        if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+        {
+          request.Request.UniqueID = $cookies.get('sl_commonUniqueID');
+        }
         if (data)
         {
           request.Request.Data = data;
@@ -120,6 +137,10 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
                   $scope.info = null;
                   if (common.wsResponse(response, error))
                   {
+                    if (angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                    {
+                      $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
+                    }
                     if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                     {
                       $scope.$root.$broadcast('resetMenu', null);
@@ -244,39 +265,56 @@ controllers.Logout = function ($cookies, $location, $scope, common)
   {
     if (common.m_bJwt)
     {
-      var request = {Section: 'secure', 'Function': 'logout'};
-      request.Request = {Type: common.m_strLoginType, Return: common.getRedirectPath()};
+      var request = null;
+      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       common.wsRequest('bridge', request).then(function (response)
       {
-        var error = {};
-        $scope.info = null;
-        if (common.wsResponse(response, error))
+        if (common.m_strLoginType == null)
         {
-          if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+          common.m_strLoginType = 'password';
+          if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
           {
-            common.m_bHaveAuth = false;
-            common.m_auth = null;
-            common.m_auth = {admin: false, apps: {}};
-            if (common.m_sessionStorage && common.m_sessionStorage.sl_wsJwt)
-            {
-              common.m_sessionStorage.sl_wsJwt = null;
-            }
-            else if (common.m_wsJwt)
-            {
-              common.m_wsJwt = null;
-            }
-            else
-            {
-              $cookies.put('sl_commonWsJwt', '');
-            }
-            $scope.$root.$broadcast('resetMenu', null);
-            document.location.href = response.Response.Redirect;
+            common.m_strLoginType = response.Response.Module;
           }
         }
-        else
+        var request = {Section: 'secure', 'Function': 'logout'};
+        request.Request = {Type: common.m_strLoginType, Return: common.getRedirectPath()};
+        common.wsRequest('bridge', request).then(function (response)
         {
-          $scope.message = error.message;
-        }
+          var error = {};
+          $scope.info = null;
+          if (common.wsResponse(response, error))
+          {
+            if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+            {
+              common.m_bHaveAuth = false;
+              common.m_auth = null;
+              common.m_auth = {admin: false, apps: {}};
+              if (common.m_sessionStorage && common.m_sessionStorage.sl_wsJwt)
+              {
+                common.m_sessionStorage.sl_wsJwt = null;
+              }
+              else if (common.m_wsJwt)
+              {
+                common.m_wsJwt = null;
+              }
+              else
+              {
+                $cookies.put('sl_commonWsJwt', '');
+              }
+              if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+              {
+                $cookies.put('sl_commonUniqueID', '');
+              }
+              $scope.$root.$broadcast('resetMenu', null);
+              document.location.href = response.Response.Redirect;
+            }
+          }
+          else
+          {
+            $scope.message = error.message;
+          }
+        });
       });
     }
     else
@@ -340,6 +378,10 @@ controllers.Logout = function ($cookies, $location, $scope, common)
       else
       {
         $cookies.put('sl_commonWsJwt', '');
+      }
+      if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+      {
+        $cookies.put('sl_commonUniqueID', '');
       }
     }
     $scope.$root.$broadcast('resetMenu', null);

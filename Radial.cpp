@@ -64,7 +64,7 @@ extern "C++"
       {
         useSingleSocket(false);
       }
-      delete pUtility;
+      delete m_pUtility;
       #ifdef COMMON_LINUX
       sem_destroy(&m_semaRadialRequestLock);
       #endif
@@ -151,7 +151,7 @@ extern "C++"
                 strBuffer += (*i) + "\n";
               }
             }
-            sjreqdata *ptData = new sjreqdata;
+            radialreqdata *ptData = new radialreqdata;
             ptData->bSent = false;
             ptData->fdSocket = readpipe[1];
             ptData->strBuffer[0] = strBuffer;
@@ -575,7 +575,7 @@ extern "C++"
                 size_t unIndex = 1;
                 m_mutexRequests.lock();
                 pollfd *fds = new pollfd[m_requests.size() + 1];
-                for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
                 {
                   if (!j->second->bSent)
                   {
@@ -654,7 +654,7 @@ extern "C++"
                   if (unIndex > 1)
                   {
                     m_mutexRequests.lock();
-                    for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                    for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
                     {
                       for (size_t k = 1; k < unIndex; k++)
                       {
@@ -684,7 +684,7 @@ extern "C++"
               }
               response.clear();
               m_mutexRequests.lock();
-              for (map<int, sjreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+              for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
               {
                 if (j->second->bSent)
                 {
@@ -717,7 +717,7 @@ extern "C++"
         }
       }
       m_mutexRequests.lock();
-      for (map<int, sjreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
+      for (map<int, radialreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
       {
         if (i->second->fdSocket != -1)
         {

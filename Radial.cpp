@@ -169,13 +169,25 @@ extern "C++"
                   strBuffer.append(szBuffer, nReturn);
                   if ((unPosition = strBuffer.find("\n")) != string::npos)
                   {
-                    bExit = bResult = true;
+                    bExit = true;
                     ptResponse->parse(strBuffer.substr(0, unPosition));
                     strBuffer.erase(0, (unPosition + 1));
                     if (ptResponse->m.find("rUniqueID") != ptResponse->m.end())
                     {
                       delete ptResponse->m["rUniqueID"];
                       ptResponse->m.erase("rUniqueID");
+                    }
+                    if (ptResponse->m.find("Status") != ptResponse->m.end() && ptResponse->m["Status"]->v == "okay")
+                    {
+                      bResult = true;
+                    }
+                    else if (ptResponse->m.find("Error") != ptResponse->m.end() && !ptResponse->m["Error"]->v.empty())
+                    {
+                      strError = ptResponse->m["Error"]->v;
+                    }
+                    else
+                    {
+                      strError = "Encountered an unknown error.";
                     }
                   }
                 }
@@ -334,9 +346,21 @@ extern "C++"
                     {
                       if ((unPosition = strBuffer[0].find("\n")) != string::npos)
                       {
-                        bExit = bResult = true;
+                        bExit = true;
                         ptResponse->parse(strBuffer[0].substr(0, unPosition));
                         strBuffer[0].erase(0, unPosition + 1);
+                        if (ptResponse->m.find("Status") != ptResponse->m.end() && ptResponse->m["Status"]->v == "okay")
+                        {
+                          bResult = true;
+                        }
+                        else if (ptResponse->m.find("Error") != ptResponse->m.end() && !ptResponse->m["Error"]->v.empty())
+                        {
+                          strError = ptResponse->m["Error"]->v;
+                        }
+                        else
+                        {
+                          strError = "Encountered an unknown error.";
+                        }
                       }
                     }
                     else

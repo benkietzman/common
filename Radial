@@ -90,23 +90,23 @@ extern "C++"
       Radial(string &strError);
       ~Radial();
 
-      /*! \fn bool request(list<string> in, list<string> &out, string &strError)
+      /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Radial request.
-      * \param in Contains request lines.
-      * \param out Contains response lines.
+      * \param ptRequest Contains request.
+      * \param ptResponse Contains response.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool request(list<string> in, list<string> &out, string &strError);
-      /*! \fn bool request(list<string> in, list<string> &out, time_t CTimeout, string &strError)
+      bool request(Json *ptRequest, Json *ptResponse, string &strError);
+      /*! \fn bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
       * \brief Submits a Radial request.
-      * \param in Contains request lines.
-      * \param out Contains response lines.
+      * \param ptRequest Contains request.
+      * \param ptResponse Contains response.
       * \param CTimeout Contains the timeout.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool request(list<string> in, list<string> &out, time_t CTimeout, string &strError);
+      bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError);
       /*! \fn void requestThread()
       * \brief Request thread.
       */

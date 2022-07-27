@@ -92,6 +92,18 @@ extern "C++"
       bool bResult = false;
       time_t CEnd, CStart;
 
+      if (!m_strUser.empty() && (ptRequest->m.find("User") == ptRequest->m.end() || ptRequest->m["User"]->v.empty()))
+      {
+        ptRequest->insert("User", m_strUser);
+      }
+      if (!m_strPassword.empty() && (ptRequest->m.find("Password") == ptRequest->m.end() || ptRequest->m["Password"]->v.empty()))
+      {
+        ptRequest->insert("Password", m_strPassword);
+      }
+      if (!m_strUserID.empty() && (ptRequest->m.find("UserID") == ptRequest->m.end() || ptRequest->m["UserID"]->v.empty()))
+      {
+        ptRequest->insert("UserID", m_strUserID);
+      }
       if (m_unThrottle > 0)
       {
         #ifdef COMMON_LINUX
@@ -649,6 +661,14 @@ extern "C++"
       {
         SSL_CTX_free(ctx);
       }
+    }
+    // }}}
+    // {{{ setCredentials()
+    void Radial::setCredentials(const string strUser, const string strPassword, const string strUserID)
+    {
+      m_strUser = strUser;
+      m_strPassword = strPassword;
+      m_strUserID = strUserID;
     }
     // }}}
     // {{{ setThrottle()

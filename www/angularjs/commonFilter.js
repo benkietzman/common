@@ -58,6 +58,15 @@ filters.commonOrderObjectBy = function ()
   };
 };
 // }}}
+// {{{ commonRemoveSpaces
+filters.commonRemoveSpaces = function()
+{
+  return function(input)
+  {
+    return (angular.isString(input) && input.length > 0) ? input.replace(/ /g, '') : input;
+  }
+};
+// }}}
 // {{{ commonTelephone
 filters.commonTelephone = function ()
 {     

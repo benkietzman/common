@@ -89,7 +89,6 @@ extern "C++"
       std::mutex m_mutexUnique;
       string m_strApplication;
       string m_strEmail;
-      string m_strCtsJunctionServer;
       string m_strFrequency;
       string m_strLoggerApplication;
       string m_strLoggerPassword;
@@ -98,7 +97,6 @@ extern "C++"
       string m_strProgram;
       string m_strRoom;
       string m_strTimeout;
-      string m_strTroutJunctionServer;
       thread *m_pThreadRequest;
       time_t m_ulModifyTime;
       void (*m_pLoggerPush)(map<string, string> &);
@@ -210,16 +208,6 @@ extern "C++"
       * \return Returns a boolean true/false value. 
       */
       bool fusionUpdate(const string strUser, const string strPassword, string &strAuth, const string strUpdate, string &strError);
-      /*! \fn string getCtsJunctionServer()
-      * \brief Gets the CTS Junction server.
-      * \return Returns the CTS Junction server.
-      */
-      string getCtsJunctionServer();
-      /*! \fn string getTroutJunctionServer()
-      * \brief Gets the TROUT Junction server.
-      * \return Returns the TROUT Junction server.
-      */
-      string getTroutJunctionServer();
       /*! \fn bool ircBot(const string strRoom, const string strMessage, string &strError)
       * \brief Submits a IRC Bot request.
       * \param strRoom Contains room or user ID.

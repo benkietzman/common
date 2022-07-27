@@ -113,6 +113,11 @@ extern "C++"
       Bridge(string &strError);
       ~Bridge();
 
+      /*! \fn void dbFree(list<map<string, string> > *result) 
+      * \brief Frees query results.
+      * \param result Contains the query results.
+      */
+      void dbFree(list<map<string, string> > *result);
       /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError)
       * \brief Sends a query request to a database.
       * \param strDatabase Contains the database.
@@ -120,11 +125,6 @@ extern "C++"
       * \param strError Contains the error message.
       * \return Returns a list of resultant rows containing maps of field/value pairs..
       */
-      /*! \fn void dbFree(list<map<string, string> > *result) 
-      * \brief Frees query results.
-      * \param result Contains the query results.
-      */
-      void dbFree(list<map<string, string> > *result);
       list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError);
       /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
       * \brief Sends a query request to a database.

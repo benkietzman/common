@@ -82,6 +82,140 @@ extern "C++"
       }
     }
     // }}}
+    // {{{ dbFree()
+    void Radial::dbFree(list<map<string, string> > *result)
+    {
+      if (result != NULL)
+      {
+        for (list<map<string, string> >::iterator i = result->begin(); i != result->end(); i++)
+        {
+          i->clear();
+        }
+        result->clear();
+        delete result;
+        result = NULL; 
+      }
+    } 
+    // }}}
+    // {{{ dbQuery()
+    list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, string &strError)
+    {
+      unsigned long long ullRows;
+
+      return dbQuery(strDatabase, strQuery, ullRows, strError);
+    }
+    list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
+    {
+      list<map<string, string> > *result = NULL;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "database");
+      ptRequest->insert("Database", strDatabase);
+      ptRequest->insert("Query", strQuery);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        result = new list<map<string, string> >;
+        if (ptResponse->m.find("Response") != ptResponse->m.end() && !ptResponse->m["Response"]->l.empty())
+        {
+          for (list<Json *>::iterator i = ptResponse->m["Response"]->l.begin(); i != ptResponse->m["Response"]->l.end(); i++)
+          {
+            map<string, string> row;
+            (*i)->flatten(row, true);
+            result->push_back(row);
+            row.clear();
+          }
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return result;
+    }
+    // }}}
+    // {{{ dbUpdate()
+    bool Radial::dbUpdate(const string strDatabase, const string strUpdate, string &strError)
+    {
+      unsigned long long ullID, ullRows;
+
+      return dbUpdate(strDatabase, strUpdate, ullID, ullRows, strError);
+    }
+    bool Radial::dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ullID = ullRows = 0;
+      ptRequest->insert("Interface", "database");
+      ptRequest->insert("Database", strDatabase);
+      ptRequest->insert("Update", strUpdate);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Response") != ptResponse->m.end())
+        {
+          if (ptResponse->m["Response"]->m.find("ID") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["ID"]->v.empty())
+          {
+            stringstream ssID(ptResponse->m["Response"]->m["ID"]->v);
+            ssID >> ullID;
+          }
+          if (ptResponse->m["Response"]->m.find("Rows") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Rows"]->v.empty())
+          {
+            stringstream ssRows(ptResponse->m["Response"]->m["Rows"]->v);
+            ssRows >> ullRows;
+          }
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ listInterfaces()
+    bool Radial::listInterfaces(map<string, map<string, string> > &interfaces, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "hub");
+      ptRequest->insert("Function", "list");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Response") != ptResponse->m.end())
+        {
+          for (auto &interface : ptResponse->m["Response"]->m)
+          {
+            map<string, string> item;
+            interface.second->flatten(item, true, false);
+            interfaces[interface.first] = item;
+          }
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ ping()
+    bool Radial::ping(string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "hub");
+      ptRequest->insert("Function", "ping");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
     // {{{ request()
     bool Radial::request(Json *ptRequest, Json *ptResponse, string &strError)
     {
@@ -735,6 +869,114 @@ extern "C++"
     void Radial::setTimeout(const string strTimeout)
     {
       m_strTimeout = strTimeout;
+    }
+    // }}}
+    // {{{ storageAdd()
+    bool Radial::storageAdd(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "storage");
+      ptRequest->insert("Function", "add");
+      ptRequest->insert("Keys", keys);
+      ptRequest->insert("Request", ptData);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ storageRemove()
+    bool Radial::storageRemove(list<string> keys, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "storage");
+      ptRequest->insert("Function", "remove");
+      ptRequest->insert("Keys", keys);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ storageRetrieve()
+    bool Radial::storageRetrieve(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "storage");
+      ptRequest->insert("Function", "retrieve");
+      ptRequest->insert("Keys", keys);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Response") != ptResponse->m.end())
+        {
+          ptData->merge(ptResponse->m["Response"], true, false);
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ storageRetrieveKeys()
+    bool Radial::storageRetrieveKeys(list<string> inKeys, list<string> &outKeys, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "storage");
+      ptRequest->insert("Function", "retrieve");
+      ptRequest->insert("Keys", inKeys);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Response") != ptResponse->m.end())
+        {
+          for (auto &ptKey : ptResponse->m["Response"]->l)
+          {
+            outKeys.push_back(ptKey->v);
+          }
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ storageUpdate()
+    bool Radial::storageUpdate(list<string> keys, Json *ptData, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "storage");
+      ptRequest->insert("Function", "update");
+      ptRequest->insert("Keys", keys);
+      ptRequest->insert("Request", ptData);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
     }
     // }}}
     // {{{ useSingleSocket()

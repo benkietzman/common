@@ -93,6 +93,59 @@ extern "C++"
       Radial(string &strError);
       ~Radial();
 
+      /*! \fn void dbFree(list<map<string, string> > *result)
+      * \brief Frees query results.
+      * \param result Contains the query results.
+      */
+      void dbFree(list<map<string, string> > *result);
+      /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError)
+      * \brief Sends a query request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs..
+      */
+      list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError);
+      /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
+      * \brief Sends a query request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs..
+      */
+      list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
+      /*! \fn bool dbUpdate(const string strDatabase, const string strUpdate, string &strError)
+      * \brief Sends an update request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool dbUpdate(const string strDatabase, const string strUpdate, string &strError);
+      /*! \fn bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+      * \brief Sends an update request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param ullID Contains the returned ID.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
+      /*! \fn bool listInterfaces(map<string, map<string, string> > &interfaces, string &strError)
+      * \brief Sends a list interfaces request.
+      * \param interfaces Contains the interfaces.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool listInterfaces(map<string, map<string, string> > &interfaces, string &strError);
+      /*! \fn bool ping(string &strError)
+      * \brief Sends a ping request.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool ping(string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Radial request.
       * \param ptRequest Contains request.
@@ -131,6 +184,45 @@ extern "C++"
       * \param strTimeout Contains the timeout.
       */
       void setTimeout(const string strTimeout);
+      /*! \fn bool storageAdd(list<string> keys, Json *ptData, string &strError)
+      * \brief Sends a storage add request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool storageAdd(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool storageRemove(list<string> keys, string &strError)
+      * \brief Sends a storage remove request.
+      * \param keys Contains the keys.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool storageRemove(list<string> keys, string &strError);
+      /*! \fn bool storageRetrieve(list<string> keys, Json *ptData, string &strError)
+      * \brief Sends a storage retrieve request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool storageRetrieve(list<string> keys, Json *ptData, string &strError);
+      /*! \fn bool storageRetrieveKeys(list<string> inKeys, list<string> &outKeys, string &strError)
+      * \brief Sends a storage retrieve keys request.
+      * \param inKeys Contains the input keys.
+      * \param outKeys Contains the output keys.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool storageRetrieveKeys(list<string> inKeys, list<string> &outKeys, string &strError);
+      /*! \fn bool storageUpdate(list<string> keys, Json *ptData, string &strError)
+      * \brief Sends a storage update request.
+      * \param keys Contains the keys.
+      * \param ptData Contains the data.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool storageUpdate(list<string> keys, Json *ptData, string &strError);
       /*! \fn void useSingleSocket(const bool bUseSingleSocket = true)
       * \brief Use single socket.  This should only be enabled within non-forking environments.
       * \param bUseSingleSocket Contains the single socket value.

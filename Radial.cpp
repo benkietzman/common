@@ -30,6 +30,7 @@ extern "C++"
 {
   namespace common
   {
+    // {{{ semaphores
     #ifdef COMMON_LINUX
     sem_t m_semaRadialRequestLock;
     #endif
@@ -42,6 +43,7 @@ extern "C++"
     #ifdef COMMON_SOLARIS
     sema_t m_semaRadialThrottle;
     #endif
+    // }}}
     // {{{ Radial()
     Radial::Radial(string &strError)
     {
@@ -82,6 +84,7 @@ extern "C++"
       }
     }
     // }}}
+    // {{{ database
     // {{{ databaseFree()
     void Radial::databaseFree(list<map<string, string> > *result)
     {
@@ -197,6 +200,8 @@ extern "C++"
       return databaseUpdate(strDatabase, strUpdate, ullID, ullRows, strError);
     }
     // }}}
+    // }}}
+    // {{{ hub
     // {{{ hubList()
     bool Radial::hubList(map<string, map<string, string> > &interfaces, string &strError)
     {
@@ -242,6 +247,46 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // }}}
+    // {{{ linkStatus()
+    bool Radial::linkStatus(list<string> &nodes, string &strMaster, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->insert("Interface", "link");
+      ptRequest->insert("Function", "status");
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Response") != ptResponse->m.end())
+        {
+          if (ptResponse->m["Response"]->m.find("Master") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Master"]->v.empty())
+          {
+            strMaster = ptResponse->m["Response"]->m["Master"]->v;
+          }
+          if (ptResponse->m["Response"]->m.find("Node") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Node"]->v.empty())
+          {
+            nodes.push_back(ptResponse->m["Response"]->m["Node"]->v);
+          }
+          if (ptResponse->m["Response"]->m.find("Links") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Links"]->l.empty())
+          {
+            for (auto &ptLink : ptResponse->m["Response"]->m["Links"]->l)
+            {
+              nodes.push_back(ptLink->v);
+            }
+          }
+          nodes.sort();
+          nodes.unique();
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ request
     // {{{ request()
     bool Radial::request(Json *ptRequest, Json *ptResponse, string &strError)
     {
@@ -847,6 +892,8 @@ extern "C++"
       }
     }
     // }}}
+    // }}}
+    // {{{ set
     // {{{ setCredentials()
     void Radial::setCredentials(const string strUser, const string strPassword, const string strUserID)
     {
@@ -897,6 +944,8 @@ extern "C++"
       m_strTimeout = strTimeout;
     }
     // }}}
+    // }}}
+    // {{{ storage
     // {{{ storageAdd()
     bool Radial::storageAdd(list<string> keys, Json *ptData, string &strError)
     {
@@ -1004,6 +1053,7 @@ extern "C++"
 
       return bResult;
     }
+    // }}}
     // }}}
     // {{{ useSingleSocket()
     void Radial::useSingleSocket(const bool bUseSingleSocket)

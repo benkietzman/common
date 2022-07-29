@@ -174,18 +174,26 @@ extern "C++"
       */
       bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
       /*! \fn bool hubList(map<string, map<string, string> > &interfaces, string &strError)
-      * \brief Sends a list interfaces request.
+      * \brief Sends a hub list request.
       * \param interfaces Contains the interfaces.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
       bool hubList(map<string, map<string, string> > &interfaces, string &strError);
       /*! \fn bool hubPing(string &strError)
-      * \brief Sends a ping request.
+      * \brief Sends a hub ping request.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
       bool hubPing(string &strError);
+      /*! \fn bool linkStatus(list<string> &nodes, string &strMaster, string &strError)
+      * \brief Sends a link status request.
+      * \param nodes Contains the list of linked nodes.
+      * \param strMaster Contains the master node.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool linkStatus(list<string> &nodes, string &strMaster, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Radial request.
       * \param ptRequest Contains request.

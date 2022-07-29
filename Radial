@@ -93,6 +93,46 @@ extern "C++"
       Radial(string &strError);
       ~Radial();
 
+      /*! \fn void databaseFree(list<map<string, string> > *result)
+      * \brief Frees query results.
+      * \param result Contains the query results.
+      */
+      void databaseFree(list<map<string, string> > *result);
+      /*! \fn list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError)
+      * \brief Sends a query request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs..
+      */
+      list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError);
+      /*! \fn list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
+      * \brief Sends a query request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a list of resultant rows containing maps of field/value pairs..
+      */
+      list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
+      /*! \fn bool databaseUpdate(const string strDatabase, const string strUpdate, string &strError)
+      * \brief Sends an update request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool databaseUpdate(const string strDatabase, const string strUpdate, string &strError);
+      /*! \fn bool databaseUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+      * \brief Sends an update request to a database.
+      * \param strDatabase Contains the database.
+      * \param strQuery Contains the query.
+      * \param ullID Contains the returned ID.
+      * \param ullRows Contains the number of affected rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool databaseUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
       /*! \fn void dbFree(list<map<string, string> > *result)
       * \brief Frees query results.
       * \param result Contains the query results.
@@ -133,19 +173,19 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
-      /*! \fn bool listInterfaces(map<string, map<string, string> > &interfaces, string &strError)
+      /*! \fn bool hubList(map<string, map<string, string> > &interfaces, string &strError)
       * \brief Sends a list interfaces request.
       * \param interfaces Contains the interfaces.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool listInterfaces(map<string, map<string, string> > &interfaces, string &strError);
-      /*! \fn bool ping(string &strError)
+      bool hubList(map<string, map<string, string> > &interfaces, string &strError);
+      /*! \fn bool hubPing(string &strError)
       * \brief Sends a ping request.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool ping(string &strError);
+      bool hubPing(string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Radial request.
       * \param ptRequest Contains request.

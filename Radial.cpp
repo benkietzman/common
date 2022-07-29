@@ -82,8 +82,8 @@ extern "C++"
       }
     }
     // }}}
-    // {{{ dbFree()
-    void Radial::dbFree(list<map<string, string> > *result)
+    // {{{ databaseFree()
+    void Radial::databaseFree(list<map<string, string> > *result)
     {
       if (result != NULL)
       {
@@ -97,14 +97,14 @@ extern "C++"
       }
     } 
     // }}}
-    // {{{ dbQuery()
-    list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, string &strError)
+    // {{{ databaseQuery()
+    list<map<string, string> > *Radial::databaseQuery(const string strDatabase, const string strQuery, string &strError)
     {
       unsigned long long ullRows;
 
-      return dbQuery(strDatabase, strQuery, ullRows, strError);
+      return databaseQuery(strDatabase, strQuery, ullRows, strError);
     }
-    list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
+    list<map<string, string> > *Radial::databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
     {
       list<map<string, string> > *result = NULL;
       Json *ptRequest = new Json, *ptResponse = new Json;
@@ -132,14 +132,14 @@ extern "C++"
       return result;
     }
     // }}}
-    // {{{ dbUpdate()
-    bool Radial::dbUpdate(const string strDatabase, const string strUpdate, string &strError)
+    // {{{ databaseUpdate()
+    bool Radial::databaseUpdate(const string strDatabase, const string strUpdate, string &strError)
     {
       unsigned long long ullID, ullRows;
 
-      return dbUpdate(strDatabase, strUpdate, ullID, ullRows, strError);
+      return databaseUpdate(strDatabase, strUpdate, ullID, ullRows, strError);
     }
-    bool Radial::dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+    bool Radial::databaseUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
@@ -171,8 +171,34 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ listInterfaces()
-    bool Radial::listInterfaces(map<string, map<string, string> > &interfaces, string &strError)
+    // {{{ dbFree()
+    void Radial::dbFree(list<map<string, string> > *result)
+    {
+      databaseFree(result);
+    } 
+    // }}}
+    // {{{ dbQuery()
+    list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, string &strError)
+    {
+      return databaseQuery(strDatabase, strQuery, strError);
+    }
+    list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
+    {
+      return databaseQuery(strDatabase, strQuery, ullRows, strError);
+    }
+    // }}}
+    // {{{ dbUpdate()
+    bool Radial::dbUpdate(const string strDatabase, const string strUpdate, string &strError)
+    {
+      return databaseUpdate(strDatabase, strUpdate, strError);
+    }
+    bool Radial::dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
+    {
+      return databaseUpdate(strDatabase, strUpdate, ullID, ullRows, strError);
+    }
+    // }}}
+    // {{{ hubList()
+    bool Radial::hubList(map<string, map<string, string> > &interfaces, string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
@@ -198,8 +224,8 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ ping()
-    bool Radial::ping(string &strError)
+    // {{{ hubPing()
+    bool Radial::hubPing(string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;

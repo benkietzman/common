@@ -462,10 +462,17 @@ extern "C++"
     // {{{ sslAccept()
     SSL *Utility::sslAccept(SSL_CTX *ctx, int fdSocket, string &strError)
     {
+      bool bRetry;
+
+      return sslAccept(ctx, fdSocket, bRetry, strError);
+    }
+    SSL *Utility::sslAccept(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError)
+    {
       bool bGood = false;
       int nReturn;
       SSL *ssl = NULL;
- 
+
+      bRetry = false; 
       ERR_clear_error();
       if ((ssl = SSL_new(ctx)) == NULL)
       {
@@ -477,13 +484,13 @@ extern "C++"
       }
       else if ((nReturn = SSL_accept(ssl)) <= 0)
       {
-        strError = (string)"SSL_accept() " + sslstrerror(ssl, nReturn);
+        strError = (string)"SSL_accept() " + sslstrerror(ssl, nReturn, bRetry);
       }
       else
       {
         bGood = true;
       }
-      if (!bGood && ssl != NULL)
+      if (!bRetry && !bGood && ssl != NULL)
       {
         SSL_shutdown(ssl);
         SSL_free(ssl);
@@ -496,10 +503,17 @@ extern "C++"
     // {{{ sslConnect()
     SSL *Utility::sslConnect(SSL_CTX *ctx, int fdSocket, string &strError)
     {
+      bool bRetry;
+
+      return sslConnect(ctx, fdSocket, bRetry, strError);
+    }
+    SSL *Utility::sslConnect(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError)
+    {
       bool bGood = false;
       int nReturn;
       SSL *ssl = NULL;
- 
+
+      bRetry = false; 
       ERR_clear_error();
       if ((ssl = SSL_new(ctx)) == NULL)
       {
@@ -511,13 +525,13 @@ extern "C++"
       }
       else if ((nReturn = SSL_connect(ssl)) != 1)
       {
-        strError = (string)"SSL_connect() " + sslstrerror(ssl, nReturn);
+        strError = (string)"SSL_connect() " + sslstrerror(ssl, nReturn, bRetry);
       }
       else
       {
         bGood = true;
       }
-      if (!bGood && ssl != NULL)
+      if (!bRetry && !bGood && ssl != NULL)
       {
         SSL_shutdown(ssl);
         SSL_free(ssl);
@@ -756,8 +770,15 @@ extern "C++"
     }
     string Utility::sslstrerror(SSL *ssl, int nReturn)
     {
+      bool bRetry;
+
+      return sslstrerror(ssl, nReturn, bRetry);
+    }
+    string Utility::sslstrerror(SSL *ssl, int nReturn, bool &bRetry)
+    {
       stringstream ssError;
 
+      bRetry = false;
       ssError << sslstrerror();
       if (ssError.str().empty())
       {
@@ -767,10 +788,10 @@ extern "C++"
         {
           case SSL_ERROR_NONE : ssError << "[SSL_ERROR_NONE] The TLS/SSL I/O operation completed."; break;
           case SSL_ERROR_ZERO_RETURN : ssError << "[SSL_ERROR_ZERO_RETURN] The TLS/SSL connection has been closed."; break;
-          case SSL_ERROR_WANT_READ : ssError << "[SSL_ERROR_WANT_READ] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-          case SSL_ERROR_WANT_WRITE : ssError << "[SSL_ERROR_WANT_WRITE] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-          case SSL_ERROR_WANT_CONNECT : ssError << "[SSL_ERROR_WANT_CONNECT] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
-          case SSL_ERROR_WANT_ACCEPT : ssError << "[SSL_ERROR_WANT_ACCEPT) The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_READ : bRetry = true; ssError << "[SSL_ERROR_WANT_READ] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_WRITE : bRetry = true; ssError << "[SSL_ERROR_WANT_WRITE] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_CONNECT : bRetry = true; ssError << "[SSL_ERROR_WANT_CONNECT] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
+          case SSL_ERROR_WANT_ACCEPT : bRetry = true; ssError << "[SSL_ERROR_WANT_ACCEPT) The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
           case SSL_ERROR_WANT_X509_LOOKUP : ssError << "[SSL_ERROR_WANT_X509_LOOKUP] The operation did not complete because an application callback set by SSL_CTX_set_client_cert_cb() has asked to be called again."; break;
           case SSL_ERROR_SYSCALL :
           {

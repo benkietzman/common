@@ -239,6 +239,15 @@ extern "C++"
       * \return SSL contains the SSL handle.
       */
       SSL *sslAccept(SSL_CTX *ctx, int fdSocket, string &strError);
+      /*! \fn SSL *sslAccept(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError)
+      * \brief OpenSSL SSL_accept() wrapper function.
+      * \param ctx Contains the SSL context.
+      * \param fdSocket Contains the socket descriptor.
+      * \param bRetry Contains the retry.
+      * \param strError Returns an error message.
+      * \return SSL contains the SSL handle.
+      */
+      SSL *sslAccept(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError);
       /*! \fn SSL *sslConnect(SSL_CTX *ctx, int fdSocket, string &strError)
       * \brief OpenSSL SSL_connect() wrapper function.
       * \param ctx Contains the SSL context.
@@ -247,6 +256,15 @@ extern "C++"
       * \return SSL contains the SSL handle.
       */
       SSL *sslConnect(SSL_CTX *ctx, int fdSocket, string &strError);
+      /*! \fn SSL *sslConnect(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError)
+      * \brief OpenSSL SSL_connect() wrapper function.
+      * \param ctx Contains the SSL context.
+      * \param fdSocket Contains the socket descriptor.
+      * \param bRetry Contains the retry.
+      * \param strError Returns an error message.
+      * \return SSL contains the SSL handle.
+      */
+      SSL *sslConnect(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError);
       /*! \fn void sslDeinit()
       * \brief OpenSSL deinitialization.
       */
@@ -327,6 +345,14 @@ extern "C++"
       * \return Returns the error string.
       */
       string sslstrerror(SSL *ssl, int nReturn);
+      /*! \fn string sslstrerror(SSL *ssl, int nReturn, bool &bRetry)
+      * \brief Obtain an SSL error message.
+      * \param ssl Contains the SSL handle.
+      * \param nReturn Contains the return.
+      * \param bRetry Contains the retry.
+      * \return Returns the error string.
+      */
+      string sslstrerror(SSL *ssl, int nReturn, bool &bRetry);
     };
     // }}}
   }

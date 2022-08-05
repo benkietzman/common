@@ -441,15 +441,26 @@ extern "C++"
     // {{{ socketType()
     bool Utility::socketType(int fdSocket, common_socket_type &eType, string &strError)
     {
+      bool bRetry;
+
+      return socketType(fdSocket, eType, bRetry, strError);
+    }
+    bool Utility::socketType(int fdSocket, common_socket_type &eType, bool &bRetry, string &strError)
+    {
       bool bResult = false;
       char cChar;
       int nReturn;
 
+      bRetry = false;
       if ((nReturn = recv(fdSocket, &cChar, 1, MSG_PEEK)) > 0)
       {
         bResult = true;
         // Checking SSL handshake packet type:
         eType = ((cChar == 0x14 /* Change Cipher Spec */ || cChar == 0x15 /* Alert */ || cChar == 0x16 /* Handshake */ || cChar == 0x17 /* Application Data */)?COMMON_SOCKET_ENCRYPTED:COMMON_SOCKET_UNENCRYPTED);
+      }
+      else if (errno == EAGAIN)
+      {
+        bRetry = true;
       }
       else
       {

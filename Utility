@@ -231,6 +231,18 @@ extern "C++"
       *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
       */
       bool socketType(int fdSocket, common_socket_type &eType, string &strError);
+      /*! \fn bool socketType(int fdSocket, common_socket_type &eType, bool &bRetry, string &strError)
+      * \brief Take a peek of the current socket to determine if it's a regular or encrypted one.
+      * \param fdSocket Contains the socket descriptor.
+      * \param eType Returns an enum indicating if the socket is encrypted, unencrypted, or invalid.
+      * \param bRetry Contains the retry.
+      * \param strError Contains the error.
+      * \return Returns a boolean true/false value.
+      *   - SOC_UNENCRYPTED: This is a regular unencrypted socket.
+      *   - SOC_ENCRYPTED:   This is an SSL encrypted socket;
+      *   - SOC_INVALID:     Error occurred or the peer already closed the socket.
+      */
+      bool socketType(int fdSocket, common_socket_type &eType, bool &bRetry, string &strError);
       /*! \fn SSL *sslAccept(SSL_CTX *ctx, int fdSocket, string &strError)
       * \brief OpenSSL SSL_accept() wrapper function.
       * \param ctx Contains the SSL context.

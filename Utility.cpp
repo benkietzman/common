@@ -473,7 +473,7 @@ extern "C++"
     // {{{ sslAccept()
     SSL *Utility::sslAccept(SSL_CTX *ctx, int fdSocket, string &strError)
     {
-      bool bRetry = false;
+      bool bRetry;
 
       return sslAccept(ctx, fdSocket, bRetry, strError);
     }
@@ -483,26 +483,23 @@ extern "C++"
       int nReturn;
       SSL *ssl = NULL;
 
+      bRetry = false; 
       ERR_clear_error();
-      if (!bRetry && (ssl = SSL_new(ctx)) == NULL)
+      if ((ssl = SSL_new(ctx)) == NULL)
       {
         strError = (string)"SSL_new() " + sslstrerror();
       }
-      else if (!bRetry && !SSL_set_fd(ssl, fdSocket))
+      else if (!SSL_set_fd(ssl, fdSocket))
       {
         strError = (string)"SSL_set_fd() " + sslstrerror();
       }
+      else if ((nReturn = SSL_accept(ssl)) <= 0)
+      {
+        strError = (string)"SSL_accept() " + sslstrerror(ssl, nReturn, bRetry);
+      }
       else
       {
-        bRetry = false; 
-        if ((nReturn = SSL_accept(ssl)) <= 0)
-        {
-          strError = (string)"SSL_accept() " + sslstrerror(ssl, nReturn, bRetry);
-        }
-        else
-        {
-          bGood = true;
-        }
+        bGood = true;
       }
       if (!bRetry && !bGood && ssl != NULL)
       {
@@ -517,7 +514,7 @@ extern "C++"
     // {{{ sslConnect()
     SSL *Utility::sslConnect(SSL_CTX *ctx, int fdSocket, string &strError)
     {
-      bool bRetry = false;
+      bool bRetry;
 
       return sslConnect(ctx, fdSocket, bRetry, strError);
     }
@@ -527,26 +524,23 @@ extern "C++"
       int nReturn;
       SSL *ssl = NULL;
 
+      bRetry = false; 
       ERR_clear_error();
-      if (!bRetry && (ssl = SSL_new(ctx)) == NULL)
+      if ((ssl = SSL_new(ctx)) == NULL)
       {
         strError = (string)"SSL_new() " + sslstrerror();
       }
-      else if (!bRetry && !SSL_set_fd(ssl, fdSocket))
+      else if (!SSL_set_fd(ssl, fdSocket))
       {
         strError = (string)"SSL_set_fd() " + sslstrerror();
       }
+      else if ((nReturn = SSL_connect(ssl)) != 1)
+      {
+        strError = (string)"SSL_connect() " + sslstrerror(ssl, nReturn, bRetry);
+      }
       else
       {
-        bRetry = false; 
-        if ((nReturn = SSL_connect(ssl)) != 1)
-        {
-          strError = (string)"SSL_connect() " + sslstrerror(ssl, nReturn, bRetry);
-        }
-        else
-        {
-          bGood = true;
-        }
+        bGood = true;
       }
       if (!bRetry && !bGood && ssl != NULL)
       {

@@ -334,7 +334,7 @@ extern "C++"
     string ChatBot::ident(const string strUser)
     {
       char md5string[33];
-      MD5_CTX context;
+      EVP_MD_CTX *ctx = EVP_MD_CTX_new();
       string strIdent;
       stringstream ssIdent;
       timespec start;
@@ -342,9 +342,10 @@ extern "C++"
 
       clock_gettime(CLOCK_REALTIME, &start);
       ssIdent << strUser << "," << start.tv_sec << "," << start.tv_nsec;
-      MD5_Init(&context);
-      MD5_Update(&context, ssIdent.str().c_str(), ssIdent.str().size());
-      MD5_Final(digest, &context);
+      EVP_DigestInit_ex(ctx, NULL, NULL);
+      EVP_DigestUpdate(ctx, ssIdent.str().c_str(), ssIdent.str().size());
+      EVP_DigestFinal_ex(ctx, digest, NULL);
+      EVP_MD_CTX_free(ctx);
       for (int i = 0; i < 16; i++)
       {
         sprintf(&md5string[i*2], "%02x", (unsigned int)digest[i]);

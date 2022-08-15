@@ -774,7 +774,7 @@ extern "C++"
           ssError << ", ";
         }
         ERR_error_string_n(ulError, szError, 1024);
-        ssError << ERR_lib_error_string(ulError) << "::" << ERR_func_error_string(ulError) << "(" << ulError << "," << szError << ") " << ERR_reason_error_string(ulError);
+        ssError << ERR_lib_error_string(ulError) << "(" << ulError << "," << szError << ") " << ERR_reason_error_string(ulError);
       }
 
       return ssError.str();

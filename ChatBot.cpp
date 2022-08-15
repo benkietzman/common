@@ -342,9 +342,9 @@ extern "C++"
 
       clock_gettime(CLOCK_REALTIME, &start);
       ssIdent << strUser << "," << start.tv_sec << "," << start.tv_nsec;
-      EVP_DigestInit_ex(ctx, NULL, NULL);
+      EVP_DigestInit(ctx, EVP_md5());
       EVP_DigestUpdate(ctx, ssIdent.str().c_str(), ssIdent.str().size());
-      EVP_DigestFinal_ex(ctx, digest, NULL);
+      EVP_DigestFinal(ctx, digest, NULL);
       EVP_MD_CTX_free(ctx);
       for (int i = 0; i < 16; i++)
       {

@@ -833,6 +833,7 @@ extern "C++"
           case SSL_ERROR_WANT_CONNECT : bRetry = true; ssError << "[SSL_ERROR_WANT_CONNECT] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
           case SSL_ERROR_WANT_ACCEPT : bRetry = true; ssError << "[SSL_ERROR_WANT_ACCEPT) The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
           case SSL_ERROR_WANT_X509_LOOKUP : ssError << "[SSL_ERROR_WANT_X509_LOOKUP] The operation did not complete because an application callback set by SSL_CTX_set_client_cert_cb() has asked to be called again."; break;
+          case SSL_ERROR_WANT_RETRY_VERIFY : bRetry = true; ssError << "[SSL_ERROR_WANT_RETRY_VERIFY] The operation did not complete; the same TLS/SSL I/O function should be called again later."; break;
           case SSL_ERROR_SYSCALL :
           {
             ssError << "[SSL_ERROR_SYSCALL] Some I/O error occurred.  ";

@@ -593,6 +593,10 @@ extern "C++"
         {
           SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
         }
+        else
+        {
+          SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, NULL);
+        }
       }
       else
       {

@@ -285,20 +285,22 @@ extern "C++"
       * \brief OpenSSL initialization.
       */
       void sslInit();
-      /*! \fn SSL_CTX *sslInit(const bool bSslServer, string &strError)
+      /*! \fn SSL_CTX *sslInit(const bool bSslServer, string &strError, const bool bVerifyPeer = false)
       * \brief OpenSSL initialization.
       * \param bSslServer A boolean indicates if the current program is an SSL server or client.  If true, the program is an SSL server; otherwise, it's an SSL client.
       * \param strError Returns an error message.
+      * \param bVerifyPeer Contains the verify peer true/false value.
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
-      SSL_CTX *sslInit(const bool bSslServer, string &strError);
-      /*! \fn SSL_CTX *sslInitClient(string &strError)
+      SSL_CTX *sslInit(const bool bSslServer, string &strError, const bool bVerifyPeer = false);
+      /*! \fn SSL_CTX *sslInitClient(string &strError, const bool bVerifyPeer = false)
       * \brief OpenSSL initialization for a client.
       * \param strError Returns an error message.
+      * \param bVerifyPeer Contains the verify peer true/false value.
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
-      SSL_CTX *sslInitClient(string &strError);
-      /*! \fn SSL_CTX *sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = true)
+      SSL_CTX *sslInitClient(string &strError, const bool bVerifyPeer = false);
+      /*! \fn SSL_CTX *sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = false)
       * \brief OpenSSL initialization for a server.
       * \param strCertificate Contains the certificate.
       * \param strPrivateKey Contains the private key.
@@ -306,22 +308,23 @@ extern "C++"
       * \param bVerifyPeer Contains the verify peer true/false value.
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
-      SSL_CTX *sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = true);
-      /*! \fn SSL_CTX *sslInitServer(string &strError)
+      SSL_CTX *sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = false);
+      /*! \fn SSL_CTX *sslInitServer(string &strError, const bool bVerifyPeer)
       * \brief OpenSSL initialization for a server.
       * \param strError Returns an error message.
+      * \param bVerifyPeer Contains the verify peer true/false value.
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
-      SSL_CTX *sslInitServer(string &strError);
-      /*! \fn SSL_CTX *sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = true)
+      SSL_CTX *sslInitServer(string &strError, const bool bVerifyPeer);
+      /*! \fn SSL_CTX *sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = false)
       * \brief OpenSSL initialization for a server.
       * \param strCertificate Contains the certificate.
       * \param strPrivateKey Contains the private key.
-      * \param bVerifyPeer Contains the verify peer true/false value.
       * \param strError Returns an error message.
+      * \param bVerifyPeer Contains the verify peer true/false value.
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
-      SSL_CTX *sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = true);
+      SSL_CTX *sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer = false);
       /*! \fn bool sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
       * \brief Loads the SSL certificate and private key into the SSL CTX and then checks their consistency.
       * \param ctx Contains the SSL context.

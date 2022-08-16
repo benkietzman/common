@@ -575,7 +575,7 @@ extern "C++"
         CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
       }
     }
-    SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError)
+    SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError, const bool bVerifyPeer)
     {
       long lErrCode;
       const char* lcpErrMsg;
@@ -587,7 +587,14 @@ extern "C++"
       method = (SSL_METHOD *)((bSslServer)?SSLv23_server_method():SSLv23_client_method());
       ERR_clear_error();
       ctx = SSL_CTX_new(method);
-      if (ctx == NULL)
+      if (ctx != NULL)
+      {
+        if (bVerifyPeer)
+        {
+          SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+        }
+      }
+      else
       {
         lErrCode = ERR_get_error();
         lcpErrMsg = ERR_error_string(lErrCode, NULL);
@@ -600,24 +607,17 @@ extern "C++"
     }
     // }}}
     // {{{ sslInitClient()
-    SSL_CTX *Utility::sslInitClient(string &strError)
+    SSL_CTX *Utility::sslInitClient(string &strError, const bool bVerifyPeer)
     {
-      return sslInit(false, strError);
+      return sslInit(false, strError, bVerifyPeer);
     }
     SSL_CTX *Utility::sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer)
     {
       SSL_CTX *ctx = NULL;
 
-      if ((ctx = sslInitClient(strError)) != NULL)
+      if ((ctx = sslInitClient(strError, bVerifyPeer)) != NULL)
       {
-        if (sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
-        {
-          if (bVerifyPeer)
-          {
-            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
-          }
-        }
-        else
+        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
         {
           SSL_CTX_free(ctx);
           ctx = NULL;
@@ -628,24 +628,17 @@ extern "C++"
     }
     // }}}
     // {{{ sslInitServer()
-    SSL_CTX *Utility::sslInitServer(string &strError)
+    SSL_CTX *Utility::sslInitServer(string &strError, const bool bVerifyPeer)
     {
-      return sslInit(true, strError);
+      return sslInit(true, strError, bVerifyPeer);
     }
     SSL_CTX *Utility::sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer)
     {
       SSL_CTX *ctx = NULL;
 
-      if ((ctx = sslInitServer(strError)) != NULL)
+      if ((ctx = sslInitServer(strError, bVerifyPeer)) != NULL)
       {
-        if (sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
-        {
-          if (bVerifyPeer)
-          {
-            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
-          }
-        }
-        else
+        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
         {
           SSL_CTX_free(ctx);
           ctx = NULL;

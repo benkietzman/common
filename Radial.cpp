@@ -454,7 +454,7 @@ extern "C++"
           SSL_CTX *ctx = SSL_CTX_new(method);
           if (ctx != NULL)
           {
-            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+            //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
           }
           for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
           {
@@ -674,7 +674,7 @@ extern "C++"
 
       if (ctx != NULL)
       {
-        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+        //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
       }
       while (m_bUseSingleSocket)
       {

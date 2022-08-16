@@ -1915,7 +1915,7 @@ extern "C++"
               SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
               if ((ctx = SSL_CTX_new(method)) != NULL)
               {
-                SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+                //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
               }
               else
               {
@@ -2180,7 +2180,7 @@ extern "C++"
         SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
         if ((ctx = SSL_CTX_new(method)) != NULL)
         {
-          SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+          //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
         }
         else
         {

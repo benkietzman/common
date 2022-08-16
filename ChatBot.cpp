@@ -216,7 +216,11 @@ extern "C++"
       if (m_bSecure)
       {
         SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
-        if ((m_ctx = SSL_CTX_new(method)) == NULL)
+        if ((m_ctx = SSL_CTX_new(method)) != NULL)
+        {
+          SSL_CTX_set_verify(m_ctx, SSL_VERIFY_PEER, NULL);
+        }
+        else
         {
           m_bSecure = false;
         }

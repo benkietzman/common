@@ -452,6 +452,10 @@ extern "C++"
           bool bDone = false;
           SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
           SSL_CTX *ctx = SSL_CTX_new(method);
+          if (ctx != NULL)
+          {
+            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+          }
           for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
           {
             bool bConnected[4] = {false, false, false, false};
@@ -668,6 +672,10 @@ extern "C++"
       SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
       SSL_CTX *ctx = SSL_CTX_new(method);
 
+      if (ctx != NULL)
+      {
+        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+      }
       while (m_bUseSingleSocket)
       {
         list<string> server;

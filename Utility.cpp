@@ -604,13 +604,20 @@ extern "C++"
     {
       return sslInit(false, strError);
     }
-    SSL_CTX *Utility::sslInitClient(const string strCertificate, const string strPrivateKey, string &strError)
+    SSL_CTX *Utility::sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer)
     {
       SSL_CTX *ctx = NULL;
 
       if ((ctx = sslInitClient(strError)) != NULL)
       {
-        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        if (sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        {
+          if (bVerifyPeer)
+          {
+            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+          }
+        }
+        else
         {
           SSL_CTX_free(ctx);
           ctx = NULL;
@@ -625,13 +632,20 @@ extern "C++"
     {
       return sslInit(true, strError);
     }
-    SSL_CTX *Utility::sslInitServer(const string strCertificate, const string strPrivateKey, string &strError)
+    SSL_CTX *Utility::sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer)
     {
       SSL_CTX *ctx = NULL;
 
       if ((ctx = sslInitServer(strError)) != NULL)
       {
-        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        if (sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        {
+          if (bVerifyPeer)
+          {
+            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+          }
+        }
+        else
         {
           SSL_CTX_free(ctx);
           ctx = NULL;

@@ -298,6 +298,14 @@ extern "C++"
       * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
       */
       SSL_CTX *sslInitClient(string &strError);
+      /*! \fn SSL_CTX *sslInitClient(const string strCertificate, const string strPrivateKey, string &strError)
+      * \brief OpenSSL initialization for a server.
+      * \param strCertificate Contains the certificate.
+      * \param strPrivateKey Contains the private key.
+      * \param strError Returns an error message.
+      * \return SSL_CTX contains the SSL context for establishing an SSL socket connection.
+      */
+      SSL_CTX *sslInitClient(const string strCertificate, const string strPrivateKey, string &strError);
       /*! \fn SSL_CTX *sslInitServer(string &strError)
       * \brief OpenSSL initialization for a server.
       * \param strError Returns an error message.

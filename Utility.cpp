@@ -604,6 +604,21 @@ extern "C++"
     {
       return sslInit(false, strError);
     }
+    SSL_CTX *Utility::sslInitClient(const string strCertificate, const string strPrivateKey, string &strError)
+    {
+      SSL_CTX *ctx = NULL;
+
+      if ((ctx = sslInitClient(strError)) != NULL)
+      {
+        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        {
+          SSL_CTX_free(ctx);
+          ctx = NULL;
+        }
+      }
+
+      return ctx;
+    }
     // }}}
     // {{{ sslInitServer()
     SSL_CTX *Utility::sslInitServer(string &strError)

@@ -572,7 +572,7 @@ extern "C++"
         SSL_load_error_strings();
         SSL_library_init();
         OpenSSL_add_all_algorithms();
-        CONF_modules_load_file(NULL, NULL, 0); // Configure OpenSSL using standard configuration file and application.
+        CONF_modules_load_file(NULL, NULL, 0);
       }
     }
     SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError, const bool bVerifyPeer)
@@ -591,7 +591,19 @@ extern "C++"
       {
         if (bVerifyPeer)
         {
-          SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+          if (SSL_CTX_set_default_verify_paths(ctx) == 1)
+          {
+            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+          }
+          else
+          {
+            lErrCode = ERR_get_error();
+            lcpErrMsg = ERR_error_string(lErrCode, NULL);
+            ssMessage << "SSL_CTX_new(" << lErrCode << ") " << lcpErrMsg;
+            strError = ssMessage.str();
+            SSL_CTX_free(ctx);
+            return NULL;
+          }
         }
         else
         {

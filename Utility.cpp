@@ -581,25 +581,24 @@ extern "C++"
       const char* lcpErrMsg;
       stringstream ssMessage;
       SSL_CTX *ctx = NULL;
-      SSL_METHOD *method;
 
       sslInit();
-      method = (SSL_METHOD *)((bSslServer)?SSLv23_server_method():SSLv23_client_method());
       ERR_clear_error();
-      ctx = SSL_CTX_new(method);
+      ctx = SSL_CTX_new(((bSslServer)?SSLv23_server_method():SSLv23_client_method()));
       if (ctx != NULL)
       {
         if (bVerifyPeer)
         {
+          SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
           if (SSL_CTX_set_default_verify_paths(ctx) == 1)
           {
-            SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+            SSL_CTX_set_verify(ctx, ((bSslServer)?SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT:SSL_VERIFY_PEER), &Utility::sslCertificateVerificationCallback);
           }
           else
           {
             lErrCode = ERR_get_error();
             lcpErrMsg = ERR_error_string(lErrCode, NULL);
-            ssMessage << "SSL_CTX_new(" << lErrCode << ") " << lcpErrMsg;
+            ssMessage << "SSL_CTX_set_default_verify_paths(" << lErrCode << ") " << lcpErrMsg;
             strError = ssMessage.str();
             SSL_CTX_free(ctx);
             return NULL;
@@ -760,39 +759,6 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ sslWrite()
-    bool Utility::sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
-    {
-      bool bBlocking = false, bResult = true;
-      long lArg, lArgOrig;
-
-      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
-      {
-        bBlocking = true;
-        lArg |= O_NONBLOCK;
-        fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
-      }
-      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
-      {
-        strBuffer.erase(0, nReturn);
-      }
-      else
-      {
-        switch (SSL_get_error(ssl, nReturn))
-        {
-          case SSL_ERROR_ZERO_RETURN:
-          case SSL_ERROR_SYSCALL:
-          case SSL_ERROR_SSL: bResult = false; break;
-        }
-      }
-      if (bBlocking)
-      {
-        fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
-      }
-
-      return bResult;
-    }
-    // }}}
     // {{{ sslstrerror()
     string Utility::sslstrerror()
     {
@@ -868,6 +834,61 @@ extern "C++"
       }
 
       return ssError.str();
+    }
+    // }}}
+    // {{{ sslCertificateVerificationCallback()
+    int Utility::sslCertificateVerificationCallback(int preverify_ok, X509_STORE_CTX *x509_ctx)
+    {
+      /*
+      X509 *cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+
+      if (cert != NULL)
+      {
+        unsigned char *utf8;
+        cout << "Cert depth << " << X509_STORE_CTX_get_error_depth(x509_ctx) << endl;
+        ASN1_STRING_to_UTF8(&utf8, X509_NAME_ENTRY_get_data(X509_NAME_get_entry(X509_get_issuer_name(cert), X509_NAME_get_index_by_NID(X509_get_issuer_name(cert), NID_commonName, -1))));
+        cout << "  Issuer:  " << utf8 << endl;
+        OPENSSL_free(utf8);
+        ASN1_STRING_to_UTF8(&utf8, X509_NAME_ENTRY_get_data(X509_NAME_get_entry(X509_get_subject_name(cert), X509_NAME_get_index_by_NID(X509_get_subject_name(cert), NID_commonName, -1))));
+        cout << "  Subject:  " << utf8 << endl;
+        OPENSSL_free(utf8);
+      }
+      */
+
+      return preverify_ok;
+    }
+    // }}}
+    // {{{ sslWrite()
+    bool Utility::sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
+    {
+      bool bBlocking = false, bResult = true;
+      long lArg, lArgOrig;
+
+      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
+      {
+        bBlocking = true;
+        lArg |= O_NONBLOCK;
+        fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
+      }
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
+      {
+        strBuffer.erase(0, nReturn);
+      }
+      else
+      {
+        switch (SSL_get_error(ssl, nReturn))
+        {
+          case SSL_ERROR_ZERO_RETURN:
+          case SSL_ERROR_SYSCALL:
+          case SSL_ERROR_SSL: bResult = false; break;
+        }
+      }
+      if (bBlocking)
+      {
+        fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
+      }
+
+      return bResult;
     }
     // }}}
   }

@@ -627,13 +627,13 @@ extern "C++"
     {
       return sslInit(false, strError, bVerifyPeer);
     }
-    SSL_CTX *Utility::sslInitClient(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer)
+    SSL_CTX *Utility::sslInitClient(const string strCertificateChain, const string strPrivateKey, string &strError, const bool bVerifyPeer)
     {
       SSL_CTX *ctx = NULL;
 
       if ((ctx = sslInitClient(strError, bVerifyPeer)) != NULL)
       {
-        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        if (!sslLoadCertChainKey(ctx, strCertificateChain, strPrivateKey, strError))
         {
           SSL_CTX_free(ctx);
           ctx = NULL;
@@ -648,13 +648,13 @@ extern "C++"
     {
       return sslInit(true, strError, bVerifyPeer);
     }
-    SSL_CTX *Utility::sslInitServer(const string strCertificate, const string strPrivateKey, string &strError, const bool bVerifyPeer)
+    SSL_CTX *Utility::sslInitServer(const string strCertificateChain, const string strPrivateKey, string &strError, const bool bVerifyPeer)
     {
       SSL_CTX *ctx = NULL;
 
       if ((ctx = sslInitServer(strError, bVerifyPeer)) != NULL)
       {
-        if (!sslLoadCertKey(ctx, strCertificate, strPrivateKey, strError))
+        if (!sslLoadCertChainKey(ctx, strCertificateChain, strPrivateKey, strError))
         {
           SSL_CTX_free(ctx);
           ctx = NULL;
@@ -665,12 +665,12 @@ extern "C++"
     }
     // }}}
     // }}}
-    // {{{ sslLoadCertKey()
-    bool Utility::sslLoadCertKey(SSL_CTX *ctx, const string strCertificate, const string strPrivateKey, string &strError)
+    // {{{ sslLoadCertChainKey()
+    bool Utility::sslLoadCertChainKey(SSL_CTX *ctx, const string strCertificateChain, const string strPrivateKey, string &strError)
     {
       bool bResult = false;
 
-      if (SSL_CTX_use_certificate_file(ctx, strCertificate.c_str(), SSL_FILETYPE_PEM) == 1)
+      if (SSL_CTX_use_certificate_chain_file(ctx, strCertificateChain.c_str()) == 1)
       {
         if (SSL_CTX_use_PrivateKey_file(ctx, strPrivateKey.c_str(), SSL_FILETYPE_PEM) == 1)
         {
@@ -690,7 +690,7 @@ extern "C++"
       }
       else
       {
-        strError = (string)"SSL_CTX_use_certificate_file() " + sslstrerror();
+        strError = (string)"SSL_CTX_use_certificate_chain_file() " + sslstrerror();
       }
 
       return bResult;

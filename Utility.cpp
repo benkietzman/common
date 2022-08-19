@@ -591,10 +591,12 @@ extern "C++"
         if (bVerifyPeer)
         {
           SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
-          if (SSL_CTX_set_default_verify_paths(ctx) == 1)
+          //if (SSL_CTX_set_default_verify_paths(ctx) == 1)
           {
+            SSL_CTX_load_verify_locations(ctx, "/etc/letsencrypt/live/www.kietzman.org/chain.pem", NULL);
             SSL_CTX_set_verify(ctx, ((bSslServer)?SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT:SSL_VERIFY_PEER), NULL);
           }
+/*
           else
           {
             lErrCode = ERR_get_error();
@@ -604,6 +606,7 @@ extern "C++"
             SSL_CTX_free(ctx);
             return NULL;
           }
+*/
         }
         else
         {

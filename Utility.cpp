@@ -570,8 +570,9 @@ extern "C++"
       {
         m_bSslInit = true;
         SSL_load_error_strings();
-        SSL_library_init();
+        ERR_load_crypto_strings();
         OpenSSL_add_all_algorithms();
+        SSL_library_init();
         CONF_modules_load_file(NULL, NULL, 0);
       }
     }
@@ -592,7 +593,7 @@ extern "C++"
           SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
           if (SSL_CTX_set_default_verify_paths(ctx) == 1)
           {
-            SSL_CTX_set_verify(ctx, ((bSslServer)?SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT:SSL_VERIFY_PEER), &Utility::sslCertificateVerificationCallback);
+            SSL_CTX_set_verify(ctx, ((bSslServer)?SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT:SSL_VERIFY_PEER), NULL);
           }
           else
           {
@@ -834,28 +835,6 @@ extern "C++"
       }
 
       return ssError.str();
-    }
-    // }}}
-    // {{{ sslCertificateVerificationCallback()
-    int Utility::sslCertificateVerificationCallback(int preverify_ok, X509_STORE_CTX *x509_ctx)
-    {
-      /*
-      X509 *cert = X509_STORE_CTX_get_current_cert(x509_ctx);
-
-      if (cert != NULL)
-      {
-        unsigned char *utf8;
-        cout << "Cert depth << " << X509_STORE_CTX_get_error_depth(x509_ctx) << endl;
-        ASN1_STRING_to_UTF8(&utf8, X509_NAME_ENTRY_get_data(X509_NAME_get_entry(X509_get_issuer_name(cert), X509_NAME_get_index_by_NID(X509_get_issuer_name(cert), NID_commonName, -1))));
-        cout << "  Issuer:  " << utf8 << endl;
-        OPENSSL_free(utf8);
-        ASN1_STRING_to_UTF8(&utf8, X509_NAME_ENTRY_get_data(X509_NAME_get_entry(X509_get_subject_name(cert), X509_NAME_get_index_by_NID(X509_get_subject_name(cert), NID_commonName, -1))));
-        cout << "  Subject:  " << utf8 << endl;
-        OPENSSL_free(utf8);
-      }
-      */
-
-      return preverify_ok;
     }
     // }}}
     // {{{ sslWrite()

@@ -371,13 +371,6 @@ extern "C++"
       * \return Returns the error string.
       */
       string sslstrerror(SSL *ssl, int nReturn, bool &bRetry);
-      /*! \fn static int sslCertificateVerificationCallback(int preverify_ok, X509_STORE_CTX *x509_ctx)
-      * \brief Verifies the digital certificate.
-      * \param preverify_ok Contains the preverification.
-      * \param x509_ctx Contains the X509 data.
-      * \return Returns 1 for success or 0 for failure.
-      */
-      static int sslCertificateVerificationCallback(int preverify_ok, X509_STORE_CTX *x509_ctx);
       /*! \fn bool sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
       * \brief Read data from SSL handle and appends it onto the existing strBuffer.
       * \param ssl SSL handle.

@@ -267,7 +267,6 @@ extern "C++"
                     }
                     ptResponse->parse(ptJson->json(strJson));
                     delete ptJson;
-                    strBuffer.erase(0, (unPosition + 1));
                     if (ptResponse->m.find("Status") != ptResponse->m.end() && ptResponse->m["Status"]->v == "okay")
                     {
                       bResult = true;
@@ -278,8 +277,9 @@ extern "C++"
                     }
                     else
                     {
-                      strError = "Encountered an unknown error.";
+                      strError = (string)"Encountered an unknown error. --- " + strBuffer.substr(0, unPosition);
                     }
+                    strBuffer.erase(0, (unPosition + 1));
                   }
                 }
                 else
@@ -358,7 +358,6 @@ extern "C++"
                     {
                       bExit = true;
                       ptResponse->parse(strBuffer[0].substr(0, unPosition));
-                      strBuffer[0].erase(0, unPosition + 1);
                       if (ptResponse->m.find("Status") != ptResponse->m.end() && ptResponse->m["Status"]->v == "okay")
                       {
                         bResult = true;
@@ -369,8 +368,9 @@ extern "C++"
                       }
                       else
                       {
-                        strError = "Encountered an unknown error.";
+                        strError = (string)"Encountered an unknown error. --- " + strBuffer[0].substr(0, unPosition);
                       }
+                      strBuffer[0].erase(0, unPosition + 1);
                     }
                   }
                   else

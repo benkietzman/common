@@ -405,6 +405,36 @@ extern "C++"
       return m_strError.empty();
     }
     // }}}
+    // {{{ Json::i()
+    void Json::i(list<string> jsonList)
+    {
+      insert(jsonList);
+    }
+    void Json::i(map<string, string> jsonMap)
+    {
+      insert(jsonMap);
+    }
+    void Json::i(const string strKey, list<string> jsonList)
+    {
+      insert(strKey, jsonList);
+    }
+    void Json::i(const string strKey, map<string, string> jsonMap)
+    {
+      insert(strKey, jsonMap);
+    }
+    void Json::i(const string strKey, const string strValue, const char cType)
+    {
+      insert(strKey, strValue, cType);
+    }
+    void Json::i(const string strKey, Json *ptJson)
+    {
+      insert(strKey, ptJson);
+    }
+    void Json::i(const string strValue, const char cType)
+    {
+      insert(strValue, cType);
+    }
+    // }}}
     // {{{ Json::insert()
     void Json::insert(list<string> jsonList)
     {
@@ -1034,6 +1064,24 @@ extern "C++"
       }
     }
     // }}}
+    // {{{ Json::pb()
+    void Json::pb(list<string> jsonList)
+    {
+      push_back(jsonList);
+    }
+    void Json::pb(map<string, string> jsonMap)
+    {
+      push_back(jsonMap);
+    }
+    void Json::pb(const string strValue, const char cType)
+    {
+      push_back(strValue, cType);
+    }
+    void Json::pb(Json *ptJson)
+    {
+      push_back(ptJson);
+    }
+    // }}}
     // {{{ Json::push_back()
     void Json::push_back(list<string> jsonList)
     {
@@ -1061,6 +1109,24 @@ extern "C++"
       ptSubJson->m_ptParent = this;
       ptSubJson->m_strTag = m_strTag;
       l.push_back(ptSubJson);
+    }
+    // }}}
+    // {{{ Json::pf()
+    void Json::pf(list<string> jsonList)
+    {
+      push_front(jsonList);
+    }
+    void Json::pf(map<string, string> jsonMap)
+    {
+      push_front(jsonMap);
+    }
+    void Json::pf(const string strValue, const char cType)
+    {
+      push_front(strValue, cType);
+    }
+    void Json::pf(Json *ptJson)
+    {
+      push_front(ptJson);
     }
     // }}}
     // {{{ Json::push_front()

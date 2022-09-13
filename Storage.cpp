@@ -110,6 +110,7 @@ extern "C++"
     bool Storage::request(const string strAction, list<string> keys, Json *ptData, string &strError)
     {
       bool bResult = false;
+      string strJson;
       Json *ptCurrent;
 
       lock();
@@ -150,7 +151,7 @@ extern "C++"
               ptCurrent = ptCurrent->m[*j];
             }
           }
-          ptCurrent->merge(ptData, false, false);
+          ptCurrent->parse(ptData->json(strJson));
         }
         else
         {
@@ -205,7 +206,7 @@ extern "C++"
               if (nextIter == keys.end())
               {
                 bFound = true;
-                ptData->merge(ptCurrent->m[*j], true, false);
+                ptData->parse(ptCurrent->m[*j]->json(strJson));
               }
               else
               {
@@ -224,7 +225,7 @@ extern "C++"
         }
         else
         {
-          ptData->merge(ptCurrent, true, false);
+          ptData->parse(ptCurrent->json(strJson));
         }
       }
       // }}}
@@ -249,7 +250,7 @@ extern "C++"
                 {
                   ptKeys->push_back(k->first);
                 }
-                ptData->merge(ptKeys, true, false);
+                ptData->parse(ptKeys->json(strJson));
                 delete ptKeys;
               }
               else
@@ -274,7 +275,7 @@ extern "C++"
           {
             ptKeys->push_back(j->first);
           }
-          ptData->merge(ptKeys, true, false);
+          ptData->parse(ptKeys->json(strJson));
           delete ptKeys;
         }
       }

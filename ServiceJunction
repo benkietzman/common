@@ -371,14 +371,15 @@ extern "C++"
       * \return Returns a boolean true/false value. 
       */
       bool oracleUpdate(const string strSchema, const string strPassword, const string strTnsName, const string strUpdate, string &strError);
-      /*! \fn bool page(const string strUser, const string strMessage, string &strError)
+      /*! \fn bool page(const string strUser, const string strMessage, string &strError, const bool bGroup = false)
       * \brief Sends a text page.
       * \param strUser Contains the user.
       * \param strMessage Contains the message.
       * \param strError Contains the error message.
+      * \param bGroup Contains the group boolean true/false value.
       * \return Returns a boolean true/false value.
       */
-      bool page(const string strUser, const string strMessage, string &strError);
+      bool page(const string strUser, const string strMessage, string &strError, const bool bGroup = false);
       /*! \fn bool pdf(const string strPdf, list<string> &pages, string &strError)
       * \brief Converts a PDF to text.
       * \param strPdf Contains the PDF.

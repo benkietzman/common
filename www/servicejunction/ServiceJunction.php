@@ -1017,7 +1017,7 @@ class ServiceJunction
   }
   // }}}
   // {{{ page()
-  public function page($strUserID, $strMessage)
+  public function page($strUser, $strMessage, $bGroup = false)
   {
     $bResult = false;
 
@@ -1031,7 +1031,14 @@ class ServiceJunction
       $req['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'pager';
-    $request['User'] = $strUserID;
+    if ($bGroup)
+    {
+      $request['Group'] = $strUser;
+    }
+    else
+    {
+      $request['User'] = $strUser;
+    }
     $request['Message'] = $strMessage;
     $response = null;
     if ($this->request(array(json_encode($request)), $response))

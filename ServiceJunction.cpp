@@ -1528,7 +1528,7 @@ extern "C++"
     }
     // }}}
     // {{{ page()
-    bool ServiceJunction::page(const string strUser, const string strMessage, string &strError)
+    bool ServiceJunction::page(const string strUser, const string strMessage, string &strError, const bool bGroup)
     {
       bool bResult = false;
       Json *ptJson;
@@ -1549,7 +1549,14 @@ extern "C++"
         requestArray["Timeout"] = m_strTimeout;
       }
       requestArray["Service"] = "pager";
-      requestArray["User"] = strUser;
+      if (bGroup)
+      {
+        requestArray["Group"] = strUser;
+      }
+      else
+      {
+        requestArray["User"] = strUser;
+      }
       requestArray["Message"] = ((!m_strApplication.empty())?m_strApplication + (string)":  ":"") + strMessage;
       ptJson = new Json(requestArray);
       requestArray.clear();

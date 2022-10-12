@@ -138,7 +138,7 @@ Vue.component('commonMenu',
           </div>
         </div>
       </div>
-      <div v-if="common.submenu" class="navbar navbar-default" role="navigation" style="margin-top: 50px;">
+      <div v-if="common.submenu" class="navbar navbar-default" role="navigation" style="margin-top: 50px; margin-bottom: -50px;">
         <div class="container-fluid" id="navfluid">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#subnavigationbar">

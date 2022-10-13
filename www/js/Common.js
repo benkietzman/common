@@ -273,6 +273,19 @@ class Common
     return this.m_auth.last_name;
   };
   // }}}
+  // {{{ isArray()
+  isArray(variable)
+  {
+    let bResult = false;
+
+    if (typeof variable === 'object' && Array.isArray(variable))
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
   // {{{ isCookie()
   isCookie(strName)
   {
@@ -329,6 +342,32 @@ class Common
     let bResult = false;
 
     if (this.isDefined(this.m_auth) && ((this.isDefined(this.m_auth.admin) && this.m_auth.admin) || (strApplication != null && this.isDefined(this.m_auth.apps) && this.isDefined(this.m_auth.apps[strApplication]) && this.m_auth.apps[strApplication])))
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
+  // {{{ isNull()
+  isNull(variable)
+  {
+    let bResult = false;
+
+    if (this.isDefined(variable) && variable === null)
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
+  // {{{ isObject()
+  isObject(variable)
+  {
+    let bResult = false;
+
+    if (typeof variable === 'object' && !Array.isArray(variable) && variable !== null)
     {
       bResult = true;
     }

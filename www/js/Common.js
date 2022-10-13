@@ -328,7 +328,7 @@ class Common
   {
     let bResult = false;
 
-    if (this.isDefined(variable) && variable.length > 0)
+    if (variable.length > 0)
     {
       bResult = true;
     }

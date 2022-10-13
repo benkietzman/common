@@ -323,6 +323,19 @@ class Common
     return bResult;
   }
   // }}}
+  // {{{ isEmpty()
+  isEmpty(variable)
+  {
+    let bResult = false;
+
+    if (variable.length == 0))
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
   // {{{ isGlobalAdmin()
   isGlobalAdmin()
   {

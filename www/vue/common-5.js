@@ -59,10 +59,10 @@ Vue.component('commonCentralMenu',
   template:
   `
     <div style="position: relative; z-index: 1000;">
-      <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 120px; right: 0px; border-style: solid; border-width: 1px; border-color: #777777;">
-        <button id="central-slide-opener" class="btn btn-success glyphicon glyphicon-align-justify" v-on:click="slideMenu()" style="float: left; margin: 0px 0px 0px -40px; border-radius: 10px 0px 00px 10px;"></button>
+      <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 120px; right: 0px;">
+        <button id="central-slide-opener" class="btn btn-sm btn-success float-start" v-on:click="slideMenu()" style="font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 00px 10px;">&#8803;</button>
         <div v-show="common.centralMenu.show" id="central-slide-content" style="padding: 10px;">
-          <select class="form-control input-sm" v-on:change="go()" v-model="common.centralMenu.application">
+          <select class="form-control form-control-sm" v-on:change="go()" v-model="common.centralMenu.application">
             <option v-for="app in common.centralMenu.applications" :value="app">{{app.name}}</option>
           </select>
         </div>
@@ -116,25 +116,25 @@ Vue.component('commonMenu',
   // {{{ template
   template:
   `
-    <div style="margin-bottom: 10px;">
-      <nav v-if="common.menu" class="navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
-        <div class="container-fluid">
-          <a v-if="common.application" class="navbar-brand" href="#/">{{common.application}}</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navigationbar" aria-controls="navigationbar" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navigationbar">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item" v-for="item in common.menu.left"><router-link class="nav-link" :class="item.active" :to="item.href">{{item.value}}</router-link></li>
-            </ul>
-            <ul class="navbar-nav navbar-right">
-              <li class="nav-item" v-for="item in common.menu.right"><router-link class="nav-link" :class="item.active" :to="item.href">{{item.value}}</router-link></li>
-            </ul>
+    <div>
+      <div class="fixed-top">
+        <nav v-if="common.menu" class="navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
+          <div class="container-fluid">
+            <a v-if="common.application" class="navbar-brand" href="#/">{{common.application}}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navigationbar" aria-controls="navigationbar" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navigationbar">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item" v-for="item in common.menu.left"><router-link class="nav-link" :class="item.active" :to="item.href">{{item.value}}</router-link></li>
+              </ul>
+              <ul class="navbar-nav navbar-right">
+                <li class="nav-item" v-for="item in common.menu.right"><router-link class="nav-link" :class="item.active" :to="item.href">{{item.value}}</router-link></li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </nav>
-      <div class="container">
-        <nav v-if="common.submenu" class="navbar navbar-expand-lg navbar-dark bg-dark bg-gradient">
+        </nav>
+        <nav v-if="common.submenu" class="container navbar navbar-expand-lg navbar-dark bg-dark bg-gradient">
           <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#subnavigationbar" aria-controls="subnavigationbar" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
@@ -149,6 +149,10 @@ Vue.component('commonMenu',
             </div>
           </div>
         </nav>
+      </div>
+      <div style="padding: 30px;">
+      </div>
+      <div v-if="common.submenu" style="padding: 30px;">
       </div>
     </div>
   `

@@ -116,7 +116,7 @@ Vue.component('commonMenu',
   // {{{ template
   template:
   `
-    <div style="margin-bottom: 50px;">
+    <div style="margin-bottom: 10px;">
       <nav v-if="common.menu" class="navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
         <div class="container-fluid">
           <a v-if="common.application" class="navbar-brand" href="#/">{{common.application}}</a>

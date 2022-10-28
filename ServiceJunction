@@ -482,18 +482,18 @@ extern "C++"
       * \return Returns a boolean true/false value. 
       */
       bool sysInfo(const string strServer, const string strProcess, Json *ptResponse, string &strError);
-      /*! \fn bool teradataQuery(const string strUser, const string strPassword, const string strURL, const string strQuery, list<map<string, string> > &result, string &strError)
+      /*! \fn bool teradataQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError)
       * \brief Runs a query against the Teradata database.
       * \param strUser Contains the Teradata user.
       * \param strPassword Contains the Teradata password.
-      * \param strURL Contains the Teradata URL.
+      * \param strServer Contains the Teradata URL.
       * \param strQuery Contains the MySQL query.
       * \param result Returns a list of resultant rows containing maps of field/value pairs.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value. 
       */
-      bool teradataQuery(const string strUser, const string strPassword, const string strURL, const string strQuery, list<map<string, string> > &result, string &strError);
-      /*! \fn bool teradataUpdate(const string strUser, const string strPassword, const string strURL, const string strUpdate, string &strError)
+      bool teradataQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool teradataUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError)
       * \brief Runs an insert/update/delete against the Teradata database.
       * \param strUser Contains the Teradata user.
       * \param strPassword Contains the Teradata password.
@@ -502,7 +502,7 @@ extern "C++"
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value. 
       */
-      bool teradataUpdate(const string strUser, const string strPassword, const string strURL, const string strUpdate, string &strError);
+      bool teradataUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError);
       /*! \fn void useSecureJunction(const bool bUseSecureJunction = true)
       * \brief Use secure Service Junction requests.
       * \param bUseSecureJunction Contains the secure Service Junction value.

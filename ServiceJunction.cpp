@@ -2583,7 +2583,7 @@ extern "C++"
     }
     // }}}
     // {{{ teradataQuery()
-    bool ServiceJunction::teradataQuery(const string strUser, const string strPassword, const string strURL, const string strQuery, list<map<string, string> > &result, string &strError)
+    bool ServiceJunction::teradataQuery(const string strUser, const string strPassword, const string strServer, const string strQuery, list<map<string, string> > &result, string &strError)
     {
       bool bResult = false;
       Json *ptJson;
@@ -2611,7 +2611,7 @@ extern "C++"
       requestArray["Service"] = "teradata";
       requestArray["User"] = strUser;
       requestArray["Password"] = strPassword;
-      requestArray["URL"] = strURL;
+      requestArray["Server"] = strServer;
       requestArray["Query"] = strQuery;
       ptJson = new Json(requestArray);
       requestArray.clear();
@@ -2661,7 +2661,7 @@ extern "C++"
     }
     // }}}
     // {{{ teradataUpdate()
-    bool ServiceJunction::teradataUpdate(const string strUser, const string strPassword, const string strURL, const string strUpdate, string &strError)
+    bool ServiceJunction::teradataUpdate(const string strUser, const string strPassword, const string strServer, const string strUpdate, string &strError)
     {
       bool bResult = false;
       Json *ptJson;
@@ -2685,7 +2685,7 @@ extern "C++"
       requestArray["Service"] = "teradata";
       requestArray["User"] = strUser;
       requestArray["Password"] = strPassword;
-      requestArray["URL"] = strURL;
+      requestArray["Server"] = strServer;
       requestArray["Update"] = strUpdate;
       ptJson = new Json(requestArray);
       requestArray.clear();

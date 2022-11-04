@@ -29,6 +29,10 @@ class Common
     this.strPrevMenu = null;
     this.strPrevSubMenu = null;
     this.strSubMenu = null;
+    if (this.isDefined(options.app_id))
+    {
+      this.app = document.getElementById(options.app_id);
+    }
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -36,6 +40,10 @@ class Common
     if (this.isDefined(options.centralScript))
     {
       this.centralScript = options.centralScript;
+    }
+    if (this.isDefined(options.router))
+    {
+      this.router = options.router;
     }
     if (this.isDefined(options.script))
     {
@@ -704,6 +712,12 @@ class Common
     this.setMenu(this.strMenu, this.strSubMenu);
   }
   // }}}
+  // {{{ render()
+  render(template, data)
+  {
+    this.app.innerHTML = Mustache.render(template, data);
+  } 
+  // }}}
   // {{{ request()
   request(strFunction, request, callback)
   {
@@ -757,6 +771,17 @@ class Common
     }
 
     return bResult;
+  }
+  // }}}
+  // {{{ route()
+  route(url, component)
+  {
+    this.router.on(url, async () =>
+    {
+      let c = await import(component);
+      c.default.load();
+      this.render(c.default.template, c.default.data);
+    });
   }
   // }}}
   // {{{ setCookie()

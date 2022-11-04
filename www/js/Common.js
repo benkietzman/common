@@ -410,6 +410,13 @@ class Common
     return bResult;
   }
   // }}}
+  // {{{ load()
+  async load(id, component)
+  {
+    let c = await import(component);
+    this.render(id, c.default.template, c.default.load(id, c.default.template));
+  }
+  // }}}
   // {{{ processLogin()
   processLogin()
   {

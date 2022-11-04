@@ -29,10 +29,6 @@ class Common
     this.strPrevMenu = null;
     this.strPrevSubMenu = null;
     this.strSubMenu = null;
-    if (this.isDefined(options.app_id))
-    {
-      this.app = document.getElementById(options.app_id);
-    }
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -87,6 +83,16 @@ class Common
         }
       });
     }
+  }
+  // }}}
+  // {{{ applyBindings()
+  applyBindings(b)
+  {
+    document.querySelectorAll('[data-bind]').forEach(e =>
+    {
+      const o = b[e.getAttribute('data-bind')];
+      this.bindValue(e, o);
+    });
   }
   // }}}
   // {{{ attachEvent()
@@ -173,6 +179,14 @@ class Common
         }
       });
     }
+  }
+  // }}}
+  // {{{ bindValue()
+  bindValue(i, o)
+  {
+    i.value = o.value;
+    o.subscribe(() => i.value = o.value);
+    i.onkeyup = () => o.value = i.value;
   }
   // }}}
   // {{{ clearMenu()
@@ -713,9 +727,13 @@ class Common
   }
   // }}}
   // {{{ render()
-  render(template, data)
+  render(id, template, data)
   {
-    this.app.innerHTML = Mustache.render(template, data);
+    document.getElementById(id).innerHTML = Mustache.render(template, data);
+    if (this.isObject(data.bindings))
+    {
+      this.applyBindings(data.bindings);
+    }
   } 
   // }}}
   // {{{ request()
@@ -774,13 +792,12 @@ class Common
   }
   // }}}
   // {{{ route()
-  route(url, component)
+  route(url, id, component)
   {
     this.router.on(url, async () =>
     {
       let c = await import(component);
-      c.default.load();
-      this.render(c.default.template, c.default.data);
+      this.render(id, c.default.template, c.default.load(id, c.default.template));
     });
   }
   // }}}

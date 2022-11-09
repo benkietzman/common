@@ -9,10 +9,10 @@
 class Observable
 {
   // {{{ constructor()
-  constructor(value)
+  constructor()
   {
     this.listeners = [];
-    this.v = value;
+    this.v = null;
   }
   // }}}
   // {{{ notify()
@@ -34,11 +34,11 @@ class Observable
   }
   // }}}
   // {{{ set value()
-  set value(val)
+  set value(v)
   {
-    if (val !== this.v)
+    if (v !== this.v)
     {
-      this.v = val;
+      this.v = v;
       this.notify();
     }
   }

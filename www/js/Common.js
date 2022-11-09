@@ -85,16 +85,6 @@ class Common
     }
   }
   // }}}
-  // {{{ applyBindings()
-  applyBindings(b)
-  {
-    document.querySelectorAll('[data-bind]').forEach(e =>
-    {
-      const o = b[e.getAttribute('data-bind')];
-      this.bindValue(e, o);
-    });
-  }
-  // }}}
   // {{{ attachEvent()
   attachEvent(strHandle, callback)
   {
@@ -179,14 +169,6 @@ class Common
         }
       });
     }
-  }
-  // }}}
-  // {{{ bindValue()
-  bindValue(i, o)
-  {
-    i.value = o.value;
-    o.subscribe(() => i.value = o.value);
-    i.onkeyup = () => o.value = i.value;
   }
   // }}}
   // {{{ clearMenu()
@@ -734,12 +716,23 @@ class Common
   }
   // }}}
   // {{{ render()
-  render(id, template, data)
+  render(id, t, d)
   {
-    document.getElementById(id).innerHTML = Mustache.render(template, data);
-    if (this.isObject(data.bindings))
+    document.getElementById(id).innerHTML = Mustache.render(t, d);
+    if (this.isObject(d.b))
     {
-      this.applyBindings(data.bindings);
+      document.querySelectorAll('#'+id+' [b]').forEach(e =>
+      {
+        if (this.isDefined(d.b[e.getAttribute('b')]))
+        {
+          const o = d.b[e.getAttribute('b')];
+          e.value = o.value;
+          o.subscribe(() => e.value = o.value);
+          e.onkeyup = () => o.value = e.value;
+          e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
+          e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+        }
+      });
     }
   } 
   // }}}

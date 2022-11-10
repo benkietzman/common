@@ -5,7 +5,7 @@
 // copyright  : kietzman.org
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
-
+// {{{ Common
 class Common
 {
   // {{{ constructor()
@@ -1297,3 +1297,73 @@ class Common
   }
   // }}}
 }
+// }}}
+// {{{ Observable
+class Observable
+{
+  // {{{ constructor()
+  constructor()
+  {
+    this.listeners = [];
+    this.v = null;
+  }
+  // }}}
+  // {{{ notify()
+  notify()
+  {
+    this.listeners.forEach(listener => listener(this.v));
+  }
+  // }}}
+  // {{{ subscribe()
+  subscribe(listener)
+  {
+    this.listeners.push(listener);
+  }
+  // }}}
+  // {{{ get value()
+  get value()
+  {
+    return this.v;
+  }
+  // }}}
+  // {{{ set value()
+  set value(v)
+  {
+    if (v !== this.v)
+    {
+      this.v = v;
+      this.notify();
+    }
+  }
+  // }}}
+}
+// }}}
+// {{{ Computed
+class Computed extends Observable
+{
+  // {{{ constructor()
+  constructor(value, deps)
+  {
+    super(value());
+    const listener = () =>
+    {
+      this.v = value();
+      this.notify();
+    }
+    deps.forEach(dep => dep.subscribe(listener));
+  }
+  // }}}
+  // {{{ get value()
+  get value()
+  {
+    return this.v;
+  }
+  // }}}
+  // {{{ set value()
+  set value(val)
+  {
+    throw "Cannot set computed property";
+  }
+  // }}}
+}
+// }}}

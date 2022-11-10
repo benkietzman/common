@@ -20,7 +20,7 @@ export default
     <div class="fixed-top">
       <nav class="navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
         <div class="container-fluid">
-          <span class="navbar-brand">{{common.application}}</span>
+          <a class="navbar-brand" href="#/">{{common.application}}</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navigationbar" aria-controls="navigationbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -31,9 +31,9 @@ export default
               {{/common.menu.left}}
             </ul>
             <ul class="navbar-nav navbar-right">
-              {{#common.mnu.right}}
+              {{#common.menu.right}}
               <li class="nav-item"><a class="nav-link {{active}}" href="{{href}}">{{value}}</a></li>
-              {{/common.mnu.right}}
+              {{/common.menu.right}}
             </ul>
           </div>
         </div>

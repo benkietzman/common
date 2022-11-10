@@ -791,14 +791,28 @@ class Common
     return bResult;
   }
   // }}}
-  // {{{ route()
-  route(url, id, component)
+  // {{{ routes()
+  routes(id, data)
   {
-    this.router.on(url, async () =>
+    for (let i = 0; i < data.length; i++)
     {
-      let c = await import(component);
-      this.render(id, c.default.template, c.default.load(id, c.default.template));
-    });
+      if (this.isDefined(data[i].component))
+      {
+        if (this.isDefined(data[i].path))
+        {
+          this.router.on(data[i].path, async (nav) =>
+          {
+            let c = await import(data[i].component);
+            this.render(id, c.default.template, c.default.load(id, c.default.template, nav));
+          });
+        }
+      }
+      else if (this.isDefined(data[i].default))
+      {
+        this.router.notFound(() => this.router.navigate(data[i].default));
+      }
+    }
+    this.router.resolve();
   }
   // }}}
   // {{{ setCookie()

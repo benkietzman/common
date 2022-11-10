@@ -14,6 +14,7 @@ class Common
     this.activeMenu = null;
     this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
+    this.components = {};
     this.footer = {engineer: false};
     this.autoLoads = {};
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
@@ -38,9 +39,37 @@ class Common
     {
       this.centralScript = options.centralScript;
     }
+    if (this.isDefined(options.ids))
+    {
+      this.ids = options.ids;
+    }
+    if (!this.isDefined(this.ids))
+    {
+      this.ids = {};
+    }
+    if (!this.isDefined(this.ids.app))
+    {
+      this.ids.app = 'app';
+    }
+    if (!this.isDefined(this.ids.centralMenu))
+    {
+      this.ids.centralMenu = 'centralMenu';
+    }
+    if (!this.isDefined(this.ids.menu))
+    {
+      this.ids.menu = 'menu';
+    }
+    if (this.isDefined(options.loads))
+    {
+      this.loads(options.loads);
+    }
     if (this.isDefined(options.router))
     {
       this.router = options.router;
+    }
+    if (this.isDefined(options.routes))
+    {
+      this.routes(options.routes);
     }
     if (this.isDefined(options.script))
     {
@@ -210,6 +239,16 @@ class Common
 
     return bResult;
   }
+  // }}}
+  // {{{ forceUpdate()
+  forceUpdate()
+  {
+    for (let id of Object.keys(this.autoLoads))
+    {
+      this.render(id, this.autoLoads[id], null);
+    }
+    this.render(this.ids.app, this.component, this.nav);
+  } 
   // }}}
   // {{{ getCookie()
   getCookie(strName)
@@ -398,7 +437,11 @@ class Common
   {
     if (this.isDefined(this.autoLoads[id]))
     {
-      this.render(id, this.autoLoads[id].template, this.autoLoads[id].load(id, this.autoLoads[id].template));
+      this.render(id, this.autoLoads[id], null);
+      if (this.isDefined(this.autoLoads[id].mounted))
+      {
+        this.autoLoads[id].mounted(id);
+      }
     }
   }
   // }}}
@@ -411,7 +454,7 @@ class Common
     {
       let c = await import(data[id]);
       this.autoLoads[id] = c.default;
-      this.render(id, c.default.template, c.default.load(id, c.default.template));
+      this.load(id);
     }
   }
   // }}}
@@ -732,21 +775,51 @@ class Common
   }
   // }}}
   // {{{ render()
-  render(id, t, d)
+  render(id, component)
   {
-    document.getElementById(id).innerHTML = Mustache.render(t, d);
-    if (this.isObject(d.b))
+    document.getElementById(id).innerHTML = Mustache.render(component.template, component.data);
+    if (this.isObject(component.data.bindings))
     {
-      document.querySelectorAll('#'+id+' [b]').forEach(e =>
+      document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
       {
-        if (this.isDefined(d.b[e.getAttribute('b')]))
+        e.onchange = () => eval('component.methods.' + e.getAttribute('c-change'));
+      });
+      document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
+      {
+        e.onclick = () => eval('component.methods.' + e.getAttribute('c-click'));
+      });
+      document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
+      {
+        if (this.isDefined(component.data.bindings[e.getAttribute('c-model')]))
         {
-          const o = d.b[e.getAttribute('b')];
-          e.value = o.value;
-          o.subscribe(() => e.value = o.value);
+          const o = component.data.bindings[e.getAttribute('c-model')];
+          if (this.isDefined(e.value))
+          {
+            e.value = o.value;
+            o.subscribe(() => e.value = o.value);
+          }
+          else if (this.isDefined(e.innerHTML))
+          {
+            e.innerHTML = o.value;
+            o.subscribe(() => e.innerHTML = o.value);
+          }
           e.onkeyup = () => o.value = e.value;
-          e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
-          e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+          if (e.hasAttribute('c-change'))
+          {
+            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('component.methods.' + e.getAttribute('c-change'));};
+          }
+          else
+          {
+            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
+          }
+          if (e.hasAttribute('c-change'))
+          {
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('component.methods.' + e.getAttribute('c-click'));};
+          }
+          else
+          {
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+          }
         }
       });
     }
@@ -808,7 +881,7 @@ class Common
   }
   // }}}
   // {{{ routes()
-  routes(id, data)
+  routes(data)
   {
     for (let i = 0; i < data.length; i++)
     {
@@ -818,8 +891,22 @@ class Common
         {
           this.router.on(data[i].path, async (nav) =>
           {
-            let c = await import(data[i].component);
-            this.render(id, c.default.template, c.default.load(id, c.default.template, nav));
+            let c = null;
+            let path = data[i].path;
+            if (this.isDefined(this.components[path]))
+            {
+              this.component = c = this.components[path];
+            }
+            else
+            {
+              let component = await import(data[i].component);
+              this.components[path] = this.component = c = component.default;
+              if (this.isDefined(component.default.mounted))
+              {
+                component.default.mounted(this.ids.app, nav);
+              }
+            }
+            this.render(this.ids.app, c, nav);
           });
         }
       }
@@ -937,12 +1024,7 @@ class Common
     }
     this.menu = menu;
     this.submenu = submenu;
-    let strPath = menu;
-    if (submenu)
-    {
-      strPath += submenu;
-    }
-    this.load(strPath);
+    this.load(this.ids.menu);
   }
   // }}}
   // {{{ setRedirectPath()

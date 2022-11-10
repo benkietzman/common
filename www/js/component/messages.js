@@ -7,15 +7,13 @@
 ///////////////////////////////////////////
 export default
 {
-  load(id, t)
+  // {{{ data
+  data:
   {
-    let d =
-    {
-      common: common
-    };
-
-    return d;
+    common: common
   },
+  // }}}
+  // {{{ template
   template: `
     {{#common.m_messages}}
     <div class="alert alert-{{Class}} alert-dismissible fade in">
@@ -29,4 +27,5 @@ export default
     </div>
     {{/common.m_messages}}
   `
+  // }}}
 }

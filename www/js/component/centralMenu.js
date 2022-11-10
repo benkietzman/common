@@ -7,24 +7,38 @@
 ///////////////////////////////////////////
 export default
 {
-  load(id, t)
+  // {{{ data
+  data:
   {
-    let d =
+    bindings:
     {
-      b: {},
-      common: common
-    };
-    d.b.application = new Observable;
-    d.b.application.onchange = () =>
+      application: new Observable
+    },
+    common: common
+  },
+  // }}}
+  // {{{ methods
+  methods:
+  {
+    // {{{ go()
+    go()
     {
-      document.location.href = common.centralMenu.applications[d.b.application.value].website;
-    };
-    d.b.slideOpener = new Observable;
-    d.b.slideOpener.onclick = () =>
+      document.location.href = common.centralMenu.applications[common.autoLoads['centralMenu'].data.bindings.application.value].website;
+    },
+    // }}}
+    // {{{ slideMenu()
+    slideMenu()
     {
       common.centralMenu.show = !common.centralMenu.show;
-      common.render(id, t, d);
-    };
+      common.forceUpdate();
+    }
+    // }}}
+  },
+  // }}}
+  // {{{ mounted()
+  mounted(id, nav)
+  {
+    this.data.id = id;
     common.request('applications', {_script: common.centralScript}, (data) =>
     {
       let error = {};
@@ -40,24 +54,24 @@ export default
             common.centralMenu.applications.push(data.Response.out[i]);
             if (data.Response.out[i].name == common.application)
             {
-              d.b.application.value = unIndex;
+              this.data.bindings.application.value = unIndex;
             }
             unIndex++;
           }
         }
       }
-      common.render(id, t, d);
+      common.render(id, this);
     });
-
-    return d;
   },
+  // }}}
+  // {{{ template
   template: `
     <div style="position: relative; z-index: 1000;">
       <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 120px; right: 0px;">
-        <button id="central-slide-opener" b="slideOpener" class="btn btn-sm btn-success float-start" style="font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 00px 10px;">&#8803;</button>
+        <button id="central-slide-opener" class="btn btn-sm btn-success float-start" c-click="slideMenu()" style="font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 00px 10px;">&#8803;</button>
         {{#common.centralMenu.show}}
         <div id="central-slide-content" style="padding: 10px;">
-          <select class="form-control form-control-sm" b="application">
+          <select class="form-control form-control-sm" c-change="go()" c-model="application">
             {{#common.centralMenu.applications}}
             <option value="{{i}}">{{name}}</option>
             {{/common.centralMenu.applications}}
@@ -67,4 +81,5 @@ export default
       </div>
     </div>
   `
+  // }}}
 }

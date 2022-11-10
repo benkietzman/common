@@ -7,12 +7,15 @@
 ///////////////////////////////////////////
 export default
 {
-  load(id, t)
+  // {{{ data
+  data:
   {
-    let d =
-    {
-      common: common
-    };
+    common: common
+  },
+  // }}}
+  // {{{ mounted()
+  mounted(id)
+  {
     common.footer._script = common.centralScript;
     common.request('footer', common.footer, (response) =>
     {
@@ -22,11 +25,11 @@ export default
       {
         common.footer = response.Response.out;
       }
-      common.render(id, t, d);
+      common.render(id, this);
     });
-
-    return d;
   },
+  // }}}
+  // {{{ template
   template: `
     <br>
     <div class="container">
@@ -49,4 +52,5 @@ export default
     </div>
     <br>
   `
+  // }}}
 }

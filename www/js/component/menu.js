@@ -7,15 +7,13 @@
 ///////////////////////////////////////////
 export default
 {
-  load(id, t)
+  // {{{ data
+  data:
   {
-    let d =
-    {
-      common: common
-    };
-
-    return d;
+    common: common
   },
+  // }}}
+  // {{{ template
   template: `
     <div class="fixed-top">
       <nav class="navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
@@ -63,4 +61,5 @@ export default
     <div v-if="common.submenu" style="padding: 30px;">
     </div>
   `
+  // }}}
 }

@@ -398,18 +398,19 @@ class Common
   {
     if (this.isDefined(this.autoLoads[id]))
     {
-      let c = await import(this.autoLoads[id]);
-      this.render(id, c.default.template, c.default.load(id, c.default.template));
+      this.render(id, this.autoLoads[id].template, this.autoLoads[id].load(id, this.autoLoads[id].template));
     }
   }
   // }}}
   // {{{ loads()
   async loads(data)
   {
-    this.autoLoads = data;
+    this.autoLoads = null;
+    this.autoLoads = {};
     for (let id of Object.keys(data))
     {
       let c = await import(data[id]);
+      this.autoLoads[id] = c.default;
       this.render(id, c.default.template, c.default.load(id, c.default.template));
     }
   }

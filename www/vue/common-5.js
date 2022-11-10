@@ -191,7 +191,7 @@ Vue.component('commonMessages',
         <strong v-show="message.Title">{{message.Title}}<br></strong>
         {{message.Body}}
         <br>
-        <div class="pull-right"><i>{{message.Time}}</i></div>
+        <div class="float-end"><i>{{message.Time}}</i></div>
       </div>
     </div>
   `

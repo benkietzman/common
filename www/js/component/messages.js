@@ -11,17 +11,22 @@ export default
   {
     let d =
     {
+      common: common
     };
 
     return d;
   },
   template: `
-    <div v-for="message in getMessages()" :class="'alert alert-' + message.Class + ' alert-dismissible fade in'">
-      <button class="close" data-dismiss="alert" aria-label="close" v-on:click="close(message.Index)">&times;</button>
-      <strong v-show="message.Title">{{message.Title}}<br></strong>
-      {{message.Body}}
+    {{#common.m_messages}}
+    <div class="alert alert-{{Class}} alert-dismissible fade in">
+      <button class="close" data-dismiss="alert" aria-label="close">&times;</button>
+      {{#Title}}
+      <strong>{{Title}}<br></strong>
+      {{/Title}}
+      {{Body}}
       <br>
-      <div class="pull-right"><i>{{message.Time}}</i></div>
+      <div class="float-end"><i>{{Time}}</i></div>
     </div>
+    {{/common.m_messages}}
   `
 }

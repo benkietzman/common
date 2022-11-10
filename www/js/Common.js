@@ -15,6 +15,7 @@ class Common
     this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
     this.footer = {engineer: false};
+    this.autoLoads = {};
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
     this.logout = {info: false, message: false};
     this.m_auth = {};
@@ -393,10 +394,24 @@ class Common
   }
   // }}}
   // {{{ load()
-  async load(id, component)
+  async load(id)
   {
-    let c = await import(component);
-    this.render(id, c.default.template, c.default.load(id, c.default.template));
+    if (this.isDefined(this.autoLoads[id]))
+    {
+      let c = await import(this.autoLoads[id]);
+      this.render(id, c.default.template, c.default.load(id, c.default.template));
+    }
+  }
+  // }}}
+  // {{{ loads()
+  async loads(data)
+  {
+    this.autoLoads = data;
+    for (let id of Object.keys(data))
+    {
+      let c = await import(data[id]);
+      this.render(id, c.default.template, c.default.load(id, c.default.template));
+    }
   }
   // }}}
   // {{{ processLogin()
@@ -921,6 +936,12 @@ class Common
     }
     this.menu = menu;
     this.submenu = submenu;
+    let strPath = menu;
+    if (submenu)
+    {
+      strPath += submenu;
+    }
+    this.load(strPath);
   }
   // }}}
   // {{{ setRedirectPath()

@@ -10,8 +10,10 @@ export default
   // {{{ controller()
   controller()
   {
-    let s = common.getStore('messages');
-    s.common = common;
+    let s = common.store('messages',
+    {
+      common: common
+    });
   },
   // }}}
   // {{{ template

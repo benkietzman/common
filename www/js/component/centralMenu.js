@@ -11,13 +11,14 @@ export default
   controller(id)
   {
     // {{{ prep work
-    let s = common.getStore('centralMenu');
-    s.bindings =
+    let s = common.store('centralMenu',
     {
-      application: new Observable
-    };
-    s.common = common;
-    s.id = id;
+      bindings:
+      {
+        application: new Observable
+      },
+      common: common
+    });
     // }}}
     // {{{ go()
     s.go = () =>

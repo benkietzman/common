@@ -10,8 +10,10 @@ export default
   // {{{ controller()
   controller(id)
   {
-    let s = common.getStore('footer');
-    s.common = common;
+    let s = common.store('footer',
+    {
+      common: common
+    });
     common.footer._script = common.centralScript;
     common.request('footer', common.footer, (response) =>
     {

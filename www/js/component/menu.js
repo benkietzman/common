@@ -10,8 +10,10 @@ export default
   // {{{ contoller()
   controller()
   {
-    let s = common.getStore('menu');
-    s.common = common;
+    let s = common.store('menu',
+    {
+      common: common
+    });
   },
   // }}}
   // {{{ template

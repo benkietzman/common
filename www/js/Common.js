@@ -735,6 +735,10 @@ class Common
   // {{{ putStore()
   putStore(controller, data)
   {
+    if (!this.isDefined(data) || this.isNull(data))
+    {
+      data = {};
+    }
     this.m_store[controller] = data;
   }
   // }}}
@@ -892,10 +896,10 @@ class Common
             {
               let component = await import(data[i].component);
               this.components[path] = this.component = c = component.default;
-              if (this.isDefined(component.default.controller))
-              {
-                component.default.controller(this.id, nav);
-              }
+            }
+            if (this.isDefined(c.controller))
+            {
+              c.controller(this.id, nav);
             }
             this.render(this.id, data[i].name, c);
           });

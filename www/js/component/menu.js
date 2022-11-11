@@ -7,10 +7,11 @@
 ///////////////////////////////////////////
 export default
 {
-  // {{{ data
-  data:
+  // {{{ contoller()
+  controller()
   {
-    common: common
+    let s = common.getStore('menu');
+    s.common = common;
   },
   // }}}
   // {{{ template

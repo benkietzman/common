@@ -7,38 +7,32 @@
 ///////////////////////////////////////////
 export default
 {
-  // {{{ data
-  data:
+  // {{{ controller()
+  controller(id)
   {
-    bindings:
+    // {{{ prep work
+    let s = common.getStore('centralMenu');
+    s.bindings =
     {
       application: new Observable
-    },
-    common: common
-  },
-  // }}}
-  // {{{ methods
-  methods:
-  {
+    };
+    s.common = common;
+    s.id = id;
+    // }}}
     // {{{ go()
-    go()
+    s.go = () =>
     {
-      document.location.href = common.centralMenu.applications[common.autoLoads['centralMenu'].data.bindings.application.value].website;
+      document.location.href = common.centralMenu.applications[s.bindings.application.value].website;
     },
     // }}}
     // {{{ slideMenu()
-    slideMenu()
+    s.slideMenu = () =>
     {
       common.centralMenu.show = !common.centralMenu.show;
-      common.forceUpdate();
+      common.render();
     }
     // }}}
-  },
-  // }}}
-  // {{{ mounted()
-  mounted(id, nav)
-  {
-    this.data.id = id;
+    // {{{ main
     common.request('applications', {_script: common.centralScript}, (data) =>
     {
       let error = {};
@@ -54,14 +48,15 @@ export default
             common.centralMenu.applications.push(data.Response.out[i]);
             if (data.Response.out[i].name == common.application)
             {
-              this.data.bindings.application.value = unIndex;
+              s.bindings.application.value = unIndex;
             }
             unIndex++;
           }
         }
       }
-      common.render(id, this);
+      common.render(id, 'centralMenu', this);
     });
+    // }}}
   },
   // }}}
   // {{{ template

@@ -7,15 +7,11 @@
 ///////////////////////////////////////////
 export default
 {
-  // {{{ data
-  data:
+  // {{{ controller()
+  controller(id)
   {
-    common: common
-  },
-  // }}}
-  // {{{ mounted()
-  mounted(id)
-  {
+    let s = common.getStore('footer');
+    s.common = common;
     common.footer._script = common.centralScript;
     common.request('footer', common.footer, (response) =>
     {
@@ -25,7 +21,7 @@ export default
       {
         common.footer = response.Response.out;
       }
-      common.render(id, this);
+      common.render(id, 'footer', this);
     });
   },
   // }}}

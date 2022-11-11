@@ -39,25 +39,13 @@ class Common
     {
       this.centralScript = options.centralScript;
     }
-    if (this.isDefined(options.ids))
+    if (this.isDefined(options.id))
     {
-      this.ids = options.ids;
+      this.id = options.id;
     }
-    if (!this.isDefined(this.ids))
+    if (!this.isDefined(this.id))
     {
-      this.ids = {};
-    }
-    if (!this.isDefined(this.ids.app))
-    {
-      this.ids.app = 'app';
-    }
-    if (!this.isDefined(this.ids.centralMenu))
-    {
-      this.ids.centralMenu = 'centralMenu';
-    }
-    if (!this.isDefined(this.ids.menu))
-    {
-      this.ids.menu = 'menu';
+      this.id = 'app';
     }
     if (this.isDefined(options.loads))
     {
@@ -239,16 +227,6 @@ class Common
 
     return bResult;
   }
-  // }}}
-  // {{{ forceUpdate()
-  forceUpdate()
-  {
-    for (let id of Object.keys(this.autoLoads))
-    {
-      this.render(id, this.autoLoads[id], null);
-    }
-    this.render(this.ids.app, this.component, this.nav);
-  } 
   // }}}
   // {{{ getCookie()
   getCookie(strName)
@@ -437,11 +415,11 @@ class Common
   {
     if (this.isDefined(this.autoLoads[id]))
     {
-      this.render(id, this.autoLoads[id], null);
-      if (this.isDefined(this.autoLoads[id].mounted))
+      if (this.isDefined(this.autoLoads[id].controller))
       {
-        this.autoLoads[id].mounted(id);
+        this.autoLoads[id].controller(id);
       }
+      this.render(id, id, this.autoLoads[id]);
     }
   }
   // }}}
@@ -775,53 +753,65 @@ class Common
   }
   // }}}
   // {{{ render()
-  render(id, component)
+  render(id, name, component)
   {
-    document.getElementById(id).innerHTML = Mustache.render(component.template, component.data);
-    if (this.isObject(component.data.bindings))
+    if (this.isDefined(id) && !this.isNull(id))
     {
-      document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
+      let s = common.getStore(name);
+      document.getElementById(id).innerHTML = Mustache.render(component.template, s);
+      if (this.isObject(s.bindings))
       {
-        e.onchange = () => eval('component.methods.' + e.getAttribute('c-change'));
-      });
-      document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
-      {
-        e.onclick = () => eval('component.methods.' + e.getAttribute('c-click'));
-      });
-      document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
-      {
-        if (this.isDefined(component.data.bindings[e.getAttribute('c-model')]))
+        document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
         {
-          const o = component.data.bindings[e.getAttribute('c-model')];
-          if (this.isDefined(e.value))
+          e.onchange = () => eval('s.' + e.getAttribute('c-change'));
+        });
+        document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
+        {
+          e.onclick = () => eval('s.' + e.getAttribute('c-click'));
+        });
+        document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
+        {
+          if (this.isDefined(s.bindings[e.getAttribute('c-model')]))
           {
-            e.value = o.value;
-            o.subscribe(() => e.value = o.value);
+            const o = s.bindings[e.getAttribute('c-model')];
+            if (this.isDefined(e.value))
+            {
+              e.value = o.value;
+              o.subscribe(() => e.value = o.value);
+            }
+            else if (this.isDefined(e.innerHTML))
+            {
+              e.innerHTML = o.value;
+              o.subscribe(() => e.innerHTML = o.value);
+            }
+            e.onkeyup = () => o.value = e.value;
+            if (e.hasAttribute('c-change'))
+            {
+              e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
+            }
+            else
+            {
+              e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
+            }
+            if (e.hasAttribute('c-change'))
+            {
+              e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
+            }
+            else
+            {
+              e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+            }
           }
-          else if (this.isDefined(e.innerHTML))
-          {
-            e.innerHTML = o.value;
-            o.subscribe(() => e.innerHTML = o.value);
-          }
-          e.onkeyup = () => o.value = e.value;
-          if (e.hasAttribute('c-change'))
-          {
-            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('component.methods.' + e.getAttribute('c-change'));};
-          }
-          else
-          {
-            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
-          }
-          if (e.hasAttribute('c-change'))
-          {
-            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('component.methods.' + e.getAttribute('c-click'));};
-          }
-          else
-          {
-            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
-          }
-        }
-      });
+        });
+      }
+    }
+    else
+    {
+      for (let id of Object.keys(this.autoLoads))
+      {
+        this.render(id, id, this.autoLoads[id]);
+      }
+      this.render(this.id, this.name, this.component);
     }
   } 
   // }}}
@@ -887,12 +877,13 @@ class Common
     {
       if (this.isDefined(data[i].component))
       {
-        if (this.isDefined(data[i].path))
+        if (this.isDefined(data[i].name) && this.isDefined(data[i].path))
         {
           this.router.on(data[i].path, async (nav) =>
           {
             let c = null;
             let path = data[i].path;
+            this.name = data[i].name;
             if (this.isDefined(this.components[path]))
             {
               this.component = c = this.components[path];
@@ -901,12 +892,12 @@ class Common
             {
               let component = await import(data[i].component);
               this.components[path] = this.component = c = component.default;
-              if (this.isDefined(component.default.mounted))
+              if (this.isDefined(component.default.controller))
               {
-                component.default.mounted(this.ids.app, nav);
+                component.default.controller(this.id, nav);
               }
             }
-            this.render(this.ids.app, c, nav);
+            this.render(this.id, data[i].name, c);
           });
         }
       }
@@ -1024,7 +1015,7 @@ class Common
     }
     this.menu = menu;
     this.submenu = submenu;
-    this.load(this.ids.menu);
+    this.load('menu');
   }
   // }}}
   // {{{ setRedirectPath()

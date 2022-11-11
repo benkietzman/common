@@ -17,20 +17,21 @@ export default
       {
         application: new Observable
       },
-      common: common
+      common: common,
+      slideMenu: () =>
+      {
+        common.centralMenu.show = !common.centralMenu.show;
+        common.render();
+      }
     });
     // }}}
     // {{{ go()
-    s.go = () =>
+    if (!common.isDefined(s.go))
     {
-      document.location.href = common.centralMenu.applications[s.bindings.application.value].website;
-    },
-    // }}}
-    // {{{ slideMenu()
-    s.slideMenu = () =>
-    {
-      common.centralMenu.show = !common.centralMenu.show;
-      common.render();
+      s.go = () =>
+      {
+        document.location.href = common.centralMenu.applications[s.bindings.application.value].website;
+      };
     }
     // }}}
     // {{{ main

@@ -26,13 +26,10 @@ export default
     });
     // }}}
     // {{{ go()
-    if (!common.isDefined(s.go))
+    s.go = () =>
     {
-      s.go = () =>
-      {
-        document.location.href = common.centralMenu.applications[s.bindings.application.value].website;
-      };
-    }
+      document.location.href = common.centralMenu.applications[s.bindings.application.value].website;
+    };
     // }}}
     // {{{ main
     common.request('applications', {_script: common.centralScript}, (data) =>

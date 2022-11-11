@@ -34,18 +34,18 @@ export default
     <div class="container">
       <div class="row">
         <div class="col-md-4 text-muted credit">
-          <a href="mailto:{{c.footer.email}}?subject={{c.footer.subject}}">Contact Admin</a>
-          ---
+          {{#c.footer.email}}{{#c.footer.subject}}<a href="mailto:{{c.footer.email}}?subject={{c.footer.subject}}">Contact Admin</a>{{/c.footer.subject}}{{/c.footer.email}}
+          {{#c.footer.email}}{{#c.footer.subject}}{{#c.footer.version}}---{{/c.footer.version}}{{/c.footer.subject}}{{/c.footer.email}}
           {{c.footer.version}}
         </div>
         <div class="col-md-4 hidden-xs text-muted credit" style="font-size:9px;text-align:center;">
-          <strong style="font-size:11px;">{{c.footer.title}}</strong>
-          <br>
+          {{#c.footer.title}}<strong style="font-size:11px;">{{c.footer.title}}</strong><br>{{/c.footer.title}}
           {{c.footer.message}}
         </div>
         <div class="col-md-4 text-muted credit" style="font-size:10px;text-align:right;">
-          &copy; {{c.footer.year}} <a href="{{c.footer.website}}" target="_new">{{c.footer.company}}</a>
-          <br>Engineered by <a href="{{c.footer.engineer.link}}" target="{{c.footer.engineer.target}}">{{c.footer.engineer.first_name}} {{c.footer.engineer.last_name}}</a>
+          {{#c.footer.year}}&copy; {{c.footer.year}}{{/c.footer.year}}
+          {{#c.footer.website}}{{#c.footer.company}}<a href="{{c.footer.website}}" target="_new">{{c.footer.company}}</a>{{/c.footer.company}}{{/c.footer.website}}
+          {{#c.footer.engineer.link}}{{#c.footer.engineer.target}}{{#c.footer.engineer.first_name}}{{#c.footer.engineer.last_name}}<br>Engineered by <a href="{{c.footer.engineer.link}}" target="{{c.footer.engineer.target}}">{{c.footer.engineer.first_name}} {{c.footer.engineer.last_name}}</a>{{/c.footer.engineer.last_name}}{{/c.footer.engineer.first_name}}{{/c.footer.engineer.target}}{{/c.footer.engineer.link}}
         </div>
       </div>
     </div>

@@ -31,7 +31,7 @@ export default
         <h3 class="page-header">{{common.login.login.title}}</h3>
         <div class="col-md-5" style="padding:10px;"><input class="form-control" type="text" v-model="common.login.login.userid" maxlength="20" v-on:keyup="$event.keyCode == 13 && common.processLogin()" placeholder="User" autofocus></div>
         <div class="col-md-5" style="padding:10px;"><input class="form-control" type="password" v-model="common.login.login.password" maxlength="64" v-on:keyup="$event.keyCode == 13 && common.processLogin()" placeholder="Password"></div>
-        <div class="col-md-2" style="padding:10px;"><button class="btn btn-primary" v-on:click="common.processLogin()" style="float:right;">Login</button></div>
+        <div class="col-md-2" style="padding:10px;"><button class="btn btn-primary pull-right" v-on:click="common.processLogin()">Login</button></div>
       </div>
     </div>
   `

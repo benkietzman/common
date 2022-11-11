@@ -431,7 +431,7 @@ class Common
         .then((response) =>
         {
           let request = null;
-          response = response.json();
+          response = ((response.status == 200)?response.json():{});
           request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.login.login};
           request.Request.Type = this.m_strLoginType;
           if (window.localStorage.getItem('sl_uniqueID'))
@@ -447,7 +447,7 @@ class Common
             var error = {};
             if (this.wsResponse(response, error))
             {
-              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0)
+              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
               {
                 this.login.message = response.Error.Message;
               }
@@ -504,6 +504,7 @@ class Common
                     {
                       this.login.message = error.message;
                     }
+                    this.render(this.id, 'Login', this.component);
                   });
                 }
               }
@@ -516,6 +517,7 @@ class Common
             {
               this.login.message = error.message;
             }
+            this.render(this.id, 'Login', this.component);
           });
         });
       });
@@ -709,20 +711,6 @@ class Common
     this.m_store[controller] = data;
   }
   // }}}
-  // {{{ resetMenu()
-  resetMenu()
-  {
-    if (this.isValid())
-    {
-      this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
-    }
-    else
-    {
-      this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
-    }
-    this.setMenu(this.strMenu, this.strSubMenu);
-  }
-  // }}}
   // {{{ render()
   render(id, name, component)
   {
@@ -745,6 +733,10 @@ class Common
         {
           e.onclick = () => eval('s.' + e.getAttribute('c-click'));
         });
+        document.querySelectorAll('#' + id + ' [c-keyup]').forEach(e =>
+        {
+          e.onkeyup = () => eval('s.' + e.getAttribute('c-keyup'));
+        });
         document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
         {
           if (this.isDefined(s.b[e.getAttribute('c-model')]))
@@ -760,7 +752,6 @@ class Common
               e.innerHTML = o.value;
               o.subscribe(() => e.innerHTML = o.value);
             }
-            e.onkeyup = () => o.value = e.value;
             if (e.hasAttribute('c-change'))
             {
               e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
@@ -776,6 +767,14 @@ class Common
             else
             {
               e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+            }
+            if (e.hasAttribute('c-keyup'))
+            {
+              e.onkeyup = () => {o.value = e.value; eval('s.' + e.getAttribute('c-keyup'));};
+            }
+            else
+            {
+              e.onkeyup = () => o.value = e.value;
             }
           }
         });
@@ -823,6 +822,20 @@ class Common
       .then(response => response.json())
       .then(callback);
     }
+  }
+  // }}}
+  // {{{ resetMenu()
+  resetMenu()
+  {
+    if (this.isValid())
+    {
+      this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
+    }
+    else
+    {
+      this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
+    }
+    this.setMenu(this.strMenu, this.strSubMenu);
   }
   // }}}
   // {{{ response()

@@ -10,9 +10,10 @@ export default
   // {{{ contoller()
   controller()
   {
-    let s = common.store('menu',
+    let c = common;
+    let s = c.store('menu',
     {
-      common: common
+      c: c
     });
   },
   // }}}
@@ -21,20 +22,20 @@ export default
     <div class="fixed-top">
       <nav class="navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#/">{{common.application}}</a>
+          <a class="navbar-brand" href="#/">{{c.application}}</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navigationbar" aria-controls="navigationbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navigationbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              {{#common.menu.left}}
+              {{#c.menu.left}}
               <li class="nav-item"><a class="nav-link {{active}}" href="{{href}}">{{value}}</a></li>
-              {{/common.menu.left}}
+              {{/c.menu.left}}
             </ul>
             <ul class="navbar-nav navbar-right">
-              {{#common.menu.right}}
+              {{#c.menu.right}}
               <li class="nav-item"><a class="nav-link {{active}}" href="{{href}}">{{value}}</a></li>
-              {{/common.menu.right}}
+              {{/c.menu.right}}
             </ul>
           </div>
         </div>
@@ -46,14 +47,14 @@ export default
           </button>
           <div class="collapse navbar-collapse" id="subnavigationbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              {{#common.submenu.left}}
+              {{#c.submenu.left}}
               <li class="nav-item"><a class="nav-link {{active}}" href="{{href}}">{{value}}</a></li>
-              {{/common.submenu.left}}
+              {{/c.submenu.left}}
             </ul>
             <ul class="navbar-nav navbar-right">
-              {{#common.submenu.right}}
+              {{#c.submenu.right}}
               <li class="nav-item"><a class="nav-link {{active}}" href="{{href}}">{{value}}</a></li>
-              {{/common.submenu.right}}
+              {{/c.submenu.right}}
             </ul>
           </div>
         </div>
@@ -61,7 +62,7 @@ export default
     </div>
     <div style="padding: 30px;">
     </div>
-    <div v-if="common.submenu" style="padding: 30px;">
+    <div v-if="c.submenu" style="padding: 30px;">
     </div>
   `
   // }}}

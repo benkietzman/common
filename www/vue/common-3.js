@@ -55,6 +55,35 @@ Vue.component('commonCentralMenu',
     // }}}
   },
   // }}}
+  // {{{ mounted()
+  mounted()
+  {
+    common.request('applications', {_script: common.centralScript}, (data) =>
+    {
+      let error = {};
+      if (common.response(data, error))
+      {
+        var bFound = false;
+        common.centralMenu.applications = [];
+        for (var i = 0; i < data.Response.out.length; i++)
+        {
+          if (((data.Response.out[i].menu_id == 1 && common.isValid()) || data.Response.out[i].menu_id == 2) && (data.Response.out[i].retirement_date == null || data.Response.out[i].retirement_date == '0000-00-00 00:00:00'))
+          {
+            common.centralMenu.applications.push(data.Response.out[i]);
+          }
+        }
+        for (var i = 0; !bFound && i < common.centralMenu.applications.length; i++)
+        {
+          if (common.centralMenu.applications[i].name == common.application)
+          {
+            bFound = true;
+            common.centralMenu.application = common.centralMenu.applications[i];
+          }
+        }
+      }
+    });
+  },
+  // }}}
   // {{{ template
   template:
   `
@@ -77,6 +106,20 @@ Vue.component('commonFooter',
 {
   // {{{ data
   data: () => {return {common: common};},
+  // }}}
+  // {{{ mounted()
+  mounted()
+  {
+    common.request('footer', common.footer, (response) =>
+    {
+      let error = {};
+      common.dispatchEvent('commonFooterReady', null);
+      if (common.response(response, error))
+      {
+        common.footer = response.Response.out;
+      } 
+    }); 
+  },
   // }}}
   // {{{ template
   template:
@@ -177,10 +220,12 @@ Vue.component('commonMessages',
     {
     },
     // }}}
+    // {{{ getMessages()
     getMessages()
     {
       return common.m_messages;
     }
+    // }}}
   },
   // }}}
   // {{{ props

@@ -63,43 +63,10 @@ class Common
     {
       this.script = options.script;
     }
-    this.request('applications', {_script: this.centralScript}, (data) =>
-    {
-      let error = {};
-      if (this.response(data, error))
-      {
-        var bFound = false;
-        this.centralMenu.applications = [];
-        for (var i = 0; i < data.Response.out.length; i++)
-        {
-          if (((data.Response.out[i].menu_id == 1 && this.isValid()) || data.Response.out[i].menu_id == 2) && (data.Response.out[i].retirement_date == null || data.Response.out[i].retirement_date == '0000-00-00 00:00:00'))
-          {
-            this.centralMenu.applications.push(data.Response.out[i]);
-          }
-        }
-        for (var i = 0; !bFound && i < this.centralMenu.applications.length; i++)
-        {
-          if (this.centralMenu.applications[i].name == this.application)
-          {
-            bFound = true;
-            this.centralMenu.application = this.centralMenu.applications[i];
-          }
-        }
-      }
-    });
     if (this.isDefined(options.footer))
     {
       this.footer = {...this.footer, ...options.footer};
       this.footer._script = this.centralScript;
-      this.request('footer', this.footer, (response) =>
-      {
-        let error = {};
-        this.dispatchEvent('commonFooterReady', null);
-        if (this.response(response, error))
-        {
-          this.footer = response.Response.out;
-        }
-      });
     }
   }
   // }}}
@@ -419,7 +386,7 @@ class Common
       {
         this.autoLoads[id].controller(id);
       }
-      this.render(id, id, this.autoLoads[id]);
+      this.render(id, this.autoLoads[id]);
     }
   }
   // }}}
@@ -761,9 +728,14 @@ class Common
   {
     if (this.isDefined(id) && !this.isNull(id))
     {
+      if (!this.isDefined(component) || this.isNull(component))
+      {
+        component = name;
+        name = id;
+      }
       let s = common.getStore(name);
       document.getElementById(id).innerHTML = Mustache.render(component.template, s);
-      if (this.isObject(s.bindings))
+      if (this.isObject(s.b))
       {
         document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
         {
@@ -775,9 +747,9 @@ class Common
         });
         document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
         {
-          if (this.isDefined(s.bindings[e.getAttribute('c-model')]))
+          if (this.isDefined(s.b[e.getAttribute('c-model')]))
           {
-            const o = s.bindings[e.getAttribute('c-model')];
+            const o = s.b[e.getAttribute('c-model')];
             if (this.isDefined(e.value))
             {
               e.value = o.value;
@@ -813,7 +785,7 @@ class Common
     {
       for (let id of Object.keys(this.autoLoads))
       {
-        this.render(id, id, this.autoLoads[id]);
+        this.render(id, this.autoLoads[id]);
       }
       this.render(this.id, this.name, this.component);
     }

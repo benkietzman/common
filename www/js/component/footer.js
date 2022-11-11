@@ -10,20 +10,21 @@ export default
   // {{{ controller()
   controller(id)
   {
-    let s = common.store('footer',
+    let c = common;
+    let s = c.store('footer',
     {
-      common: common
+      c: c
     });
-    common.footer._script = common.centralScript;
-    common.request('footer', common.footer, (response) =>
+    c.footer._script = c.centralScript;
+    c.request('footer', c.footer, (response) =>
     {
       let error = {};
-      common.dispatchEvent('commonFooterReady', null);
-      if (common.response(response, error))
+      c.dispatchEvent('commonFooterReady', null);
+      if (c.response(response, error))
       {
-        common.footer = response.Response.out;
+        c.footer = response.Response.out;
       }
-      common.render(id, 'footer', this);
+      c.render(id, this);
     });
   },
   // }}}
@@ -33,18 +34,18 @@ export default
     <div class="container">
       <div class="row">
         <div class="col-md-4 text-muted credit">
-          <a href="mailto:{{common.footer.email}}?subject={{common.footer.subject}}">Contact Admin</a>
+          <a href="mailto:{{c.footer.email}}?subject={{c.footer.subject}}">Contact Admin</a>
           ---
-          {{common.footer.version}}
+          {{c.footer.version}}
         </div>
         <div class="col-md-4 hidden-xs text-muted credit" style="font-size:9px;text-align:center;">
-          <strong style="font-size:11px;">{{common.footer.title}}</strong>
+          <strong style="font-size:11px;">{{c.footer.title}}</strong>
           <br>
-          {{common.footer.message}}
+          {{c.footer.message}}
         </div>
         <div class="col-md-4 text-muted credit" style="font-size:10px;text-align:right;">
-          &copy; {{common.footer.year}} <a href="{{common.footer.website}}" target="_new">{{common.footer.company}}</a>
-          <br>Engineered by <a href="{{common.footer.engineer.link}}" target="{{common.footer.engineer.target}}">{{common.footer.engineer.first_name}} {{common.footer.engineer.last_name}}</a>
+          &copy; {{c.footer.year}} <a href="{{c.footer.website}}" target="_new">{{c.footer.company}}</a>
+          <br>Engineered by <a href="{{c.footer.engineer.link}}" target="{{c.footer.engineer.target}}">{{c.footer.engineer.first_name}} {{c.footer.engineer.last_name}}</a>
         </div>
       </div>
     </div>

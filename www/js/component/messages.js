@@ -10,15 +10,16 @@ export default
   // {{{ controller()
   controller()
   {
-    let s = common.store('messages',
+    let c = common;
+    let s = c.store('messages',
     {
-      common: common
+      c: c
     });
   },
   // }}}
   // {{{ template
   template: `
-    {{#common.m_messages}}
+    {{#c.m_messages}}
     <div class="alert alert-{{Class}} alert-dismissible fade in">
       <button class="close" data-dismiss="alert" aria-label="close">&times;</button>
       {{#Title}}
@@ -28,7 +29,7 @@ export default
       <br>
       <div class="float-end"><i>{{Time}}</i></div>
     </div>
-    {{/common.m_messages}}
+    {{/c.m_messages}}
   `
   // }}}
 }

@@ -80,6 +80,37 @@ class Common
       this.footer = {...this.footer, ...options.footer};
       this.footer._script = this.centralScript;
     }
+    if (this.isDefined(Handlebars))
+    {
+      Handlebars.registerHelper('getUserEmail', () =>
+      {
+        return this.getUserEmail();
+      });
+      Handlebars.registerHelper('getUserFirstName', () =>
+      {
+        return this.getUserFirstName();
+      });
+      Handlebars.registerHelper('getUserID', () =>
+      {
+        return this.getUserID();
+      });
+      Handlebars.registerHelper('getUserLastName', () =>
+      {
+        return this.getUserLastName();
+      });
+      Handlebars.registerHelper('isGlobalAdmin', () =>
+      {
+        return this.isGlobalAdmin();
+      });
+      Handlebars.registerHelper('isLocalAdmin', () =>
+      {
+        return this.isLocalAdmin(this.application);
+      });
+      Handlebars.registerHelper('isValid', () =>
+      {
+        return this.isValid(this.application);
+      });
+    }
   }
   // }}}
   // {{{ attachEvent()

@@ -98,17 +98,48 @@ class Common
       {
         return this.getUserLastName();
       });
-      Handlebars.registerHelper('isGlobalAdmin', () =>
+      Handlebars.registerHelper('isGlobalAdmin', (application, options) =>
       {
-        return this.isGlobalAdmin();
+        if (this.isGlobalAdmin())
+        {
+          return options.fn(this);
+        }
+        else
+        {
+          return options.inverse(this);
+        }
       });
-      Handlebars.registerHelper('isLocalAdmin', () =>
+      Handlebars.registerHelper('isLocalAdmin', (application, options) =>
       {
-        return this.isLocalAdmin(this.application);
+        if (!this.isDefined(options))
+        {
+          options = application;
+          application = null;
+        }
+        if (this.isLocalAdmin(application))
+        {
+          return options.fn(this);
+        }
+        else
+        {
+          return options.inverse(this);
+        }
       });
-      Handlebars.registerHelper('isValid', () =>
+      Handlebars.registerHelper('isValid', (application, options) =>
       {
-        return this.isValid(this.application);
+        if (!this.isDefined(options))
+        {
+          options = application;
+          application = null;
+        }
+        if (this.isValid(application))
+        {
+          return options.fn(this);
+        }
+        else
+        {
+          return options.inverse(this);
+        }
       });
     }
   }

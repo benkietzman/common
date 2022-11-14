@@ -898,7 +898,7 @@ class Common
       {
         if (this.isDefined(data[i].name) && this.isDefined(data[i].path))
         {
-          this.router.on(data[i].path, async ({nav}) =>
+          this.router.on(data[i].path, async (nav) =>
           {
             let c = null;
             let path = data[i].path;

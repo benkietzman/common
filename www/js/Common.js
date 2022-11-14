@@ -51,12 +51,16 @@ class Common
     {
       this.loads(options.loads);
     }
-    if (this.isDefined(options.router))
-    {
-      this.router = options.router;
-    }
     if (this.isDefined(options.routes))
     {
+      if (this.isDefined(options.router))
+      {
+        this.router = options.router;
+      }
+      else
+      {
+        this.router = new Navigo('/', {hash: true});
+      }
       this.routes(options.routes);
     }
     if (this.isDefined(options.script))

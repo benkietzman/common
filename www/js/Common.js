@@ -799,28 +799,28 @@ class Common
       }
       let s = common.getStore(name);
       document.getElementById(id).innerHTML = Handlebars.compile(component.template)(s);
+      document.querySelectorAll('#' + id + ' [autofocus]').forEach(e =>
+      {
+        e.focus();
+      });
+      document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
+      {
+        e.onchange = () => eval('s.' + e.getAttribute('c-change'));
+      });
+      document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
+      {
+        e.onclick = () => eval('s.' + e.getAttribute('c-click'));
+      });
+      document.querySelectorAll('#' + id + ' [c-keydown]').forEach(e =>
+      {
+        e.onkeydown = () => eval('s.' + e.getAttribute('c-keydown'));
+      });
+      document.querySelectorAll('#' + id + ' [c-keyup]').forEach(e =>
+      {
+        e.onkeyup = () => eval('s.' + e.getAttribute('c-keyup'));
+      });
       if (this.isObject(s.b))
       {
-        document.querySelectorAll('#' + id + ' [autofocus]').forEach(e =>
-        {
-          e.focus();
-        });
-        document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
-        {
-          e.onchange = () => eval('s.' + e.getAttribute('c-change'));
-        });
-        document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
-        {
-          e.onclick = () => eval('s.' + e.getAttribute('c-click'));
-        });
-        document.querySelectorAll('#' + id + ' [c-keydown]').forEach(e =>
-        {
-          e.onkeydown = () => eval('s.' + e.getAttribute('c-keydown'));
-        });
-        document.querySelectorAll('#' + id + ' [c-keyup]').forEach(e =>
-        {
-          e.onkeyup = () => eval('s.' + e.getAttribute('c-keyup'));
-        });
         document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
         {
           if (this.isDefined(s.b[e.getAttribute('c-model')]))
@@ -1336,6 +1336,7 @@ class Common
               response.Time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
               this.m_messages.push(response);
               this.m_messages[this.m_messages.length - 1].Index = (this.m_messages.length - 1);
+              this.render('messages', this.autoLoads['messages']);
             }
             else if (response.Action == 'notification')
             {

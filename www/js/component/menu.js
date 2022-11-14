@@ -28,14 +28,14 @@ export default
           </button>
           <div class="collapse navbar-collapse" id="navigationbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              {{#c.menu.left}}
+              {{#each c.menu.left}}
               <li class="nav-item"><a class="nav-link {{active}}" href="#{{href}}">{{value}}</a></li>
-              {{/c.menu.left}}
+              {{/each}}
             </ul>
             <ul class="navbar-nav navbar-right">
-              {{#c.menu.right}}
+              {{#each c.menu.right}}
               <li class="nav-item"><a class="nav-link {{active}}" href="#{{href}}">{{value}}</a></li>
-              {{/c.menu.right}}
+              {{/each}}
             </ul>
           </div>
         </div>
@@ -47,14 +47,14 @@ export default
           </button>
           <div class="collapse navbar-collapse" id="subnavigationbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              {{#c.submenu.left}}
+              {{#each c.submenu.left}}
               <li class="nav-item"><a class="nav-link {{active}}" href="#{{href}}">{{value}}</a></li>
-              {{/c.submenu.left}}
+              {{/each}}
             </ul>
             <ul class="navbar-nav navbar-right">
-              {{#c.submenu.right}}
+              {{#each c.submenu.right}}
               <li class="nav-item"><a class="nav-link {{active}}" href="#{{href}}">{{value}}</a></li>
-              {{/c.submenu.right}}
+              {{/each}}
             </ul>
           </div>
         </div>
@@ -62,8 +62,10 @@ export default
     </div>
     <div style="padding: 30px;">
     </div>
-    <div v-if="c.submenu" style="padding: 30px;">
+    {{#if c.submenu}}
+    <div style="padding: 30px;">
     </div>
+    {{/if}}
   `
   // }}}
 }

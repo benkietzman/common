@@ -19,18 +19,16 @@ export default
         application: new Observable
       },
       c: c,
+      go: () =>
+      {
+        document.location.href = c.centralMenu.applications[s.b.application.value].website;
+      },
       slideMenu: () =>
       {
         c.centralMenu.show = !c.centralMenu.show;
         c.render(id, this);
       }
     });
-    // }}}
-    // {{{ go()
-    s.go = () =>
-    {
-      document.location.href = c.centralMenu.applications[s.b.application.value].website;
-    };
     // }}}
     // {{{ main
     if (!c.isDefined(c.centralMenu.applications))
@@ -67,15 +65,15 @@ export default
     <div style="position: relative; z-index: 1000;">
       <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 120px; right: 0px;">
         <button id="central-slide-opener" class="btn btn-sm btn-success float-start" c-click="slideMenu()" style="font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 00px 10px;">&#8803;</button>
-        {{#c.centralMenu.show}}
+        {{#if c.centralMenu.show}}
         <div id="central-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-change="go()" c-model="application">
-            {{#c.centralMenu.applications}}
+            {{#each c.centralMenu.applications}}
             <option value="{{i}}">{{name}}</option>
-            {{/c.centralMenu.applications}}
+            {{/each}}
           </select>
         </div>
-        {{/c.centralMenu.show}}
+        {{/if}}
       </div>
     </div>
   `

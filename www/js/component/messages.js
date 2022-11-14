@@ -19,7 +19,7 @@ export default
   // }}}
   // {{{ template
   template: `
-    {{#c.m_messages}}
+    {{#each c.m_messages}}
     <div class="alert alert-{{Class}} alert-dismissible fade in">
       <button class="close" data-dismiss="alert" aria-label="close">&times;</button>
       {{#Title}}
@@ -29,7 +29,7 @@ export default
       <br>
       <div class="float-end"><i>{{Time}}</i></div>
     </div>
-    {{/c.m_messages}}
+    {{/each}}
   `
   // }}}
 }

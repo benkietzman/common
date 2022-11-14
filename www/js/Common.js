@@ -586,6 +586,7 @@ class Common
               {
                 this.login.message = error.message;
               }
+              this.render(this.id, 'Login', this.component);
             });
           }
         }
@@ -593,6 +594,7 @@ class Common
         {
           this.login.message = error.message;
         }
+        this.render(this.id, 'Login', this.component);
       });
     }
   }
@@ -722,9 +724,13 @@ class Common
         name = id;
       }
       let s = common.getStore(name);
-      document.getElementById(id).innerHTML = Mustache.render(component.template, s);
+      document.getElementById(id).innerHTML = Handlebars.compile(component.template)(s);
       if (this.isObject(s.b))
       {
+        document.querySelectorAll('#' + id + ' [autofocus]').forEach(e =>
+        {
+          e.focus();
+        });
         document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
         {
           e.onchange = () => eval('s.' + e.getAttribute('c-change'));
@@ -732,6 +738,10 @@ class Common
         document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
         {
           e.onclick = () => eval('s.' + e.getAttribute('c-click'));
+        });
+        document.querySelectorAll('#' + id + ' [c-keydown]').forEach(e =>
+        {
+          e.onkeydown = () => eval('s.' + e.getAttribute('c-keydown'));
         });
         document.querySelectorAll('#' + id + ' [c-keyup]').forEach(e =>
         {
@@ -760,7 +770,7 @@ class Common
             {
               e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
             }
-            if (e.hasAttribute('c-change'))
+            if (e.hasAttribute('c-click'))
             {
               e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
             }
@@ -768,13 +778,21 @@ class Common
             {
               e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
             }
-            if (e.hasAttribute('c-keyup'))
+            if (e.hasAttribute('c-keydown'))
             {
-              e.onkeyup = () => {o.value = e.value; eval('s.' + e.getAttribute('c-keyup'));};
+              e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
             }
             else
             {
-              e.onkeyup = () => o.value = e.value;
+              e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
+            }
+            if (e.hasAttribute('c-keyup'))
+            {
+              e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
+            }
+            else
+            {
+              e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
             }
           }
         });

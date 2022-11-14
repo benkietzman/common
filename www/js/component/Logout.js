@@ -26,12 +26,12 @@ export default
   // {{{ template
   template: `
     <br><br><br>
-    {{#c.logout.message}}
+    {{#if c.logout.message}}
     <div style="color:red;font-weight:bold;"><br><br>{{c.logout.message}}<br><br></div>
-    {{/c.logout.message}}
-    {{#c.logout.info}}
+    {{/if}}
+    {{#if c.logout.info}}
     <div style="color:orange;"><br><br>{{c.logout.info}}<br><br></div>
-    {{/c.logout.info}}
+    {{/if}}
   `
   // }}}
 }

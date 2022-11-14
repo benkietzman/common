@@ -39,6 +39,10 @@ class Common
     {
       this.centralScript = options.centralScript;
     }
+    else
+    {
+      this.centralScript = '/central/include/request.php';
+    }
     if (this.isDefined(options.id))
     {
       this.id = options.id;
@@ -66,6 +70,10 @@ class Common
     if (this.isDefined(options.script))
     {
       this.script = options.script;
+    }
+    else
+    {
+      this.script = 'include/request.php';
     }
     if (this.isDefined(options.footer))
     {

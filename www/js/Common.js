@@ -80,7 +80,7 @@ class Common
       this.footer = {...this.footer, ...options.footer};
       this.footer._script = this.centralScript;
     }
-    if (this.isDefined(Handlebars))
+    if (typeof Handlebars !== 'undefined')
     {
       Handlebars.registerHelper('getUserEmail', () =>
       {

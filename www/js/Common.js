@@ -1493,10 +1493,10 @@ class Common
 class Observable
 {
   // {{{ constructor()
-  constructor()
+  constructor(v)
   {
     this.listeners = [];
-    this.v = null;
+    this.v = v;
   }
   // }}}
   // {{{ notify()

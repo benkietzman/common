@@ -231,7 +231,7 @@ class ServiceJunction
   }
   // }}}
   // {{{ curl()
-  public function curl($strURL, $strType, $auth, $get, $post, $put, $strProxy, &$strCookies, $strHeader, $strContent, $strError, $strUserAgent = '', $bMobile = false, $bFailOnError = true, $strCustomRequest = '')
+  public function curl($strURL, $strType, $auth, $get, $post, $put, $strProxy, &$strCookies, $strHeader, $strContent, $strUserAgent = '', $bMobile = false, $bFailOnError = true, $strCustomRequest = '')
   {
     $bResult = false;
     $in = array();

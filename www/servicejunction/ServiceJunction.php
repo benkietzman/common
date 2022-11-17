@@ -63,7 +63,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'aes';
     if ($strDecrypted != '')
@@ -230,6 +230,118 @@ class ServiceJunction
     return $bResult;
   }
   // }}}
+  // {{{ curl()
+  public function curl($strURL, $strType, $auth, $get, $post, $put, $strProxy, &$strCookies, $strHeader, $strContent, $strError, $strUserAgent = '', $bMobile = false, $bFailOnError = true, $strCustomRequest = '')
+  {
+    $bResult = false;
+    $in = array();
+    $out = null;
+    $request = array();
+
+    if ($this->m_strApplication != '')
+    {
+      $request['reqApp'] = $this->m_strApplication;
+    }
+    if ($this->m_strProgram != '')
+    {
+      $request['reqProg'] = $this->m_strProgram;
+    }
+    $request['Service'] = 'curl';
+    $unIndex = 0;
+    $in[$unIndex++] = json_encode($request);
+    unset($request);
+    $request = array();
+    $request['URL'] = $strURL;
+    $request['Display'] = 'Content,Cookies,Header';
+    if ($strCookies != '')
+    {
+      $request['Cookies'] = $strCookies;
+      $strCookies = '';
+    }
+    if ($auth != null)
+    {
+      $request['Auth'] = $auth;
+    }
+    if ($strContent != '')
+    {
+      $request['Content'] = $strContent;
+    }
+    $request['FailOnError'] = (($bFailOnError)?'yes':'no');
+    if ($strCustomRequest != '')
+    {
+      $request['CustomRequest'] = $strCustomRequest;
+    }
+    if ($get != null)
+    {
+      $request['Get'] = $get;
+    }
+    if ($strHeader != '')
+    {
+      $request['Header'] = $strHeader;
+    }
+    if ($strUserAgent != '')
+    {
+      $request['UserAgent'] = $strUserAgent;
+    }
+    $request['Mobile'] = (($bMobile)?'yes':'no');
+    if ($post != null)
+    {
+      $request['Post'] = $post;
+    }
+    if ($put != null)
+    {
+      $request['Put'] = $put;
+    }
+    if ($strProxy != '')
+    {
+      $request['Proxy'] = $strProxy;
+    }
+    if ($strType != '')
+    {
+      $request['Type'] = $strType;
+    }
+    $in[$unIndex++] = json_encode($request);
+    unset($request);
+    if ($this->request($in, $out))
+    {
+      $status = json_decode($out[0], true);
+      if (sizeof($out) == 2)
+      {
+        $result = json_decode($out[1], true);
+        if (isset($result['Cookies']))
+        {
+          $strCookies = $result['Cookies'];
+        }
+        if (isset($result['Header']))
+        {
+          $strHeader = $result['Header'];
+        }
+        if (isset($result['Content']))
+        {
+          $strContent = $result['Content'];
+        }
+        unset($result);
+      }
+      if (isset($status['Status']) && $status['Status'] == 'okay')
+      {
+        $bResult = true;
+      }
+      else if (isset($status['Error']) && $status['Error'] != '')
+      {
+        $this->setError($status['Error']);
+      }
+      else
+      {
+        $this->setError('Encountered an unknown error.');
+      }
+      unset($status);
+    }
+    unset($in);
+    unset($out);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ email()
   public function email($strFrom, $strTo, $strSubject = null, $strText = null, $strHTML = null, $strFile = null)
   {
@@ -242,7 +354,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'email';
     $request['From'] = $strFrom;
@@ -321,7 +433,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'finance';
     $request['Function'] = $strFunction;
@@ -387,7 +499,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'google';
     $request['Application'] = 'fusion';
@@ -445,7 +557,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'google';
     $request['Application'] = 'fusion';
@@ -516,7 +628,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'historical';
     $request['Function'] = $strFunction;
@@ -560,7 +672,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'ircBot';
     $request['Room'] = $strRoom;
@@ -601,7 +713,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'jwt';
     if ($strPayload != '')
@@ -705,7 +817,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'location';
     $request['State'] = $strState;
@@ -747,7 +859,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'mssql';
     $request['User'] = $strUser;
@@ -794,7 +906,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'mssql';
     $request['User'] = $strUser;
@@ -836,7 +948,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'mysql';
     $request['User'] = $strUser;
@@ -884,7 +996,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'mysql';
     $request['User'] = $strUser;
@@ -939,7 +1051,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'oracle';
     $request['Schema'] = $strSchema;
@@ -986,7 +1098,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'oracle';
     $request['Schema'] = $strSchema;
@@ -1028,7 +1140,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'pager';
     if ($bGroup)
@@ -1224,7 +1336,7 @@ class ServiceJunction
     }
     if ($this->m_strProgram != '')
     {
-      $req['reqProg'] = $this->m_strProgram;
+      $request['reqProg'] = $this->m_strProgram;
     }
     $request['Service'] = 'weather';
     $request['Country'] = $strCountry;

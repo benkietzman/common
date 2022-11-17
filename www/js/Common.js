@@ -506,7 +506,7 @@ class Common
         {
           let request = null;
           response = ((response.status == 200)?response.json():{});
-          request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.login.login};
+          request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
           request.Request.Type = this.m_strLoginType;
           if (window.localStorage.getItem('sl_uniqueID'))
           {
@@ -603,7 +603,7 @@ class Common
       {
         this.login.LoginType = this.m_strLoginType;
       }
-      this.request('authProcessLogin', this.login.login, (result) =>
+      this.request('authProcessLogin', this.simplify(this.login.login), (result) =>
       {
         var error = {};
         if (this.response(result, error))

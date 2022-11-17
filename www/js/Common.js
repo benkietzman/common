@@ -819,55 +819,62 @@ class Common
       {
         e.onkeyup = () => eval('s.' + e.getAttribute('c-keyup'));
       });
-      if (this.isObject(s.b))
+      if (this.isObject(s))
       {
         document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
         {
-          if (this.isDefined(s.b[e.getAttribute('c-model')]))
+          let o = _.get(s, e.getAttribute('c-model'));
+          if (!this.isDefined(o))
           {
-            const o = s.b[e.getAttribute('c-model')];
-            if (this.isDefined(e.value))
-            {
-              e.value = o.value;
-              o.subscribe(() => e.value = o.value);
-            }
-            else if (this.isDefined(e.innerHTML))
-            {
-              e.innerHTML = o.value;
-              o.subscribe(() => e.innerHTML = o.value);
-            }
-            if (e.hasAttribute('c-change'))
-            {
-              e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
-            }
-            else
-            {
-              e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
-            }
-            if (e.hasAttribute('c-click'))
-            {
-              e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
-            }
-            else
-            {
-              e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
-            }
-            if (e.hasAttribute('c-keydown'))
-            {
-              e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
-            }
-            else
-            {
-              e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
-            }
-            if (e.hasAttribute('c-keyup'))
-            {
-              e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
-            }
-            else
-            {
-              e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
-            }
+            o = new Observable;
+            _.set(s, e.getAttribute('c-model'), o);
+          }
+          if (!(o instanceof Observable) && !(o instanceof Computed))
+          {
+            o = new Observable(o);
+            _.set(s, e.getAttribute('c-model'), o);
+          }
+          if (this.isDefined(e.value))
+          {
+            e.value = o.value;
+            o.subscribe(() => e.value = o.value);
+          }
+          else if (this.isDefined(e.innerHTML))
+          {
+            e.innerHTML = o.value;
+            o.subscribe(() => e.innerHTML = o.value);
+          }
+          if (e.hasAttribute('c-change'))
+          {
+            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
+          }
+          else
+          {
+            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
+          }
+          if (e.hasAttribute('c-click'))
+          {
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
+          }
+          else
+          {
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+          }
+          if (e.hasAttribute('c-keydown'))
+          {
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
+          }
+          else
+          {
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
+          }
+          if (e.hasAttribute('c-keyup'))
+          {
+            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
+          }
+          else
+          {
+            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
           }
         });
       }
@@ -1496,7 +1503,7 @@ class Observable
   constructor(v)
   {
     this.listeners = [];
-    this.v = v;
+    this.v = ((typeof v !== 'undefined')?v:'');
   }
   // }}}
   // {{{ notify()

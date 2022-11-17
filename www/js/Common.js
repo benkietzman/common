@@ -823,16 +823,33 @@ class Common
       {
         document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
         {
-          let o = _.get(s, e.getAttribute('c-model'));
-          if (!this.isDefined(o))
+          let o = null;
+          if (typeof _ !== 'undefined')
           {
-            o = new Observable;
-            _.set(s, e.getAttribute('c-model'), o);
+            o = _.get(s, e.getAttribute('c-model'));
+            if (!this.isDefined(o))
+            {
+              o = new Observable;
+              _.set(s, e.getAttribute('c-model'), o);
+            }
+            if (!(o instanceof Observable) && !(o instanceof Computed))
+            {
+              o = new Observable(o);
+              _.set(s, e.getAttribute('c-model'), o);
+            }
           }
-          if (!(o instanceof Observable) && !(o instanceof Computed))
+          else
           {
-            o = new Observable(o);
-            _.set(s, e.getAttribute('c-model'), o);
+            if (!this.isDefined(s[e.getAttribute('c-model')]))
+            {
+              s[e.getAttribute('c-model')] = new Observable;
+            }
+            o = s[e.getAttribute('c-model')];
+            if (!(o instanceof Observable) && !(o instanceof Computed))
+            {
+              o = new Observable(o);
+              s[e.getAttribute('c-model')] = o;
+            }
           }
           if (this.isDefined(e.value))
           {

@@ -14,23 +14,12 @@ export default
     let c = common;
     let s = c.store('Login',
     {
-      b:
-      {
-        password: new Observable,
-        userid: new Observable
-      },
       c: c,
-      processLogin: () =>
-      {
-        c.login.login.userid = s.b.userid.value;
-        c.login.login.password = s.b.password.value;
-        c.processLogin();
-      },
       processLoginKey: () =>
       {
         if (window.event.keyCode == 13)
         {
-          s.processLogin()
+          c.processLogin()
         }
       }
     });
@@ -57,9 +46,9 @@ export default
     {{#if c.login.showForm}}
     <div class="row" style="width:50%;">
       <h3 class="page-header">{{c.login.login.title}}</h3>
-      <div class="col-md-5" style="padding:10px;"><input class="form-control" type="text" c-model="userid" maxlength="20" c-keyup="processLoginKey()" placeholder="User" autofocus></div>
-      <div class="col-md-5" style="padding:10px;"><input class="form-control" type="password" c-model="password" maxlength="64" c-keyup="processLoginKey()" placeholder="Password"></div>
-      <div class="col-md-2" style="padding:10px;"><button class="btn btn-primary float-end" c-click="processLogin()">Login</button></div>
+      <div class="col-md-5" style="padding:10px;"><input class="form-control" type="text" c-model="c.login.login.userid" maxlength="20" c-keyup="processLoginKey()" placeholder="User" autofocus></div>
+      <div class="col-md-5" style="padding:10px;"><input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()" placeholder="Password"></div>
+      <div class="col-md-2" style="padding:10px;"><button class="btn btn-primary float-end" c-click="c.processLogin()">Login</button></div>
     </div>
     {{/if}}
   `

@@ -14,14 +14,11 @@ export default
     let c = common;
     let s = c.store('centralMenu',
     {
-      b:
-      {
-        application: new Observable
-      },
+      application: new Observable,
       c: c,
       go: () =>
       {
-        document.location.href = c.centralMenu.applications[s.b.application.value].website;
+        document.location.href = c.centralMenu.applications[s.application.value].website;
       },
       slideMenu: () =>
       {
@@ -48,7 +45,7 @@ export default
               c.centralMenu.applications.push(data.Response.out[i]);
               if (data.Response.out[i].name == c.application)
               {
-                s.b.application.value = unIndex;
+                s.application.value = unIndex;
               }
               unIndex++;
             }

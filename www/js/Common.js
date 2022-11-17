@@ -1608,7 +1608,7 @@ class Computed extends Observable
   }
   // }}}
   // {{{ set value()
-  set value(val)
+  set value(v)
   {
     throw "Cannot set computed property";
   }

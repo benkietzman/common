@@ -1151,6 +1151,39 @@ class Common
     this.m_strLoginType = strLoginType;
   };
   // }}}
+  // {{{ simplify()
+  simplify(data)
+  {
+    let simple = null;
+
+    if ((data instanceof Observable) || (data instanceof Computed))
+    {
+      simple = data.value;
+    }
+    else if (this.isArray(data))
+    {
+      simple = [];
+      for (let i = 0; i < data.length; i++)
+      {
+        simple[i] = this.simplify(data[i]);
+      }
+    }
+    else if (this.isObject(data))
+    {
+      simple = {};
+      for (let key of Object.keys(data))
+      {
+        simple[key] = this.simplify(data[key]);
+      }
+    }
+    else
+    {
+      simple = data;
+    }
+
+    return simple;
+  }
+  // }}}
   // {{{ store()
   store(controller, data)
   {

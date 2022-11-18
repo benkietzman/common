@@ -11,3 +11,4 @@ fieldset legend {color: black;}
 .modal:focus {outline: 0;}
 
 .input-group-addon {width: auto;}
+.input-group-text {width: auto;}

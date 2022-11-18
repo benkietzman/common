@@ -1032,6 +1032,12 @@ class Common
     this.router.resolve();
   }
   // }}}
+  // {{{ scope()
+  scope(controller, data)
+  {
+    return this.store(controller, data);
+  }
+  // }}}
   // {{{ setCookie()
   setCookie(strName, strValue)
   {

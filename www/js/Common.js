@@ -230,6 +230,99 @@ class Common
     }
   }
   // }}}
+  // {{{ binder()
+  bind(id, name)
+  {
+    if (this.isDefined(id) && !this.isNull(id))
+    {
+      if (!this.isDefined(name) || this.isNull(name))
+      {
+        name = id;
+      }
+      let s = common.getStore(name);
+      if (this.isObject(s))
+      {
+        document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
+        {
+          let o = null;
+          if (typeof _ !== 'undefined')
+          {
+            o = _.get(s, e.getAttribute('c-model'));
+            if (!this.isDefined(o))
+            {
+              o = new Observable;
+              _.set(s, e.getAttribute('c-model'), o);
+            }
+            if (!(o instanceof Observable) && !(o instanceof Computed))
+            {
+              o = new Observable(o);
+              _.set(s, e.getAttribute('c-model'), o);
+            }
+          }
+          else
+          {
+            if (!this.isDefined(s[e.getAttribute('c-model')]))
+            {
+              s[e.getAttribute('c-model')] = new Observable;
+            }
+            o = s[e.getAttribute('c-model')];
+            if (!(o instanceof Observable) && !(o instanceof Computed))
+            {
+              o = new Observable(o);
+              s[e.getAttribute('c-model')] = o;
+            }
+          }
+          if (this.isDefined(e.value))
+          {
+            e.value = o.value;
+            o.subscribe(() => e.value = o.value);
+          }
+          else if (this.isDefined(e.innerHTML))
+          {
+            e.innerHTML = o.value;
+            o.subscribe(() => e.innerHTML = o.value);
+          }
+          if (e.hasAttribute('c-change'))
+          {
+            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
+          }
+          else
+          {
+            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
+          }
+          if (e.hasAttribute('c-click'))
+          {
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
+          }
+          else
+          {
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+          }
+          if (e.hasAttribute('c-keydown'))
+          {
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
+          }
+          else
+          {
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
+          }
+          if (e.hasAttribute('c-keyup'))
+          {
+            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
+          }
+          else
+          {
+            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
+          }
+        });
+      }
+    }
+    else
+    {
+      this.bind(this.id, this.name);
+    }
+  } 
+  // }}}
   // {{{ clearMenu()
   clearMenu()
   {
@@ -819,82 +912,7 @@ class Common
       {
         e.onkeyup = () => eval('s.' + e.getAttribute('c-keyup'));
       });
-      if (this.isObject(s))
-      {
-        document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
-        {
-          let o = null;
-          if (typeof _ !== 'undefined')
-          {
-            o = _.get(s, e.getAttribute('c-model'));
-            if (!this.isDefined(o))
-            {
-              o = new Observable;
-              _.set(s, e.getAttribute('c-model'), o);
-            }
-            if (!(o instanceof Observable) && !(o instanceof Computed))
-            {
-              o = new Observable(o);
-              _.set(s, e.getAttribute('c-model'), o);
-            }
-          }
-          else
-          {
-            if (!this.isDefined(s[e.getAttribute('c-model')]))
-            {
-              s[e.getAttribute('c-model')] = new Observable;
-            }
-            o = s[e.getAttribute('c-model')];
-            if (!(o instanceof Observable) && !(o instanceof Computed))
-            {
-              o = new Observable(o);
-              s[e.getAttribute('c-model')] = o;
-            }
-          }
-          if (this.isDefined(e.value))
-          {
-            e.value = o.value;
-            o.subscribe(() => e.value = o.value);
-          }
-          else if (this.isDefined(e.innerHTML))
-          {
-            e.innerHTML = o.value;
-            o.subscribe(() => e.innerHTML = o.value);
-          }
-          if (e.hasAttribute('c-change'))
-          {
-            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
-          }
-          else
-          {
-            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
-          }
-          if (e.hasAttribute('c-click'))
-          {
-            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
-          }
-          else
-          {
-            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
-          }
-          if (e.hasAttribute('c-keydown'))
-          {
-            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
-          }
-          else
-          {
-            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
-          }
-          if (e.hasAttribute('c-keyup'))
-          {
-            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
-          }
-          else
-          {
-            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
-          }
-        });
-      }
+      this.bind(id, name);
     }
     else
     {

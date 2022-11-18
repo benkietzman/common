@@ -41,7 +41,6 @@ export default
           {
             if (((data.Response.out[i].menu_id == 1 && c.isValid()) || data.Response.out[i].menu_id == 2) && (data.Response.out[i].retirement_date == null || data.Response.out[i].retirement_date == '0000-00-00 00:00:00'))
             {
-              data.Response.out[i].i = unIndex;
               c.centralMenu.applications.push(data.Response.out[i]);
               if (data.Response.out[i].name == c.application)
               {
@@ -66,7 +65,7 @@ export default
         <div id="central-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-change="go()" c-model="application">
             {{#each c.centralMenu.applications}}
-            <option value="{{i}}">{{name}}</option>
+            <option value="{{@key}}">{{name}}</option>
             {{/each}}
           </select>
         </div>

@@ -158,6 +158,10 @@ class Common
           return options.inverse(this);
         }
       });
+      Handlebars.registerHelper('json', function(context)
+      {
+        return JSON.stringify(context);
+      });
     }
   }
   // }}}

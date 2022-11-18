@@ -1053,6 +1053,10 @@ class Common
     let nActiveLeft = -1;
     let menu = this.menu;
     let submenu = this.submenu;
+    if (!this.isDefined(strSubMenu))
+    {
+      strSubMenu = null;
+    }
     this.menu = null;
     this.submenu = null;
     this.strPrevMenu = this.strMenu;

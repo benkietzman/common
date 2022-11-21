@@ -1207,7 +1207,7 @@ class Common
 
     if ((data instanceof Observable) || (data instanceof Computed))
     {
-      simple = data.value;
+      simple = this.simplify(data.value);
     }
     else if (this.isArray(data))
     {

@@ -45,24 +45,18 @@ export default
     {{/if}}
     {{#if c.login.showForm}}
     <div class="row">
-      <div class="col-md-3"></div>
-      <div class="col-md-6">
+      <div class="col-md-auto">
         <div class="card">
           <div class="card-header">
             <h3 class="page-header">{{c.login.login.title}}</h3>
           </div>
-          <div class="card-body table-responsive">
-            <table class="table">
-              <tr>
-                <td><div class="input-group"><span class="input-group-text">User</span><input class="form-control" type="text" c-model="c.login.login.userid" maxlength="20" c-keyup="processLoginKey()" autofocus></div></td>
-                <td><div class="input-group"><span class="input-group-text">Password</span><input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()"></div></td>
-                <td><button class="btn btn-primary float-end" c-click="c.processLogin()">Login</button></td>
-              </tr>
-            </table>
+          <div class="card-body row">
+            <div class="col-md-auto"><div class="input-group"><span class="input-group-text">User</span><input class="form-control" type="text" c-model="c.login.login.userid" maxlength="20" c-keyup="processLoginKey()" autofocus></div></div>
+            <div class="col-md-auto"><div class="input-group"><span class="input-group-text">Password</span><input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()"></div></div>
+            <div class="col-md-auto"><button class="btn btn-primary float-end" c-click="c.processLogin()">Login</button></div>
           </div>
         </div>
       </div>
-      <div class="col-md-3"></div>
     </div>
     {{/if}}
   `

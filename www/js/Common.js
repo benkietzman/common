@@ -84,11 +84,11 @@ class Common
     {
       Handlebars.registerHelper('add', (v1, v2) =>
       {
-        return (v1 + v2);
+        return (Number(v1) + Number(v2));
       });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {
-        return (v1 / v2);
+        return (Number(v1) / Number(v2));
       });
       Handlebars.registerHelper('for', (from, to, incr, options) =>
       {
@@ -191,15 +191,15 @@ class Common
       });
       Handlebars.registerHelper('mod', (v1, v2) =>
       {
-        return (v1 % v2);
+        return (Number(v1) % Number(v2));
       });
       Handlebars.registerHelper('multiply', (v1, v2) =>
       {
-        return (v1 * v2);
+        return (Number(v1) * Number(v2));
       });
       Handlebars.registerHelper('subtract', (v1, v2) =>
       {
-        return (v1 - v2);
+        return (Number(v1) - Number(v2));
       });
     }
   }

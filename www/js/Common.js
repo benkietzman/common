@@ -82,6 +82,14 @@ class Common
     }
     if (typeof Handlebars !== 'undefined')
     {
+      Handlebars.registerHelper('add', (v1, v2) =>
+      {
+        return (v1 + v2);
+      });
+      Handlebars.registerHelper('divide', (v1, v2) =>
+      {
+        return (v1 / v2);
+      });
       Handlebars.registerHelper('for', (from, to, incr, options) =>
       {
         let accum = '';
@@ -180,6 +188,18 @@ class Common
       Handlebars.registerHelper('json', (context) =>
       {
         return JSON.stringify(context);
+      });
+      Handlebars.registerHelper('mod', (v1, v2) =>
+      {
+        return (v1 % v2);
+      });
+      Handlebars.registerHelper('multiply', (v1, v2) =>
+      {
+        return (v1 * v2);
+      });
+      Handlebars.registerHelper('subtract', (v1, v2) =>
+      {
+        return (v1 - v2);
       });
     }
   }

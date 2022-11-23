@@ -82,6 +82,15 @@ class Common
     }
     if (typeof Handlebars !== 'undefined')
     {
+      Handlebars.registerHelper('for', (from, to, incr, block) =>
+      {
+        let accum = '';
+        for(let i = from; i < to; i += incr)
+        {
+          accum += block.fn(i);
+        }
+        return accum;
+      });
       Handlebars.registerHelper('getUserEmail', () =>
       {
         return this.getUserEmail();

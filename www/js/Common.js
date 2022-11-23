@@ -82,23 +82,23 @@ class Common
     }
     if (typeof Handlebars !== 'undefined')
     {
-      Handlebars.registerHelper('for', (from, to, incr, block) =>
+      Handlebars.registerHelper('for', (from, to, incr, options) =>
       {
         let accum = '';
-        for(let i = from; i < to; i += incr)
+        for (let i = from; i <= to; i += incr)
         {
-          accum += block.fn(i);
+          accum += options.fn(i);
         }
         return accum;
       });
-      Handlebars.registerHelper('numberFormat', (value, decimalLength, thousandsSep, decimalSep) =>
+      Handlebars.registerHelper('formatNumber', (value, decimalLength, thousandsSep, decimalSep) =>
       {
         let dl = decimalLength || 2;
         let ts = thousandsSep || ',';
         let ds = decimalSep || '.';
-        let value = parseFloat(value);
+        let v = parseFloat(value);
         let re = '\\d(?=(\\d{3})+' + ((dl > 0)?'\\D':'$') + ')';
-        let num = value.toFixed(Math.max(0, ~~dl));
+        let num = v.toFixed(Math.max(0, ~~dl));
         return ((ds)?num.replace('.', ds):num).replace(new RegExp(re, 'g'), '$&' + ts);
       });
       Handlebars.registerHelper('getUserEmail', () =>
@@ -177,7 +177,7 @@ class Common
           return options.inverse(this);
         }
       });
-      Handlebars.registerHelper('json', function(context)
+      Handlebars.registerHelper('json', (context) =>
       {
         return JSON.stringify(context);
       });
@@ -651,7 +651,7 @@ class Common
           }
           this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
-            var error = {};
+            let error = {};
             if (this.wsResponse(response, error))
             {
               if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
@@ -686,11 +686,11 @@ class Common
                 }
                 else
                 {
-                  var request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
+                  let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
                   request.Request = {Type: this.m_strLoginType, Return: document.location.href};
                   this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                   {
-                    var error = {};
+                    let error = {};
                     this.login.info = null;
                     if (this.wsResponse(response, error))
                     {
@@ -738,7 +738,7 @@ class Common
       }
       this.request('authProcessLogin', this.simplify(this.login.login), (result) =>
       {
-        var error = {};
+        let error = {};
         if (this.response(result, error))
         {
           this.m_auth = null;
@@ -759,7 +759,7 @@ class Common
           }
           else
           {
-            var login = {};
+            let login = {};
             login.Application = this.application;
             if (this.m_strLoginType != '')
             {
@@ -768,7 +768,7 @@ class Common
             login.Redirect = this.getRedirectPath();
             this.request('authLogin', login, (result) =>
             {
-              var error = {};
+              let error = {};
               this.login.info = null;
               if (this.response(result, error))
               {
@@ -826,11 +826,11 @@ class Common
               this.m_strLoginType = response.Response.Module;
             }
           }
-          var request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
+          let request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
           request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
           this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
-            var error = {};
+            let error = {};
             this.logout.info = null;
             if (this.wsResponse(response, error))
             {
@@ -854,7 +854,7 @@ class Common
       }
       else
       {
-        var logout = {};
+        let logout = {};
         logout.Application = this.getApplication();
         if (this.m_strLoginType != '')
         {
@@ -863,7 +863,7 @@ class Common
         logout.Redirect = this.getRedirectPath();
         this.request('authLogout', logout, (result) =>
         {
-          var error = {};
+          let error = {};
           this.logout.info = null;
           if (this.response(result, error))
           {
@@ -1133,7 +1133,7 @@ class Common
     if (nActiveLeft >= 0 && menu.left[nActiveLeft].submenu)
     {
       submenu = menu.left[nActiveLeft].submenu;
-      for (var i = 0; i < submenu.left.length; i++)
+      for (let i = 0; i < submenu.left.length; i++)
       {
         if (submenu.left[i].value == strSubMenu)
         {
@@ -1449,7 +1449,7 @@ class Common
             }
             else if (response.Action == 'message')
             {
-              var date = null;
+              let date = null;
               if (this.isDefined(response.Time) && response.Time != '')
               {
                 date = new Date(response.Time * 1000);

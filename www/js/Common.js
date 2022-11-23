@@ -91,6 +91,16 @@ class Common
         }
         return accum;
       });
+      Handlebars.registerHelper('numberFormat', (value, decimalLength, thousandsSep, decimalSep) =>
+      {
+        let dl = decimalLength || 2;
+        let ts = thousandsSep || ',';
+        let ds = decimalSep || '.';
+        let value = parseFloat(value);
+        let re = '\\d(?=(\\d{3})+' + ((dl > 0)?'\\D':'$') + ')';
+        let num = value.toFixed(Math.max(0, ~~dl));
+        return ((ds)?num.replace('.', ds):num).replace(new RegExp(re, 'g'), '$&' + ts);
+      });
       Handlebars.registerHelper('getUserEmail', () =>
       {
         return this.getUserEmail();

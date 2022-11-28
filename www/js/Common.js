@@ -99,15 +99,13 @@ class Common
         }
         return accum;
       });
-      Handlebars.registerHelper('formatNumber', (value, decimalLength, thousandsSep, decimalSep) =>
+      Handlebars.registerHelper('number', (value, decimalLength, thousandsSep, decimalSep) =>
       {
-        let dl = decimalLength || 2;
-        let ts = thousandsSep || ',';
-        let ds = decimalSep || '.';
-        let v = parseFloat(value);
-        let re = '\\d(?=(\\d{3})+' + ((dl > 0)?'\\D':'$') + ')';
-        let num = v.toFixed(Math.max(0, ~~dl));
-        return ((ds)?num.replace('.', ds):num).replace(new RegExp(re, 'g'), '$&' + ts);
+        return this.formatNumber(value, decimalLength, thousandsSep, decimalSep);
+      });
+      Handlebars.registerHelper('numberShort', (value, decimalLength, thousandsSep, decimalSep) =>
+      {
+        return this.formatNumberShort(value, decimalLength, thousandsSep, decimalSep);
       });
       Handlebars.registerHelper('getUserEmail', () =>
       {
@@ -420,6 +418,63 @@ class Common
     }
 
     return bResult;
+  }
+  // }}}
+  // {{{ formatNumber()
+  formatNumber(value, decimalLength, thousandsSep, decimalSep)
+  {
+    if (!this.isDefined(decimalLength) || this.isNull(decimalLength) || this.isObject(decimalLength))
+    {
+      decimalLength = 2;
+    }
+    if (!this.isDefined(thousandsSep) || this.isNull(thousandsSep) || this.isObject(thousandsSep))
+    {
+      thousandsSep = ',';
+    }
+    let num = Number(value).toFixed(Math.max(0, ~~decimalLength));
+    if (decimalSep)
+    {
+      num = num.replace('.', decimalSep);
+    }
+
+    return num.replace(new RegExp('\\d(?=(\\d{3})+' + ((decimalLength > 0)?'\\D':'$') + ')', 'g'), '$&' + thousandsSep);
+  }
+  // }}}
+  // {{{ formatNumberShort()
+  formatNumberShort(value, decimalLength, thousandsSep, decimalSep)
+  {
+    let bNegative = false;
+    let nNumber = Number(value);
+    let strSuffix = '';
+
+    if (nNumber < 0)
+    {
+      bNegative = true;
+      nNumber *= -1;
+    }
+    if (nNumber > 1000)
+    {
+      strSuffix = 'K';
+      nNumber /= 1000;
+      if (nNumber > 1000)
+      {
+        strSuffix = 'M';
+        nNumber /= 1000;
+        if (nNumber > 1000)
+        {
+          strSuffix = 'B';
+          nNumber /= 1000;
+          if (nNumber > 1000)
+          {
+            strSuffix = 'T';
+            nNumber /= 1000;
+          }
+        }
+      }
+    }
+    nNumber = this.formatNumber(nNumber, decimalLength, thousandsSep, decimalSep);
+
+    return ((bNegative)?'-':'') + nNumber + strSuffix;
   }
   // }}}
   // {{{ getCookie()

@@ -452,19 +452,19 @@ class Common
       bNegative = true;
       nNumber *= -1;
     }
-    if (nNumber > 1000)
+    if (nNumber >= 1000)
     {
       strSuffix = 'K';
       nNumber /= 1000;
-      if (nNumber > 1000)
+      if (nNumber >= 1000)
       {
         strSuffix = 'M';
         nNumber /= 1000;
-        if (nNumber > 1000)
+        if (nNumber >= 1000)
         {
           strSuffix = 'B';
           nNumber /= 1000;
-          if (nNumber > 1000)
+          if (nNumber >= 1000)
           {
             strSuffix = 'T';
             nNumber /= 1000;

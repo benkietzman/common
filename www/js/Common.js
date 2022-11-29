@@ -288,7 +288,7 @@ class Common
     }
   }
   // }}}
-  // {{{ binder()
+  // {{{ bind()
   bind(id, name)
   {
     if (this.isDefined(id) && !this.isNull(id))
@@ -1028,6 +1028,7 @@ class Common
         e.onkeyup = () => eval('s.' + e.getAttribute('c-keyup'));
       });
       this.bind(id, name);
+      this.dispatchEvent('render', {id: id, name: name});
     }
     else
     {

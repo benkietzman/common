@@ -1000,6 +1000,10 @@ class Common
   {
     if (this.isDefined(id) && !this.isNull(id))
     {
+      if ((!this.isDefined(name) || this.isNull(name)) && this.isDefined(this.autoLoads[id]))
+      {
+        name = this.autoLoads[id];
+      }
       if (!this.isDefined(component) || this.isNull(component))
       {
         component = name;

@@ -55,6 +55,185 @@ extern "C++"
       return m_conf;
     }
     // }}}
+    // {{{ connect()
+    bool Utility::connect(const string strServer, const string strPort, int &fdSocket, string &strError)
+    {
+      return connect(strServer, strPort, "", "", fdSocket, strError);
+    }
+    bool Utility::connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError)
+    {
+      bool bResult = false;
+
+      if (!strServer.empty())
+      {
+        if (!strPort.empty())
+        {
+          addrinfo hints, *result;
+          bool bUseProxy = false;
+          int nReturn;
+          string strDestServer = strServer, strDestPort = strPort;
+          memset(&hints, 0, sizeof(addrinfo));
+          hints.ai_family = AF_UNSPEC;
+          hints.ai_socktype = SOCK_STREAM;
+          if (!strProxyServer.empty() && !strProxyPort.empty())
+          {
+            bUseProxy = true;
+            strDestServer = strProxyServer;
+            strDestPort = strProxyPort;
+          }
+          if ((nReturn = getaddrinfo(strDestServer.c_str(), strDestPort.c_str(), &hints, &result)) == 0)
+          {
+            bool bConnected[2] = {false, false};
+            for (addrinfo *rp = result; !bConnected[1] && rp != NULL; rp = rp->ai_next)
+            {
+              bConnected[0] = false;
+              if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
+              {
+                bConnected[0] = true;
+                if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                {
+                  bConnected[1] = true;
+                }
+                else
+                {
+                  close(fdSocket);
+                  fdSocket = -1;
+                }
+              }
+            }
+            freeaddrinfo(result);
+            if (bConnected[1])
+            {
+              if (bUseProxy)
+              {
+                bool bClose = false, bExit = false;
+                char cChar;
+                size_t unPosition;
+                string strBuffers[2];
+                stringstream ssBuffer;
+                ssBuffer << "CONNECT " << strServer << ":" << strPort << " HTTP/1.0\r\n\r\n";
+                strBuffers[1] = ssBuffer.str();
+                while (!bExit)
+                {
+                  pollfd fds[1];
+                  fds[0].fd = fdSocket;
+                  fds[0].events = POLLIN;
+                  if (!strBuffers[1].empty())
+                  {
+                    fds[0].events |= POLLOUT;
+                  }
+                  if ((nReturn = poll(fds, 1, 250)) > 0)
+                  {
+                    if (fds[0].revents & POLLIN)
+                    {
+                      if ((nReturn = read(fdSocket, &cChar, 1)) > 0)
+                      {
+                        strBuffers[0].push_back(cChar);
+                        if ((unPosition = strBuffers[0].find("\r\n\r\n")) != string::npos)
+                        {
+                          string strCode, strLine, strValue;
+                          stringstream ssData(strBuffers[0].substr(0, unPosition)), ssLine;
+                          getline(ssData, strLine);
+                          ssLine.str(strLine);
+                          ssLine >> strValue >> strCode;
+                          if (strCode == "200")
+                          {
+                            bExit = bResult = true;
+                          }
+                          else
+                          {
+                            bClose = true;
+                            strError = strLine;
+                            while (!bExit && getline(ssData, strLine))
+                            {
+                              if (strLine.size() >= 15 && strLine.substr(0, 15) == "X-Squid-Error: ")
+                              {
+                                bExit = true;
+                                strError = strLine.substr(15, (strLine.size() - 15));
+                              }
+                            }
+                            if (!bExit)
+                            {
+                              bExit = true;
+                              strError = strLine;
+                            }
+                          }
+                        }
+                      }
+                      else
+                      {
+                        bClose = bExit = true;
+                        if (nReturn < 0)
+                        {
+                          stringstream ssError;
+                          ssError << "read(" << errno << ") error:  " << strerror(errno);
+                          strError = ssError.str();
+                        }
+                      }
+                    }
+                    if (fds[0].revents & POLLOUT)
+                    {
+                      if ((nReturn = write(fdSocket, strBuffers[1].c_str(), strBuffers[1].size())) > 0)
+                      {
+                        strBuffers[1].erase(0, nReturn);
+                      }
+                      else
+                      {
+                        bClose = bExit = true;
+                        if (nReturn < 0)
+                        {
+                          stringstream ssError;
+                          ssError << "write(" << errno << ") error:  " << strerror(errno);
+                          strError = ssError.str();
+                        }
+                      }
+                    }
+                  }
+                  else if (nReturn < 0)
+                  {
+                    stringstream ssError;
+                    bClose = bExit = true;
+                    ssError << "poll(" << errno << ") error:  " << strerror(errno);
+                    strError = ssError.str();
+                  }
+                }
+                if (bClose)
+                {
+                  close(fdSocket);
+                }
+              }
+              else
+              {
+                bResult = true;
+              }
+            }
+            else
+            {
+              stringstream ssError;
+              ssError << ((!bConnected[0])?"socket":"connect") << "(" << errno << ") error:  " << strerror(errno);
+              strError = ssError.str();
+            }
+          }
+          else
+          {
+            stringstream ssError;
+            ssError << "getaddrinfo(" << nReturn << ") error:  " << gai_strerror(nReturn);
+            strError = ssError.str();
+          }
+        }
+        else
+        {
+          strError = "Please provide the Port.";
+        }
+      }
+      else
+      {
+        strError = "Please provide the Server.";
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ daemonize()
     void Utility::daemonize()
     {

@@ -35,6 +35,7 @@
 #include <functional>
 #include <iostream>
 #include <mutex>
+#include <netdb.h>
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -82,6 +83,26 @@ extern "C++"
       * \return Returns a pointer to the configuration storage.
       */
       Json *conf();
+      /*! \fn bool connect(const string strServer, const string strPort, int &fdSocket, string &strError)
+      * \brief Connect to a server and port.
+      * \param strServer Contains the server.
+      * \param strPort Contains the port.
+      * \param fdSocket Contains the socket.
+      * \param strError Contains the error.
+      * \return Returns a boolean true/false value.
+      */
+      bool connect(const string strServer, const string strPort, int &fdSocket, string &strError);
+      /*! \fn bool connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError)
+      * \brief Connect to a server and port via a proxy.
+      * \param strServer Contains the server.
+      * \param strPort Contains the port.
+      * \param strProxyServer Contains the proxy server.
+      * \param strProxyPort Contains the proxy port.
+      * \param fdSocket Contains the socket.
+      * \param strError Contains the error.
+      * \return Returns a boolean true/false value.
+      */
+      bool connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError);
       /*! \fn void daemonize()
       * \brief Turns the process into a system daemon.
       */

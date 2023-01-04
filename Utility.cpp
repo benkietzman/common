@@ -56,9 +56,9 @@ extern "C++"
     }
     // }}}
     // {{{ connect()
-    bool Utility::connect(const string strServer, const string strPort, int &fdSocket, string &strError)
+    bool Utility::connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy)
     {
-      return connect(strServer, strPort, "", "", fdSocket, strError);
+      return connect(strServer, strPort, ((bProxy)?m_strProxyServer:""), ((bProxy)?m_strProxyPort:""), fdSocket, strError);
     }
     bool Utility::connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError)
     {
@@ -615,6 +615,13 @@ extern "C++"
       m_strConf = strPath;
       m_ulModifyTime = 0;
       readConf(strError);
+    }
+    // }}}
+    // {{{ setProxy()
+    void Utility::setProxy(const string strServer, const string strPort)
+    {
+      m_strProxyServer = strServer;
+      m_strProxyPort = strPort;
     }
     // }}}
     // {{{ socketType()

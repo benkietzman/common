@@ -68,6 +68,8 @@ extern "C++"
       private:
       bool m_bSslInit;
       std::mutex m_mutexConf;
+      string m_strProxyPort;
+      string m_strProxyServer;
       time_t m_ulModifyTime;
       File m_file;
 
@@ -83,15 +85,16 @@ extern "C++"
       * \return Returns a pointer to the configuration storage.
       */
       Json *conf();
-      /*! \fn bool connect(const string strServer, const string strPort, int &fdSocket, string &strError)
+      /*! \fn bool connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy = false)
       * \brief Connect to a server and port.
       * \param strServer Contains the server.
       * \param strPort Contains the port.
       * \param fdSocket Contains the socket.
       * \param strError Contains the error.
+      * \param bProxy Contains the proxy bolean value.
       * \return Returns a boolean true/false value.
       */
-      bool connect(const string strServer, const string strPort, int &fdSocket, string &strError);
+      bool connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy = false);
       /*! \fn bool connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError)
       * \brief Connect to a server and port via a proxy.
       * \param strServer Contains the server.
@@ -237,11 +240,18 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool readConf(string &strError);
-      /*! \fn void setConfPath(const string strPath)
+      /*! \fn void setConfPath(const string strPath, string &strError)
       * \brief Sets the configuration storage path.
+      * \param strPath Contains the path.
       * \param strError Contains the error message.
       */
       void setConfPath(const string strPath, string &strError);
+      /*! \fn void setProxy(const string strServer, const string strPort)
+      * \brief Sets the proxy.
+      * \param strServer Contains the server.
+      * \param strPort Contains the port.
+      */
+      void setProxy(const string strServer, const string strPort);
       /*! \fn bool socketType(int fdSocket, common_socket_type &eType, string &strError)
       * \brief Take a peek of the current socket to determine if it's a regular or encrypted one.
       * \param fdSocket Contains the socket descriptor.

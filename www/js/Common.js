@@ -1191,17 +1191,17 @@ class Common
   {
     if (this.isDefined(this.junction) && this.isDefined(this.email))
     {
-      let strText = null;
       if (window.localStorage.getItem('sl_debugMessages'))
       {
         let messages = window.localStorage.getItem('sl_debugMessages');
+        let strHtml = null;
         for (let i = 0; i < messages.length; i++)
         {
-          strText = strText + messages[i] + "\n";
+          strHtml = strHtml + '<li>' + messages[i] + '</li>';
         }
-        if (!this.isNull(strText))
+        if (!this.isNull(strHtml))
         {
-          sendEmail(this.email, 'Common Debug', null, strText);
+          sendEmail(this.email, 'Common Debug', '<html><body><ul>'+strHtml+'</ul></body></html>', null);
         }
       }
     }

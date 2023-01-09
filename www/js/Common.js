@@ -999,18 +999,22 @@ class Common
   }
   // }}}
   // {{{ pushDebugMessage()
-  pushDebugMessage(controller, data)
+  pushDebugMessage(strMessage)
   {
-    let messages = null;
-    if (window.localStorage.getItem('sl_debugMessages'))
+    if (this.isDefined(options.debug) && options.debug)
     {
-      messages = window.localStorage.getItem('sl_debugMessages');
+      let messages = null;
+      if (window.localStorage.getItem('sl_debugMessages'))
+      {
+        messages = window.localStorage.getItem('sl_debugMessages');
+      }
+      else
+      {
+        messages = [];
+      }
+      messages.push(strMessage);
+      window.localStorage.setItem('sl_debugMessages', messages);
     }
-    else
-    {
-      messages = [];
-    }
-    window.localStorage.setItem('sl_debugMessages', messages);
   }
   // }}}
   // {{{ putStore()
@@ -1021,6 +1025,15 @@ class Common
       data = {};
     }
     this.m_store[controller] = data;
+  }
+  // }}}
+  // {{{ removeDebugMessages()
+  removeDebugMessages()
+  {
+    if (window.localStorage.getItem('sl_debugMessages'))
+    {
+      window.localStorage.removeItem('sl_debugMessages');
+    }
   }
   // }}}
   // {{{ render()

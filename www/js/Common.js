@@ -1003,10 +1003,14 @@ class Common
   {
     if (this.isDefined(this.debug) && this.debug)
     {
-      let messages = [];
+      let messages = null;
       if (window.localStorage.getItem('sl_debugMessages'))
       {
         messages = window.localStorage.getItem('sl_debugMessages');
+      }
+      if (!this.isArray(messages))
+      {
+        messages = [];
       }
       messages.push(strMessage);
       window.localStorage.setItem('sl_debugMessages', messages);

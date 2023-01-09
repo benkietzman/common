@@ -1207,10 +1207,10 @@ class Common
       if (window.localStorage.getItem('sl_debugMessages'))
       {
         let messages = JSON.parse(window.localStorage.getItem('sl_debugMessages'));
-        let strHtml = null;
+        let strHtml = '';
         for (let i = 0; i < messages.length; i++)
         {
-          strHtml = strHtml + '<li>' + messages[i] + '</li>';
+          strHtml += '<li>' + messages[i] + '</li>';
         }
         if (!this.isNull(strHtml))
         {

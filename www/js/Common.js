@@ -15,6 +15,7 @@ class Common
     this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
     this.components = {};
+    this.debug = false;
     this.footer = {engineer: false};
     this.autoLoads = {};
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
@@ -50,6 +51,18 @@ class Common
     if (!this.isDefined(this.id))
     {
       this.id = 'app';
+    }
+    if (this.isDefined(options.junction))
+    {
+      this.junction = options.junction;
+      if (this.isDefined(options.email))
+      {
+        this.email = options.email;
+        if (this.isDefined(options.debug) && options.debug)
+        {
+          this.debug = options.debug;
+        }
+      }
     }
     if (this.isDefined(options.loads))
     {
@@ -985,6 +998,21 @@ class Common
     }
   }
   // }}}
+  // {{{ pushDebugMessage()
+  pushDebugMessage(controller, data)
+  {
+    let messages = null;
+    if (window.localStorage.getItem('sl_debugMessages'))
+    {
+      messages = window.localStorage.getItem('sl_debugMessages');
+    }
+    else
+    {
+      messages = [];
+    }
+    window.localStorage.setItem('sl_debugMessages', messages);
+  }
+  // }}}
   // {{{ putStore()
   putStore(controller, data)
   {
@@ -1156,6 +1184,52 @@ class Common
   scope(controller, data)
   {
     return this.store(controller, data);
+  }
+  // }}}
+  // {{{ sendDebugEmail()
+  sendDebugEmail()
+  {
+    if (this.isDefined(this.junction) && this.isDefined(this.email))
+    {
+      let strText = null;
+      if (window.localStorage.getItem('sl_debugMessages'))
+      {
+        let messages = window.localStorage.getItem('sl_debugMessages');
+        for (let i = 0; i < messages.length; i++)
+        {
+          strText = strText + messages[i] + "\n";
+        }
+        if (!this.isNull(strText))
+        {
+          sendEmail(this.email, 'Common Debug', null, strText);
+        }
+      }
+    }
+  }
+  // }}}
+  // {{{ sendEmail()
+  sendEmail(strTo, strSubject, strHtml, strText)
+  {
+    if (this.isDefined(this.junction))
+    {
+      let request = {Service: 'email', To: strTo, Subject: strSubject};
+      if (!this.isNull(strHtml))
+      {
+        request.HTML = strHtml;
+      }
+      if (!this.isNull(strText))
+      {
+        request.Text = strText;
+      }
+      this.junction.request([request], true, (response) =>
+      {
+        let error = {};
+        if (!this.junction.response(response, error))
+        {
+          console.log(response);
+        }
+      });
+    }
   }
   // }}}
   // {{{ setCookie()

@@ -1006,14 +1006,14 @@ class Common
       let messages = null;
       if (window.localStorage.getItem('sl_debugMessages'))
       {
-        messages = window.localStorage.getItem('sl_debugMessages');
+        messages = JSON.parse(window.localStorage.getItem('sl_debugMessages'));
       }
-      if (!this.isArray(messages))
+      else
       {
         messages = [];
       }
       messages.push(strMessage);
-      window.localStorage.setItem('sl_debugMessages', messages);
+      window.localStorage.setItem('sl_debugMessages', JSON.stringify(messages));
     }
   }
   // }}}
@@ -1206,7 +1206,7 @@ class Common
     {
       if (window.localStorage.getItem('sl_debugMessages'))
       {
-        let messages = window.localStorage.getItem('sl_debugMessages');
+        let messages = JSON.parse(window.localStorage.getItem('sl_debugMessages'));
         let strHtml = null;
         for (let i = 0; i < messages.length; i++)
         {

@@ -1214,7 +1214,7 @@ class Common
         }
         if (!this.isNull(strHtml))
         {
-          sendEmail(this.email, 'Common Debug', '<html><body><ul>'+strHtml+'</ul></body></html>', null);
+          this.sendEmail(this.email, 'Common Debug', '<html><body><ul>'+strHtml+'</ul></body></html>', null);
         }
       }
     }

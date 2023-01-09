@@ -1001,7 +1001,7 @@ class Common
   // {{{ pushDebugMessage()
   pushDebugMessage(strMessage)
   {
-    if (this.isDefined(options.debug) && options.debug)
+    if (this.isDefined(this.debug) && this.debug)
     {
       let messages = null;
       if (window.localStorage.getItem('sl_debugMessages'))

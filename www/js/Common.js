@@ -742,7 +742,7 @@ class Common
             let error = {};
             if (this.wsResponse(response, error))
             {
-              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1 && response.Error.Message != 'Failed to find key.')
+              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1 && response.Error.Message.search('Failed to find key.') == -1)
               {
                 this.login.message = response.Error.Message;
               }

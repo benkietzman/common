@@ -174,14 +174,12 @@ class Bridge
   }
   // }}}
   // {{{ databaseQuery()
-  public function databaseQuery($strUser, $strPassword, $strDatabase, $strQuery, &$result)
+  public function databaseQuery($strDatabase, $strQuery, &$result)
   {
     $bResult = false;
 
     $request = [];
     $request['Section'] = 'database';
-    $request['User'] = $strUser;
-    $request['Password'] = $strPassword;
     $request['Database'] = $strDatabase;
     $request['Request'] = [];
     $request['Request']['Query'] = $strQuery;
@@ -210,23 +208,21 @@ class Bridge
   }
   // }}}
   // {{{ databaseUpdate()
-  public function databaseUpdate($strUser, $strPassword, $strDatabase, $strUpdate)
+  public function databaseUpdate($strDatabase, $strUpdate)
   {
     $nID = null;
 
-    return $this->databaseUpdateWithID($strUser, $strPassword, $strDatabase, $strUpdate, $nID);
+    return $this->databaseUpdateWithID($strDatabase, $strUpdate, $nID);
   }
   // }}}
   // {{{ databaseUpdateWithID()
-  public function databaseUpdateWithID($strUser, $strPassword, $strDatabase, $strUpdate, &$nID)
+  public function databaseUpdateWithID($strDatabase, $strUpdate, &$nID)
   {
     $bResult = false;
 
     $request = [];
     $request['Section'] = 'database';
     $request['User'] = $strUser;
-    $request['Password'] = $strPassword;
-    $request['Database'] = $strDatabase;
     $request['Request'] = [];
     $request['Request']['Update'] = $strQuery;
     $response = null;
@@ -254,21 +250,21 @@ class Bridge
   }
   // }}}
   // {{{ dbQuery()
-  public function dbQuery($strUser, $strPassword, $strDatabase, $strQuery, &$result)
+  public function dbQuery($strDatabase, $strQuery, &$result)
   {
-    return $this->databaseQuery($strUser, $strPassword, $strDatabase, $strQuery, $result);
+    return $this->databaseQuery($strDatabase, $strQuery, $result);
   }
   // }}}
   // {{{ dbUpdate()
-  public function dbUpdate($strUser, $strPassword, $strDatabase, $strUpdate)
+  public function dbUpdate($strDatabase, $strUpdate)
   {
-    return $this->databaseUpdate($strUser, $strPassword, $strDatabase, $strUpdate);
+    return $this->databaseUpdate($strDatabase, $strUpdate);
   }
   // }}}
   // {{{ dbUpdateWithID()
-  public function dbUpdateWithID($strUser, $strPassword, $strDatabase, $strUpdate, &$nID)
+  public function dbUpdateWithID($strDatabase, $strUpdate, &$nID)
   {
-    return $this->databaseUpdateWithID($strUser, $strPassword, $strDatabase, $strUpdate, $nID);
+    return $this->databaseUpdateWithID($strDatabase, $strUpdate, $nID);
   }
   // }}}
   // {{{ disconnect()

@@ -33,7 +33,7 @@ class Bridge
     $this->m_bAuthenticated = false;
     $this->m_bFailed = false;
     $this->m_bRegistered = false;
-    $this->m_bUseSecureBridge = true;
+    $this->m_bUseSecureBridge = false;
     $this->m_buffer = [[], []];
     $this->m_CTime = [0, 0];
     $this->m_handle = false;

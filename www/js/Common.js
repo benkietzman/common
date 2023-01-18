@@ -251,7 +251,7 @@ class Common
               if (!this.m_wsRequestID && !this.m_bConnecting)
               {
                 this.m_bConnecting = true;
-                let request = {Section: 'bridge', 'Function': 'connect'};
+                let request = {Interface: 'live', Section: 'bridge', 'Function': 'connect'};
                 request.Request = {};
                 this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                 {
@@ -267,7 +267,7 @@ class Common
             else if (this.m_wsRequestID)
             {
               this.m_bConnecting = true;
-              let request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
+              let request = {Interface: 'live', Section: 'bridge', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
               request.Request = {};
               this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
               {

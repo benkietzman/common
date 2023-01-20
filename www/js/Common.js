@@ -1506,7 +1506,7 @@ class Common
       // {{{ WebSocket::onmessage()
       this.m_ws[strName].ws.onmessage = (e) =>
       {
-        let response = JSON.parse(e.data);
+        let response = JSON.parse(e.data.detail);
         if (this.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error == 'Failed: exp')))
         {
           response.Error.Message = 'Session expired.  Please login again.';
@@ -1681,7 +1681,7 @@ class Common
       this.wsSend(strName, unHandle, request);
       this.attachEvent(unHandle, (data) =>
       {
-        deferred.resolve(data.detail);
+        deferred.resolve(data);
       });
     }
 

@@ -1234,7 +1234,7 @@ class ServiceJunction
       $bReturnObj = false;
       for ($i = 0; $i < $nSize; $i++)
       {
-        if (trim($request[$i]) != 'end')
+        if (is_array($request[$i]) || is_object($request[$i]) || trim($request[$i]) != 'end')
         {
           // check if request is a line of json or php array or object
           if(is_array($request[$i])){

@@ -222,7 +222,7 @@ class Bridge
 
     $request = [];
     $request['Section'] = 'database';
-    $request['User'] = $strUser;
+    $request['Database'] = $strDatabase;
     $request['Request'] = [];
     $request['Request']['Update'] = $strQuery;
     $response = null;
@@ -577,10 +577,9 @@ class Bridge
       $nErrorNo = null;
       $port = 12199;
       $strError = null;
-      $unAttempt = 0;
       for ($i = (($this->m_bUseSecureBridge)?0:1); !$bConnected && $i < 2; $i++)
       {
-        $unATtempt = 0;
+        $unAttempt = 0;
         $unPick = rand(0, ($unSize - 1));
         while (!$bConnected && $unAttempt++ < $unSize)
         {

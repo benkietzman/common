@@ -291,16 +291,9 @@ class Radial
                     {
                       $bResult = true;
                     }
-                    else if (isset($response['Error']))
+                    else if (isset($response['Error']) && $response['Error'] != '')
                     {
-                      else if ($response['Error'] != '')
-                      {
-                        $this->setError($response['Error']);
-                      }
-                      else
-                      {
-                        $this->setError('Encountered an unknown error.');
-                      }
+                      $this->setError($response['Error']);
                     }
                     else
                     {

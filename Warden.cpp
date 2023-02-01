@@ -176,7 +176,6 @@ extern "C++"
         bResult = true;
         if (ptResponse->m.find("Data") != ptResponse->m.end())
         {
-          ptData->clear();
           ptData->merge(ptResponse->m["Data"], true, false);
         }
       }

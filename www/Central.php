@@ -291,12 +291,10 @@ class Central extends Secure
               if ($insertApplicationAccount->execute())
               {
                 $bResult = true;
-                $this->syslog()->userAccountCreated('Created the user.', $request['user_id']);
               }
               else
               {
                 $strError = $insertApplicationAccount->getError();
-                $this->syslog()->userAccountCreated('Failed to create the user.', $request['user_id'], false);
               }
             }
             else
@@ -368,12 +366,10 @@ class Central extends Secure
               if ($updateApplicationAccount->execute())
               {
                 $bResult = true;
-                $this->syslog()->userAccountModified('Modified the user.', $request['user_id']);
               }
               else
               {
                 $strError = $updateApplicationAccount->getError();
-                $this->syslog()->userAccountModified('Failed to modify the user.', $request['user_id'], false);
               }
             }
             else
@@ -418,12 +414,10 @@ class Central extends Secure
         if ($deleteApplicationAccount->execute())
         {
           $bResult = true;
-          $this->syslog()->userAccountDeleted('Deleted the user.');
         }
         else
         {
           $strError = $deleteApplicationAccount->getError();
-          $this->syslog()->userAccountDeleted('Failed to delete the user.', null, false);
         }
       }
       unset($accountrequest);
@@ -2511,12 +2505,10 @@ class Central extends Secure
                         if ($insertApplicationContact->execute())
                         {
                           $bResult = true;
-                          $this->syslog()->userAccountCreated('Created the user.', $request['userid']);
                         }
                         else
                         {
                           $strError = $insertApplicationContact->getError();
-                          $this->syslog()->userAccountCreated('Failed to create the user.', $request['userid'], false);
                         }
                       }
                       else
@@ -2627,12 +2619,10 @@ class Central extends Secure
                           if ($updateApplicationContact->execute())
                           {
                             $bResult = true;
-                            $this->syslog()->userAccountModified('Modified the user.', $request['userid']);
                           }
                           else
                           {
                             $strError = $updateApplicationContact->getError();
-                            $this->syslog()->userAccountModified('Failed to modify the user.', $request['userid'], false);
                           }
                         }
                         else
@@ -2709,12 +2699,10 @@ class Central extends Secure
             if ($deleteApplicationContact->execute())
             {
               $bResult = true;
-              $this->syslog()->userAccountDeleted('Deleted the user.');
             }
             else
             {
               $strError = $deleteApplicationContact->getError();
-              $this->syslog()->userAccountDeleted('Deleted the user.', null, false);
             }
           }
           else
@@ -3010,12 +2998,10 @@ class Central extends Secure
           if ($getApplicationDeveloper->fetch('assoc'))
           {
             $bResult = true;
-            $this->syslog()->logon('Authorized the user as an application developer', $this->getUserID());
           }
           else
           {
             $strError = 'You are not a developer for this application.';
-            $this->syslog()->logon('Failed to authorize the user as an application developer', $this->getUserID(), false);
           }
         }
         else
@@ -3053,12 +3039,10 @@ class Central extends Secure
           if ($getServerAdmin->fetch('assoc'))
           {
             $bResult = true;
-            $this->syslog()->logon('Authorized the user as a server administrator', $this->getUserID());
           }
           else
           {
             $strError = 'You are not a admin for this server.';
-            $this->syslog()->logon('Failed to authorize the user as a server administrator', $this->getUserID(), false);
           }
         }
         else
@@ -4025,12 +4009,10 @@ class Central extends Secure
                   if ($insertServerContact->execute())
                   {
                     $bResult = true;
-                    $this->syslog()->userAccountCreated('Created the user.', $request['userid']);
                   }
                   else
                   {
                     $strError = $insertServerContact->getError();
-                    $this->syslog()->userAccountCreated('Failed to create the user.', $request['userid'], false);
                   }
                 }
                 else
@@ -4120,12 +4102,10 @@ class Central extends Secure
                     if ($updateServerContact->execute())
                     {
                       $bResult = true;
-                      $this->syslog()->userAccountModified('Modified the user.', $request['userid']);
                     }
                     else
                     {
                       $strError = $updateServerContact->getError();
-                      $this->syslog()->userAccountModified('Failed to modify the user.', $request['userid'], false);
                     }
                   }
                   else
@@ -4185,12 +4165,10 @@ class Central extends Secure
           if ($deleteServerContact->execute())
           {
             $bResult = true;
-            $this->syslog()->userAccountDeleted('Deleted the user.');
           }
           else
           {
             $strError = $deleteServerContact->getError();
-            $this->syslog()->userAccountDeleted('Failed to delete the user.', null, false);
           }
         }
         else
@@ -4388,12 +4366,10 @@ class Central extends Secure
           if ($insertUser->execute())
           {
             $bResult = true;
-            $this->syslog()->userAccountCreated('Created the user.', $request['userid']);
           }
           else
           {
             $strError = $insertUser->getError();
-            $this->syslog()->userAccountCreated('Failed to create the user.', $request['userid'], false);
           }
         }
         unset($userrequest);
@@ -4444,12 +4420,10 @@ class Central extends Secure
           if ($updateUser->execute())
           {
             $bResult = true;
-            $this->syslog()->userAccountModified('Modified the user.', $request['userid']);
           }
           else
           {
             $strError = $updateUser->getError();
-            $this->syslog()->userAccountModified('Failed to modify the user.', $request['userid'], false);
           }
         }
         else
@@ -4488,12 +4462,10 @@ class Central extends Secure
         if ($deleteUser->execute())
         {
           $bResult = true;
-          $this->syslog()->userAccountDeleted('Deleted the user.');
         }
         else
         {
           $strError = $deleteUser->getError();
-          $this->syslog()->userAccountDeleted('Failed to delete the user.', null, false);
         }
       }
       else

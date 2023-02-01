@@ -23,7 +23,6 @@
 // {{{ includes
 include_once(dirname(__FILE__).'/../Basic.php');
 include_once(dirname(__FILE__).'/../database/CommonDatabase.php');
-include_once(dirname(__FILE__).'/../Syslog.php');
 include_once(dirname(__FILE__).'/../servicejunction/ServiceJunction.php');
 include_once(dirname(__FILE__).'/../warden/Warden.php');
 if (($mod_handle = opendir(dirname(__FILE__).'/module/')))
@@ -78,8 +77,6 @@ class Secure extends Basic
   private $m_db;
   //! Stores the read-only database handle
   private $m_readdb;
-  //! Stores the syslog class instantiation
-  private $m_syslog;
   // }}}
   // {{{ __construct()
   /*! \fn __construct($strUser, $strPassword, $strHost, $strDB, $strReturnPath = 'secure')
@@ -129,7 +126,6 @@ class Secure extends Basic
     $this->m_junction = new ServiceJunction;
     $this->m_junction->useSecureJunction(false);
     $this->m_junction->setApplication('Common');
-    $this->m_syslog = new Syslog('Common Library', 'Secure.php');
     $this->m_strReturnPath = $strReturnPath;
   }
   // }}}
@@ -290,11 +286,6 @@ class Secure extends Basic
     if (isset($_SESSION['sl_login']) && isset($_SESSION['sl_admin']) && $_SESSION['sl_admin'])
     {
       $bResult = true;
-      $this->m_syslog->logon('Authorized the user as a global administrator.', $this->getUserID());
-    }
-    else
-    {
-      $this->m_syslog->logon('Failed to authorize the user as a global administrator.', $this->getUserID(), false);
     }
 
     return $bResult;
@@ -329,14 +320,6 @@ class Secure extends Basic
           $bResult = true;
         }
       }
-    }
-    if ($bResult)
-    {
-      $this->m_syslog->logon('Authorized the user as a local administrator for the '.$this->m_strApplication.' application.', $this->getUserID());
-    }
-    else
-    {
-      $this->m_syslog->logon('Failed to authorize the user as a local administrator for the '.$this->m_strApplication.' application.', $this->getUserID(), false);
     }
 
     return $bResult;
@@ -377,14 +360,6 @@ class Secure extends Basic
           }
         }
       }
-    }
-    if ($bResult)
-    {
-      $this->m_syslog->logon('Authorized the user for the '.$this->m_strApplication.' application.', $this->getUserID());
-    }
-    else
-    {
-      $this->m_syslog->logon('Failed to authorize the user for the '.$this->m_strApplication.' application.', $this->getUserID(), false);
     }
 
     return $bResult;
@@ -611,14 +586,7 @@ class Secure extends Basic
         {
           if ($this->m_module != null)
           {
-            if (($bResult = $this->m_module->processLogin($request, $strError)))
-            {
-              $this->m_syslog->logon('Authenticated the user against the '.$this->m_strLoginType.' module.', $this->getUserID());
-            }
-            else
-            {
-              $this->m_syslog->logon('Failed to authenticate the user against the '.$this->m_strLoginType.' module.', $this->getUserID(), false);
-            }
+            $bResult = $this->m_module->processLogin($request, $strError);
           }
           else
           {
@@ -633,14 +601,7 @@ class Secure extends Basic
             $this->enforceAccountCheck(false);
             if ($this->m_module != null)
             {
-              if (($bResult = $this->m_module->processLogin($request, $strError)))
-              {
-                $this->m_syslog->logon('Authenticated the user against the '.$this->m_strLoginType.' module.', $this->getUserID());
-              }
-              else
-              {
-                $this->m_syslog->logon('Failed to authenticate the user against the '.$this->m_strLoginType.' module.', $this->getUserID(), false);
-              }
+              $bResult = $this->m_module->processLogin($request, $strError);
             }
           }
           if ($this->isValid())
@@ -652,14 +613,9 @@ class Secure extends Basic
               if (!$getPerson->fetch())
               {
                 $insertPerson = $this->m_db->parse('insert into person (userid, active, admin, locked) values (\''.$this->getUserID().'\', 1, 0, 0)');
-                if ($insertPerson->execute())
-                {
-                  $this->syslog()->userAccountCreated('Created the user.', $this->getUserID());
-                }
-                else
+                if (!$insertPerson->execute())
                 {
                   $strError = $_SESSION['sl_message'] = 'Auto-Register Failed:  Could not insert user into central database ('.$insertPerson->getError().')';
-                  $this->syslog()->userAccountCreated('Failed to create the user.', $this->getUserID(), false);
                 }
               }
             }
@@ -684,14 +640,9 @@ class Secure extends Basic
                       if (!$getApplicationContact->fetch())
                       {
                         $insertApplicationContact = $this->m_db->parse('insert into application_contact (type_id, application_id, contact_id, notify, admin, locked) values ('.$getContactTypeRow['id'].', '.$getApplicationRow['id'].', '.$getPersonRow['id'].', 1, 0, 0)');
-                        if ($insertApplicationContact->execute())
-                        {
-                          $this->syslog()->userAccountCreated('Created the user for the '.$this->m_strApplication.' application.', $this->getUserID());
-                        }
-                        else
+                        if (!$insertApplicationContact->execute())
                         {
                           $_SESSION['sl_message'] = 'Auto-Register Failed:  Could not register user with application ('.$insertApplicationContact->getError().')';
-                          $this->syslog()->userAccountCreated('Failed to create the user for the '.$this->m_strApplication.' application.', $this->getUserID(), false);
                         }
                       }
                     }
@@ -717,14 +668,7 @@ class Secure extends Basic
             $this->enforceAccountCheck($bRevertAccountCheck);
             if ($_SESSION['sl_message'] == '&nbsp;' && $this->m_module != null)
             {
-              if (($bResult = $this->m_module->processLogin($request, $strError)))
-              {
-                $this->m_syslog->logon('Authenticated the user against the '.$this->m_strLoginType.' module.', $this->getUserID());
-              }
-              else
-              {
-                $this->m_syslog->logon('Failed to authenticate the user against the '.$this->m_strLoginType.' module.', $this->getUserID(), false);
-              }
+              $bResult = $this->m_module->processLogin($request, $strError);
             }
           }
           else
@@ -804,15 +748,6 @@ class Secure extends Basic
   public function setUniquePrefix($strPrefix)
   {
     $this->m_strUniquePrefix = $strPrefix;
-  }
-  // }}}
-  // {{{ syslog()
-  /*! \fn syslog()
-  * \brief Accesses the syslog instantiation.
-  */
-  public function syslog()
-  {
-    return $this->m_syslog;
   }
   // }}}
 }

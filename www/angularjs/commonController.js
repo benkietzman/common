@@ -146,6 +146,10 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
                       $scope.$root.$broadcast('resetMenu', null);
                       document.location.href = response.Response.Redirect;
                     }
+                    else
+                    {
+                      $('#login_userid').focus();
+                    }
                   }
                   else
                   {

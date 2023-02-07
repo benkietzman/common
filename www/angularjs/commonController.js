@@ -44,31 +44,6 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
     }
     if (common.m_bJwt)
     {
-      var request = null;
-      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-      common.wsRequest('bridge', request).then(function (response)
-      {
-        if (common.m_strLoginType == null)
-        {
-          common.m_strLoginType = 'password';
-          if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
-          {
-            common.m_strLoginType = response.Response.Module;
-          }
-        }
-        $http.get('/include/common_addons/auth/modules.json').then(function(response)
-        {
-          var data = null;
-          if (angular.isDefined(response.data[common.m_strLoginType]) && angular.isDefined(response.data[common.m_strLoginType]['cookie']) && angular.isDefined($cookies.get(response.data[common.m_strLoginType]['cookie'])))
-          {
-            data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
-          }
-          $scope.$root.$broadcast('commonAuthLogin', data);
-        }, function ()
-        {
-          $scope.$root.$broadcast('commonAuthLogin', null);
-        });
-      });
       $scope.$on('commonAuthLogin', function (event, data)
       {
         var request = null;
@@ -167,6 +142,30 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
           {
             $scope.message = error.message;
           }
+        });
+      });
+      var request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      common.wsRequest('bridge', request).then(function (response)
+      {
+        if (common.m_strLoginType == null)
+        {
+          common.m_strLoginType = 'password';
+          if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
+          {
+            common.m_strLoginType = response.Response.Module;
+          }
+        }
+        $http.get('/include/common_addons/auth/modules.json').then(function(response)
+        {
+          var data = null;
+          if (angular.isDefined(response.data[common.m_strLoginType]) && angular.isDefined(response.data[common.m_strLoginType]['cookie']) && angular.isDefined($cookies.get(response.data[common.m_strLoginType]['cookie'])))
+          {
+            data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
+          }
+          $scope.$root.$broadcast('commonAuthLogin', data);
+        }, function ()
+        {
+          $scope.$root.$broadcast('commonAuthLogin', null);
         });
       });
     }

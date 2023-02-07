@@ -37,12 +37,6 @@ export default
   // {{{ template
   template: `
     <br><br><br>
-    {{#if c.login.message}}
-    <div style="color:red;font-weight:bold;"><br><br>{{c.login.message}}<br><br></div>
-    {{/if}}
-    {{#if c.login.info}}
-    <div style="color:orange;"><br><br>{{c.login.info}}<br><br></div>
-    {{/if}}
     {{#if c.login.showForm}}
     <div class="row">
       <div class="col-md-auto">
@@ -58,6 +52,12 @@ export default
         </div>
       </div>
     </div>
+    {{/if}}
+    {{#if c.login.message}}
+    <div style="color:red;font-weight:bold;"><br><br>{{c.login.message}}</div>
+    {{/if}}
+    {{#if c.login.info}}
+    <div style="color:orange;"><br><br>{{c.login.info}}</div>
     {{/if}}
   `
   // }}}

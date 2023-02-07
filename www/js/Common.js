@@ -702,6 +702,7 @@ class Common
   processLogin()
   {
     this.login.info = 'Processing login...';
+    this.render(this.id, 'Login', this.component);
     if (this.m_bJwt)
     {
       let request = null;

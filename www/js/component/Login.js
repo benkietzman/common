@@ -19,7 +19,7 @@ export default
       {
         if (window.event.keyCode == 13)
         {
-          c.processLogin()
+          c.processLogin();
         }
       }
     });

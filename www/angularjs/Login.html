@@ -9,8 +9,6 @@
 -->
 <div ng-controller="Login">
   <br><br><br>
-  <div ng-show="message" style="color:red;font-weight:bold;"><br><br>{{message}}<br><br></div>
-  <div ng-show="info" style="color:orange;"><br><br>{{info}}<br><br></div>
   <div ng-show="showForm" class="row" style="width:50%;">
     <div class="panel panel-default" style="display: table; box-shadow: 3px 3px 4px black;">
       <div class="panel-heading" style="font-weight:bold">
@@ -24,4 +22,6 @@
         </div>
       </div>
   </div>
+  <div ng-show="message" style="color:red;font-weight:bold;"><br><br>{{message}}</div>
+  <div ng-show="info" style="color:orange;"><br><br>{{info}}</div>
 </div>

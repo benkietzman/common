@@ -44,106 +44,6 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
     }
     if (common.m_bJwt)
     {
-      $scope.$on('commonAuthLogin', function (event, data)
-      {
-        var request = null;
-        request = {Section: 'secure', 'Function': 'process', Request: login};
-        request.Request.Type = common.m_strLoginType;
-        if (angular.isDefined($cookies.get('sl_commonUniqueID')))
-        {
-          request.Request.UniqueID = $cookies.get('sl_commonUniqueID');
-        }
-        if (data)
-        {
-          request.Request.Data = data;
-        }
-        common.wsRequest('bridge', request).then(function (response)
-        {
-          var error = {};
-          if (common.wsResponse(response, error))
-          {
-            if (angular.isDefined(response.Error) && angular.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
-            {
-              $scope.message = response.Error.Message;
-            }
-            if (angular.isDefined(response.Response.auth))
-            {
-              common.m_auth = response.Response.auth;
-              common.m_bHaveAuth = true;
-              if (angular.isDefined(response.Response.jwt))
-              {
-                if (common.m_sessionStorage)
-                {
-                  common.m_sessionStorage.sl_wsJwt = response.Response.jwt;
-                }
-                else if (response.Response.jwt.length > 4096)
-                {
-                  common.m_wsJwt = response.Response.jwt;
-                }
-                else
-                {
-                  $cookies.put('sl_commonWsJwt', response.Response.jwt);
-                }
-              }
-              if (angular.isDefined(common.m_auth.login_title))
-              {
-                if (!angular.isDefined($scope.login) || $scope.login == null)
-                {
-                  $scope.login = {};
-                }
-                $scope.login.title = common.m_auth.login_title;
-                if ($scope.login.title.length <= 30 || $scope.login.title.substr($scope.login.title.length - 30, 30) != ' (please wait for redirect...)')
-                {
-                  $scope.showForm = true;
-                }
-              }
-              if (common.isValid(null))
-              {
-                $scope.$root.$broadcast('resetMenu', null);
-                document.location.href = common.m_strRedirectPath;
-              }
-              else
-              {
-                var request = {Section: 'secure', 'Function': 'login'};
-                request.Request = {Type: common.m_strLoginType, Return: document.location.href};
-                common.wsRequest('bridge', request).then(function (response)
-                {
-                  var error = {};
-                  $scope.info = null;
-                  if (common.wsResponse(response, error))
-                  {
-                    if (angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
-                    {
-                      $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
-                    }
-                    if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
-                    {
-                      $scope.$root.$broadcast('resetMenu', null);
-                      document.location.href = response.Response.Redirect;
-                    }
-                    else
-                    {
-                      $('#login_userid').focus();
-                    }
-                  }
-                  else
-                  {
-                    $scope.message = error.message;
-                  }
-                });
-              }
-            }
-            if (angular.isDefined(error.message))
-            {
-              $scope.message = error.message;
-            }
-          }
-          else
-          {
-            $scope.message = error.message;
-          }
-        });
-      });
       var request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       common.wsRequest('bridge', request).then(function (response)
       {
@@ -162,10 +62,10 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
           {
             data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
           }
-          $scope.$root.$broadcast('commonAuthLogin', data);
+          $scope.processLoginCont(login, data);
         }, function ()
         {
-          $scope.$root.$broadcast('commonAuthLogin', null);
+          $scope.processLoginCont(login, null);
         });
       });
     }
@@ -245,6 +145,108 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
         }
       });
     }
+  }
+  // }}}
+  // {{{ processLoginCont
+  $scope.processLoginCont = function (login, data)
+  {
+    var request = null;
+    request = {Section: 'secure', 'Function': 'process', Request: login};
+    request.Request.Type = common.m_strLoginType;
+    if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+    {
+      request.Request.UniqueID = $cookies.get('sl_commonUniqueID');
+    }
+    if (data)
+    {
+      request.Request.Data = data;
+    }
+    common.wsRequest('bridge', request).then(function (response)
+    {
+      var error = {};
+      if (common.wsResponse(response, error))
+      {
+        if (angular.isDefined(response.Error) && angular.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
+        {
+          $scope.message = response.Error.Message;
+        }
+        if (angular.isDefined(response.Response.auth))
+        {
+          common.m_auth = response.Response.auth;
+          common.m_bHaveAuth = true;
+          if (angular.isDefined(response.Response.jwt))
+          {
+            if (common.m_sessionStorage)
+            {
+              common.m_sessionStorage.sl_wsJwt = response.Response.jwt;
+            }
+            else if (response.Response.jwt.length > 4096)
+            {
+              common.m_wsJwt = response.Response.jwt;
+            }
+            else
+            {
+              $cookies.put('sl_commonWsJwt', response.Response.jwt);
+            }
+          }
+          if (angular.isDefined(common.m_auth.login_title))
+          {
+            if (!angular.isDefined($scope.login) || $scope.login == null)
+            {
+              $scope.login = {};
+            }
+            $scope.login.title = common.m_auth.login_title;
+            if ($scope.login.title.length <= 30 || $scope.login.title.substr($scope.login.title.length - 30, 30) != ' (please wait for redirect...)')
+            {
+              $scope.showForm = true;
+            }
+          }
+          if (common.isValid(null))
+          {
+            $scope.$root.$broadcast('resetMenu', null);
+            document.location.href = common.m_strRedirectPath;
+          }
+          else
+          {
+            var request = {Section: 'secure', 'Function': 'login'};
+            request.Request = {Type: common.m_strLoginType, Return: document.location.href};
+            common.wsRequest('bridge', request).then(function (response)
+            {
+              var error = {};
+              $scope.info = null;
+              if (common.wsResponse(response, error))
+              {
+                if (angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                {
+                  $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
+                }
+                if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                {
+                  $scope.$root.$broadcast('resetMenu', null);
+                  document.location.href = response.Response.Redirect;
+                }
+                else
+                {
+                  $('#login_userid').focus();
+                }
+              }
+              else
+              {
+                $scope.message = error.message;
+              }
+            });
+          }
+        }
+        if (angular.isDefined(error.message))
+        {
+          $scope.message = error.message;
+        }
+      }
+      else
+      {
+        $scope.message = error.message;
+      }
+    });
   }
   // }}}
   // {{{ submit()

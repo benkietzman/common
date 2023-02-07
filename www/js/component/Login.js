@@ -22,6 +22,7 @@ export default
           c.processLogin()
         }
       }
+    });
     // {{{ main
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>

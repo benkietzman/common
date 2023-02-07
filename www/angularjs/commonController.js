@@ -38,6 +38,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
   // {{{ processLogin
   $scope.processLogin = function (login)
   {
+    $scope.info = 'Processing login...';
     if (!angular.isDefined(login) || login == null)
     {
       login = {};

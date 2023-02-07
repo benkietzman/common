@@ -15,15 +15,13 @@ export default
     let s = c.store('Login',
     {
       c: c,
-      processLoginKey: () =>
+      processLoginKey: (s.u) =>
       {
         if (window.event.keyCode == 13)
         {
           c.processLogin()
         }
       }
-    });
-    // }}}
     // {{{ main
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>

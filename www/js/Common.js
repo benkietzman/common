@@ -701,6 +701,7 @@ class Common
   // {{{ processLogin()
   processLogin()
   {
+    this.login.info = 'Processing login...';
     if (this.m_bJwt)
     {
       let request = null;
@@ -740,6 +741,7 @@ class Common
           this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
             let error = {};
+            this.login.info = null;
             if (this.wsResponse(response, error))
             {
               if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1 && response.Error.Message.search('Failed to find key.') == -1)
@@ -827,6 +829,7 @@ class Common
       this.request('authProcessLogin', this.simplify(this.login.login), (result) =>
       {
         let error = {};
+        this.login.info = null;
         if (this.response(result, error))
         {
           this.m_auth = null;

@@ -54,10 +54,10 @@ export default
     </div>
     {{/if}}
     {{#if c.login.message}}
-    <div style="color:red;font-weight:bold;"><br><br>{{c.login.message}}</div>
+    <div style="color:red;font-weight:bold;"><br>{{c.login.message}}</div>
     {{/if}}
     {{#if c.login.info}}
-    <div style="color:orange;"><br><br>{{c.login.info}}</div>
+    <div style="color:orange;"><br>{{c.login.info}}</div>
     {{/if}}
   `
   // }}}

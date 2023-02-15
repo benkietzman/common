@@ -217,7 +217,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
               $scope.info = null;
               if (common.wsResponse(response, error))
               {
-                if (angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                if (angular.isDefined(response.Response) && angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
                 {
                   $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
                 }

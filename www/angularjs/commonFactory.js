@@ -25,6 +25,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   factory.m_sessionStorage = null;
   factory.m_store = {};
   factory.m_strApplication = null;
+  factory.m_strAuthProtocol = null;
   factory.m_strLoginType = null;
   factory.m_strMenu = null;
   factory.m_strRedirectPath = null;
@@ -57,8 +58,8 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
       }
       if (wsJwt)
       {
-        var request = {Section: 'secure', 'Function': 'auth', wsJwt: wsJwt, Request: {}};
-        this.wsRequest('bridge', request).then(function (response)
+        var request = {Interface: 'secure', Section: 'secure', 'Function': 'auth', wsJwt: wsJwt, Request: {}};
+        this.wsRequest(this.m_strAuthProtocol, request).then(function (response)
         {
           var error = {};
           if (factory.wsResponse(response, error))
@@ -75,9 +76,9 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
               if (!factory.m_wsRequestID && !factory.m_bConnecting)
               {
                 factory.m_bConnecting = true;
-                var request = {Section: 'bridge', 'Function': 'connect'};
+                var request = {Interface: 'live', Section: 'bridge', 'Function': 'connect'};
                 request.Request = {};
-                factory.wsRequest('bridge', request).then(function (response)
+                factory.wsRequest(factory.m_strAuthProtocol, request).then(function (response)
                 {
                   var error = {};
                   if (factory.wsResponse(response, error))
@@ -97,9 +98,9 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
               if (factory.m_wsRequestID)
               {
                 factory.m_bConnecting = true;
-                var request = {Section: 'bridge', 'Function': 'disconnect', wsRequestID: factory.m_wsRequestID};
+                var request = {Interface: 'live', Section: 'bridge', 'Function': 'disconnect', wsRequestID: factory.m_wsRequestID};
                 request.Request = {};
-                factory.wsRequest('bridge', request).then(function (response)
+                factory.wsRequest(factory.m_strAuthProtocol, request).then(function (response)
                 {
                   factory.m_wsRequestID = null;
                   factory.m_bConnecting = false;
@@ -548,6 +549,10 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
       }
       this.m_ws[strName].Port = strPort;
       this.m_ws[strName].Protocol = strProtocol;
+      if (this.m_strAuthProtocol == null || strProtocol == 'radial')
+      {
+        this.m_strAuthProtocol = strProtocol;
+      }
       this.m_ws[strName].Secure = bSecure;
       this.m_ws[strName].Server = strServer;
       this.m_ws[strName].Unique = 0;
@@ -607,7 +612,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
       this.m_ws[strName].ws.onMessage(function (event)
       {
         var response = JSON.parse(event.data);
-        if (factory.m_bJwt && strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp')
+        if (factory.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error == 'Failed: exp')))
         {
           response.Error.Message = 'Session expired.  Please login again.';
           factory.m_auth = null;
@@ -634,14 +639,19 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
           $rootScope.$root.$broadcast('resetMenu', null);
           //factory.m_ws[strName].ws.send(JSON.stringify(response));
         }
-        else if (!factory.m_bJwt && strProtocol == 'bridge' && factory.m_ws[strName].SetBridgeCredentials && factory.m_ws[strName].SetBridgeCredentials.Script && factory.m_ws[strName].SetBridgeCredentials.Script.length > 0 && factory.m_ws[strName].SetBridgeCredentials['Function'] && factory.m_ws[strName].SetBridgeCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && ((response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Your access has been denied.') || (response.Error.SubType == 'requestSocket' && response.Error.Message && response.Error.Message.search('Please provide the User.') == -1)))
+        else if (!factory.m_bJwt && ((strProtocol == 'bridge' && factory.m_ws[strName].SetBridgeCredentials && factory.m_ws[strName].SetBridgeCredentials.Script && factory.m_ws[strName].SetBridgeCredentials.Script.length > 0 && factory.m_ws[strName].SetBridgeCredentials['Function'] && factory.m_ws[strName].SetBridgeCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && ((response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Your access has been denied.') || (response.Error.SubType == 'requestSocket' && response.Error.Message && response.Error.Message == 'Please provide the User.'))) || (strProtocol == 'radial' && factory.m_ws[strName].SetRadialCredentials && factory.m_ws[strName].SetRadialCredentials.Script && factory.m_ws[strName].SetRadialCredentials.Script.length > 0 && factory.m_ws[strName].SetRadialCredentials['Function'] && factory.m_ws[strName].SetRadialCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && (response.Error == 'Your access has been denied.' || response.Error == 'Please provide the User.'))))
         {
           if (angular.isDefined($cookies.get('PHPSESSID')))
           {
-            if (!factory.m_bSetBridgeCredentials)
+            if (strProtocol == 'bridge' && !factory.m_bSetBridgeCredentials)
             {
               factory.m_bSetBridgeCredentials = true;
               $http.post(factory.m_ws[strName].SetBridgeCredentials['Script'], {'Function': factory.m_ws[strName].SetBridgeCredentials['Function']}).then(function (response) {factory.m_bSetBridgeCredentials = false;}, function (response) {factory.m_bSetBridgeCredentials = false});
+            }
+            else if (strProtocol == 'radial' && !factory.m_bSetRadialCredentials)
+            {
+              factory.m_bSetRadialCredentials = true;
+              $http.post(factory.m_ws[strName].SetRadialCredentials['Script'], {'Function': factory.m_ws[strName].SetRadialCredentials['Function']}).then(function (response) {factory.m_bSetRadialCredentials = false;}, function (response) {factory.m_bSetRadialCredentials = false});
             }
             delete response.Error;
             delete response.wsRequestID;
@@ -841,6 +851,16 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
     this.m_ws[strName].SetBridgeCredentials = {Script: strScript, 'Function': strFunction};
   };
   // }}}
+  // {{{ wsSetRadialCredentials()
+  factory.wsSetRadialCredentials = function (strName, strScript, strFunction)
+  {
+    if (!angular.isDefined(this.m_ws[strName]))
+    {
+      this.m_ws[strName] = {};
+    }
+    this.m_ws[strName].SetRadialCredentials = {Script: strScript, 'Function': strFunction};
+  };
+  // }}}
   // {{{ wsUnique()
   factory.wsUnique = function (strName)
   {
@@ -853,12 +873,6 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
 
     return nUnique;
   }
-  // }}}
-  // {{{ main
-  setInterval(function ()
-  {
-    factory.wsRequest('bridge', {Section: 'ping', Request: {}}).then(function (response) {});
-  }, 120000);
   // }}}
   return factory;
 }

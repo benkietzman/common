@@ -45,8 +45,8 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
     }
     if (common.m_bJwt)
     {
-      var request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-      common.wsRequest('bridge', request).then(function (response)
+      var request = {Interface: 'radial', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
       {
         if (common.m_strLoginType == null)
         {
@@ -152,7 +152,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
   $scope.processLoginCont = function (login, data)
   {
     var request = null;
-    request = {Section: 'secure', 'Function': 'process', Request: login};
+    request = {Interface: 'radial', Section: 'secure', 'Function': 'process', Request: login};
     request.Request.Type = common.m_strLoginType;
     if (angular.isDefined($cookies.get('sl_commonUniqueID')))
     {
@@ -162,7 +162,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
     {
       request.Request.Data = data;
     }
-    common.wsRequest('bridge', request).then(function (response)
+    common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
     {
       var error = {};
       if (common.wsResponse(response, error))
@@ -209,9 +209,9 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
           }
           else
           {
-            var request = {Section: 'secure', 'Function': 'login'};
+            var request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
             request.Request = {Type: common.m_strLoginType, Return: document.location.href};
-            common.wsRequest('bridge', request).then(function (response)
+            common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
             {
               var error = {};
               $scope.info = null;
@@ -272,8 +272,8 @@ controllers.Logout = function ($cookies, $location, $scope, common)
     if (common.m_bJwt)
     {
       var request = null;
-      request = {Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-      common.wsRequest('bridge', request).then(function (response)
+      request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
       {
         if (common.m_strLoginType == null)
         {
@@ -283,9 +283,9 @@ controllers.Logout = function ($cookies, $location, $scope, common)
             common.m_strLoginType = response.Response.Module;
           }
         }
-        var request = {Section: 'secure', 'Function': 'logout'};
+        var request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
         request.Request = {Type: common.m_strLoginType, Return: common.getRedirectPath()};
-        common.wsRequest('bridge', request).then(function (response)
+        common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
         {
           var error = {};
           $scope.info = null;
@@ -409,6 +409,34 @@ controllers.bridgeStatus = function ($interval, $scope, common)
     }
   }
   $scope.$on('bridgePurpose_status', function (event, stat)
+  {
+    $scope.last = Date.now();
+    if (stat.Activity)
+    {
+      stat.Activity = stat.Activity.split(',').join(' --> ');
+    }
+    $scope.stat = stat;
+  });
+  $interval(function()
+  {
+    $scope.expire();
+  }, 250);
+};
+// }}}
+// {{{ radialStatus()
+controllers.radialStatus = function ($interval, $scope, common)
+{
+  $scope.last = 0;
+
+  $scope.expire = function()
+  {
+    var current = Date.now();
+    if ((current - $scope.last) >= 5000)
+    {
+      $scope.stat = null;
+    }
+  }
+  $scope.$on('radialPurpose_status', function (event, stat)
   {
     $scope.last = Date.now();
     if (stat.Activity)

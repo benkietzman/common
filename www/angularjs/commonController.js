@@ -45,7 +45,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
     }
     if (common.m_bJwt)
     {
-      var request = {Interface: 'radial', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      var request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
       {
         if (common.m_strLoginType == null)
@@ -152,7 +152,7 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
   $scope.processLoginCont = function (login, data)
   {
     var request = null;
-    request = {Interface: 'radial', Section: 'secure', 'Function': 'process', Request: login};
+    request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: login};
     request.Request.Type = common.m_strLoginType;
     if (angular.isDefined($cookies.get('sl_commonUniqueID')))
     {

@@ -112,9 +112,9 @@ extern "C++"
       list<map<string, string> > *result = NULL;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "database");
-      ptRequest->insert("Database", strDatabase);
-      ptRequest->insert("Query", strQuery);
+      ptRequest->i("Interface", "database");
+      ptRequest->i("Database", strDatabase);
+      ptRequest->i("Query", strQuery);
       if (request(ptRequest, ptResponse, strError))
       {
         result = new list<map<string, string> >;
@@ -148,9 +148,9 @@ extern "C++"
       Json *ptRequest = new Json, *ptResponse = new Json;
 
       ullID = ullRows = 0;
-      ptRequest->insert("Interface", "database");
-      ptRequest->insert("Database", strDatabase);
-      ptRequest->insert("Update", strUpdate);
+      ptRequest->i("Interface", "database");
+      ptRequest->i("Database", strDatabase);
+      ptRequest->i("Update", strUpdate);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -208,8 +208,8 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "hub");
-      ptRequest->insert("Function", "list");
+      ptRequest->i("Interface", "hub");
+      ptRequest->i("Function", "list");
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -235,8 +235,8 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "hub");
-      ptRequest->insert("Function", "ping");
+      ptRequest->i("Interface", "hub");
+      ptRequest->i("Function", "ping");
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -248,14 +248,34 @@ extern "C++"
     }
     // }}}
     // }}}
+    // {{{ ircChat()
+    bool Radial::ircChat(const string strTarget, const string strMessage, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->i("Interface", "irc");
+      ptRequest->i("Function", "chat");
+      ptRequest->i("Target", strTarget);
+      ptRequest->i("Message", strMessage);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
     // {{{ linkStatus()
     bool Radial::linkStatus(list<string> &nodes, string &strMaster, string &strError)
     {
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "link");
-      ptRequest->insert("Function", "status");
+      ptRequest->i("Interface", "link");
+      ptRequest->i("Function", "status");
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -299,15 +319,15 @@ extern "C++"
 
       if (!m_strUser.empty() && (ptRequest->m.find("User") == ptRequest->m.end() || ptRequest->m["User"]->v.empty()))
       {
-        ptRequest->insert("User", m_strUser);
+        ptRequest->i("User", m_strUser);
       }
       if (!m_strPassword.empty() && (ptRequest->m.find("Password") == ptRequest->m.end() || ptRequest->m["Password"]->v.empty()))
       {
-        ptRequest->insert("Password", m_strPassword);
+        ptRequest->i("Password", m_strPassword);
       }
       if (!m_strUserID.empty() && (ptRequest->m.find("UserID") == ptRequest->m.end() || ptRequest->m["UserID"]->v.empty()))
       {
-        ptRequest->insert("UserID", m_strUserID);
+        ptRequest->i("UserID", m_strUserID);
       }
       if (m_unThrottle > 0)
       {
@@ -349,8 +369,8 @@ extern "C++"
           unUniqueID = m_unUniqueID++;
           m_mutexUnique.unlock();
           ssUniqueID << unUniqueID;
-          ptRequest->insert("rUniqueID", ssUniqueID.str(), 'n');
-          ptRequest->json(strBuffer);
+          ptRequest->i("rUniqueID", ssUniqueID.str(), 'n');
+          ptRequest->j(strBuffer);
           strBuffer += "\n";
           radialreqdata *ptData = new radialreqdata;
           ptData->bSent = false;
@@ -536,7 +556,7 @@ extern "C++"
               size_t unPosition;
               string strBuffer[2];
               bDone = true;
-              ptRequest->json(strBuffer[1]);
+              ptRequest->j(strBuffer[1]);
               strBuffer[1] += "\n";
               while (!bExit)
               {
@@ -799,7 +819,7 @@ extern "C++"
                           m_mutexRequests.lock();
                           if (m_requests.find(unUniqueID) != m_requests.end())
                           {
-                            ptJson->json(m_requests[unUniqueID]->strBuffer[1]);
+                            ptJson->j(m_requests[unUniqueID]->strBuffer[1]);
                             m_requests[unUniqueID]->strBuffer[1] += "\n";
                           }
                           m_mutexRequests.unlock();
@@ -960,10 +980,10 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "storage");
-      ptRequest->insert("Function", "add");
-      ptRequest->insert("Keys", keys);
-      ptRequest->insert("Request", ptData);
+      ptRequest->i("Interface", "storage");
+      ptRequest->i("Function", "add");
+      ptRequest->i("Keys", keys);
+      ptRequest->i("Request", ptData);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -980,9 +1000,9 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "storage");
-      ptRequest->insert("Function", "remove");
-      ptRequest->insert("Keys", keys);
+      ptRequest->i("Interface", "storage");
+      ptRequest->i("Function", "remove");
+      ptRequest->i("Keys", keys);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -999,9 +1019,9 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "storage");
-      ptRequest->insert("Function", "retrieve");
-      ptRequest->insert("Keys", keys);
+      ptRequest->i("Interface", "storage");
+      ptRequest->i("Function", "retrieve");
+      ptRequest->i("Keys", keys);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -1022,9 +1042,9 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "storage");
-      ptRequest->insert("Function", "retrieve");
-      ptRequest->insert("Keys", inKeys);
+      ptRequest->i("Interface", "storage");
+      ptRequest->i("Function", "retrieve");
+      ptRequest->i("Keys", inKeys);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -1048,10 +1068,10 @@ extern "C++"
       bool bResult = false;
       Json *ptRequest = new Json, *ptResponse = new Json;
 
-      ptRequest->insert("Interface", "storage");
-      ptRequest->insert("Function", "update");
-      ptRequest->insert("Keys", keys);
-      ptRequest->insert("Request", ptData);
+      ptRequest->i("Interface", "storage");
+      ptRequest->i("Function", "update");
+      ptRequest->i("Keys", keys);
+      ptRequest->i("Request", ptData);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;

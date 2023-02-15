@@ -186,6 +186,14 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool hubPing(string &strError);
+      /*! \fn bool ircChat(const string strTarget, const string strMessage, string &strError)
+      * \brief Sends a chat message over irc.
+      * \param strTarget Contains the target.
+      * \param strMessage Contains the message.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool ircChat(const string strTarget, const string strMessage, string &strError);
       /*! \fn bool linkStatus(list<string> &nodes, string &strMaster, string &strError)
       * \brief Sends a link status request.
       * \param nodes Contains the list of linked nodes.

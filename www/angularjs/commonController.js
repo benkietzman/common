@@ -217,18 +217,21 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
               $scope.info = null;
               if (common.wsResponse(response, error))
               {
-                if (angular.isDefined(response.Response) && angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                if (angular.isDefined(response.Response))
                 {
-                  $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
-                }
-                if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
-                {
-                  $scope.$root.$broadcast('resetMenu', null);
-                  document.location.href = response.Response.Redirect;
-                }
-                else
-                {
-                  $('#login_userid').focus();
+                  if (angular.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                  {
+                    $cookies.put('sl_commonUniqueID', response.Response.UniqueID);
+                  }
+                  if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                  {
+                    $scope.$root.$broadcast('resetMenu', null);
+                    document.location.href = response.Response.Redirect;
+                  }
+                  else
+                  {
+                    $('#login_userid').focus();
+                  }
                 }
               }
               else

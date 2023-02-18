@@ -23,6 +23,7 @@ include_once('MySqlConnection.php');
 include_once('OracleConnection.php');
 include_once('PdoConnection.php');
 include_once('PostgreConnection.php');
+include_once('RadialConnection.php');
 // }}}
 //! CommonDatabase Class
 /*!

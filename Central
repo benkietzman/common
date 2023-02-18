@@ -83,6 +83,7 @@ extern "C++"
       string m_strPassword;
       string m_strPrefix;
       string m_strRoom;
+      string m_strServer;
       string m_strUser;
       bool (*m_pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &);
       Acorn *m_pAcorn;
@@ -262,10 +263,11 @@ extern "C++"
       * \param ptResponse Contains the response.
       */
       bool request(const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError);
-      /*! \fn bool request(const string strUser, const string strPassword, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
+      /*! \fn bool request(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Sends a Central request.
       * \param strUser Contains the User.
       * \param strPassword Contains the Password.
+      * \param strServer Contains the Server or service type.
       * \param strDatabase Contains the Database.
       * \param strFunction Contains the Function.
       * \param strJwt Contains the Jwt.
@@ -273,19 +275,20 @@ extern "C++"
       * \param ptRequest Contains the request.
       * \param ptResponse Contains the response.
       */
-      bool request(const string strUser, const string strPassword, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError);
+      bool request(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError);
       /*! \fn void setApplication(const string strApplication)
       * \brief Set the application.
       * \param strApplication Contains the application.
       */
       void setApplication(const string strApplication);
-      /*! \fn void setAuth(const string strUser, const string strPassword, const string strDatabase)
+      /*! \fn void setAuth(const string strUser, const string strPassword, const string strServer, const string strDatabase)
       * \brief Sends a Central request.
       * \param strUser Contains the User.
       * \param strPassword Contains the Password.
+      * \param strServer Contains the Server or service type.
       * \param strDatabase Contains the Database.
       */
-      void setAuth(const string strUser, const string strPassword, const string strDatabase);
+      void setAuth(const string strUser, const string strPassword, const string strServer, const string strDatabase);
       /*! \fn void setEmail(const string strEmail)
       * \brief Set the email account.
       * \param strEmail Contains the email account.

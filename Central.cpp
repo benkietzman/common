@@ -849,9 +849,9 @@ extern "C++"
     // {{{ request()
     bool Central::request(const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
     {
-      return request(m_strUser, m_strPassword, m_strDatabase, strFunction, strJwt, strSessionID, ptRequest, ptResponse, strError);
+      return request(m_strUser, m_strPassword, m_strServer, m_strDatabase, strFunction, strJwt, strSessionID, ptRequest, ptResponse, strError);
     }
-    bool Central::request(const string strUser, const string strPassword, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
+    bool Central::request(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strFunction, const string strJwt, const string strSessionID, Json *ptRequest, Json *ptResponse, string &strError)
     {
       bool bResult = false;
       list<string> in, out;
@@ -861,6 +861,7 @@ extern "C++"
       ptJson->insert("Service", "central");
       ptJson->insert("User", strUser);
       ptJson->insert("Password", strPassword);
+      ptJson->insert("Server", strServer);
       ptJson->insert("Database", strDatabase);
       ptJson->insert("Function", strFunction);
       if (!strJwt.empty())
@@ -920,10 +921,11 @@ extern "C++"
     }
     // }}}
     // {{{ setAuth()
-    void Central::setAuth(const string strUser, const string strPassword, const string strDatabase)
+    void Central::setAuth(const string strUser, const string strPassword, const string strServer, const string strDatabase)
     {
       m_strUser = strUser;
       m_strPassword = strPassword;
+      m_strServer = strServer;
       m_strDatabase = strDatabase;
     }
     // }}}

@@ -23,16 +23,25 @@ class Central extends Secure
   {
     parent::__construct($strUser, $strPassword, $strServer, $strDatabase);
     $this->setApplication('Central');
-    if ($strServer != '')
+    if ($strServer == '')
+    {
+      $strServer = 'bridge';
+    }
+    if ($strServer == 'bridge')
+    {
+      $this->m_database = new CommonDatabase('Bridge');
+      $this->m_centraldb = $this->m_database->connect($strUser, $strPassword, $strDatabase);
+    }
+    else if ($strServer == 'radial')
+    {
+      $this->m_database = new CommonDatabase('Radial');
+      $this->m_centraldb = $this->m_database->connect($strUser, $strPassword, $strDatabase);
+    }
+    else
     {
       $this->m_database = new CommonDatabase('MySql');
       $this->m_centraldb = $this->m_database->connect($strUser, $strPassword, $strServer);
       $this->m_centraldb->selectDatabase($strDatabase);
-    }
-    else
-    {
-      $this->m_database = new CommonDatabase('Bridge');
-      $this->m_centraldb = $this->m_database->connect($strUser, $strPassword, $strDatabase);
     }
     $this->m_junction = new ServiceJunction;
     $this->m_junction->setApplication('Central');

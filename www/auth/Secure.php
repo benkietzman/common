@@ -91,20 +91,33 @@ class Secure extends Basic
   {
     parent::__construct();
     $this->m_bCheckAccount = true;
-    if ($strHost != '')
+    if ($strHost == '')
     {
-      if (!is_array($strHost))
+      $strHost = 'bridge';
+    }
+    if (!is_array($strHost) && $strHost != 'bridge' && $strHost != 'radial')
+    {
+      $strHostTemp = $strHost;
+      $strHost = array();
+      $strHost['read'] = $strHostTemp;
+      $strHost['write'] = $strHostTemp;
+    }
+    if (is_array($strHost))
+    {
+      foreach ($strHost as $key => $value)
       {
-        $strHostTemp = $strHost;
-        $strHost = array();
-        $strHost['read'] = $strHostTemp;
-        $strHost['write'] = $strHostTemp;
+        $this->m_database = new CommonDatabase('MySql');
+        if ($key == 'read')
+        {
+          $this->m_readdb = $this->m_database->connect($strUser, $strPassword, $value);
+          $this->m_readdb->selectDatabase($strDB);
+        }
+        else
+        {
+          $this->m_db = $this->m_database->connect($strUser, $strPassword, $value);
+          $this->m_db->selectDatabase($strDB);
+        }
       }
-      $this->m_database = new CommonDatabase('MySql');
-      $this->m_db = $this->m_database->connect($strUser, $strPassword, $strHost['write']);
-      $this->m_db->selectDatabase($strDB);
-      $this->m_readdb = $this->m_database->connect($strUser, $strPassword, $strHost['read']);
-      $this->m_readdb->selectDatabase($strDB);
     }
     else
     {
@@ -115,9 +128,25 @@ class Secure extends Basic
         $strDB['read'] = $strDBTemp;
         $strDB['write'] = $strDBTemp;
       }
-      $this->m_database = new CommonDatabase('Bridge');
-      $this->m_db = $this->m_database->connect($strUser, $strPassword, $strDB['write']);
-      $this->m_readdb = $this->m_database->connect($strUser, $strPassword, $strDB['read']);
+      foreach ($strDB as $key => $value)
+      {
+        if ($value == 'bridge')
+        {
+          $this->m_database = new CommonDatabase('Bridge');
+        }
+        else
+        {
+          $this->m_database = new CommonDatabase('Radial');
+        }
+        if ($key == 'read')
+        {
+          $this->m_readdb = $this->m_database->connect($strUser, $strPassword, $value);
+        }
+        else
+        {
+          $this->m_db = $this->m_database->connect($strUser, $strPassword, $value);
+        }
+      }
     }
     if ($this->paramExists('bk_login_choice') && $this->getParam('bk_login_choice') != '')
     {

@@ -70,7 +70,7 @@ function AutoAuthenticateCentral($user)
   session_start();
   if (isset($_SESSION['sl_login']) && $_SESSION['sl_login'] != '')
   {
-    $name = $wgContLang->ucfirst($_SESSION['sl_login']);
+    $name = ucfirst($_SESSION['sl_login']);
     $t = Title::newFromText($name);
     if (is_null($t))
     {

@@ -124,18 +124,6 @@ class ErrorHandler
             for ($i = 0; $i < sizeof($value); $i++)
             {
               echo $value[$i][0];
-              echo '<br>';
-              if (sizeof($value[$i][1]) > 0)
-              {
-                echo '<table style="border-style:solid;border-width:1px;border-color:black;" align="center">';
-                echo '<tr><th style="border-style:solid;border-width:1px;border-color:white;background:black;color:white;">Variable</th><th style="border-style:solid;border-width:1px;border-color:white;background:black;color:white;">Value</th></tr>';
-                foreach ($value[$i][1] as $subkey => $subvalue)
-                {
-                  echo '<tr><td style="border-style:solid;border-width:1px;border-color:black;">'.$subkey.'</td><td>'.$subvalue.'</td></tr>';
-                }
-                echo '</table>';
-                echo '<br>';
-              }
             }
             echo '</center>';
             echo '</p>';
@@ -189,7 +177,7 @@ class ErrorHandler
   }
   // }}}
   // {{{ handler()
-  public function handler($errno, $errstr, $errfile, $errline, $errcontext)
+  public function handler($errno, $errstr, $errfile, $errline)
   {
     if ($errno == E_ERROR || $errno == E_CORE_ERROR || $errno == E_COMPILE_ERROR || $errno == E_USER_ERROR)
     {
@@ -200,7 +188,6 @@ class ErrorHandler
         $this->showMessages();
       }
       echo "<b>ERROR:</b> [".$errno."] ".$errstr." in <b>".$errfile."</b> on line <b>".$errline."</b><br>";
-      print_r($errcontext);
       exit(1);
     }
     else
@@ -221,9 +208,7 @@ class ErrorHandler
         {
           $this->m_errorList[$strType] = array();
         }
-        $this->m_errorList[$strType][$this->m_nErrorIndex[$strType]++] = array();
-        $this->m_errorList[$strType][$this->m_nErrorIndex[$strType]++][0] = $errstr.' in <b>'.$errfile.'</b> on line <b>'.$errline.'</b>';
-        $this->m_errorList[$strType][$this->m_nErrorIndex[$strType]++][1] = $errcontext;
+        $this->m_errorList[$strType][$this->m_nErrorIndex[$strType]++] = $errstr.' in <b>'.$errfile.'</b> on line <b>'.$errline.'</b>';
       }
     }
   }

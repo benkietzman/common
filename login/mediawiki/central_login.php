@@ -15,7 +15,7 @@
 // (at your option) any later version.
 //////////////////////////////////////////////////////////////////////////
 
-if( !defined('MEDIAWIKI'))
+if (!defined('MEDIAWIKI'))
 {
   die();
 }
@@ -66,7 +66,8 @@ $wgHooks['UserLoadAfterLoadFromSession'][] = 'AutoAuthenticateCentral';
 function AutoAuthenticateCentral($user)
 {
   global $wgContLang;
-  wfSetupSession();
+  //wfSetupSession();
+  session_start();
   if (isset($_SESSION['sl_login']) && $_SESSION['sl_login'] != '')
   {
     $name = $wgContLang->ucfirst($_SESSION['sl_login']);

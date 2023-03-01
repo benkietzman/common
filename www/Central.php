@@ -1544,7 +1544,7 @@ class Central extends Secure
         $strQuery .= (($bFirst)?' where':' and').' date_format(close_date, \'%Y-%m-%d\') <= \''.$strCloseDateEnd.'\'';
         $bFirst = false;
       }
-      $strQuery .= ' order by due_date is null, due_date, priority desc, id';
+      $strQuery .= ' order by due_date, priority desc, id';
     }
     $getIssue = $this->m_centraldb->parse($strQuery);
     if ($getIssue->execute())

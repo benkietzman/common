@@ -110,6 +110,20 @@ extern "C++"
       * \brief Turns the process into a system daemon.
       */
       void daemonize();
+      /*! \fn bool fdBlocking(int fdSocket, string &strError)
+      * \brief Set file descriptor into blocking mode.
+      * \param fdSocket File descriprot.
+      * \param strError Contains the error.
+      * \return Returns a boolean true/false value.
+      */
+      bool fdBlocking(int fdSocket, string &strError);
+      /*! \fn bool fdNonBlocking(int fdSocket, string &strError)
+      * \brief Set file descriptor into non-blocking mode.
+      * \param fdSocket File descriprot.
+      * \param strError Contains the error.
+      * \return Returns a boolean true/false value.
+      */
+      bool fdNonBlocking(int fdSocket, string &strError);
       /*! \fn bool fdRead(int fdSocket, string &strBuffer, int &nReturn)
       * \brief Read data from file descriptor and appends it onto the existing strBuffer.
       * \param fdSocket File descriprot.

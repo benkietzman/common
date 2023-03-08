@@ -262,6 +262,64 @@ extern "C++"
       signal(SIGTTIN, SIG_IGN);
     }
     // }}}
+    // {{{ fdBlocking()
+    bool Utility::fdBlocking(int fdSocket, string &strError)
+    {
+      bool bResult = false;
+      long lArg;
+      stringstream ssMessage;
+
+      if ((lArg = fcntl(fdSocket, F_GETFL, NULL)) >= 0)
+      {
+        lArg |= O_NONBLOCK;
+        if ((lArg = fcntl(fdSocket, F_SETFL, lArg)) == 0)
+        {
+          bResult = true;
+        }
+        else
+        {
+          ssMessage << "fcntl(F_SETFL," << errno << ") " << strerror(errno);
+          strError = ssMessage.str();
+        }
+      }
+      else
+      {
+        ssMessage << "fcntl(F_GETFL," << errno << ") " << strerror(errno);
+        strError = ssMessage.str();
+      }
+
+      return bResult;
+    }
+    // }}}
+    // {{{ fdNonBlocking()
+    bool Utility::fdNonBlocking(int fdSocket, string &strError)
+    {
+      bool bResult = false;
+      long lArg;
+      stringstream ssMessage;
+
+      if ((lArg = fcntl(fdSocket, F_GETFL, NULL)) >= 0)
+      {
+        lArg &= (~O_NONBLOCK);
+        if ((lArg = fcntl(fdSocket, F_SETFL, lArg)) == 0)
+        {
+          bResult = true;
+        }
+        else
+        {
+          ssMessage << "fcntl(F_SETFL," << errno << ") " << strerror(errno);
+          strError = ssMessage.str();
+        }
+      }
+      else
+      {
+        ssMessage << "fcntl(F_GETFL," << errno << ") " << strerror(errno);
+        strError = ssMessage.str();
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ fdRead()
     bool Utility::fdRead(int fdSocket, string &strBuffer, int &nReturn)
     {

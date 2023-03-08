@@ -271,7 +271,7 @@ extern "C++"
 
       if ((lArg = fcntl(fdSocket, F_GETFL, NULL)) >= 0)
       {
-        lArg |= O_NONBLOCK;
+        lArg &= (~O_NONBLOCK);
         if ((lArg = fcntl(fdSocket, F_SETFL, lArg)) == 0)
         {
           bResult = true;
@@ -300,7 +300,7 @@ extern "C++"
 
       if ((lArg = fcntl(fdSocket, F_GETFL, NULL)) >= 0)
       {
-        lArg &= (~O_NONBLOCK);
+        lArg |= O_NONBLOCK;
         if ((lArg = fcntl(fdSocket, F_SETFL, lArg)) == 0)
         {
           bResult = true;

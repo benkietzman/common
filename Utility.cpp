@@ -812,6 +812,7 @@ extern "C++"
     // {{{ sslInit()
     void Utility::sslInit()
     {
+      m_mutexSsl.lock();
       if (!m_bSslInit)
       {
         m_bSslInit = true;
@@ -821,6 +822,7 @@ extern "C++"
         SSL_library_init();
         CONF_modules_load_file(NULL, NULL, 0);
       }
+      m_mutexSsl.unlock();
     }
     SSL_CTX *Utility::sslInit(const bool bSslServer, string &strError, const bool bVerifyPeer)
     {
@@ -831,7 +833,9 @@ extern "C++"
 
       sslInit();
       ERR_clear_error();
+      m_mutexSsl.lock();
       ctx = SSL_CTX_new(((bSslServer)?SSLv23_server_method():SSLv23_client_method()));
+      m_mutexSsl.unlock();
       if (ctx != NULL)
       {
         if (bVerifyPeer)

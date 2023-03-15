@@ -799,11 +799,13 @@ extern "C++"
     // {{{ sslDeinit()
     void Utility::sslDeinit()
     {
+      m_mutexSsl.lock();
       if (m_bSslInit)
       {
         m_bSslInit = false;
         EVP_cleanup();
       }
+      m_mutexSsl.unlock();
     }
     // }}}
     // {{{ sslInit

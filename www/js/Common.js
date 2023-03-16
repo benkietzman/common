@@ -25,6 +25,7 @@ class Common
     this.m_store = {};
     this.m_strAuthProtocol = null;
     this.m_strLoginType = null;
+    this.m_nUnique = 0;
     this.m_ws = {};
     this.menu = {left: [], right: []};
     this.submenu = false;
@@ -32,7 +33,6 @@ class Common
     this.strPrevMenu = null;
     this.strPrevSubMenu = null;
     this.strSubMenu = null;
-    this.nUnique = 0;
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -1775,7 +1775,7 @@ class Common
   {
     let nUnique = 0;
 
-    nUnique = this.nUnique++;
+    nUnique = this.m_nUnique++;
 
     return nUnique;
   }

@@ -866,7 +866,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   {
     var nUnique = 0;
 
-    nUnique = this.nUnique++;
+    nUnique = this.m_nUnique++;
 
     return nUnique;
   }

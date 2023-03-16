@@ -761,7 +761,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
     if (angular.isDefined(this.m_ws[strName]))
     {
       var data = this;
-      var unHandle = this.wsUnique(strName);
+      var unHandle = this.wsUnique();
       this.wsSend(strName, unHandle, request);
       var unbind = $rootScope.$on(unHandle, function (event, response)
       {

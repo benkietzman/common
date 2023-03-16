@@ -32,6 +32,7 @@ class Common
     this.strPrevMenu = null;
     this.strPrevSubMenu = null;
     this.strSubMenu = null;
+    this.nUnique = 0;
     if (this.isDefined(options.application))
     {
       this.application = options.application;
@@ -1457,7 +1458,6 @@ class Common
       }
       this.m_ws[strName].Secure = bSecure;
       this.m_ws[strName].Server = strServer;
-      this.m_ws[strName].Unique = 0;
       this.m_ws[strName].ws = new WebSocket(((bSecure)?'wss':'ws')+'://'+strServer+':'+strPort, [strProtocol]);
       // {{{ WebSocket::onopen()
       this.m_ws[strName].ws.onopen = (e) =>
@@ -1771,14 +1771,11 @@ class Common
   }
   // }}}
   // {{{ wsUnique()
-  wsUnique(strName)
+  wsUnique()
   {
     let nUnique = 0;
 
-    if (this.isDefined(this.m_ws[strName]))
-    {
-      nUnique = this.m_ws[strName].Unique++;
-    }
+    nUnique = this.nUnique++;
 
     return nUnique;
   }

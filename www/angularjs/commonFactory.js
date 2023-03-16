@@ -34,6 +34,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   factory.m_strPrevSubMenu = null;
   factory.m_strSubMenu = null;
   factory.m_submenu = null;
+  factory.m_nUnique = 0;
   factory.m_ws = {};
   factory.m_wsJwt = null;
   factory.m_wsRequestID = null;
@@ -555,7 +556,6 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
       }
       this.m_ws[strName].Secure = bSecure;
       this.m_ws[strName].Server = strServer;
-      this.m_ws[strName].Unique = 0;
       this.m_ws[strName].ws = $websocket(((bSecure)?'wss':'ws') + '://' + strServer + ':' + strPort + '/', strProtocol);
       this.m_ws[strName].ws.onOpen(function ()
       {
@@ -862,14 +862,11 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
   };
   // }}}
   // {{{ wsUnique()
-  factory.wsUnique = function (strName)
+  factory.wsUnique = function ()
   {
     var nUnique = 0;
 
-    if (angular.isDefined(this.m_ws[strName]))
-    {
-      nUnique = this.m_ws[strName].Unique++;
-    }
+    nUnique = this.nUnique++;
 
     return nUnique;
   }

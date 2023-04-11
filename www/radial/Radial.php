@@ -242,7 +242,7 @@ class Radial
           $unPick = 0;
         }
         $strServer = $servers[$unPick];
-        if ($handle = stream_socket_client('tls://'.$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+        if (($handle = stream_socket_client('tls://'.$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext)) !== false)
         { 
           $bConnected = true;
         }

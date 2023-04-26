@@ -1172,6 +1172,12 @@ extern "C++"
       v = strValue;
     }
     // }}}
+    // {{{ Json::x()
+    string Json::x(string &strXml, const bool bAppend)
+    {
+      return xml(strXml, bAppend);
+    }
+    // }}}
     // {{{ Json::xml()
     string Json::xml(string &strXml, const bool bAppend)
     {

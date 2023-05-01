@@ -1093,7 +1093,7 @@ extern "C++"
         {
           m_pThreadRequest = new thread([this](){requestThread();});
           #ifdef COMMON_LINUX
-          pthread_setname_np(m_pThreadRequest->native_handle(), "SJ_requestThrea");
+          pthread_setname_np(m_pThreadRequest->native_handle(), "RDL_requestThre");
           #endif
         }
         else

@@ -365,9 +365,7 @@ extern "C++"
     // {{{ getProcessStatus()
     void Central::getProcessStatus(time_t &CTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident)
     {
-      pid_t nPid = getpid();
-
-      getProcessStatus(nPid, CTime, fCpu, fMem, ulImage, ulResident);
+      getProcessStatus(getpid(), CTime, fCpu, fMem, ulImage, ulResident);
     }
     void Central::getProcessStatus(const pid_t nPid, time_t &CTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident)
     {

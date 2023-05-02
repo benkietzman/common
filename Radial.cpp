@@ -361,22 +361,20 @@ extern "C++"
           size_t unPosition, unUniqueID = 0;
           string strBuffer;
           stringstream ssUniqueID;
-          m_mutexUnique.lock();
+          radialreqdata *ptData = new radialreqdata;
+          m_mutexRequests.lock();
           while (m_requests.find(m_unUniqueID) != m_requests.end())
           {
             m_unUniqueID++;
           }
           unUniqueID = m_unUniqueID++;
-          m_mutexUnique.unlock();
           ssUniqueID << unUniqueID;
           ptRequest->i("rUniqueID", ssUniqueID.str(), 'n');
           ptRequest->j(strBuffer);
           strBuffer += "\n";
-          radialreqdata *ptData = new radialreqdata;
           ptData->bSent = false;
           ptData->fdSocket = readpipe[1];
           ptData->strBuffer[0] = strBuffer;
-          m_mutexRequests.lock();
           m_requests[unUniqueID] = ptData;
           m_mutexRequests.unlock();
           strBuffer.clear();
@@ -692,65 +690,70 @@ extern "C++"
       SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
       SSL_CTX *ctx = SSL_CTX_new(method);
 
-      if (ctx != NULL)
+      if ((ctx = SSL_CTX_new(method)) != NULL)
       {
         //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
-      }
-      while (m_bUseSingleSocket)
-      {
-        list<string> server;
-        string strError;
-        utility()->readConf(strError);
-        if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
+        while (m_bUseSingleSocket)
         {
-          server.push_back(utility()->conf()->m["Load Balancer"]->v);
-        }
-        if (utility()->conf()->m.find("Radial") != utility()->conf()->m.end())
-        {
-          server.push_back(utility()->conf()->m["Radial"]->v);
-        }
-        if (!server.empty())
-        {
-          for (list<string>::iterator i = server.begin(); m_bUseSingleSocket && i != server.end(); i++)
+          list<string> server;
+          string strError;
+          utility()->readConf(strError);
+          if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
           {
-            bool bConnected = false;
-            int fdSocket = -1, nReturn = -1;
-            SSL *ssl = NULL;
-            string strServer;
-            unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
-            vector<string> radialServer;
-            for (int j = 1; !m_manip.getToken(strServer, (*i), j, ",", true).empty(); j++)
+            server.push_back(utility()->conf()->m["Load Balancer"]->v);
+          }
+          if (utility()->conf()->m.find("Radial") != utility()->conf()->m.end())
+          {
+            server.push_back(utility()->conf()->m["Radial"]->v);
+          }
+          if (!server.empty())
+          {
+            for (list<string>::iterator i = server.begin(); m_bUseSingleSocket && i != server.end(); i++)
             {
-              radialServer.push_back(m_manip.trim(strServer, strServer));
-            }
-            srand(unSeed);
-            unPick = rand_r(&unSeed) % radialServer.size();
-            while (m_bUseSingleSocket && !bConnected && unAttempt++ < radialServer.size())
-            {
-              addrinfo hints, *result;
-              if (unPick == radialServer.size())
+              bool bConnected = false;
+              int fdSocket = -1, nReturn = -1;
+              SSL *ssl = NULL;
+              string strServer;
+              unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
+              vector<string> radialServer;
+              for (int j = 1; !m_manip.getToken(strServer, (*i), j, ",", true).empty(); j++)
               {
-                unPick = 0;
+                radialServer.push_back(m_manip.trim(strServer, strServer));
               }
-              strServer = radialServer[unPick];
-              memset(&hints, 0, sizeof(addrinfo));
-              hints.ai_family = AF_UNSPEC;
-              hints.ai_socktype = SOCK_STREAM;
-              m_mutexGetAddrInfo.lock();
-              nReturn = getaddrinfo(strServer.c_str(), "7234", &hints, &result);
-              m_mutexGetAddrInfo.unlock();
-              if (nReturn == 0)
+              srand(unSeed);
+              unPick = rand_r(&unSeed) % radialServer.size();
+              while (m_bUseSingleSocket && !bConnected && unAttempt++ < radialServer.size())
               {
-                addrinfo *rp;
-                for (rp = result; m_bUseSingleSocket && !bConnected && rp != NULL; rp = rp->ai_next)
+                addrinfo hints, *result;
+                if (unPick == radialServer.size())
                 {
-                  if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
+                  unPick = 0;
+                }
+                strServer = radialServer[unPick];
+                memset(&hints, 0, sizeof(addrinfo));
+                hints.ai_family = AF_UNSPEC;
+                hints.ai_socktype = SOCK_STREAM;
+                m_mutexGetAddrInfo.lock();
+                nReturn = getaddrinfo(strServer.c_str(), "7234", &hints, &result);
+                m_mutexGetAddrInfo.unlock();
+                if (nReturn == 0)
+                {
+                  addrinfo *rp;
+                  for (rp = result; m_bUseSingleSocket && !bConnected && rp != NULL; rp = rp->ai_next)
                   {
-                    if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                    if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                     {
-                      if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
+                      if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                       {
-                        bConnected = true;
+                        if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
+                        {
+                          bConnected = true;
+                        }
+                        else
+                        {
+                          close(fdSocket);
+                          fdSocket = -1;
+                        }
                       }
                       else
                       {
@@ -758,166 +761,159 @@ extern "C++"
                         fdSocket = -1;
                       }
                     }
-                    else
+                  }
+                  freeaddrinfo(result);
+                }
+                unPick++;
+              }
+              radialServer.clear();
+              if (bConnected)
+              {
+                bool bExit = false;
+                list<string> response;
+                size_t unPosition;
+                string strBuffer[2];
+                unSleep = 1;
+                while (m_bUseSingleSocket && !bExit)
+                {
+                  size_t unIndex = 1;
+                  m_mutexRequests.lock();
+                  pollfd *fds = new pollfd[m_requests.size() + 1];
+                  for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                  {
+                    if (!j->second->bSent)
                     {
-                      close(fdSocket);
-                      fdSocket = -1;
+                      j->second->bSent = true;
+                      strBuffer[1].append(j->second->strBuffer[0]);
+                    }
+                    if (j->second->fdSocket != -1 && !j->second->strBuffer[1].empty())
+                    {
+                      fds[unIndex].fd = j->second->fdSocket;
+                      fds[unIndex].events = POLLOUT;
+                      unIndex++;
                     }
                   }
-                }
-                freeaddrinfo(result);
-              }
-              unPick++;
-            }
-            radialServer.clear();
-            if (bConnected)
-            {
-              bool bExit = false;
-              list<string> response;
-              size_t unPosition;
-              string strBuffer[2];
-              unSleep = 1;
-              while (m_bUseSingleSocket && !bExit)
-              {
-                size_t unIndex = 1;
-                m_mutexRequests.lock();
-                pollfd *fds = new pollfd[m_requests.size() + 1];
-                for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
-                {
-                  if (!j->second->bSent)
+                  m_mutexRequests.unlock();
+                  fds[0].fd = fdSocket;
+                  fds[0].events = POLLIN;
+                  if (!strBuffer[1].empty())
                   {
-                    j->second->bSent = true;
-                    strBuffer[1] += j->second->strBuffer[0];
+                    fds[0].events |= POLLOUT;
                   }
-                  if (j->second->fdSocket != -1 && !j->second->strBuffer[1].empty())
+                  if ((nReturn = poll(fds, unIndex, 250)) > 0)
                   {
-                    fds[unIndex].fd = j->second->fdSocket;
-                    fds[unIndex].events = POLLOUT;
-                    unIndex++;
-                  }
-                }
-                m_mutexRequests.unlock();
-                fds[0].fd = fdSocket;
-                fds[0].events = POLLIN;
-                if (!strBuffer[1].empty())
-                {
-                  fds[0].events |= POLLOUT;
-                }
-                if ((nReturn = poll(fds, unIndex, 250)) > 0)
-                {
-                  if (fds[0].revents & POLLIN)
-                  {
-                    if (utility()->sslRead(ssl, strBuffer[0], nReturn))
+                    if (fds[0].revents & POLLIN)
                     {
-                      while ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                      if (utility()->sslRead(ssl, strBuffer[0], nReturn))
                       {
-                        Json *ptJson = new Json(strBuffer[0].substr(0, unPosition));
-                        strBuffer[0].erase(0, unPosition + 1);
-                        if (ptJson->m.find("rUniqueID") != ptJson->m.end() && !ptJson->m["rUniqueID"]->v.empty())
+                        while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                         {
-                          size_t unUniqueID = atoi(ptJson->m["rUniqueID"]->v.c_str());
-                          m_mutexRequests.lock();
-                          if (m_requests.find(unUniqueID) != m_requests.end())
+                          Json *ptJson = new Json(strBuffer[0].substr(0, unPosition));
+                          strBuffer[0].erase(0, (unPosition + 1));
+                          if (ptJson->m.find("rUniqueID") != ptJson->m.end() && !ptJson->m["rUniqueID"]->v.empty())
                           {
-                            ptJson->j(m_requests[unUniqueID]->strBuffer[1]);
-                            m_requests[unUniqueID]->strBuffer[1] += "\n";
+                            size_t unUniqueID = atoi(ptJson->m["rUniqueID"]->v.c_str());
+                            m_mutexRequests.lock();
+                            if (m_requests.find(unUniqueID) != m_requests.end())
+                            {
+                              ptJson->j(m_requests[unUniqueID]->strBuffer[1]);
+                              m_requests[unUniqueID]->strBuffer[1] += "\n";
+                            }
+                            m_mutexRequests.unlock();
                           }
-                          m_mutexRequests.unlock();
+                          delete ptJson;
                         }
-                        delete ptJson;
+                      }
+                      else
+                      {
+                        bExit = true;
                       }
                     }
-                    else
+                    if (fds[0].revents & POLLOUT)
                     {
-                      bExit = true;
-                    }
-                  }
-                  if (fds[0].revents & POLLOUT)
-                  {
-                    if (!utility()->sslWrite(ssl, strBuffer[1], nReturn))
-                    {
-                      bExit = true;
-                    }
-                  }
-                  if (unIndex > 1)
-                  {
-                    m_mutexRequests.lock();
-                    for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
-                    {
-                      for (size_t k = 1; k < unIndex; k++)
+                      if (!utility()->sslWrite(ssl, strBuffer[1], nReturn))
                       {
-                        if (fds[k].fd == j->second->fdSocket && fds[k].revents & POLLOUT)
+                        bExit = true;
+                      }
+                    }
+                    if (unIndex > 1)
+                    {
+                      m_mutexRequests.lock();
+                      for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
+                      {
+                        for (size_t k = 1; k < unIndex; k++)
                         {
-                          if ((nReturn = write(j->second->fdSocket, j->second->strBuffer[1].c_str(), j->second->strBuffer[1].size())) > 0)
+                          if (fds[k].fd == j->second->fdSocket && fds[k].revents & POLLOUT)
                           {
-                            j->second->strBuffer[1].erase(0, nReturn);
-                            if (j->second->strBuffer[1].empty())
+                            if ((nReturn = write(j->second->fdSocket, j->second->strBuffer[1].c_str(), j->second->strBuffer[1].size())) > 0)
+                            {
+                              j->second->strBuffer[1].erase(0, nReturn);
+                              if (j->second->strBuffer[1].empty())
+                              {
+                                close(j->second->fdSocket);
+                                j->second->fdSocket = -1;
+                              }
+                            }
+                            else
                             {
                               close(j->second->fdSocket);
                               j->second->fdSocket = -1;
                             }
                           }
-                          else
-                          {
-                            close(j->second->fdSocket);
-                            j->second->fdSocket = -1;
-                          }
                         }
                       }
+                      m_mutexRequests.unlock();
                     }
-                    m_mutexRequests.unlock();
                   }
+                  delete[] fds;
                 }
-                delete[] fds;
-              }
-              response.clear();
-              m_mutexRequests.lock();
-              for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
-              {
-                if (j->second->bSent)
+                response.clear();
+                m_mutexRequests.lock();
+                for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
                 {
-                  if (j->second->fdSocket != -1)
+                  if (j->second->bSent)
                   {
-                    close(j->second->fdSocket);
-                    j->second->fdSocket = -1;
+                    if (j->second->fdSocket != -1)
+                    {
+                      close(j->second->fdSocket);
+                      j->second->fdSocket = -1;
+                    }
                   }
                 }
+                m_mutexRequests.unlock();
+                SSL_shutdown(ssl);
+                SSL_free(ssl);
+                close(fdSocket);
+                fdSocket = -1;
               }
-              m_mutexRequests.unlock();
-              SSL_shutdown(ssl);
-              SSL_free(ssl);
-              close(fdSocket);
-              fdSocket = -1;
+            }
+          }
+          server.clear();
+          if (m_bUseSingleSocket)
+          {
+            for (size_t i = 0; m_bUseSingleSocket && i < (unSleep * 4); i++)
+            {
+              utility()->msleep(250);
+            }
+            if (unSleep < 256)
+            {
+              unSleep *= 2;
             }
           }
         }
-        server.clear();
-        if (m_bUseSingleSocket)
+        m_mutexRequests.lock();
+        for (map<int, radialreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
         {
-          for (size_t i = 0; m_bUseSingleSocket && i < (unSleep * 4); i++)
+          if (i->second->fdSocket != -1)
           {
-            utility()->msleep(250);
-          }
-          if (unSleep < 256)
-          {
-            unSleep *= 2;
+            close(i->second->fdSocket);
+            i->second->fdSocket = -1;
           }
         }
-      }
-      m_mutexRequests.lock();
-      for (map<int, radialreqdata *>::iterator i = m_requests.begin(); i != m_requests.end(); i++)
-      {
-        if (i->second->fdSocket != -1)
-        {
-          close(i->second->fdSocket);
-          i->second->fdSocket = -1;
-        }
-      }
-      m_mutexRequests.unlock();
-      if (ctx != NULL)
-      {
+        m_mutexRequests.unlock();
         SSL_CTX_free(ctx);
       }
+      m_bUseSingleSocket = false;
     }
     // }}}
     // }}}
@@ -1093,7 +1089,7 @@ extern "C++"
         {
           m_pThreadRequest = new thread([this](){requestThread();});
           #ifdef COMMON_LINUX
-          pthread_setname_np(m_pThreadRequest->native_handle(), "RDL_requestThre");
+          pthread_setname_np(m_pThreadRequest->native_handle(), "RadialRequest");
           #endif
         }
         else

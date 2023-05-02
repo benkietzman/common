@@ -86,7 +86,6 @@ extern "C++"
       size_t m_unUniqueID;
       std::mutex m_mutexGetAddrInfo;
       std::mutex m_mutexRequests;
-      std::mutex m_mutexUnique;
       string m_strApplication;
       string m_strEmail;
       string m_strFrequency;

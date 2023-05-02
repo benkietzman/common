@@ -1783,18 +1783,18 @@ extern "C++"
             size_t unPosition, unUniqueID = 0;
             string strBuffer;
             stringstream ssUniqueID;
+            sjreqdata *ptData = new sjreqdata;
+            m_mutexRequests.lock();
             for (list<string>::iterator i = in.begin(); i != in.end(); i++)
             {
               if (i == in.begin())
               {
                 Json *ptJson = new Json(in.front());
-                m_mutexUnique.lock();
                 while (m_requests.find(m_unUniqueID) != m_requests.end())
                 {
                   m_unUniqueID++;
                 }
                 unUniqueID = m_unUniqueID++;
-                m_mutexUnique.unlock();
                 ssUniqueID << unUniqueID;
                 ptJson->insert("ProcessType", "parallel");
                 ptJson->insert("sjUniqueID", ssUniqueID.str(), 'n');
@@ -1807,11 +1807,9 @@ extern "C++"
                 strBuffer += (*i) + "\n";
               }
             }
-            sjreqdata *ptData = new sjreqdata;
             ptData->bSent = false;
             ptData->fdSocket = readpipe[1];
             ptData->strBuffer[0] = strBuffer;
-            m_mutexRequests.lock();
             m_requests[unUniqueID] = ptData;
             m_mutexRequests.unlock();
             strBuffer.clear();
@@ -2742,7 +2740,7 @@ extern "C++"
         {
           m_pThreadRequest = new thread([this](){requestThread();});
           #ifdef COMMON_LINUX
-          pthread_setname_np(m_pThreadRequest->native_handle(), "SJ_requestThrea");
+          pthread_setname_np(m_pThreadRequest->native_handle(), "JunctionRequest");
           #endif
         }
         else

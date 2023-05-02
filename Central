@@ -162,6 +162,17 @@ extern "C++"
       * \return Returns the process status.
       */
       void getProcessStatus(time_t &CTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident);
+      /*! \fn void getProcessStatus(const pid_t nPid, struct tm &tTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident)
+      * \brief Retrieves process status of the current process.
+      * \param nPid Contains the PID.
+      * \param CTime Contains the start time.
+      * \param fCpu Contains the CPU usage.
+      * \param fMem Contains the memory usage.
+      * \param ulImage Contains the image size.
+      * \param ulResident Contans the resident size.
+      * \return Returns the process status.
+      */
+      void getProcessStatus(const pid_t nPid, time_t &CTime, float &fCpu, float &fMem, unsigned long &ulImage, unsigned long &ulResident);
       /*! \fn ServiceJunction *junction()
       * \brief Interfaces with the Service Junction class.
       * \return Returns a pointer to the Service Junction class.

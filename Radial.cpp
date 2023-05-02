@@ -457,13 +457,20 @@ extern "C++"
       {
         list<string> server;
         utility()->readConf(strError);
-        if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
+        if (!m_strServer.empty())
         {
-          server.push_back(utility()->conf()->m["Load Balancer"]->v);
+          server.push_back(m_strServer);
         }
-        if (utility()->conf()->m.find("Radial") != utility()->conf()->m.end())
+        else
         {
-          server.push_back(utility()->conf()->m["Radial"]->v);
+          if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
+          {
+            server.push_back(utility()->conf()->m["Load Balancer"]->v);
+          }
+          if (utility()->conf()->m.find("Radial") != utility()->conf()->m.end())
+          {
+            server.push_back(utility()->conf()->m["Radial"]->v);
+          }
         }
         if (!server.empty())
         {
@@ -698,13 +705,20 @@ extern "C++"
           list<string> server;
           string strError;
           utility()->readConf(strError);
-          if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
+          if (!m_strServer.empty())
           {
-            server.push_back(utility()->conf()->m["Load Balancer"]->v);
+            server.push_back(m_strServer);
           }
-          if (utility()->conf()->m.find("Radial") != utility()->conf()->m.end())
+          else
           {
-            server.push_back(utility()->conf()->m["Radial"]->v);
+            if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
+            {
+              server.push_back(utility()->conf()->m["Load Balancer"]->v);
+            }
+            if (utility()->conf()->m.find("Radial") != utility()->conf()->m.end())
+            {
+              server.push_back(utility()->conf()->m["Radial"]->v);
+            }
           }
           if (!server.empty())
           {
@@ -924,6 +938,12 @@ extern "C++"
       m_strUser = strUser;
       m_strPassword = strPassword;
       m_strUserID = strUserID;
+    }
+    // }}}
+    // {{{ setServer()
+    void Radial::setServer(const string strServer)
+    {
+      m_strServer = strServer;
     }
     // }}}
     // {{{ setThrottle()

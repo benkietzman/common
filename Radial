@@ -81,6 +81,7 @@ extern "C++"
       std::mutex m_mutexRequests;
       std::mutex m_mutexUnique;
       string m_strPassword;
+      string m_strServer;
       string m_strTimeout;
       string m_strUser;
       string m_strUserID;
@@ -230,6 +231,11 @@ extern "C++"
       * \param strUserID Contains the user ID.
       */
       void setCredentials(const string strUser, const string strPassword, const string strUserID = "");
+      /*! \fn void setServer(const string strServer)
+      * \brief Set the server.
+      * \param strServer Contains the server.
+      */
+      void setServer(const string strServer);
       /*! \fn void setThrottle(const size_t unThrottle)
       * \brief Set the throttle.
       * \param unThrottle Contains the throttle.

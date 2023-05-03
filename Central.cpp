@@ -64,6 +64,7 @@ extern "C++"
       delete m_pFile;
       delete m_pJunction;
       delete m_pManip;
+      delete m_pRadial;
       delete m_pUtility;
     }
     // }}}

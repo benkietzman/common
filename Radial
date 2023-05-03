@@ -203,6 +203,42 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool linkStatus(list<string> &nodes, string &strMaster, string &strError);
+      /*! \fn bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError)
+      * \brief Runs a query against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strQuery Contains the MySQL query.
+      * \param result Returns a list of resultant rows containing maps of field/value pairs.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError);
+      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError)
+      * \brief Runs an insert/update/delete against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strID Contains the auto-increment ID.
+      * \param strRows Contains the number of impacted rows.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError);
+      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError)
+      * \brief Runs an insert/update/delete against the MySQL database.
+      * \param strUser Contains the MySQL user.
+      * \param strPassword Contains the MySQL password.
+      * \param strServer Contains the MySQL server.
+      * \param strDatabase Contains the MySQL database.
+      * \param strUpdate Contains the MySQL insert/update/delete query.
+      * \param strError Contains the error message.
+      * \return Returns a boolean true/false value.
+      */
+      bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError);
       /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
       * \brief Submits a Radial request.
       * \param ptRequest Contains request.

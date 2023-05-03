@@ -45,6 +45,7 @@ using namespace std;
 #include "DateTime"
 #include "File"
 #include "Json"
+#include "Radial"
 #include "ServiceJunction"
 #include "SignalHandling"
 #include "StringManip"
@@ -90,6 +91,7 @@ extern "C++"
       Archive *m_pArchive;
       DateTime *m_pDate;
       File *m_pFile;
+      Radial *m_pRadial;
       ServiceJunction *m_pJunction;
       StringManip *m_pManip;
       Utility *m_pUtility;
@@ -260,7 +262,12 @@ extern "C++"
       * \return Returns a list of resultant rows containing maps of field/value pairs. 
       */
       list<map<string, string> > *query(const string strName, const string strQuery, unsigned long long &ullRows, string &strError);
-      /*! \fn void addDatabase(const string strName)
+      /*! \fn Radial *radial()
+      * \brief Interfaces with the Radial class.
+      * \return Returns a pointer to the Radial class.
+      */
+      Radial *radial();
+      /*! \fn void removeDatabase(const string strName)
       * \brief Removes database credentials from list of databases.
       * \param strName Contains the database name.
       */

@@ -306,6 +306,77 @@ extern "C++"
       return bResult;
     }
     // }}}
+    // {{{ mysqlQuery()
+    bool Radial::mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError)
+    {
+      bool bResult = false;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+      string strJson;
+      
+      result.clear();
+      ptRequest->i("Interface", "mysql");
+      ptRequest->i("User", strUser);
+      ptRequest->i("Password", strPassword);
+      ptRequest->i("Server", strServer);
+      ptRequest->i("Database", strDatabase);
+      ptRequest->i("Query", strQuery);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("Response") != ptResponse->m.end())
+        {
+          for (auto &i : ptResponse->m["Response"]->l)
+          {
+            map<string, string> row;
+            i->flatten(row, true);
+            result.push_back(row);
+          }
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    // }}}
+    // {{{ mysqlUpdate()
+    bool Radial::mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError)
+    {
+      bool bResult = false;
+      list<map<string, string> > result;
+      map<string, string> requestArray;
+      Json *ptRequest = new Json, *ptResponse = new Json;
+
+      ptRequest->i("Interface", "mysql");
+      ptRequest->i("User", strUser);
+      ptRequest->i("Password", strPassword);
+      ptRequest->i("Server", strServer);
+      ptRequest->i("Database", strDatabase);
+      ptRequest->i("Update", strUpdate);
+      if (request(ptRequest, ptResponse, strError))
+      {
+        bResult = true;
+        if (ptResponse->m.find("ID") != ptResponse->m.end() && !ptResponse->m["ID"]->v.empty())
+        {
+          strID = ptResponse->m["ID"]->v;
+        }
+        if (ptResponse->m.find("Rows") != ptResponse->m.end() && !ptResponse->m["Rows"]->v.empty())
+        {
+          strRows = ptResponse->m["Rows"]->v;
+        }
+      }
+      delete ptRequest;
+      delete ptResponse;
+
+      return bResult;
+    }
+    bool Radial::mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError)
+    {
+      string strID, strRows;
+
+      return mysqlUpdate(strUser, strPassword, strServer, strDatabase, strUpdate, strID, strRows, strError);
+    }
+    // }}}
     // {{{ request
     // {{{ request()
     bool Radial::request(Json *ptRequest, Json *ptResponse, string &strError)

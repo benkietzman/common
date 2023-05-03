@@ -39,6 +39,7 @@ extern "C++"
       m_pFile = new File;
       m_pJunction = new ServiceJunction(strError);
       m_pManip = new StringManip;
+      m_pRadial = new Radial(strError);
       m_pUtility = new Utility(strError);
       m_pMysql = NULL;
     }
@@ -773,6 +774,14 @@ extern "C++"
               strError = "No rows returned.";
             }
           }
+          else if (radial()->mysqlQuery(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], ((m_database[strName]->credentials.find("ServerRead") != m_database[strName]->credentials.end())?m_database[strName]->credentials["ServerRead"]:m_database[strName]->credentials["Server"]), m_database[strName]->credentials["Database"], strQuery, *result, strError))
+          {
+            ullRows = result->size();
+            if (result->empty())
+            {
+              strError = "No rows returned.";
+            }
+          }
           else if (junction()->mysqlQuery(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], ((m_database[strName]->credentials.find("ServerRead") != m_database[strName]->credentials.end())?m_database[strName]->credentials["ServerRead"]:m_database[strName]->credentials["Server"]), m_database[strName]->credentials["Database"], strQuery, *result, strError))
           {
             ullRows = result->size();
@@ -836,6 +845,12 @@ extern "C++"
       }
 
       return result;
+    }
+    // }}}
+    // {{{ radial()
+    Radial *Central::radial()
+    {
+      return m_pRadial;
     }
     // }}}
     // {{{ removeDatabase()
@@ -1013,6 +1028,13 @@ extern "C++"
           if (m_pMysql != NULL && (*m_pMysql)("update", strName, strUpdate, NULL, ullID, ullRows, strError))
           {
             bResult = true;
+          }
+          else if (radial()->mysqlUpdate(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["Server"], m_database[strName]->credentials["Database"], strUpdate, strID, strRows, strError))
+          {
+            stringstream ssID(strID), ssRows(strRows);
+            bResult = true;
+            ssID >> ullID;
+            ssRows >> ullRows;
           }
           else if (junction()->mysqlUpdate(m_database[strName]->credentials["User"], m_database[strName]->credentials["Password"], m_database[strName]->credentials["Server"], m_database[strName]->credentials["Database"], strUpdate, strID, strRows, strError))
           {

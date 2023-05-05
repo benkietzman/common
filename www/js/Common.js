@@ -111,7 +111,7 @@ class Common
           return '';
         }
         let result = '';
-        array.sort((a, b) =>
+        array.sort(function(a, b)
         {
           a = a[prop];
           b = b[prop];

@@ -113,14 +113,6 @@ class Common
         }
         return accum;
       });
-      Handlebars.registerHelper('number', (value, decimalLength, thousandsSep, decimalSep) =>
-      {
-        return this.formatNumber(value, decimalLength, thousandsSep, decimalSep);
-      });
-      Handlebars.registerHelper('numberShort', (value, decimalLength, thousandsSep, decimalSep) =>
-      {
-        return this.formatNumberShort(value, decimalLength, thousandsSep, decimalSep);
-      });
       Handlebars.registerHelper('getUserEmail', () =>
       {
         return this.getUserEmail();
@@ -153,6 +145,10 @@ class Common
           case '||': return (v1 || v2) ? options.fn(this) : options.inverse(this);
           default: return options.inverse(this);
         }
+      });
+      Handlebars.registerHelper('indexOf', (data, strIndex) =>
+      {
+        return data[strIndex];
       });
       Handlebars.registerHelper('isGlobalAdmin', (application, options) =>
       {
@@ -208,6 +204,14 @@ class Common
       Handlebars.registerHelper('multiply', (v1, v2) =>
       {
         return (Number(v1) * Number(v2));
+      });
+      Handlebars.registerHelper('number', (value, decimalLength, thousandsSep, decimalSep) =>
+      {
+        return this.formatNumber(value, decimalLength, thousandsSep, decimalSep);
+      });
+      Handlebars.registerHelper('numberShort', (value, decimalLength, thousandsSep, decimalSep) =>
+      {
+        return this.formatNumberShort(value, decimalLength, thousandsSep, decimalSep);
       });
       Handlebars.registerHelper('subtract', (v1, v2) =>
       {

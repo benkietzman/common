@@ -104,32 +104,6 @@ class Common
       {
         return (Number(v1) / Number(v2));
       });
-      Handlebars.registerHelper('eachSort', (array, prop, options) =>
-      {
-        if (!this.isDefined(array) || !this.isDefined(prop))
-        {
-          return '';
-        }
-        let result = '';
-        array.sort(function(a, b)
-        {
-          a = a[prop];
-          b = b[prop];
-          return ((a > b)?1:((a < b)?-1:0));
-        });
-        if (this.isDefined(options['desc']))
-        {
-          array = array.reverse();
-        }
-        let alen = array.length
-        let j = -1;
-        while (++j < alen)
-        {
-          result += options.fn(array[j]);
-        }
-
-        return result;
-      });
       Handlebars.registerHelper('for', (from, to, incr, options) =>
       {
         let accum = '';

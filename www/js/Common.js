@@ -1442,14 +1442,15 @@ class Common
   // {{{ tableSort()
   tableSort(strID, nCol, bNumeric)
   {
-    let table, rows, switching, i, x, xn, y, yn, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById(strID);
+    let table, tableID, rows, switching, i, x, xn, y, yn, shouldSwitch, dir, switchcount = 0;
+    tableID = document.getElementById(strID);
+    table = tableID.getElementsByTagName('tbody')[0];
     switching = true;
     dir = 'asc';
     while (switching)
     {
       switching = false;
-      rows = table.rows;
+      rows = table.getElementsByTagName('tr');
       for (i = 1; i < (rows.length - 1); i++)
       {
         shouldSwitch = false;

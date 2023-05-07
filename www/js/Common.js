@@ -1451,7 +1451,7 @@ class Common
     {
       switching = false;
       rows = table.getElementsByTagName('tr');
-      for (i = 1; i < (rows.length - 1); i++)
+      for (i = 0; i < (rows.length - 1); i++)
       {
         shouldSwitch = false;
         x = rows[i].getElementsByTagName('TD')[nCol].innerHTML.toLowerCase();

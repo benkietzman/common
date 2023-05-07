@@ -1439,6 +1439,113 @@ class Common
     return this.getStore(controller);
   }
   // }}}
+  // {{{ tableSort()
+  tableSort(strID, nCol, bNumeric)
+  {
+    let table, rows, switching, i, x, xn, y, yn, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById(strID);
+    switching = true;
+    dir = 'asc';
+    while (switching)
+    {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < (rows.length - 1); i++)
+      {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName('TD')[nCol].innerHTML.toLowerCase();
+        y = rows[i+1].getElementsByTagName('TD')[nCol].innerHTML.toLowerCase();
+        if (bNumeric)
+        {
+          x = x.replace('$', '');
+          y = y.replace('$', '');
+          x = x.replace(',', '');
+          y = y.replace(',', '');
+          x = x.replace('%', '');
+          y = y.replace('%', '');
+          if (x.length > 1)
+          {
+            if (x[x.length-1] == 'k')
+            {
+              x = Number(x.substr(0, (x.length - 1)));
+              x *= 1000;
+            }
+            else if (x[x.length-1] == 'm')
+            {
+              x = Number(x.substr(0, (x.length - 1)));
+              x *= 1000000;
+            }
+            else if (x[x.length-1] == 'b' || x[x.length-1] == 'g')
+            {
+              x = Number(x.substr(0, (x.length - 1)));
+              x *= 1000000000;
+            }
+            else if (x[x.length-1] == 't')
+            {
+              x = Number(x.substr(0, (x.length - 1)));
+              x *= 1000000000000;
+            }
+          }
+          if (y.length > 1)
+          {
+            if (y[y.length-1] == 'k')
+            {
+              y = Number(y.substr(0, (y.length - 1)));
+              y *= 1000;
+            }
+            else if (y[y.length-1] == 'm')
+            {
+              y = Number(y.substr(0, (y.length - 1)));
+              y *= 1000000;
+            }
+            else if (y[y.length-1] == 'b' || y[y.length-1] == 'g')
+            {
+              y = Number(y.substr(0, (y.length - 1)));
+              y *= 1000000000;
+            }
+            else if (y[y.length-1] == 't')
+            {
+              y = Number(y.substr(0, (y.length - 1)));
+              y *= 1000000000000;
+            }
+          }
+          x = Number(x);
+          y = Number(y);
+        }
+        if (dir == 'asc')
+        {
+          if (x > y)
+          {
+            shouldSwitch = true;
+            break;
+          }
+        }
+        else if (dir == 'desc')
+        {
+          if (x < y)
+          {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch)
+      {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount ++;
+      }
+      else
+      {
+        if (switchcount == 0 && dir == 'asc')
+        {
+          dir = 'desc';
+          switching = true;
+        }
+      }
+    }
+  }
+  // }}}
   // {{{ wsCreate()
   wsCreate(strName, strServer, strPort, bSecure, strProtocol)
   {

@@ -185,6 +185,7 @@ if [ $bFoundMJson -eq 1 ]; then
     printf " Xml.o" >> Makefile;
   fi
   if [ $bFoundOpenSsl -eq 1 ]; then
+    printf " Logger.o" >> Makefile;
     printf " Radial.o" >> Makefile;
     printf " ServiceJunction.o" >> Makefile;
     if [ $bFoundXmlRpc -eq 1 ]; then
@@ -218,6 +219,7 @@ if [ $bFoundMJson -eq 1 ]; then
     printf " Xml.o" >> Makefile;
   fi
   if [ $bFoundOpenSsl -eq 1 ]; then
+    printf " Logger.o" >> Makefile
     printf " Radial.o" >> Makefile
     printf " ServiceJunction.o" >> Makefile
     if [ $bFoundXmlRpc -eq 1 ]; then

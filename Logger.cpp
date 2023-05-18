@@ -92,6 +92,7 @@ extern "C++"
 
       ptRequest->i("Function", "log");
       ptRequest->i("Label", label);
+      ptRequest->i("Message", strMessage);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;
@@ -110,6 +111,7 @@ extern "C++"
 
       ptRequest->i("Function", "message");
       ptRequest->i("Label", label);
+      ptRequest->i("Message", strMessage);
       if (request(ptRequest, ptResponse, strError))
       {
         bResult = true;

@@ -230,7 +230,7 @@ class bk_Password
         {
           unset($_SESSION['sl_admin']);
         }
-        $getPerson = $this->m_readdb->parse('select * from person where userid=\''.$strUserID.'\' and `password`=concat(\'*\',upper(sha1(unhex(sha1(\''.$strPassword.'\')))))');
+        $getPerson = $this->m_readdb->parse('select * from person where userid=\''.$strUserID.'\' and (`password`=concat(\'*\',upper(sha1(unhex(sha1(\''.$strPassword.'\'))))) or `password` = concat(\'!\',upper(sha2(unhex(sha2(\''.$strPassword'\', 512)), 512))))');
         if (($getPersonRow = $getPerson->fetch()))
         {
           $getSiteID = $this->m_readdb->parse('select a.id site_id, b.type type_name from application a, login_type b where a.login_type_id=b.id and a.name=\''.$this->m_strApplication.'\'');

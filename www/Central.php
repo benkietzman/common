@@ -285,7 +285,7 @@ class Central extends Secure
               $strQuery = 'insert into application_account (application_id, user_id, encrypt, aes, `password`, type_id, description) values ('.$request['application_id'].', \''.$request['user_id'].'\', '.$request['encrypt']['value'].', ';
               if ($request['encrypt']['value'] == 1)
               {
-                $strQuery .= '0, concat(\'*\',upper(sha1(unhex(sha1(\''.addslashes($request['password']).'\')))))';
+                $strQuery .= '0, concat(\'!\',upper(sha2(unhex(sha2(\''.addslashes($request['password']).'\', 512)), 512)))';
               }
               else if (isset($request['aes']) && $request['aes'] != '' && $request['aes'] !== 0)
               {
@@ -359,7 +359,7 @@ class Central extends Secure
               {
                 if ($request['password'] != '')
                 {
-                  $strQuery .= ', aes = 0, `password` = concat(\'*\',upper(sha1(unhex(sha1(\''.addslashes($request['password']).'\')))))';
+                  $strQuery .= ', aes = 0, `password` = concat(\'!\',upper(sha2(unhex(sha2(\''.addslashes($request['password']).'\', 512)), 512)))';
                 }
               }
               else if (isset($request['aes']) && $request['aes'] != '' && $request['aes'] !== 0)
@@ -4422,7 +4422,7 @@ class Central extends Secure
           $strQuery .= ', locked = '.((isset($request['locked']) && is_array($request['locked']) && isset($request['locked']['value']) && is_numeric($request['locked']['value']))?$request['locked']['value']:'null');
           if (isset($request['password']) && $request['password'] != '')
           {
-            $strQuery .= ', `password` = concat(\'*\',upper(sha1(unhex(sha1(\''.$request['password'].'\')))))';
+            $strQuery .= ', `password` = concat(\'!\',upper(sha2(unhex(sha2(\''.$request['password'].'\', 512)), 512)))';
           }
           $strQuery .= ' where id = '.$request['id'];
           $updateUser = $this->m_centraldb->parse($strQuery);

@@ -48,26 +48,34 @@ controllers.Login = function ($cookies, $http, $location, $scope, $window, commo
       var request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
       {
-        if (common.m_strLoginType == null)
+        var error = {};
+        if (common.wsResponse(response, error))
         {
-          common.m_strLoginType = 'password';
-          if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
+          if (common.m_strLoginType == null)
           {
-            common.m_strLoginType = response.Response.Module;
+            common.m_strLoginType = 'password';
+            if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
+            {
+              common.m_strLoginType = response.Response.Module;
+            }
           }
+          $http.get('/include/common_addons/auth/modules.json').then(function(response)
+          {
+            var data = null;
+            if (angular.isDefined(response.data[common.m_strLoginType]) && angular.isDefined(response.data[common.m_strLoginType]['cookie']) && angular.isDefined($cookies.get(response.data[common.m_strLoginType]['cookie'])))
+            {
+              data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
+            }
+            $scope.processLoginCont(login, data);
+          }, function ()
+          {
+            $scope.processLoginCont(login, null);
+          });
         }
-        $http.get('/include/common_addons/auth/modules.json').then(function(response)
+        else
         {
-          var data = null;
-          if (angular.isDefined(response.data[common.m_strLoginType]) && angular.isDefined(response.data[common.m_strLoginType]['cookie']) && angular.isDefined($cookies.get(response.data[common.m_strLoginType]['cookie'])))
-          {
-            data = $cookies.get(response.data[common.m_strLoginType]['cookie']);
-          }
-          $scope.processLoginCont(login, data);
-        }, function ()
-        {
-          $scope.processLoginCont(login, null);
-        });
+          $scope.message = error.message;
+        }
       });
     }
     else

@@ -286,52 +286,60 @@ controllers.Logout = function ($cookies, $location, $scope, common)
       request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
       {
-        if (common.m_strLoginType == null)
+        var error = {};
+        if (common.wsResponse(response, error))
         {
-          common.m_strLoginType = 'password';
-          if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
+          if (common.m_strLoginType == null)
           {
-            common.m_strLoginType = response.Response.Module;
-          }
-        }
-        var request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
-        request.Request = {Type: common.m_strLoginType, Return: common.getRedirectPath()};
-        common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
-        {
-          var error = {};
-          $scope.info = null;
-          if (common.wsResponse(response, error))
-          {
-            if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+            common.m_strLoginType = 'password';
+            if (angular.isDefined(response.Response.Module) && response.Response.Module != '')
             {
-              common.m_bHaveAuth = false;
-              common.m_auth = null;
-              common.m_auth = {admin: false, apps: {}};
-              if (common.m_sessionStorage && common.m_sessionStorage.sl_wsJwt)
-              {
-                common.m_sessionStorage.sl_wsJwt = null;
-              }
-              else if (common.m_wsJwt)
-              {
-                common.m_wsJwt = null;
-              }
-              else
-              {
-                $cookies.put('sl_commonWsJwt', '');
-              }
-              if (angular.isDefined($cookies.get('sl_commonUniqueID')))
-              {
-                $cookies.put('sl_commonUniqueID', '');
-              }
-              $scope.$root.$broadcast('resetMenu', null);
-              document.location.href = response.Response.Redirect;
+              common.m_strLoginType = response.Response.Module;
             }
           }
-          else
+          var request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
+          request.Request = {Type: common.m_strLoginType, Return: common.getRedirectPath()};
+          common.wsRequest(common.m_strAuthProtocol, request).then(function (response)
           {
-            $scope.message = error.message;
-          }
-        });
+            var error = {};
+            $scope.info = null;
+            if (common.wsResponse(response, error))
+            {
+              if (angular.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+              {
+                common.m_bHaveAuth = false;
+                common.m_auth = null;
+                common.m_auth = {admin: false, apps: {}};
+                if (common.m_sessionStorage && common.m_sessionStorage.sl_wsJwt)
+                {
+                  common.m_sessionStorage.sl_wsJwt = null;
+                }
+                else if (common.m_wsJwt)
+                {
+                  common.m_wsJwt = null;
+                }
+                else
+                {
+                  $cookies.put('sl_commonWsJwt', '');
+                }
+                if (angular.isDefined($cookies.get('sl_commonUniqueID')))
+                {
+                  $cookies.put('sl_commonUniqueID', '');
+                }
+                $scope.$root.$broadcast('resetMenu', null);
+                document.location.href = response.Response.Redirect;
+              }
+            }
+            else
+            {
+              $scope.message = error.message;
+            }
+          });
+        }
+        else
+        {
+         $scope.message = error.message;
+        }
       });
     }
     else

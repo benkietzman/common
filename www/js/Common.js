@@ -960,12 +960,12 @@ class Common
                 this.logout.message = error.message;
               }
             });
-          });
-        }
-        else
-        {
-          this.logout.message = error.message;
-        }
+          }
+          else
+          {
+            this.logout.message = error.message;
+          }
+        });
       }
       else
       {

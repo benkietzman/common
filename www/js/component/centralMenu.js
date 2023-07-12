@@ -30,27 +30,31 @@ export default
     // {{{ main
     if (!c.isDefined(c.centralMenu.applications))
     {
-      c.request('applications', {_script: c.centralScript}, (data) =>
+      this.c.attachEvent('commonWsReady', (data) =>
       {
-        let error = {};
-        if (c.response(data, error))
+        let request = {Interface: 'central', 'Function': 'applications', Request: {}};
+        this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
         {
-          let unIndex = 0;
-          c.centralMenu.applications = [];
-          for (let i = 0; i < data.Response.out.length; i++)
+          let error = {};
+          if (this.wsResponse(response, error))
           {
-            if (((data.Response.out[i].menu_id == 1 && c.isValid()) || data.Response.out[i].menu_id == 2) && (data.Response.out[i].retirement_date == null || data.Response.out[i].retirement_date == '0000-00-00 00:00:00'))
+            let unIndex = 0;
+            c.centralMenu.applications = [];
+            for (let i = 0; i < response.Response.length; i++)
             {
-              c.centralMenu.applications.push(data.Response.out[i]);
-              if (data.Response.out[i].name == c.application)
+              if (((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2) && (response.Response[i].retirement_date == null || response.Response[i].retirement_date == '0000-00-00 00:00:00'))
               {
-                s.application.value = unIndex;
+                c.centralMenu.applications.push(response.Response[i]);
+                if (response.Response[i].name == c.application)
+                {
+                  s.application.value = unIndex;
+                }
+                unIndex++;
               }
-              unIndex++;
             }
           }
-        }
-        c.render(id, this);
+          c.render(id, this);
+        });
       });
     }
     // }}}

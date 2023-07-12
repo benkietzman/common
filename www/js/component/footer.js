@@ -15,16 +15,19 @@ export default
     {
       c: c
     });
-    c.footer._script = c.centralScript;
-    c.request('footer', c.footer, (response) =>
+    this.c.attachEvent('commonWsReady', (data) =>
     {
-      let error = {};
-      c.dispatchEvent('commonFooterReady', null);
-      if (c.response(response, error))
+      let request = {Interface: 'central', 'Function': 'footer', Request: c.footer};
+      this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
-        c.footer = response.Response.out;
-      }
-      c.render(id, this);
+        let error = {};
+        if (this.wsResponse(response, error))
+        {
+          c.footer = response.Response;
+        }
+        c.dispatchEvent('commonFooterReady', null);
+        c.render(id, this);
+      });
     });
   },
   // }}}

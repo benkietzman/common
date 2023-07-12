@@ -12,7 +12,6 @@ class Common
   constructor(options)
   {
     this.activeMenu = null;
-    this.bridgeStatus = {stat: false};
     this.centralMenu = {show: false};
     this.components = {};
     this.debug = false;
@@ -28,6 +27,7 @@ class Common
     this.m_nUnique = 0;
     this.m_ws = {};
     this.menu = {left: [], right: []};
+    this.radialStatus = {stat: false};
     this.submenu = false;
     this.strMenu = null;
     this.strPrevMenu = null;
@@ -36,14 +36,6 @@ class Common
     if (this.isDefined(options.application))
     {
       this.application = options.application;
-    }
-    if (this.isDefined(options.centralScript))
-    {
-      this.centralScript = options.centralScript;
-    }
-    else
-    {
-      this.centralScript = '/central/include/request.php';
     }
     if (this.isDefined(options.id))
     {
@@ -92,7 +84,6 @@ class Common
     if (this.isDefined(options.footer))
     {
       this.footer = {...this.footer, ...options.footer};
-      this.footer._script = this.centralScript;
     }
     if (typeof Handlebars !== 'undefined')
     {
@@ -256,7 +247,7 @@ class Common
               if (!this.m_wsRequestID && !this.m_bConnecting)
               {
                 this.m_bConnecting = true;
-                let request = {Interface: 'live', Section: 'bridge', 'Function': 'connect'};
+                let request = {Interface: 'live', 'Function': 'connect'};
                 request.Request = {};
                 this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                 {
@@ -272,7 +263,7 @@ class Common
             else if (this.m_wsRequestID)
             {
               this.m_bConnecting = true;
-              let request = {Interface: 'live', Section: 'bridge', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
+              let request = {Interface: 'live', 'Function': 'disconnect', wsRequestID: this.m_wsRequestID};
               request.Request = {};
               this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
               {
@@ -1641,16 +1632,9 @@ class Common
       this.m_ws[strName].ws.onmessage = (e) =>
       {
         let response = JSON.parse(e.data);
-        if (this.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error == 'Failed: exp')))
+        if (this.m_bJwt && strProtocol == 'radial' && response.Error && response.Error == 'Failed: exp')
         {
-          if (strProtocol == 'bridge')
-          {
-            response.Error.Message = 'Session expired.  Please login again.';
-          }
-          else
-          {
-            response.Error = 'Session expired.  Please login again.';
-          }
+          response.Error = 'Session expired.  Please login again.';
           this.m_auth = null;
           this.m_auth = {admin: false, apps: {}};
           this.m_bSentJwt = false;
@@ -1664,29 +1648,11 @@ class Common
           this.dispatchEvent('commonAuthReady', null);
           this.dispatchEvent('resetMenu', null);
         }
-        else if (!this.m_bJwt && ((strProtocol == 'bridge' && this.m_ws[strName].SetBridgeCredentials && this.m_ws[strName].SetBridgeCredentials.Script && this.m_ws[strName].SetBridgeCredentials.Script.length > 0 && this.m_ws[strName].SetBridgeCredentials['Function'] && this.m_ws[strName].SetBridgeCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && ((response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Your access has been denied.') || (response.Error.SubType == 'requestSocket' && response.Error.Message && response.Error.Message == 'Please provide the User.'))) || (strProtocol == 'radial' && this.m_ws[strName].SetRadialCredentials && this.m_ws[strName].SetRadialCredentials.Script && this.m_ws[strName].SetRadialCredentials.Script.length > 0 && this.m_ws[strName].SetRadialCredentials['Function'] && this.m_ws[strName].SetRadialCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && (response.Error == 'Your access has been denied.' || response.Error == 'Please provide the User.'))))
+        else if (!this.m_bJwt && strProtocol == 'radial' && this.m_ws[strName].SetRadialCredentials && this.m_ws[strName].SetRadialCredentials.Script && this.m_ws[strName].SetRadialCredentials.Script.length > 0 && this.m_ws[strName].SetRadialCredentials['Function'] && this.m_ws[strName].SetRadialCredentials['Function'].length > 0 && response.Status && response.Status == 'error' && response.Error && (response.Error == 'Your access has been denied.' || response.Error == 'Please provide the User.'))
         {
           if (this.isCookie('PHPSESSID'))
           {
-            if (strProtocol == 'bridge' && !this.m_bSetBridgeCredentials)
-            {
-              this.m_bSetBridgeCredentials = true;
-              fetch(this.m_ws[strName].SetBridgeCredentials['Script'],
-              {
-                method: 'POST',
-                headers:
-                {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({'Function': this.m_ws[strName].SetBridgeCredentials['Function']})
-              })
-              .then(response => response.json())
-              .then((response) =>
-              {
-                this.m_bSetBridgeCredentials = false;
-              });
-            }
-            else if (strProtocol == 'radial' && !this.m_bSetRadialCredentials)
+            if (strProtocol == 'radial' && !this.m_bSetRadialCredentials)
             {
               this.m_bSetRadialCredentials = true;
               fetch(this.m_ws[strName].SetRadialCredentials['Script'],
@@ -1795,9 +1761,9 @@ class Common
             }
           }
         }
-        if (response.bridgePurpose && response.bridgePurpose == 'status')
+        if (response.radialPurpose && response.radialPurpose == 'status')
         {
-          this.dispatchEvent('bridgePurpose_status', response);
+          this.dispatchEvent('radialPurpose_status', response);
         }
       };
       // }}}

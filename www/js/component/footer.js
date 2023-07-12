@@ -15,13 +15,13 @@ export default
     {
       c: c
     });
-    this.c.attachEvent('commonWsReady', (data) =>
+    c.attachEvent('commonWsReady', (data) =>
     {
       let request = {Interface: 'central', 'Function': 'footer', Request: c.footer};
-      this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
-        if (this.wsResponse(response, error))
+        if (c.wsResponse(response, error))
         {
           c.footer = response.Response;
         }

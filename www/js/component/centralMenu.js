@@ -30,13 +30,13 @@ export default
     // {{{ main
     if (!c.isDefined(c.centralMenu.applications))
     {
-      this.c.attachEvent('commonWsReady', (data) =>
+      c.attachEvent('commonWsReady', (data) =>
       {
         let request = {Interface: 'central', 'Function': 'applications', Request: {}};
-        this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+        c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
         {
           let error = {};
-          if (this.wsResponse(response, error))
+          if (c.wsResponse(response, error))
           {
             let unIndex = 0;
             c.centralMenu.applications = [];

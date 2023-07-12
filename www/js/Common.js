@@ -1643,7 +1643,14 @@ class Common
         let response = JSON.parse(e.data);
         if (this.m_bJwt && ((strProtocol == 'bridge' && response.Status == 'error' && response.Error && response.Error.Type && response.Error.Type == 'bridge' && response.Error.SubType && response.Error.SubType == 'request' && response.Error.Message && response.Error.Message == 'Failed: exp') || (strProtocol == 'radial' && response.Error && response.Error == 'Failed: exp')))
         {
-          response.Error.Message = 'Session expired.  Please login again.';
+          if (strProtocol == 'bridge')
+          {
+            response.Error.Message = 'Session expired.  Please login again.';
+          }
+          else
+          {
+            response.Error = 'Session expired.  Please login again.';
+          }
           this.m_auth = null;
           this.m_auth = {admin: false, apps: {}};
           this.m_bSentJwt = false;

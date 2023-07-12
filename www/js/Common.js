@@ -1584,8 +1584,10 @@ class Common
       this.m_ws[strName].ws.onopen = (e) =>
       {
         this.m_ws[strName].Connected = true;
+        this.dispatchEvent('commonWsReady', null);
         this.dispatchEvent('commonWsReady_' + this.application, null);
         this.dispatchEvent('commonWsReady_' + this.application + '_' + strName, null);
+        this.dispatchEvent('commonWsReady_' + strName, null);
         this.m_ws[strName].Attempts = 1;
         if (this.m_ws[strName].modalInstance != null)
         {

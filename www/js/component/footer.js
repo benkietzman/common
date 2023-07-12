@@ -15,7 +15,7 @@ export default
     {
       c: c
     });
-    c.attachEvent('commonWsReady', (data) =>
+    c.attachEvent('commonWsReady_radial', (data) =>
     {
       let request = {Interface: 'central', 'Function': 'footer', Request: c.footer};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>

@@ -30,7 +30,7 @@ export default
     // {{{ main
     if (!c.isDefined(c.centralMenu.applications))
     {
-      c.attachEvent('commonWsReady', (data) =>
+      c.attachEvent('commonWsReady_radial', (data) =>
       {
         let request = {Interface: 'central', 'Function': 'applications', Request: {}};
         c.wsRequest(c.m_strAuthProtocol, request).then((response) =>

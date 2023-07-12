@@ -28,35 +28,32 @@ export default
     });
     // }}}
     // {{{ main
-    if (!c.isDefined(c.centralMenu.applications))
+    c.attachEvent('commonWsReady_radial', (data) =>
     {
-      c.attachEvent('commonWsReady_radial', (data) =>
+      let request = {Interface: 'central', 'Function': 'applications', Request: {}};
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
-        let request = {Interface: 'central', 'Function': 'applications', Request: {}};
-        c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+        let error = {};
+        if (c.wsResponse(response, error))
         {
-          let error = {};
-          if (c.wsResponse(response, error))
+          let unIndex = 0;
+          c.centralMenu.applications = [];
+          for (let i = 0; i < response.Response.length; i++)
           {
-            let unIndex = 0;
-            c.centralMenu.applications = [];
-            for (let i = 0; i < response.Response.length; i++)
+            if (((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2) && (response.Response[i].retirement_date == null || response.Response[i].retirement_date == '0000-00-00 00:00:00'))
             {
-              if (((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2) && (response.Response[i].retirement_date == null || response.Response[i].retirement_date == '0000-00-00 00:00:00'))
+              c.centralMenu.applications.push(response.Response[i]);
+              if (response.Response[i].name == c.application)
               {
-                c.centralMenu.applications.push(response.Response[i]);
-                if (response.Response[i].name == c.application)
-                {
-                  s.application.value = unIndex;
-                }
-                unIndex++;
+                s.application.value = unIndex;
               }
+              unIndex++;
             }
           }
-          c.render(id, this);
-        });
+        }
+        c.render(id, this);
       });
-    }
+    });
     // }}}
   },
   // }}}

@@ -30,7 +30,7 @@ export default
     // {{{ main
     c.attachEvent('commonWsReady_radial', (data) =>
     {
-      let request = {Interface: 'central', 'Function': 'applications', Request: {}};
+      let request = {Interface: 'central', 'Function': 'applications', Request: {menu: 1, retired: 0}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
@@ -40,7 +40,7 @@ export default
           c.centralMenu.applications = [];
           for (let i = 0; i < response.Response.length; i++)
           {
-            if (((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2) && (response.Response[i].retirement_date == ''))
+            if ((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2)
             {
               c.centralMenu.applications.push(response.Response[i]);
               if (response.Response[i].name == c.application)

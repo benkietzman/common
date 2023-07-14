@@ -385,35 +385,35 @@ class Common
           }
           if (e.hasAttribute('c-change'))
           {
-            e.onchange = (e) => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange(e);} eval('s.' + e.getAttribute('c-change'))(e);};
+            e.onchange = () => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
           }
           else
           {
-            e.onchange = (e) => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange(e);}};
+            e.onchange = () => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
           }
           if (e.hasAttribute('c-click'))
           {
-            e.onclick = (e) => {if (this.isDefined(o.onclick)) {o.onclick(e);} eval('s.' + e.getAttribute('c-click'))(e);};
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
           }
           else
           {
-            e.onclick = (e) => {if (this.isDefined(o.onclick)) {o.onclick(e);}};
+            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
           }
           if (e.hasAttribute('c-keydown'))
           {
-            e.onkeydown = (e) => {if (this.isDefined(o.onkeydown)) {o.onkeydown(e);}; eval('s.' + e.getAttribute('c-keydown'))(e);};
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
           }
           else
           {
-            e.onkeydown = (e) => {if (this.isDefined(o.onkeydown)) {o.onkeydown(e);}};
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
           }
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = (e) => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup(e);}; eval('s.' + e.getAttribute('c-keyup'))(e);};
+            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
           }
           else
           {
-            e.onkeyup = (e) => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup(e);}};
+            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
           }
         });
       }

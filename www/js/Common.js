@@ -102,8 +102,8 @@ class Common
       Handlebars.registerHelper('eachFilter', (a, k, v, options) =>
       {
         let result = '';
-        let subk = ((this.isObject(k))?k.v:k);
-        let subv = ((this.isObject(v))?v.v:v);
+        let subk = (((o instanceof Observable) || (o instanceof Computed))?k.v:k);
+        let subv = (((o instanceof Observable) || (o instanceof Computed))?v.v:v);
         a.forEach((deepv, deepk) =>
         {
           if (this.isDefined(deepv[subk]) && deepv[subk].search(new RegExp(subv, 'i')) != -1)
@@ -1909,10 +1909,17 @@ class Common
 class Observable
 {
   // {{{ constructor()
-  constructor(val)
+  constructor(val, id)
   {
     this.listeners = [];
+    this.id = ((typeof id !== 'undefined')?id:null);
     this.val = ((typeof val !== 'undefined')?val:'');
+  }
+  // }}}
+  // {{{ e()
+  e()
+  {
+    document.getElementById(this.id);
   }
   // }}}
   // {{{ notify()

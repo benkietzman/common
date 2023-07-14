@@ -91,18 +91,34 @@ class Common
       {
         return (Number(v1) + Number(v2));
       });
+      Handlebars.registerHelper('concat', (v1, v2) =>
+      {
+        return (v1 + v2);
+      });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {
         return (Number(v1) / Number(v2));
       });
+      Handlebars.registerHelper('eachWhen', (a, k, v, options) =>
+      {
+        let result = '';
+        a.forEach((subv, subk) =>
+        {
+          if (this.isDefined(subv[k]) && subv[k] == v)
+          {
+            result += options.fn(subv);
+          }
+        });
+        return result;
+      });
       Handlebars.registerHelper('for', (from, to, incr, options) =>
       {
-        let accum = '';
+        let result = '';
         for (let i = from; i <= to; i += incr)
         {
-          accum += options.fn(i);
+          result += options.fn(i);
         }
-        return accum;
+        return result;
       });
       Handlebars.registerHelper('getUserEmail', () =>
       {

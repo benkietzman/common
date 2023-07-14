@@ -104,7 +104,7 @@ class Common
         let result = '';
         a.forEach((subv, subk) =>
         {
-          if (this.isDefined(subv[k]) && subv[k] == v)
+          if (this.isDefined(subv[k]) && subv[k].search(new RegExp(v, 'i')) != -1)
           {
             result += options.fn(subv);
           }

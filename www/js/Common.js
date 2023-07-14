@@ -102,8 +102,8 @@ class Common
       Handlebars.registerHelper('eachFilter', (a, k, v, options) =>
       {
         let result = '';
-        let subk = (((o instanceof Observable) || (o instanceof Computed))?k.v:k);
-        let subv = (((o instanceof Observable) || (o instanceof Computed))?v.v:v);
+        let subk = (((k instanceof Observable) || (k instanceof Computed))?k.v:k);
+        let subv = (((v instanceof Observable) || (v instanceof Computed))?v.v:v);
         a.forEach((deepv, deepk) =>
         {
           if (this.isDefined(deepv[subk]) && deepv[subk].search(new RegExp(subv, 'i')) != -1)

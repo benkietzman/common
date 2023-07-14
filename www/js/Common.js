@@ -1931,10 +1931,21 @@ class Observable
     this.val = ((typeof val !== 'undefined')?val:'');
   }
   // }}}
+  // {{{ e()
+  e()
+  {
+    let r = null;
+    if (typeof this.id !== 'undefined')
+    {
+      r = document.getElementById(this.id);
+    }
+    return r;
+  }
+  // }}}
   // {{{ id()
   id(v)
   {
-    this.e = document.getElementById(v);
+    this.id = v;
   }
   // }}}
   // {{{ notify()
@@ -1998,10 +2009,21 @@ class Computed extends Observable
     deps.forEach(dep => dep.subscribe(listener));
   }
   // }}}
+  // {{{ e()
+  e()
+  {
+    let r = null;
+    if (typeof this.id !== 'undefined')
+    {
+      r = document.getElementById(this.id);
+    }
+    return r;
+  }
+  // }}}
   // {{{ id()
   id(v)
   {
-    this.e = document.getElementById(v);
+    this.id = v;
   }
   // }}}
   // {{{ get v()

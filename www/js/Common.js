@@ -102,11 +102,13 @@ class Common
       Handlebars.registerHelper('eachFilter', (a, k, v, options) =>
       {
         let result = '';
-        a.forEach((subv, subk) =>
+        let subk = ((this.isObject(k))?k.v:k);
+        let subv = ((this.isObject(v))?v.v:v);
+        a.forEach((deepv, deepk) =>
         {
-          if (this.isDefined(subv[k]) && subv[k].search(new RegExp(v, 'i')) != -1)
+          if (this.isDefined(deepv[subk]) && deepv[subk].search(new RegExp(subv, 'i')) != -1)
           {
-            result += options.fn(subv);
+            result += options.fn(deepv);
           }
         });
         return result;

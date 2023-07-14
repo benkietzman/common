@@ -341,21 +341,21 @@ class Common
           }
           if (this.isDefined(e.value))
           {
-            e.value = o.value;
-            o.subscribe(() => e.value = o.value);
+            e.value = o.v;
+            o.subscribe(() => e.v = o.v);
           }
           else if (this.isDefined(e.innerHTML))
           {
-            e.innerHTML = o.value;
-            o.subscribe(() => e.innerHTML = o.value);
+            e.innerHTML = o.v;
+            o.subscribe(() => e.innerHTML = o.v);
           }
           if (e.hasAttribute('c-change'))
           {
-            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
+            e.onchange = () => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
           }
           else
           {
-            e.onchange = () => {o.value = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
+            e.onchange = () => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();}};
           }
           if (e.hasAttribute('c-click'))
           {
@@ -375,11 +375,11 @@ class Common
           }
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
+            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
           }
           else
           {
-            e.onkeyup = () => {o.value = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
+            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}};
           }
         });
       }
@@ -1411,7 +1411,7 @@ class Common
 
     if ((data instanceof Observable) || (data instanceof Computed))
     {
-      simple = this.simplify(data.value);
+      simple = this.simplify(data.v);
     }
     else if (this.isArray(data))
     {

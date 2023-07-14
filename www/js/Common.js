@@ -339,7 +339,7 @@ class Common
               _.set(s, e.getAttribute('c-model'), o);
               if (e.getAttribute('id'))
               {
-                o.id(e.getAttribute('id');
+                o.id(e.getAttribute('id'));
               }
             }
             if (!(o instanceof Observable) && !(o instanceof Computed))
@@ -348,7 +348,7 @@ class Common
               _.set(s, e.getAttribute('c-model'), o);
               if (e.getAttribute('id'))
               {
-                o.id(e.getAttribute('id');
+                o.id(e.getAttribute('id'));
               }
             }
           }
@@ -359,7 +359,7 @@ class Common
               s[e.getAttribute('c-model')] = new Observable;
               if (e.getAttribute('id'))
               {
-                s[e.getAttribute('c-model')].id(e.getAttribute('id');
+                s[e.getAttribute('c-model')].id(e.getAttribute('id'));
               }
             }
             o = s[e.getAttribute('c-model')];
@@ -369,7 +369,7 @@ class Common
               s[e.getAttribute('c-model')] = o;
               if (e.getAttribute('id'))
               {
-                s[e.getAttribute('c-model')].id(e.getAttribute('id');
+                s[e.getAttribute('c-model')].id(e.getAttribute('id'));
               }
             }
           }

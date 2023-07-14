@@ -337,11 +337,19 @@ class Common
             {
               o = new Observable;
               _.set(s, e.getAttribute('c-model'), o);
+              if (e.getAttribute('id'))
+              {
+                o.id(e.getAttribute('id');
+              }
             }
             if (!(o instanceof Observable) && !(o instanceof Computed))
             {
               o = new Observable(o);
               _.set(s, e.getAttribute('c-model'), o);
+              if (e.getAttribute('id'))
+              {
+                o.id(e.getAttribute('id');
+              }
             }
           }
           else
@@ -349,12 +357,20 @@ class Common
             if (!this.isDefined(s[e.getAttribute('c-model')]))
             {
               s[e.getAttribute('c-model')] = new Observable;
+              if (e.getAttribute('id'))
+              {
+                s[e.getAttribute('c-model')].id(e.getAttribute('id');
+              }
             }
             o = s[e.getAttribute('c-model')];
             if (!(o instanceof Observable) && !(o instanceof Computed))
             {
               o = new Observable(o);
               s[e.getAttribute('c-model')] = o;
+              if (e.getAttribute('id'))
+              {
+                s[e.getAttribute('c-model')].id(e.getAttribute('id');
+              }
             }
           }
           if (this.isDefined(e.value))
@@ -1912,14 +1928,24 @@ class Observable
   constructor(val, id)
   {
     this.listeners = [];
-    this.id = ((typeof id !== 'undefined')?id:null);
     this.val = ((typeof val !== 'undefined')?val:'');
   }
   // }}}
   // {{{ e()
   e()
   {
-    return document.getElementById(this.id);
+    let r = null;
+    if (typeof this.id !== 'undefined')
+    {
+      r = document.getElementById(this.id);
+    }
+    return r;
+  }
+  // }}}
+  // {{{ id()
+  id(v)
+  {
+    this.id = v;
   }
   // }}}
   // {{{ notify()

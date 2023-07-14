@@ -385,7 +385,7 @@ class Common
           }
           if (e.hasAttribute('c-change'))
           {
-            e.onchange = (e) => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange(e);} eval('s.' + e.getAttribute('c-change'));};
+            e.onchange = (e) => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange(e);} eval('s.' + e.getAttribute('c-change'))(e);};
           }
           else
           {
@@ -393,7 +393,7 @@ class Common
           }
           if (e.hasAttribute('c-click'))
           {
-            e.onclick = (e) => {if (this.isDefined(o.onclick)) {o.onclick(e);} eval('s.' + e.getAttribute('c-click'));};
+            e.onclick = (e) => {if (this.isDefined(o.onclick)) {o.onclick(e);} eval('s.' + e.getAttribute('c-click'))(e);};
           }
           else
           {
@@ -401,7 +401,7 @@ class Common
           }
           if (e.hasAttribute('c-keydown'))
           {
-            e.onkeydown = (e) => {if (this.isDefined(o.onkeydown)) {o.onkeydown(e);}; eval('s.' + e.getAttribute('c-keydown'));};
+            e.onkeydown = (e) => {if (this.isDefined(o.onkeydown)) {o.onkeydown(e);}; eval('s.' + e.getAttribute('c-keydown'))(e);};
           }
           else
           {
@@ -409,7 +409,7 @@ class Common
           }
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = (e) => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup(e);}; eval('s.' + e.getAttribute('c-keyup'));};
+            e.onkeyup = (e) => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup(e);}; eval('s.' + e.getAttribute('c-keyup'))(e);};
           }
           else
           {

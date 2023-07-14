@@ -409,7 +409,8 @@ class Common
           }
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup')); if (e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); e.focus();}};
+            //e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup')); if (e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); e.focus();}};
+            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
           }
           else
           {

@@ -337,19 +337,11 @@ class Common
             {
               o = new Observable;
               _.set(s, e.getAttribute('c-model'), o);
-              if (e.getAttribute('id'))
-              {
-                o.id(e.getAttribute('id'));
-              }
             }
             if (!(o instanceof Observable) && !(o instanceof Computed))
             {
               o = new Observable(o);
               _.set(s, e.getAttribute('c-model'), o);
-              if (e.getAttribute('id'))
-              {
-                o.id(e.getAttribute('id'));
-              }
             }
           }
           else
@@ -357,20 +349,12 @@ class Common
             if (!this.isDefined(s[e.getAttribute('c-model')]))
             {
               s[e.getAttribute('c-model')] = new Observable;
-              if (e.getAttribute('id'))
-              {
-                s[e.getAttribute('c-model')].id(e.getAttribute('id'));
-              }
             }
             o = s[e.getAttribute('c-model')];
             if (!(o instanceof Observable) && !(o instanceof Computed))
             {
               o = new Observable(o);
               s[e.getAttribute('c-model')] = o;
-              if (e.getAttribute('id'))
-              {
-                s[e.getAttribute('c-model')].id(e.getAttribute('id'));
-              }
             }
           }
           if (this.isDefined(e.value))
@@ -2007,23 +1991,6 @@ class Computed extends Observable
       this.notify();
     }
     deps.forEach(dep => dep.subscribe(listener));
-  }
-  // }}}
-  // {{{ e()
-  e()
-  {
-    let r = null;
-    if (typeof this.id !== 'undefined')
-    {
-      r = document.getElementById(this.id);
-    }
-    return r;
-  }
-  // }}}
-  // {{{ id()
-  id(v)
-  {
-    this.id = v;
   }
   // }}}
   // {{{ get v()

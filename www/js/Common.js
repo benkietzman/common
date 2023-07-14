@@ -1891,16 +1891,16 @@ class Common
 class Observable
 {
   // {{{ constructor()
-  constructor(value)
+  constructor(val)
   {
     this.listeners = [];
-    this.value = ((typeof value !== 'undefined')?value:'');
+    this.val = ((typeof val !== 'undefined')?val:'');
   }
   // }}}
   // {{{ notify()
   notify()
   {
-    this.listeners.forEach(listener => listener(this.value));
+    this.listeners.forEach(listener => listener(this.val));
   }
   // }}}
   // {{{ subscribe()
@@ -1912,15 +1912,31 @@ class Observable
   // {{{ get v()
   get v()
   {
-    return this.value;
+    return this.val;
+  }
+  // }}}
+  // {{{ get value()
+  get value()
+  {
+    return this.val;
   }
   // }}}
   // {{{ set v()
-  set v(value)
+  set v(val)
   {
-    if (value !== this.value)
+    if (val !== this.val)
     {
-      this.value = value;
+      this.val = val;
+      this.notify();
+    }
+  }
+  // }}}
+  // {{{ set value()
+  set value(val)
+  {
+    if (val !== this.val)
+    {
+      this.val = val;
       this.notify();
     }
   }
@@ -1931,12 +1947,12 @@ class Observable
 class Computed extends Observable
 {
   // {{{ constructor()
-  constructor(value, deps)
+  constructor(val, deps)
   {
-    super(value());
+    super(val());
     const listener = () =>
     {
-      this.value = value();
+      this.val = val();
       this.notify();
     }
     deps.forEach(dep => dep.subscribe(listener));
@@ -1945,11 +1961,23 @@ class Computed extends Observable
   // {{{ get v()
   get v()
   {
-    return this.value;
+    return this.val;
+  }
+  // }}}
+  // {{{ get value()
+  get value()
+  {
+    return this.val;
   }
   // }}}
   // {{{ set v()
-  set v(value)
+  set v(val)
+  {
+    throw "Cannot set computed property";
+  }
+  // }}}
+  // {{{ set value()
+  set value(val)
   {
     throw "Cannot set computed property";
   }

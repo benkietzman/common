@@ -1931,21 +1931,10 @@ class Observable
     this.val = ((typeof val !== 'undefined')?val:'');
   }
   // }}}
-  // {{{ e()
-  e()
-  {
-    let r = null;
-    if (typeof this.id !== 'undefined')
-    {
-      r = document.getElementById(this.id);
-    }
-    return r;
-  }
-  // }}}
   // {{{ id()
   id(v)
   {
-    this.id = v;
+    this.e = document.getElementById(v);
   }
   // }}}
   // {{{ notify()
@@ -2007,6 +1996,12 @@ class Computed extends Observable
       this.notify();
     }
     deps.forEach(dep => dep.subscribe(listener));
+  }
+  // }}}
+  // {{{ id()
+  id(v)
+  {
+    this.e = document.getElementById(v);
   }
   // }}}
   // {{{ get v()

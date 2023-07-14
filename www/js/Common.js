@@ -337,11 +337,19 @@ class Common
             {
               o = new Observable;
               _.set(s, e.getAttribute('c-model'), o);
+              if (e.getAttribute('id'))
+              {
+                o.id(e.getAttribute('id'));
+              }
             }
             if (!(o instanceof Observable) && !(o instanceof Computed))
             {
               o = new Observable(o);
               _.set(s, e.getAttribute('c-model'), o);
+              if (e.getAttribute('id'))
+              {
+                o.id(e.getAttribute('id'));
+              }
             }
           }
           else
@@ -349,12 +357,20 @@ class Common
             if (!this.isDefined(s[e.getAttribute('c-model')]))
             {
               s[e.getAttribute('c-model')] = new Observable;
+              if (e.getAttribute('id'))
+              {
+                s[e.getAttribute('c-model')].id(e.getAttribute('id'));
+              }
             }
             o = s[e.getAttribute('c-model')];
             if (!(o instanceof Observable) && !(o instanceof Computed))
             {
               o = new Observable(o);
               s[e.getAttribute('c-model')] = o;
+              if (e.getAttribute('id'))
+              {
+                s[e.getAttribute('c-model')].id(e.getAttribute('id'));
+              }
             }
           }
           if (this.isDefined(e.value))
@@ -369,7 +385,7 @@ class Common
           }
           if (e.hasAttribute('c-change'))
           {
-            e.onchange = () => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change'));};
+            e.onchange = () => {o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change')); if (e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); e.focus();}};
           }
           else
           {
@@ -385,7 +401,7 @@ class Common
           }
           if (e.hasAttribute('c-keydown'))
           {
-            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
+            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown')); if (e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); e.focus();}};
           }
           else
           {
@@ -393,7 +409,7 @@ class Common
           }
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup'));};
+            e.onkeyup = () => {o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup')); if (e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); e.focus();}};
           }
           else
           {
@@ -1991,6 +2007,23 @@ class Computed extends Observable
       this.notify();
     }
     deps.forEach(dep => dep.subscribe(listener));
+  }
+  // }}}
+  // {{{ e()
+  e()
+  {
+    let r = null;
+    if (typeof this.id !== 'undefined')
+    {
+      r = document.getElementById(this.id);
+    }
+    return r;
+  }
+  // }}}
+  // {{{ id()
+  id(v)
+  {
+    this.id = v;
   }
   // }}}
   // {{{ get v()

@@ -99,7 +99,7 @@ class Common
       {
         return (Number(v1) / Number(v2));
       });
-      Handlebars.registerHelper('eachWhen', (a, k, v, options) =>
+      Handlebars.registerHelper('eachFilter', (a, k, v, options) =>
       {
         let result = '';
         a.forEach((subv, subk) =>

@@ -1919,7 +1919,7 @@ class Observable
   // {{{ e()
   e()
   {
-    document.getElementById(this.id);
+    return document.getElementById(this.id);
   }
   // }}}
   // {{{ notify()

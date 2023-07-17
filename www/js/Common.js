@@ -91,6 +91,10 @@ class Common
       {
         return (Number(v1) + Number(v2));
       });
+      Handlebars.registerHelper('capitalize', (v) =>
+      {
+        return (((v instanceof String) && v.length > 0)?v.charAt(0).toUpperCase() + v.substr(1).toLowerCase():v);
+      });
       Handlebars.registerHelper('concat', (v1, v2) =>
       {
         return (v1 + v2);
@@ -222,10 +226,54 @@ class Common
       {
         return this.formatNumberShort(value, decimalLength, thousandsSep, decimalSep);
       });
+      Handlebars.registerHelper('removeSpaces', (v) =>
+      {
+        return (((v instanceof String) && v.length > 0)?v.replace(/ /g, ''):v);
+      });
       Handlebars.registerHelper('subtract', (v1, v2) =>
       {
         return (Number(v1) - Number(v2));
       });
+      Handlebars.registerHelper('telephone', (v) =>
+      {
+        if (!v)
+        {
+          return '';
+        }
+        var value = v.toString().trim().replace(/^\+/, '');
+        if (value.match(/[^0-9]/))
+        {
+          return v;
+        }
+        var country, city, number;
+        switch (value.length)
+        {
+          case 10: // +1PPP####### -> C (PPP) ###-####
+            country = 1;
+            city = value.slice(0, 3);
+            number = value.slice(3);
+            break;
+          case 11: // +CPPP####### -> CCC (PP) ###-####
+            country = value[0];
+            city = value.slice(1, 4);
+            number = value.slice(4);
+            break;
+          case 12: // +CCCPP####### -> CCC (PP) ###-####
+            country = value.slice(0, 3);
+            city = value.slice(3, 5);
+            number = value.slice(5);
+            break;
+          default:
+            return v;
+        }
+        if (country == 1)
+        {
+          country = "";
+        }
+        number = number.slice(0, 3) + '-' + number.slice(3);
+        return (country + " (" + city + ") " + number).trim();
+      });
+      Handlebars.registerHelper('urlEncode', window.encodedURIComponent);
     }
   }
   // }}}

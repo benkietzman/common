@@ -385,11 +385,11 @@ class Common
           }
           if (e.hasAttribute('c-change'))
           {
-            e.onchange = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change')); if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); if (this.isDefined(o.id)) {o.e().focus();}}};
+            e.onchange = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change')); if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); if (this.isDefined(o.id)) {o.e().focus();}} };
           }
           else
           {
-            e.onchange = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}}};
+            e.onchange = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}} };
           }
           if (e.hasAttribute('c-click'))
           {
@@ -409,11 +409,11 @@ class Common
           }
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup')); if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}}};
+            e.onkeyup = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup')); if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}} };
           }
           else
           {
-            e.onkeyup = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();} if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}}};
+            e.onkeyup = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();} if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}} };
           }
         });
       }

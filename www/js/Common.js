@@ -787,124 +787,116 @@ class Common
       request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
-        let error = {};
         this.login.info = null;
-        if (this.wsResponse(response, error))
+        if (this.m_strLoginType == null)
         {
-          if (this.m_strLoginType == null)
+          this.m_strLoginType = 'password';
+          if (this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
-            this.m_strLoginType = 'password';
-            if (this.isDefined(response.Response.Module) && response.Response.Module != '')
-            {
-              this.m_strLoginType = response.Response.Module;
-            }
+            this.m_strLoginType = response.Response.Module;
           }
-          fetch('/include/common_addons/auth/modules.json',
+        }
+        fetch('/include/common_addons/auth/modules.json',
+        {
+          method: 'GET',
+          headers:
           {
-            method: 'GET',
-            headers:
-            {
-              'Content-Type': 'application/json'
-            }
-          })
-          .then((response) =>
+            'Content-Type': 'application/json'
+          }
+        })
+        .then((response) =>
+        {
+          let request = null;
+          response = ((response.status == 200)?response.json():{});
+          request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
+          request.Request.Type = this.m_strLoginType;
+          if (window.localStorage.getItem('sl_uniqueID'))
           {
-            let request = null;
-            response = ((response.status == 200)?response.json():{});
-            request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
-            request.Request.Type = this.m_strLoginType;
-            if (window.localStorage.getItem('sl_uniqueID'))
+            request.Request.UniqueID = window.localStorage.getItem('sl_uniqueID');
+          }
+          if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
+          {
+            request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
+          }
+          this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+          {
+            let error = {};
+            this.login.info = null;
+            if (this.wsResponse(response, error))
             {
-              request.Request.UniqueID = window.localStorage.getItem('sl_uniqueID');
-            }
-            if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
-            {
-              request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
-            }
-            this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
-            {
-              let error = {};
-              this.login.info = null;
-              if (this.wsResponse(response, error))
+              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1 && response.Error.Message.search('Failed to find key.') == -1)
               {
-                if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1 && response.Error.Message.search('Failed to find key.') == -1)
+                this.login.message = response.Error.Message;
+              }
+              if (this.isDefined(response.Response.auth))
+              {
+                this.m_auth = null;
+                this.m_auth = response.Response.auth;
+                this.m_bHaveAuth = true;
+                if (this.isDefined(response.Response.jwt))
                 {
-                  this.login.message = response.Error.Message;
+                  window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
                 }
-                if (this.isDefined(response.Response.auth))
+                if (this.isDefined(this.m_auth.login_title))
                 {
-                  this.m_auth = null;
-                  this.m_auth = response.Response.auth;
-                  this.m_bHaveAuth = true;
-                  if (this.isDefined(response.Response.jwt))
+                  if (!this.isDefined(this.login.login) || !this.login.login)
                   {
-                    window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
+                    this.login.login = {};
                   }
-                  if (this.isDefined(this.m_auth.login_title))
+                  this.login.login.title = this.m_auth.login_title;
+                  if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
                   {
-                    if (!this.isDefined(this.login.login) || !this.login.login)
-                    {
-                      this.login.login = {};
-                    }
-                    this.login.login.title = this.m_auth.login_title;
-                    if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
-                    {
-                      this.login.showForm = true;
-                    }
+                    this.login.showForm = true;
                   }
-                  if (this.isValid())
+                }
+                if (this.isValid())
+                {
+                  this.dispatchEvent('resetMenu', null);
+                  document.location.href = this.m_strRedirectPath;
+                }
+                else
+                {
+                  let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
+                  request.Request = {Type: this.m_strLoginType, Return: document.location.href};
+                  this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                   {
-                    this.dispatchEvent('resetMenu', null);
-                    document.location.href = this.m_strRedirectPath;
-                  }
-                  else
-                  {
-                    let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
-                    request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                    this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+                    let error = {};
+                    this.login.info = null;
+                    if (this.wsResponse(response, error))
                     {
-                      let error = {};
-                      this.login.info = null;
-                      if (this.wsResponse(response, error))
+                      if (common.isDefined(response.Response))
                       {
-                        if (common.isDefined(response.Response))
+                        if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
                         {
-                          if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
-                          {
-                            window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
-                          }
-                          if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
-                          {
-                            this.dispatchEvent('resetMenu', null);
-                            document.location.href = response.Response.Redirect;
-                          }
+                          window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
+                        }
+                        if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                        {
+                          this.dispatchEvent('resetMenu', null);
+                          document.location.href = response.Response.Redirect;
                         }
                       }
-                      else
-                      {
-                        this.login.message = error.message;
-                      }
-                      this.render(this.id, 'Login', this.component);
-                    });
-                  }
-                }
-                if (this.isDefined(error.message))
-                {
-                  this.login.message = error.message;
+                    }
+                    else
+                    {
+                      this.login.message = error.message;
+                    }
+                    this.render(this.id, 'Login', this.component);
+                  });
                 }
               }
-              else
+              if (this.isDefined(error.message))
               {
                 this.login.message = error.message;
               }
-              this.render(this.id, 'Login', this.component);
-            });
+            }
+            else
+            {
+              this.login.message = error.message;
+            }
+            this.render(this.id, 'Login', this.component);
           });
-        }
-        else
-        {
-          this.login.message = error.message;
-        }
+        });
       });
     }
     else
@@ -997,47 +989,39 @@ class Common
         request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
         this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
         {
-          let error = {};
           this.logout.info = null;
-          if (this.wsResponse(response, error))
+          if (this.m_strLoginType == null)
           {
-            if (this.m_strLoginType == null)
+            this.m_strLoginType = 'password';
+            if (this.isDefined(response.Response.Module) && response.Response.Module != '')
             {
-              this.m_strLoginType = 'password';
-              if (this.isDefined(response.Response.Module) && response.Response.Module != '')
+              this.m_strLoginType = response.Response.Module;
+            }
+          }
+          let request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
+          request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+          this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+          {
+            let error = {};
+            this.logout.info = null;
+            if (this.wsResponse(response, error))
+            {
+              if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
               {
-                this.m_strLoginType = response.Response.Module;
+                this.m_bHaveAuth = false;
+                this.m_auth = null;
+                this.m_auth = {admin: false, apps: {}};
+                window.localStorage.removeItem('sl_wsJwt');
+                window.localStorage.removeItem('sl_uniqueID');
+                this.dispatchEvent('resetMenu', null);
+                document.location.href = response.Response.Redirect;
               }
             }
-            let request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
-            request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
-            this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+            else
             {
-              let error = {};
-              this.logout.info = null;
-              if (this.wsResponse(response, error))
-              {
-                if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
-                {
-                  this.m_bHaveAuth = false;
-                  this.m_auth = null;
-                  this.m_auth = {admin: false, apps: {}};
-                  window.localStorage.removeItem('sl_wsJwt');
-                  window.localStorage.removeItem('sl_uniqueID');
-                  this.dispatchEvent('resetMenu', null);
-                  document.location.href = response.Response.Redirect;
-                }
-              }
-              else
-              {
-                this.logout.message = error.message;
-              }
-            });
-          }
-          else
-          {
-            this.logout.message = error.message;
-          }
+              this.logout.message = error.message;
+            }
+          });
         });
       }
       else

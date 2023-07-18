@@ -66,7 +66,7 @@ export default
         <div id="central-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-change="go()" c-model="application">
             {{#each c.centralMenu.applications}}
-            <option value="{{@key}}">{{name}}</option>
+            <option value="{{./}}">{{./name}}</option>
             {{/each}}
           </select>
         </div>

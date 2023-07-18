@@ -18,7 +18,7 @@ export default
       c: c,
       go: () =>
       {
-        document.location.href = c.centralMenu.applications[s.application.value].website;
+        document.location.href = c.centralMenu.applications[s.application.v].website;
       },
       slideMenu: () =>
       {
@@ -45,7 +45,7 @@ export default
               c.centralMenu.applications.push(response.Response[i]);
               if (response.Response[i].name == c.application)
               {
-                s.application.value = unIndex;
+                s.application.v = unIndex;
               }
               unIndex++;
             }

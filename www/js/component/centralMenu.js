@@ -41,7 +41,7 @@ export default
           {
             if ((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2)
             {
-              c.centralMenu.applications[response.Response[i].id] = response.Response[i]);
+              c.centralMenu.applications[response.Response[i].id] = response.Response[i];
               if (response.Response[i].name == c.application)
               {
                 s.application.v = response.Response[i].id;

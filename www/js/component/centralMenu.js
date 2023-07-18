@@ -36,18 +36,16 @@ export default
         let error = {};
         if (c.wsResponse(response, error))
         {
-          let unIndex = 0;
           c.centralMenu.applications = [];
           for (let i = 0; i < response.Response.length; i++)
           {
             if ((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2)
             {
-              c.centralMenu.applications.push(response.Response[i]);
+              c.centralMenu.applications[response.Response[i].id] = response.Response[i]);
               if (response.Response[i].name == c.application)
               {
-                s.application.v = unIndex;
+                s.application.v = response.Response[i].id;
               }
-              unIndex++;
             }
           }
         }
@@ -66,7 +64,7 @@ export default
         <div id="central-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-change="go()" c-model="application">
             {{#each c.centralMenu.applications}}
-            <option value="{{.}}">{{./name}}</option>
+            <option value="{{@key}}">{{name}}</option>
             {{/each}}
           </select>
         </div>

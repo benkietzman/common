@@ -276,7 +276,7 @@ class Common
         number = number.slice(0, 3) + '-' + number.slice(3);
         return (country + " (" + city + ") " + number).trim();
       });
-      Handlebars.registerHelper('urlEncode', window.encodedURIComponent);
+      Handlebars.registerHelper('urlEncode', encodeURIComponent);
     }
   }
   // }}}

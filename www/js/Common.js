@@ -597,6 +597,23 @@ class Common
     return strValue;
   }
   // }}}
+  // {{{ getParam()
+  getParam(nav, param)
+  {
+    let result = null;
+    
+    if (this.isObject(nav.data) && this.isDefined(nav.data[param]))
+    {
+      result = nav.data[param];
+    }
+    else if (this.isObject(nav.params) && this.isDefined(nav.params[param]))
+    {
+      result = nav.params[param];
+    }
+
+    return result;
+  }
+  // }}}
   // {{{ getRedirectPath()
   getRedirectPath()
   {
@@ -777,6 +794,12 @@ class Common
       this.autoLoads[id] = c.default;
       this.load(id);
     }
+  }
+  // }}}
+  // {{{ paramDefined()
+  paramDefined(nav, param)
+  {
+    return ((this.isObject(nav.data) && this.isDefined(nav.data[param])) || (this.isObject(nav.params) && this.isDefined(nav.params[param])));
   }
   // }}}
   // {{{ processLogin()

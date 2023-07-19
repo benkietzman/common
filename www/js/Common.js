@@ -757,6 +757,12 @@ class Common
     return bResult;
   }
   // }}}
+  // {{{ isParam()
+  isParam(nav, param)
+  {
+    return ((this.isObject(nav.data) && this.isDefined(nav.data[param])) || (this.isObject(nav.params) && this.isDefined(nav.params[param])));
+  }
+  // }}}
   // {{{ isValid()
   isValid(strApplication)
   {
@@ -794,12 +800,6 @@ class Common
       this.autoLoads[id] = c.default;
       this.load(id);
     }
-  }
-  // }}}
-  // {{{ paramDefined()
-  paramDefined(nav, param)
-  {
-    return ((this.isObject(nav.data) && this.isDefined(nav.data[param])) || (this.isObject(nav.params) && this.isDefined(nav.params[param])));
   }
   // }}}
   // {{{ processLogin()

@@ -108,13 +108,16 @@ class Common
         let result = '';
         let subk = (((k instanceof Observable) || (k instanceof Computed))?k.v:k);
         let subv = (((v instanceof Observable) || (v instanceof Computed))?v.v:v);
-        a.forEach((deepv, deepk) =>
+        if (this.isArray(a) || this.isObject(a))
         {
-          if (this.isDefined(deepv[subk]) && deepv[subk].search(new RegExp(subv, 'i')) != -1)
+          a.forEach((deepv, deepk) =>
           {
-            result += options.fn(deepv);
-          }
-        });
+            if (this.isDefined(deepv[subk]) && deepv[subk].search(new RegExp(subv, 'i')) != -1)
+            {
+              result += options.fn(deepv);
+            }
+          });
+        }
         return result;
       });
       Handlebars.registerHelper('for', (from, to, incr, options) =>

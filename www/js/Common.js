@@ -427,7 +427,7 @@ class Common
           if (this.isDefined(e.value))
           {
             e.value = o.v;
-            o.subscribe(() => e.v = o.v);
+            o.subscribe(() => e.value = o.v);
           }
           else if (this.isDefined(e.innerHTML))
           {

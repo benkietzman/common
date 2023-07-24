@@ -380,6 +380,7 @@ class Common
       {
         document.querySelectorAll('#' + id + ' [c-model]').forEach(e =>
         {
+          // {{{ init
           let o = null;
           if (typeof _ !== 'undefined')
           {
@@ -424,48 +425,155 @@ class Common
               }
             }
           }
+          // }}}
+          // {{{ value
           if (this.isDefined(e.value))
           {
-            e.value = o.v;
-            o.subscribe(() => e.value = o.v);
+            e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+            o.subscribe(() => {e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);});
           }
           else if (this.isDefined(e.innerHTML))
           {
-            e.innerHTML = o.v;
-            o.subscribe(() => e.innerHTML = o.v);
+            e.innerHTML = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+            o.subscribe(() => {e.innerHTML = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);});
           }
+          // }}}
+          // {{{ change
           if (e.hasAttribute('c-change'))
           {
-            e.onchange = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} eval('s.' + e.getAttribute('c-change')); if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component); if (this.isDefined(o.id)) {o.e().focus();}} };
+            e.onchange = () =>
+            {
+              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let c = ((o.v != v)?true:false);
+              o.v = v;
+              if (this.isDefined(o.onchange))
+              {
+                o.onchange();
+              }
+              eval('s.' + e.getAttribute('c-change'));
+              if (c && e.hasAttribute('c-render'))
+              {
+                this.render(this.id, this.name, this.component);
+                if (this.isDefined(o.id))
+                {
+                  o.e().focus();
+                }
+              }
+            };
           }
           else
           {
-            e.onchange = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onchange)) {o.onchange();} if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}} };
+            e.onchange = () =>
+            {
+              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let c = ((o.v != v)?true:false);
+              o.v = v;
+              if (this.isDefined(o.onchange))
+              {
+                o.onchange();
+              }
+              if (c && e.hasAttribute('c-render'))
+              {
+                this.render(this.id, this.name, this.component);
+                if (this.isDefined(o.id))
+                {
+                  o.e().focus();
+                }
+              }
+            };
           }
+          // }}}
+          // {{{ click
           if (e.hasAttribute('c-click'))
           {
-            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();} eval('s.' + e.getAttribute('c-click'));};
+            e.onclick = () =>
+            {
+              if (this.isDefined(o.onclick))
+              {
+                o.onclick();
+              }
+              eval('s.' + e.getAttribute('c-click'));
+            };
           }
           else
           {
-            e.onclick = () => {if (this.isDefined(o.onclick)) {o.onclick();}};
+            e.onclick = () =>
+            {
+              if (this.isDefined(o.onclick))
+              {
+                o.onclick();
+              }
+            };
           }
+          // }}}
+          // {{{ keydown
           if (e.hasAttribute('c-keydown'))
           {
-            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}; eval('s.' + e.getAttribute('c-keydown'));};
+            e.onkeydown = () =>
+            {
+              if (this.isDefined(o.onkeydown))
+              {
+                o.onkeydown();
+              }
+              eval('s.' + e.getAttribute('c-keydown'));
+            };
           }
           else
           {
-            e.onkeydown = () => {if (this.isDefined(o.onkeydown)) {o.onkeydown();}};
+            e.onkeydown = () =>
+            {
+              if (this.isDefined(o.onkeydown))
+              {
+                o.onkeydown();
+              }
+            };
           }
+          // }}}
+          // {{{ keyup
           if (e.hasAttribute('c-keyup'))
           {
-            e.onkeyup = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();}; eval('s.' + e.getAttribute('c-keyup')); if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}} };
+            e.onkeyup = () =>
+            {
+              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let c = ((o.v != v)?true:false);
+              o.v = v;
+              if (this.isDefined(o.onkeyup))
+              {
+                o.onkeyup();
+              }
+              eval('s.' + e.getAttribute('c-keyup'));
+              if (c && e.hasAttribute('c-render'))
+              {
+                this.render(this.id, this.name, this.component);
+                if (this.isDefined(o.id))
+                {
+                  o.e().focus();
+                }
+              }
+            };
           }
           else
           {
-            e.onkeyup = () => {let bChanged = ((o.v != e.value)?true:false); o.v = e.value; if (this.isDefined(o.onkeyup)) {o.onkeyup();} if (bChanged && e.hasAttribute('c-render')) {this.render(this.id, this.name, this.component);  if (this.isDefined(o.id)) {o.e().focus();}} };
+            e.onkeyup = () =>
+            {
+              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let c = ((o.v != v)?true:false);
+              o.v = v;
+              if (this.isDefined(o.onkeyup))
+              {
+                o.onkeyup();
+              }
+              if (c && e.hasAttribute('c-render'))
+              {
+                this.render(this.id, this.name, this.component);
+                if (this.isDefined(o.id))
+                {
+                  o.e().focus();
+                }
+              }
+            };
           }
+          // }}}
         });
       }
     }
@@ -1983,7 +2091,7 @@ class Common
 class Observable
 {
   // {{{ constructor()
-  constructor(val, id)
+  constructor(val)
   {
     this.listeners = [];
     this.val = ((typeof val !== 'undefined')?val:'');

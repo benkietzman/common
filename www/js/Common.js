@@ -443,7 +443,7 @@ class Common
           {
             e.onchange = () =>
             {
-              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
               o.v = v;
               if (this.isDefined(o.onchange))
@@ -465,7 +465,7 @@ class Common
           {
             e.onchange = () =>
             {
-              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
               o.v = v;
               if (this.isDefined(o.onchange))
@@ -534,7 +534,7 @@ class Common
           {
             e.onkeyup = () =>
             {
-              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
               o.v = v;
               if (this.isDefined(o.onkeyup))
@@ -556,7 +556,7 @@ class Common
           {
             e.onkeyup = () =>
             {
-              let v = ((e.hasAttribute('c-json')?JSON.parse(e.value):e.value);
+              let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
               o.v = v;
               if (this.isDefined(o.onkeyup))

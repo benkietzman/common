@@ -69,7 +69,7 @@ class Common
       }
       else
       {
-        this.router = new Navigo('/', {hash: true});
+        this.router = new Navigo('/', {hash: true, strategy: 'ONE'});
       }
       this.routes(options.routes);
     }

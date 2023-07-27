@@ -747,6 +747,10 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
         {
           $rootScope.$root.$broadcast('bridgePurpose_status', response);
         }
+        if (response.radialPurpose && response.radialPurpose == 'status')
+        {
+          $rootScope.$root.$broadcast('radialPurpose_status', response);
+        }
       });
     }
 

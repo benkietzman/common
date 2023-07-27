@@ -42,9 +42,9 @@ export default
   template: `
     {{#if stat}}
     <div style="background: black; border-radius: 10px; bottom: 4px; color: orange; display: inline-block; opacity: 0.8; left: 4px; padding: 8px 16px 12px 16px; position: fixed;">
-      {{stat.radialFunction}}
-      --&gt;
       {{stat.radialInterface}}
+      --&gt;
+      {{stat.radialFunction}}
       {{#if stat.Function}}
         --&gt;
         {{stat.Function}}

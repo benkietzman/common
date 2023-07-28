@@ -106,15 +106,33 @@ class Common
       Handlebars.registerHelper('eachFilter', (a, k, v, options) =>
       {
         let result = '';
-        let subk = (((k instanceof Observable) || (k instanceof Computed))?k.v:k);
+        let subks = [];
+        if (c.isArray(k))
+        {
+          for (let i = 0; i < k.length; i++)
+          {
+            subks.push(((k instanceof Observable) || (k instanceof Computed))?k[i].v:k[i]);
+          }
+        }
+        else if ((k instanceof Observable) || (k instanceof Computed))
+        {
+          subks.push(k.v);
+        }
+        else
+        {
+          subks.push(k);
+        }
         let subv = (((v instanceof Observable) || (v instanceof Computed))?v.v:v);
         if (this.isArray(a) || this.isObject(a))
         {
           a.forEach((deepv, deepk) =>
           {
-            if (this.isDefined(deepv[subk]) && deepv[subk].search(new RegExp(subv, 'i')) != -1)
+            for (let i = 0; i < subks.length; i++)
             {
-              result += options.fn(deepv);
+              if (this.isDefined(deepv[subk[i]]) && deepv[subk[i]].search(new RegExp(subv, 'i')) != -1)
+              {
+                result += options.fn(deepv);
+              }
             }
           });
         }

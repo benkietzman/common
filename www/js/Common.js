@@ -129,7 +129,7 @@ class Common
           {
             for (let i = 0; i < subks.length; i++)
             {
-              if (this.isDefined(deepv[subk[i]]) && deepv[subk[i]].search(new RegExp(subv, 'i')) != -1)
+              if (this.isDefined(deepv[subks[i]]) && deepv[subks[i]].search(new RegExp(subv, 'i')) != -1)
               {
                 result += options.fn(deepv);
               }

@@ -107,7 +107,7 @@ class Common
       {
         let result = '';
         let subks = [];
-        if (c.isArray(k))
+        if (this.isArray(k))
         {
           for (let i = 0; i < k.length; i++)
           {

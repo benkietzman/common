@@ -127,12 +127,17 @@ class Common
         {
           a.forEach((deepv, deepk) =>
           {
-            for (let i = 0; i < subks.length; i++)
+            let m = false;
+            for (let i = 0; !m && i < subks.length; i++)
             {
               if (this.isDefined(deepv[subks[i]]) && deepv[subks[i]].search(new RegExp(subv, 'i')) != -1)
               {
-                result += options.fn(deepv);
+                m = true;
               }
+            }
+            if (m)
+            {
+              result += options.fn(deepv);
             }
           });
         }

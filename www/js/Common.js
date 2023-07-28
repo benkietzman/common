@@ -120,7 +120,7 @@ class Common
         }
         else
         {
-          subks.push(k);
+          subks = k.split(',');
         }
         let subv = (((v instanceof Observable) || (v instanceof Computed))?v.v:v);
         if (this.isArray(a) || this.isObject(a))

@@ -111,7 +111,7 @@ class Common
         {
           for (let i = 0; i < k.length; i++)
           {
-            subks.push(((k instanceof Observable) || (k instanceof Computed))?k[i].v:k[i]);
+            subks.push(((k[i] instanceof Observable) || (k[i] instanceof Computed))?k[i].v:k[i]);
           }
         }
         else if ((k instanceof Observable) || (k instanceof Computed))

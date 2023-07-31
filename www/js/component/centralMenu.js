@@ -41,7 +41,7 @@ export default
           {
             if ((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2)
             {
-              s.applications[response.Response[i].name] = response.Response[i];
+              s.applications.push(response.Response[i]);
               if (response.Response[i].name == c.application)
               {
                 s.application.v = response.Response[i];
@@ -64,7 +64,7 @@ export default
         <div id="central-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-change="go()" c-model="application" c-json>
             {{#each applications}}
-            <option value="{{json .}}">{{@key}}</option>
+            <option value="{{json .}}">{{name}}</option>
             {{/each}}
           </select>
         </div>

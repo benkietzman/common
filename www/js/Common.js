@@ -1801,6 +1801,12 @@ class Common
     }
   }
   // }}}
+  // {{{ update()
+  update()
+  {
+    this.render(this.id, this.name, this.component);
+  } 
+  // }}}
   // {{{ wsCreate()
   wsCreate(strName, strServer, strPort, bSecure, strProtocol)
   {

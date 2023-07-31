@@ -48,6 +48,7 @@ export default
               }
             }
           }
+console.log(s.applications);
         }
         c.render(id, this);
       });

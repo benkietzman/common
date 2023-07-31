@@ -41,10 +41,10 @@ export default
           {
             if ((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2)
             {
-              c.centralMenu.applications[response.Response[i].id] = response.Response[i];
+              c.centralMenu.applications[response.Response[i].name] = response.Response[i];
               if (response.Response[i].name == c.application)
               {
-                s.application.v = response.Response[i].id;
+                s.application.v = response.Response[i].name;
               }
             }
           }
@@ -64,7 +64,7 @@ export default
         <div id="central-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-change="go()" c-model="application">
             {{#each c.centralMenu.applications}}
-            <option value="{{@key}}">{{name}}</option>
+            <option value="{{./name}}">{{@key}}</option>
             {{/each}}
           </select>
         </div>

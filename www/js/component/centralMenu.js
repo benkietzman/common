@@ -48,9 +48,8 @@ export default
               }
             }
           }
-console.log(s.applications);
+          c.render(id, this);
         }
-        c.render(id, this);
       });
     });
     // }}}
@@ -63,7 +62,6 @@ console.log(s.applications);
         <button id="central-slide-opener" class="btn btn-sm btn-success float-start" c-click="slideMenu()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;">&#8803;</button>
         {{#if c.centralMenu.show}}
         <div id="central-slide-content" style="padding: 10px;">
-{{json applications}}
           <select class="form-control form-control-sm" c-change="go()" c-model="application" c-json>
             {{#each applications}}
             <option value="{{json .}}">{{@key}}</option>

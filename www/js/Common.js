@@ -1802,9 +1802,12 @@ class Common
   }
   // }}}
   // {{{ update()
-  update()
+  update(name)
   {
-    this.render(this.id, this.name, this.component);
+    if (this.name == name)
+    {
+      this.render(this.id, this.name, this.component);
+    }
   } 
   // }}}
   // {{{ wsCreate()

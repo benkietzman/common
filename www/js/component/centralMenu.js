@@ -18,7 +18,7 @@ export default
       c: c,
       go: () =>
       {
-        document.location.href = c.centralMenu.applications[s.application.v].website;
+        document.location.href = s.application.v.website;
       },
       slideMenu: () =>
       {
@@ -36,15 +36,15 @@ export default
         let error = {};
         if (c.wsResponse(response, error))
         {
-          c.centralMenu.applications = [];
+          s.applications = [];
           for (let i = 0; i < response.Response.length; i++)
           {
             if ((response.Response[i].menu_id == 1 && c.isValid()) || response.Response[i].menu_id == 2)
             {
-              c.centralMenu.applications[response.Response[i].name] = response.Response[i];
+              s.applications[response.Response[i].name] = response.Response[i];
               if (response.Response[i].name == c.application)
               {
-                s.application.v = response.Response[i].name;
+                s.application.v = response.Response[i];
               }
             }
           }
@@ -62,9 +62,9 @@ export default
         <button id="central-slide-opener" class="btn btn-sm btn-success float-start" c-click="slideMenu()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;">&#8803;</button>
         {{#if c.centralMenu.show}}
         <div id="central-slide-content" style="padding: 10px;">
-          <select class="form-control form-control-sm" c-change="go()" c-model="application">
-            {{#each c.centralMenu.applications}}
-            <option value="{{@key}}">{{@key}}</option>
+          <select class="form-control form-control-sm" c-change="go()" c-model="application" c-json>
+            {{#each applications}}
+            <option value="{{json .}}">{{@key}}</option>
             {{/each}}
           </select>
         </div>

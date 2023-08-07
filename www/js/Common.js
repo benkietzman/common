@@ -36,7 +36,6 @@ class Common
     if (this.isDefined(options.application))
     {
       this.application = options.application;
-      $http.post('/include/common/statistic.php', {'Application': strApplication}).then(function (response, error) {});
       fetch('/include/common/statistic.php',
       {
         method: 'POST',

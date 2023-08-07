@@ -43,7 +43,7 @@ class Common
         {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({'Application': strApplication})
+        body: JSON.stringify({'Application': this.application})
       });
     }
     if (this.isDefined(options.id))

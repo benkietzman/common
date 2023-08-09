@@ -198,7 +198,7 @@ class Common
       {
         return data[strIndex];
       });
-      Handlebars.registerHelper('isGlobalAdmin', (application, options) =>
+      Handlebars.registerHelper('isGlobalAdmin', (options) =>
       {
         if (this.isGlobalAdmin())
         {

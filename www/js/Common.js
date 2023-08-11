@@ -461,9 +461,9 @@ class Common
           // {{{ value
           if (this.isDefined(e.value))
           {
-            if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+            if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
             {
-              if (e.type == 'checkbox')
+              if (e.type == 'checkbox' || e.type == 'select-multiple')
               {
                 let values = o.v;
                 document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
@@ -490,7 +490,14 @@ class Common
                         bChecked = true;
                       }
                     }
-                    sube.checked = ((bChecked)?true:false);
+                    if (e.type == 'checkbox')
+                    {
+                      sube.checked = ((bChecked)?true:false);
+                    }
+                    else
+                    {
+                      sube.selected = ((bChecked)?true:false);
+                    }
                   }
                 });
               }
@@ -512,9 +519,9 @@ class Common
             }
             o.subscribe(() =>
             {
-              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
               {
-                if (e.type == 'checkbox')
+                if (e.type == 'checkbox' || e.type == 'select-multiple')
                 {
                   let values = o.v;
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
@@ -541,7 +548,14 @@ class Common
                           bChecked = true;
                         }
                       }
-                      sube.checked = ((bChecked)?true:false);
+                      if (e.type == 'checkbox')
+                      {
+                        sube.checked = ((bChecked)?true:false);
+                      }
+                      else
+                      {
+                        sube.selected = ((bChecked)?true:false);
+                      }
                     }
                   });
                 }
@@ -576,14 +590,14 @@ class Common
             {
               let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
-              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
               {
-                if (e.type == 'checkbox')
+                if (e.type == 'checkbox' || e.type == 'select-multiple')
                 {
                   let values = [];
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
-                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected))
                     {
                       values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }
@@ -626,14 +640,14 @@ class Common
             {
               let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
-              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
               {
-                if (e.type == 'checkbox')
+                if (e.type == 'checkbox' || e.type == 'select-multiple')
                 {
                   let values = [];
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
-                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected))
                     {
                       values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }

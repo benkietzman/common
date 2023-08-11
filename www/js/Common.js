@@ -597,7 +597,7 @@ class Common
                   let values = [];
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
-                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected))
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected)))
                     {
                       values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }
@@ -647,7 +647,7 @@ class Common
                   let values = [];
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
-                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected))
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected)))
                     {
                       values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }

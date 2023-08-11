@@ -461,8 +461,107 @@ class Common
           // {{{ value
           if (this.isDefined(e.value))
           {
-            e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
-            o.subscribe(() => {e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);});
+            if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+            {
+              if (e.type == 'checkbox')
+              {
+                let values = o.v;
+                document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                {
+                  if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
+                  {
+                    let bChecked = false;
+                    if (this.isArray(values))
+                    {
+                      for (let i = 0; !bChecked && i < values.length; i++)
+                      {
+                        let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values[i]):values[i]);
+                        if (sube.value == strValue)
+                        {
+                          bChecked = true;
+                        }
+                      }
+                    }
+                    else
+                    {
+                      let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values):values);
+                      if (sube.value == strValue)
+                      {
+                        bChecked = true;
+                      }
+                    }
+                    sube.checked = ((bChecked)?true:false);
+                  }
+                });
+              }
+              else
+              {
+                let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+                document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                {
+                  if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
+                  {
+                    sube.checked = ((sube.value == strValue)?true:false);
+                  }
+                });
+              }
+            }
+            else
+            {
+              e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+            }
+            o.subscribe(() =>
+            {
+              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+              {
+                if (e.type == 'checkbox')
+                {
+                  let values = o.v;
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
+                    {
+                      let bChecked = false;
+                      if (this.isArray(values))
+                      {
+                        for (let i = 0; !bChecked && i < values.length; i++)
+                        {
+                          let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values[i]):values[i]);
+                          if (sube.value == strValue)
+                          {
+                            bChecked = true;
+                          }
+                        }
+                      }
+                      else
+                      {
+                        let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values):values);
+                        if (sube.value == strValue)
+                        {
+                          bChecked = true;
+                        }
+                      }
+                      sube.checked = ((bChecked)?true:false);
+                    }
+                  });
+                }
+                else
+                {
+                  let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
+                    {
+                      sube.checked = ((sube.value == strValue)?true:false);
+                    }
+                  });
+                }
+              }
+              else
+              {
+                e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+              }
+            });
           }
           else if (this.isDefined(e.innerHTML))
           {
@@ -477,7 +576,35 @@ class Common
             {
               let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
-              o.v = v;
+              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+              {
+                if (e.type == 'checkbox')
+                {
+                  let values = [];
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    {
+                      values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
+                    }
+                  });
+                  o.v = values;
+                }
+                else
+                {
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    {
+                      o.v = ((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value);
+                    }
+                  });
+                }
+              }
+              else
+              {
+                o.v = v;
+              }
               if (this.isDefined(o.onchange))
               {
                 o.onchange();
@@ -499,7 +626,35 @@ class Common
             {
               let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
-              o.v = v;
+              if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio'))
+              {
+                if (e.type == 'checkbox')
+                {
+                  let values = [];
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    {
+                      values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
+                    }
+                  });
+                  o.v = values;
+                }
+                else
+                {
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    {
+                      o.v = ((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value);
+                    }
+                  });
+                }
+              }
+              else
+              {
+                o.v = v;
+              }
               if (this.isDefined(o.onchange))
               {
                 o.onchange();

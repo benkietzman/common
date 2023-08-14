@@ -2050,7 +2050,7 @@ class Common
         setTimeout(() =>
         {
           this.m_ws[strName].Attempts++;
-          this.wsCreate(this.application, strName, strServer, strPort, bSecure, strProtocol);
+          this.wsCreate(strName, strServer, strPort, bSecure, strProtocol);
         }, (Math.random() * maxInterval));
       };
       // }}}

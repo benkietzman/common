@@ -2032,7 +2032,7 @@ class Common
       // {{{ WebSocket::onclose()
       this.m_ws[strName].ws.onclose = (e) =>
       {
-        let maxInterval = (Math.pow(2, this.m_wsAttempts) - 1) * 1000;
+        let maxInterval = (Math.pow(2, this.m_ws[strName].Attempts) - 1) * 1000;
         console.log(e);
         this.m_bConnecting = false;
         this.m_bSentJwt = false;

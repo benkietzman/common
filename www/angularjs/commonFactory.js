@@ -572,7 +572,7 @@ factories.common = function ($cookies, $http, $location, $q, $rootScope, $uibMod
       });
       this.m_ws[strName].ws.onClose(function (ev)
       {
-        var maxInterval = (Math.pow(2, factory.m_wsAttempts) - 1) * 1000;
+        var maxInterval = (Math.pow(2, factory.m_ws[strName].Attempts) - 1) * 1000;
         console.log(ev);
         factory.m_bConnecting = false;
         factory.m_bSentJwt = false;

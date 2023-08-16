@@ -463,112 +463,160 @@ class Common
           {
             if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
             {
-              if (e.type == 'checkbox' || e.type == 'select-multiple')
+              if (e.type == 'checkbox')
               {
-                let values = o.v;
+                let v = o.v;
                 document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                 {
                   if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
                   {
-                    let bChecked = false;
-                    if (this.isArray(values))
+                    let s = false;
+                    if (this.isArray(v))
                     {
-                      for (let i = 0; !bChecked && i < values.length; i++)
+                      for (let i = 0; !s && i < v.length; i++)
                       {
-                        let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values[i]):values[i]);
-                        if (sube.value == strValue)
+                        let sv = ((e.hasAttribute('c-json'))?JSON.stringify(v[i]):v[i]);
+                        if (sube.value == sv)
                         {
-                          bChecked = true;
+                          s = true;
                         }
                       }
                     }
                     else
                     {
-                      let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values):values);
-                      if (sube.value == strValue)
+                      let sv = ((e.hasAttribute('c-json'))?JSON.stringify(v):v);
+                      if (sube.value == sv)
                       {
-                        bChecked = true;
+                        s = true;
                       }
                     }
-                    if (e.type == 'checkbox')
+                    if (sube.checked != s)
                     {
-                      sube.checked = ((bChecked)?true:false);
-                    }
-                    else
-                    {
-                      sube.selected = ((bChecked)?true:false);
+                      sube.checked = s;
                     }
                   }
                 });
               }
-              else
+              else if (e.type == 'radio')
               {
-                let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+                let sv = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
                 document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                 {
                   if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
                   {
-                    sube.checked = ((sube.value == strValue)?true:false);
+                    let s = ((sube.value == sv)?true:false);
+                    if (sube.checked != s)
+                    {
+                      sube.checked = s;
+                    }
                   }
                 });
+              }
+              else if (e.type == 'select-multiple')
+              {
+                let v = o.v;
+                if (!this.isArray(v))
+                {
+                  v = [o.v];
+                }
+                for (let i = 0; i < e.options.length; i++)
+                {
+                  let s = false;
+                  for (let j = 0; !s && j < v.length; j++)
+                  {
+                    let sv = ((e.hasAttribute('c-json'))?JSON.stringify(v[j]):v[j]);
+                    if (e.options[i].value == sv)
+                    {
+                      s = true;
+                    }
+                  }
+                  if (e.options[i].selected != s)
+                  {
+                    e.options[i].selected = s;
+                  }
+                }
               }
             }
             else
             {
               e.value = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
             }
-            o.subscribe(() =>
+            o.subscribe('bind', () =>
             {
               if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
               {
-                if (e.type == 'checkbox' || e.type == 'select-multiple')
+                if (e.type == 'checkbox')
                 {
-                  let values = o.v;
+                  let v = o.v;
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
                     if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
                     {
-                      let bChecked = false;
-                      if (this.isArray(values))
+                      let s = false;
+                      if (this.isArray(v))
                       {
-                        for (let i = 0; !bChecked && i < values.length; i++)
+                        for (let i = 0; !s && i < v.length; i++)
                         {
-                          let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values[i]):values[i]);
-                          if (sube.value == strValue)
+                          let sv = ((e.hasAttribute('c-json'))?JSON.stringify(v[i]):v[i]);
+                          if (sube.value == sv)
                           {
-                            bChecked = true;
+                            s = true;
                           }
                         }
                       }
                       else
                       {
-                        let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(values):values);
-                        if (sube.value == strValue)
+                        let sv = ((e.hasAttribute('c-json'))?JSON.stringify(v):v);
+                        if (sube.value == sv)
                         {
-                          bChecked = true;
+                          s = true;
                         }
                       }
-                      if (e.type == 'checkbox')
+                      if (sube.checked != s)
                       {
-                        sube.checked = ((bChecked)?true:false);
-                      }
-                      else
-                      {
-                        sube.selected = ((bChecked)?true:false);
+                        sube.checked = s;
                       }
                     }
                   });
                 }
-                else
+                else if (e.type == 'radio')
                 {
-                  let strValue = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
+                  let sv = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
                     if (e.getAttribute('c-model') == sube.getAttribute('c-model'))
                     {
-                      sube.checked = ((sube.value == strValue)?true:false);
+                      let s = ((sube.value == sv)?true:false);
+                      if (sube.checked != s)
+                      {
+                        sube.checked = s;
+                      }
                     }
                   });
+                }
+                else if (e.type == 'select-multiple')
+                {
+                  let v = o.v;
+                  if (!this.isArray(v))
+                  {
+                    v = [o.v];
+                  }
+                  for (let i = 0; i < e.options.length; i++)
+                  {
+                    let s = false;
+                    for (let j = 0; !s && j < v.length; j++)
+                    {
+                      let sv = ((e.hasAttribute('c-json'))?JSON.stringify(v[j]):v[j]);
+                      if (e.options[i].value == sv)
+                      {
+                        s = true;
+                      }
+                    }
+                    if (e.options[i].selected != s)
+                    {
+                      e.options[i].selected = s;
+                    }
+                  }
                 }
               }
               else
@@ -580,7 +628,7 @@ class Common
           else if (this.isDefined(e.innerHTML))
           {
             e.innerHTML = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);
-            o.subscribe(() => {e.innerHTML = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);});
+            o.subscribe('bind', () => {e.innerHTML = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);});
           }
           // }}}
           // {{{ change
@@ -588,36 +636,66 @@ class Common
           {
             e.onchange = () =>
             {
-              let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
-              let c = ((o.v != v)?true:false);
+              let c = false;
               if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
               {
-                if (e.type == 'checkbox' || e.type == 'select-multiple')
+                if (e.type == 'checkbox')
                 {
-                  let values = [];
-                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
-                  {
-                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected)))
-                    {
-                      values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
-                    }
-                  });
-                  o.v = values;
-                }
-                else
-                {
+                  let v = [];
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
                     if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
                     {
-                      o.v = ((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value);
+                      v.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }
                   });
+                  c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
+                  if (c)
+                  {
+                    o.v = v;
+                  }
+                }
+                else if (e.type == 'radio')
+                {
+                  let v = '';
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    {
+                      v = ((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value);
+                    }
+                  });
+                  c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
+                  if (c)
+                  {
+                    o.v = v;
+                  }
+                }
+                else if (e.type == 'select-multiple')
+                {
+                  let v = [];
+                  for (let i = 0; i < e.options.length; i++)
+                  {
+                    if (e.options[i].selected)
+                    {
+                      v.push(((e.hasAttribute('c-json'))?JSON.parse(e.options[i].value):e.options[i].value));
+                    }
+                  }
+                  c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
+                  if (c)
+                  {
+                    o.v = v;
+                  }
                 }
               }
               else
               {
-                o.v = v;
+                let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
+                c = ((o.v != v)?true:false);
+                if (c)
+                {
+                  o.v = v;
+                }
               }
               if (this.isDefined(o.onchange))
               {
@@ -642,32 +720,63 @@ class Common
               let c = ((o.v != v)?true:false);
               if (this.isDefined(e.type) && (e.type == 'checkbox' || e.type == 'radio' || e.type == 'select-multiple'))
               {
-                if (e.type == 'checkbox' || e.type == 'select-multiple')
+                if (e.type == 'checkbox')
                 {
-                  let values = [];
-                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
-                  {
-                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && ((e.type == 'checkbox' && sube.checked) || (e.type == 'select-multiple' && sube.selected)))
-                    {
-                      values.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
-                    }
-                  });
-                  o.v = values;
-                }
-                else
-                {
+                  let v = [];
                   document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
                   {
                     if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
                     {
-                      o.v = ((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value);
+                      v.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }
                   });
+                  c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
+                  if (c)
+                  {
+                    o.v = v;
+                  }
+                }
+                else if (e.type == 'radio')
+                {
+                  let v = '';
+                  document.querySelectorAll('#' + id + ' [c-model]').forEach(sube =>
+                  {
+                    if (e.getAttribute('c-model') == sube.getAttribute('c-model') && sube.checked)
+                    {
+                      v = ((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value);
+                    }
+                  });
+                  c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
+                  if (c)
+                  {
+                    o.v = v;
+                  }
+                }
+                else if (e.type == 'select-multiple')
+                {
+                  let v = [];
+                  for (let i = 0; i < e.options.length; i++)
+                  {
+                    if (e.options[i].selected)
+                    {
+                      v.push(((e.hasAttribute('c-json'))?JSON.parse(e.options[i].value):e.options[i].value));
+                    }
+                  }
+                  c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
+                  if (c)
+                  {
+                    o.v = v;
+                  }
                 }
               }
               else
               {
-                o.v = v;
+                let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
+                c = ((o.v != v)?true:false);
+                if (c)
+                {
+                  o.v = v;
+                }
               }
               if (this.isDefined(o.onchange))
               {
@@ -2325,7 +2434,7 @@ class Observable
   // {{{ constructor()
   constructor(val)
   {
-    this.listeners = [];
+    this.listeners = {};
     this.val = ((typeof val !== 'undefined')?val:'');
   }
   // }}}
@@ -2349,13 +2458,20 @@ class Observable
   // {{{ notify()
   notify()
   {
-    this.listeners.forEach(listener => listener(this.val));
+    for (let [name, listener] of Object.entries(this.listeners))
+    {
+      listener(this.val);
+    }
   }
   // }}}
   // {{{ subscribe()
-  subscribe(listener)
+  subscribe(name, listener)
   {
-    this.listeners.push(listener);
+    if (typeof this.listeners[name] !== 'undefined')
+    {
+      delete this.listeners[name];
+    }
+    this.listeners[name] = listener;
   }
   // }}}
   // {{{ get v()
@@ -2404,7 +2520,7 @@ class Computed extends Observable
       this.val = val();
       this.notify();
     }
-    deps.forEach(dep => dep.subscribe(listener));
+    deps.forEach(dep => dep.subscribe('computed', listener));
   }
   // }}}
   // {{{ e()

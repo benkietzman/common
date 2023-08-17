@@ -846,7 +846,10 @@ class Common
             {
               let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
-              o.v = v;
+              if (c && this.isDefined(e.type) && (e.type == 'password' || e.type == 'text' || e.type == 'textarea'))
+              {
+                o.v = v;
+              }
               if (this.isDefined(o.onkeyup))
               {
                 o.onkeyup();
@@ -868,7 +871,10 @@ class Common
             {
               let v = ((e.hasAttribute('c-json'))?JSON.parse(e.value):e.value);
               let c = ((o.v != v)?true:false);
-              o.v = v;
+              if (c && this.isDefined(e.type) && (e.type == 'password' || e.type == 'text' || e.type == 'textarea'))
+              {
+                o.v = v;
+              }
               if (this.isDefined(o.onkeyup))
               {
                 o.onkeyup();
@@ -2477,7 +2483,7 @@ class Observable
   // {{{ get v()
   get v()
   {
-    return this.val;
+    return this.value;
   }
   // }}}
   // {{{ get value()
@@ -2489,17 +2495,13 @@ class Observable
   // {{{ set v()
   set v(val)
   {
-    if (val !== this.val)
-    {
-      this.val = val;
-      this.notify();
-    }
+    this.value = val;
   }
   // }}}
   // {{{ set value()
   set value(val)
   {
-    if (val !== this.val)
+    if (this.val !== val)
     {
       this.val = val;
       this.notify();
@@ -2543,7 +2545,7 @@ class Computed extends Observable
   // {{{ get v()
   get v()
   {
-    return this.val;
+    return this.value;
   }
   // }}}
   // {{{ get value()
@@ -2555,7 +2557,7 @@ class Computed extends Observable
   // {{{ set v()
   set v(val)
   {
-    throw "Cannot set computed property";
+    this.value = val;
   }
   // }}}
   // {{{ set value()

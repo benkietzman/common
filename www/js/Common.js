@@ -20,6 +20,8 @@ class Common
     this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, showForm: false};
     this.logout = {info: false, message: false};
     this.m_auth = {};
+    this.m_intervals = {};
+    this.m_listeners = {};
     this.m_messages = [];
     this.m_store = {};
     this.m_strAuthProtocol = null;
@@ -310,6 +312,35 @@ class Common
       });
       Handlebars.registerHelper('urlEncode', encodeURIComponent);
     }
+  }
+  // }}}
+  // {{{ addEventListener()
+  addEventListener(controller, ev, func)
+  {
+    if (!this.isDefined(this.m_listeners[controller]))
+    {
+      this.m_listeners[controller] = {};
+    }
+    if (this.isDefined(this.m_listeners[controller][ev]))
+    {
+      this.removeEventListener(controller, ev);
+    }
+    document.addEventListener(ev, func);
+    this.m_listeners[controller][ev] = func;
+  }
+  // }}}
+  // {{{ addInterval()
+  addInterval(controller, name, func, interval)
+  {
+    if (!this.isDefined(this.m_intervals[controller]))
+    {
+      this.m_intervals[controller] = {};
+    }
+    if (this.isDefined(this.m_intervals[controller][name]))
+    {
+      this.removeInterval(controller, name);
+    }
+    this.m_intervals[controller][name] = setInterval(func, interval);
   }
   // }}}
   // {{{ attachEvent()
@@ -1592,6 +1623,34 @@ class Common
     }
   }
   // }}}
+  // {{{ removeEventListener()
+  removeEventListener(controller, ev)
+  {
+    if (this.isDefined(this.m_listeners[controller]) && this.isDefined(this.m_listeners[controller][ev]))
+    {
+      document.removeEventListener(ev, this.m_listeners[controller][ev]);
+      delete this.m_listeners[controller][ev];
+    }
+    if (this.m_listeners[controller].length == 0)
+    {
+      delete this.m_listeners[controller];
+    }
+  }
+  // }}}
+  // {{{ removeInterval()
+  removeInterval(controller, name)
+  {
+    if (this.isDefined(this.m_intervals[controller]) && this.isDefined(this.m_intervals[controller][name]))
+    {
+      clearInterval(this.m_intervals[controller][name]);
+      delete this.m_intervals[controller][name];
+    }
+    if (this.m_intervals[controller].length == 0)
+    {
+      delete this.m_intervals[controller];
+    }
+  }
+  // }}}
   // {{{ render()
   render(id, name, component)
   {
@@ -1722,6 +1781,25 @@ class Common
           this.router.on(data[i].path, async (nav) =>
           {
             let c = null;
+            if (this.isDefined(this.name) && this.name != '')
+            {
+              if (this.isDefined(this.m_listeners[this.name]))
+              {
+                for (let [ev, func] of Object.entries(this.m_listeners[this.name]))
+                {
+                  document.removeEventListener(ev, func);
+                }
+                delete this.m_listeners[this.name];
+              }
+              if (this.isDefined(this.m_intervals[this.name]))
+              {
+                for (let [name, handle] of Object.entries(this.m_intervals[this.name]))
+                {
+                  clearInterval(handle);
+                }
+                delete this.m_intervals[this.name];
+              }
+            }
             let path = data[i].path;
             this.name = data[i].name;
             if (this.isDefined(this.components[path]))

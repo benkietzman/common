@@ -1266,6 +1266,48 @@ class Common
     }
   }
   // }}}
+  // {{{ loadModal()
+  loadModal(controller, id, show)
+  {
+    if (controller)
+    {
+      this.update(controller);
+    }
+    document.querySelectorAll('div.modal-backdrop').forEach(e =>
+    {
+      e.parentNode.removeChild(e);
+    });
+    document.querySelectorAll('body').forEach(e =>
+    {
+      e.style.overflow = 'auto';
+    });
+    document.querySelectorAll('div.fixed-top').forEach(e =>
+    {
+      e.style.paddingRight = '';
+    });
+    let bFirst = true;
+    document.querySelectorAll('#'+id).forEach(loadModal =>
+    {
+      if (bFirst)
+      {
+        bFirst = false;
+      }
+      else
+      {
+        loadModal.remove();
+      }
+    });
+    let modal = new bootstrap.Modal(document.getElementById(id));
+    if (show)
+    {
+      modal.show();
+    }
+    else
+    {
+      modal.hide();
+    }
+  }
+  // }}}
   // {{{ loads()
   async loads(data)
   {

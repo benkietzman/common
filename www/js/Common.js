@@ -1280,6 +1280,7 @@ class Common
     document.querySelectorAll('body').forEach(e =>
     {
       e.style.overflow = 'auto';
+      e.style.paddingRight = '';
     });
     document.querySelectorAll('div.fixed-top').forEach(e =>
     {

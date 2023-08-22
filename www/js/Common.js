@@ -2255,6 +2255,7 @@ class Common
         this.dispatchEvent('commonWsReady', null);
         this.dispatchEvent('commonWsReady_' + this.application, null);
         this.dispatchEvent('commonWsReady_' + this.application + '_' + strName, null);
+console.log('dispatch commonWsReady_'+strName);
         this.dispatchEvent('commonWsReady_' + strName, null);
         this.m_ws[strName].Attempts = 1;
         if (this.m_ws[strName].modalInstance != null)

@@ -15,7 +15,7 @@ export default
     {
       c: c
     });
-    c.attachEvent('commonWsReady_radial', (data) =>
+    s.footer = () =>
     {
       let request = {Interface: 'central', 'Function': 'footer', Request: c.footer};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
@@ -28,7 +28,15 @@ export default
         c.dispatchEvent('commonFooterReady', null);
         c.render(id, this);
       });
+    };
+    c.attachEvent('commonWsReady_radial', (data) =>
+    {
+      s.footer();
     });
+    if (c.m_ws['radial'].Connected)
+    {
+      s.footer();
+    }
   },
   // }}}
   // {{{ template

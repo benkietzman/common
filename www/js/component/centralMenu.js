@@ -28,7 +28,7 @@ export default
     });
     // }}}
     // {{{ main
-    c.attachEvent('commonWsReady_radial', (data) =>
+    s.applications = () =>
     {
       let request = {Interface: 'central', 'Function': 'applications', Request: {menu: 1, retired: 0}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
@@ -51,7 +51,15 @@ export default
           c.render(id, this);
         }
       });
+    };
+    c.attachEvent('commonWsReady_radial', (data) =>
+    {
+      s.applications();
     });
+    if (c.m_ws['radial'].Connected)
+    {
+      s.applications();
+    }
     // }}}
   },
   // }}}

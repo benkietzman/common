@@ -17,7 +17,7 @@ export default
     });
     s.footer = () =>
     {
-      let request = {Interface: 'central', 'Function': 'footer', Request: c.footer};
+      let request = {Interface: ((c.isDefined(c.footer['interface']))?c.footer['interface']:'central'), 'Function': 'footer', Request: c.footer};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};

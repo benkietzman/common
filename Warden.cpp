@@ -639,12 +639,8 @@ extern "C++"
     bool Warden::vault(const string strFunction, list<string> keys, Json *ptData, string &strError)
     {
       bool bResult = false;
-      Json *ptSubData = NULL;
+      Json *ptSubData = new Json(ptData);
 
-      if (ptData != NULL)
-      {
-        ptSubData = new Json(ptData);
-      }
       ptData->clear();
       if (!m_strApplication.empty())
       {
@@ -661,10 +657,7 @@ extern "C++"
       {
         strError = "Please provide the Application.";
       }
-      if (ptSubData != NULL)
-      {
-        delete ptSubData;
-      }
+      delete ptSubData;
 
       return bResult;
     }
@@ -691,7 +684,13 @@ extern "C++"
     // {{{ vaultRemove()
     bool Warden::vaultRemove(list<string> keys, string &strError)
     {
-      return vault("remove", keys, NULL, strError);
+      bool bResult = false;
+      Json *ptData = new Json;
+
+      bResult = vault("remove", keys, NULL, strError);
+      delete ptData;
+
+      return bResult;
     }
     bool Warden::vaultRemove(string &strError)
     {

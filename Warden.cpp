@@ -687,7 +687,7 @@ extern "C++"
       bool bResult = false;
       Json *ptData = new Json;
 
-      bResult = vault("remove", keys, NULL, strError);
+      bResult = vault("remove", keys, ptData, strError);
       delete ptData;
 
       return bResult;

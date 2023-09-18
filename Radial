@@ -94,242 +94,36 @@ extern "C++"
       Radial(string &strError);
       ~Radial();
 
-      /*! \fn void databaseFree(list<map<string, string> > *result)
-      * \brief Frees query results.
-      * \param result Contains the query results.
-      */
       void databaseFree(list<map<string, string> > *result);
-      /*! \fn list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError)
-      * \brief Sends a query request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param strError Contains the error message.
-      * \return Returns a list of resultant rows containing maps of field/value pairs..
-      */
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError);
-      /*! \fn list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
-      * \brief Sends a query request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param ullRows Contains the number of affected rows.
-      * \param strError Contains the error message.
-      * \return Returns a list of resultant rows containing maps of field/value pairs..
-      */
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
-      /*! \fn bool databaseUpdate(const string strDatabase, const string strUpdate, string &strError)
-      * \brief Sends an update request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool databaseUpdate(const string strDatabase, const string strUpdate, string &strError);
-      /*! \fn bool databaseUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
-      * \brief Sends an update request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param ullID Contains the returned ID.
-      * \param ullRows Contains the number of affected rows.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool databaseUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
-      /*! \fn void dbFree(list<map<string, string> > *result)
-      * \brief Frees query results.
-      * \param result Contains the query results.
-      */
       void dbFree(list<map<string, string> > *result);
-      /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError)
-      * \brief Sends a query request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param strError Contains the error message.
-      * \return Returns a list of resultant rows containing maps of field/value pairs..
-      */
       list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError);
-      /*! \fn list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError)
-      * \brief Sends a query request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param ullRows Contains the number of affected rows.
-      * \param strError Contains the error message.
-      * \return Returns a list of resultant rows containing maps of field/value pairs..
-      */
       list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
-      /*! \fn bool dbUpdate(const string strDatabase, const string strUpdate, string &strError)
-      * \brief Sends an update request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool dbUpdate(const string strDatabase, const string strUpdate, string &strError);
-      /*! \fn bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError)
-      * \brief Sends an update request to a database.
-      * \param strDatabase Contains the database.
-      * \param strQuery Contains the query.
-      * \param ullID Contains the returned ID.
-      * \param ullRows Contains the number of affected rows.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
-      /*! \fn bool hubList(map<string, map<string, string> > &interfaces, string &strError)
-      * \brief Sends a hub list request.
-      * \param interfaces Contains the interfaces.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool hubList(map<string, map<string, string> > &interfaces, string &strError);
-      /*! \fn bool hubPing(string &strError)
-      * \brief Sends a hub ping request.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool hubPing(string &strError);
-      /*! \fn bool ircChat(const string strTarget, const string strMessage, string &strError)
-      * \brief Sends a chat message over irc.
-      * \param strTarget Contains the target.
-      * \param strMessage Contains the message.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool ircChat(const string strTarget, const string strMessage, string &strError);
-      /*! \fn bool linkStatus(list<string> &nodes, string &strMaster, string &strError)
-      * \brief Sends a link status request.
-      * \param nodes Contains the list of linked nodes.
-      * \param strMaster Contains the master node.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool linkStatus(list<string> &nodes, string &strMaster, string &strError);
-      /*! \fn bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError)
-      * \brief Runs a query against the MySQL database.
-      * \param strUser Contains the MySQL user.
-      * \param strPassword Contains the MySQL password.
-      * \param strServer Contains the MySQL server.
-      * \param strDatabase Contains the MySQL database.
-      * \param strQuery Contains the MySQL query.
-      * \param result Returns a list of resultant rows containing maps of field/value pairs.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError);
-      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError)
-      * \brief Runs an insert/update/delete against the MySQL database.
-      * \param strUser Contains the MySQL user.
-      * \param strPassword Contains the MySQL password.
-      * \param strServer Contains the MySQL server.
-      * \param strDatabase Contains the MySQL database.
-      * \param strUpdate Contains the MySQL insert/update/delete query.
-      * \param strID Contains the auto-increment ID.
-      * \param strRows Contains the number of impacted rows.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError);
-      /*! \fn bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError)
-      * \brief Runs an insert/update/delete against the MySQL database.
-      * \param strUser Contains the MySQL user.
-      * \param strPassword Contains the MySQL password.
-      * \param strServer Contains the MySQL server.
-      * \param strDatabase Contains the MySQL database.
-      * \param strUpdate Contains the MySQL insert/update/delete query.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError);
-      /*! \fn bool request(Json *ptRequest, Json *ptResponse, string &strError)
-      * \brief Submits a Radial request.
-      * \param ptRequest Contains request.
-      * \param ptResponse Contains response.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool request(Json *ptRequest, Json *ptResponse, string &strError);
-      /*! \fn bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError)
-      * \brief Submits a Radial request.
-      * \param ptRequest Contains request.
-      * \param ptResponse Contains response.
-      * \param CTimeout Contains the timeout.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError);
-      /*! \fn void requestThread()
-      * \brief Request thread.
-      */
       void requestThread();
-      /*! \fn void setCredentials(const string strUser, const string strPassword, const string strUserID = "")
-      * \brief Set the credentials.
-      * \param strUser Contains the user.
-      * \param strPassword Contains the password.
-      * \param strUserID Contains the user ID.
-      */
       void setCredentials(const string strUser, const string strPassword, const string strUserID = "");
-      /*! \fn void setServer(const string strServer)
-      * \brief Set the server.
-      * \param strServer Contains the server.
-      */
       void setServer(const string strServer);
-      /*! \fn void setThrottle(const size_t unThrottle)
-      * \brief Set the throttle.
-      * \param unThrottle Contains the throttle.
-      */
       void setThrottle(const size_t unThrottle);
-      /*! \fn void setTimeout(const string strTimeout)
-      * \brief Set the timeout.
-      * \param strTimeout Contains the timeout.
-      */
       void setTimeout(const string strTimeout);
-      /*! \fn bool storageAdd(list<string> keys, Json *ptData, string &strError)
-      * \brief Sends a storage add request.
-      * \param keys Contains the keys.
-      * \param ptData Contains the data.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool storageAdd(list<string> keys, Json *ptData, string &strError);
-      /*! \fn bool storageRemove(list<string> keys, string &strError)
-      * \brief Sends a storage remove request.
-      * \param keys Contains the keys.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool storageRemove(list<string> keys, string &strError);
-      /*! \fn bool storageRetrieve(list<string> keys, Json *ptData, string &strError)
-      * \brief Sends a storage retrieve request.
-      * \param keys Contains the keys.
-      * \param ptData Contains the data.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool storageRetrieve(list<string> keys, Json *ptData, string &strError);
-      /*! \fn bool storageRetrieveKeys(list<string> inKeys, list<string> &outKeys, string &strError)
-      * \brief Sends a storage retrieve keys request.
-      * \param inKeys Contains the input keys.
-      * \param outKeys Contains the output keys.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool storageRetrieveKeys(list<string> inKeys, list<string> &outKeys, string &strError);
-      /*! \fn bool storageUpdate(list<string> keys, Json *ptData, string &strError)
-      * \brief Sends a storage update request.
-      * \param keys Contains the keys.
-      * \param ptData Contains the data.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value.
-      */
       bool storageUpdate(list<string> keys, Json *ptData, string &strError);
-      /*! \fn void useSingleSocket(const bool bUseSingleSocket = true)
-      * \brief Use single socket.  This should only be enabled within non-forking environments.
-      * \param bUseSingleSocket Contains the single socket value.
-      */
       void useSingleSocket(const bool bUseSingleSocket = true);
-      /*! \fn Utility *utility()
-      * \brief Interfaces with the Utility class.
-      * \return Returns a pointer to the Utility class.
-      */
       Utility *utility();
     };
     // }}}

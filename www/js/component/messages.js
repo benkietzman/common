@@ -41,9 +41,7 @@ export default
       <h4 class="alert-heading">{{Title}}</h4>
       {{/if}}
       {{#if Body}}
-      <pre style="background: inherit; color: inherit; white-space: pre-wrap;">
-        {{Body}}
-      </pre>
+      <pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{Body}}</pre>
       {{/if}}
       <hr>
       <div class="float-end"><i>{{Time}}</i></div>

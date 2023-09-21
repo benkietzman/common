@@ -41,7 +41,7 @@ export default
       <h4 class="alert-heading">{{Title}}</h4>
       {{/if}}
       {{#if Body}}
-      <pre>
+      <pre style="background: inherit; color: inherit; white-space: pre-wrap;">
         {{Body}}
       </pre>
       {{/if}}

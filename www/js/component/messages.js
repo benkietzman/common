@@ -41,9 +41,9 @@ export default
       <h4 class="alert-heading">{{Title}}</h4>
       {{/if}}
       {{#if Body}}
-      <p>
+      <pre>
         {{Body}}
-      </p>
+      </pre>
       {{/if}}
       <hr>
       <div class="float-end"><i>{{Time}}</i></div>

@@ -94,6 +94,7 @@ extern "C++"
       Radial(string &strError);
       ~Radial();
 
+      bool alert(const string strUser, const string strMessage, string &strError);
       void databaseFree(list<map<string, string> > *result);
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError);
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);

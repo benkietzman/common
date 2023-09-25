@@ -84,6 +84,26 @@ Radial::~Radial()
   }
 }
 // }}}
+// {{{ alert()
+bool Radial::alert(const string strUser, const string strMessage, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "alert");
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("User", strUser);
+  ptRequest->m["Request"]->i("Message", strMessage);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
 // {{{ database
 // {{{ databaseFree()
 void Radial::databaseFree(list<map<string, string> > *result)

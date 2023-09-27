@@ -1782,11 +1782,11 @@ class Common
   {
     if (this.isValid())
     {
-      this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'log-out', active: null};
+      this.menu.right[this.menu.right.length] = {value: 'Logout as ' + this.getUserFirstName(), href: '/Logout', icon: 'box-arrow-right', active: null};
     }
     else
     {
-      this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'user', active: null};
+      this.menu.right[this.menu.right.length] = {value: 'Login', href: '/Login', icon: 'person', active: null};
     }
     this.setMenu(this.strMenu, this.strSubMenu);
   }

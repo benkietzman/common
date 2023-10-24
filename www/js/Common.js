@@ -102,6 +102,10 @@ class Common
       {
         return (Number(v1) + Number(v2));
       });
+      Handlebars.registerHelper('byteShort', (value, decimalLength, thousandsSep, decimalSep) =>
+      {
+        return this.formatByteShort(value, decimalLength, thousandsSep, decimalSep);
+      });
       Handlebars.registerHelper('capitalize', (v) =>
       {
         return (((v instanceof String) && v.length > 0)?v.charAt(0).toUpperCase() + v.substr(1).toLowerCase():v);
@@ -989,6 +993,43 @@ class Common
     }
 
     return bResult;
+  }
+  // }}}
+  // {{{ formatByteShort()
+  formatByteShort(value, decimalLength, thousandsSep, decimalSep)
+  {
+    let bNegative = false;
+    let nNumber = Number(value);
+    let strSuffix = '';
+
+    if (nNumber < 0)
+    {
+      bNegative = true;
+      nNumber *= -1;
+    }
+    if (nNumber >= 1024)
+    {
+      strSuffix = 'KB';
+      nNumber /= 1024;
+      if (nNumber >= 1024)
+      {
+        strSuffix = 'MB';
+        nNumber /= 1024;
+        if (nNumber >= 1024)
+        {
+          strSuffix = 'GB';
+          nNumber /= 1024;
+          if (nNumber >= 1024)
+          {
+            strSuffix = 'TB';
+            nNumber /= 1024;
+          }
+        }
+      }
+    }
+    nNumber = this.formatNumber(nNumber, decimalLength, thousandsSep, decimalSep);
+
+    return ((bNegative)?'-':'') + nNumber + strSuffix;
   }
   // }}}
   // {{{ formatNumber()

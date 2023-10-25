@@ -1580,7 +1580,7 @@ class Common
           if (this.m_strLoginType == null)
           {
             this.m_strLoginType = 'password';
-            if (this.isDefined(response.Response.Module) && response.Response.Module != '')
+            if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
             {
               this.m_strLoginType = response.Response.Module;
             }

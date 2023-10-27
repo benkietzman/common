@@ -40,6 +40,7 @@ export default
           </div>
         </div>
       </nav>
+      {{#if c.submenu}}
       <nav class="container navbar navbar-expand-lg navbar-dark bg-dark bg-gradient">
         <div class="container-fluid">
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#subnavigationbar" aria-controls="subnavigationbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +60,7 @@ export default
           </div>
         </div>
       </nav>
+      {{/if}}
     </div>
     <div style="padding: 30px;">
     </div>

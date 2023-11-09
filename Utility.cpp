@@ -330,8 +330,8 @@ extern "C++"
     bool Utility::fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bResult = true;
-      char szBuffer[1048576];
-      int nSize = 1048576;
+      char szBuffer[65536];
+      int nSize = 65536;
 
       strRead.clear();
       if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
@@ -950,8 +950,8 @@ extern "C++"
     bool Utility::sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bBlocking = false, bResult = true;
-      char szBuffer[1048576];
-      int nPending, nSize = 1048576;
+      char szBuffer[65536];
+      int nPending, nSize = 65536;
       long lArg, lArgOrig;
 
       strRead.clear();

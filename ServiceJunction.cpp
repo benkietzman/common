@@ -55,6 +55,7 @@ extern "C++"
       m_bUseSecureJunction = true;
       m_bUseSingleSocket = false;
       m_ulModifyTime = 0;
+      m_unMaxPayload = 0;
       m_unThrottle = 0;
       m_unUniqueID = 0;
       m_pUtility = new Utility(strError);
@@ -2029,21 +2030,28 @@ extern "C++"
                       {
                         if ((j == 0 && utility()->sslRead(ssl, strBuffer[0], nReturn)) || (j == 1 && utility()->fdRead(fdSocket, strBuffer[0], nReturn)))
                         {
-                          while ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                          if (m_unMaxPayload == 0 || strBuffer[0].size() < m_unMaxPayload)
                           {
-                            strLine = strBuffer[0].substr(0, unPosition);
-                            strBuffer[0].erase(0, unPosition + 1);
-                            if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
+                            while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                             {
-                              if (strTrim == "end")
+                              strLine = strBuffer[0].substr(0, unPosition);
+                              strBuffer[0].erase(0, unPosition + 1);
+                              if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
                               {
-                                bExit = bResult = true;
-                              }
-                              else
-                              {
-                                out.push_back(strLine);
+                                if (strTrim == "end")
+                                {
+                                  bExit = bResult = true;
+                                }
+                                else
+                                {
+                                  out.push_back(strLine);
+                                }
                               }
                             }
+                          }
+                          else
+                          {
+                            bExit = true;
                           }
                         }
                         else if (j == 0)
@@ -2305,41 +2313,48 @@ extern "C++"
                   {
                     if ((!m_bUseSecureJunction && utility()->fdRead(fdSocket, strBuffer[0], nReturn)) || (m_bUseSecureJunction && utility()->sslRead(ssl, strBuffer[0], nReturn)))
                     {
-                      while ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                      if (m_unMaxPayload == 0 || strBuffer[0].size() < m_unMaxPayload)
                       {
-                        strLine = strBuffer[0].substr(0, unPosition);
-                        strBuffer[0].erase(0, unPosition + 1);
-                        if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
+                        while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                         {
-                          if (strTrim == "end")
+                          strLine = strBuffer[0].substr(0, unPosition);
+                          strBuffer[0].erase(0, unPosition + 1);
+                          if (!m_manip.trim(strTrim, strLine).empty() && strTrim != "\"\"")
                           {
-                            if (!response.empty())
+                            if (strTrim == "end")
                             {
-                              Json *ptJson = new Json(response.front());
-                              if (ptJson->m.find("sjUniqueID") != ptJson->m.end() && !ptJson->m["sjUniqueID"]->v.empty())
+                              if (!response.empty())
                               {
-                                size_t unUniqueID = atoi(ptJson->m["sjUniqueID"]->v.c_str());
-                                string strResponse;
-                                for (list<string>::iterator j = response.begin(); j != response.end(); j++)
+                                Json *ptJson = new Json(response.front());
+                                if (ptJson->m.find("sjUniqueID") != ptJson->m.end() && !ptJson->m["sjUniqueID"]->v.empty())
                                 {
-                                  strResponse += (*j) + "\n";
+                                  size_t unUniqueID = atoi(ptJson->m["sjUniqueID"]->v.c_str());
+                                  string strResponse;
+                                  for (list<string>::iterator j = response.begin(); j != response.end(); j++)
+                                  {
+                                    strResponse += (*j) + "\n";
+                                  }
+                                  m_mutexRequests.lock();
+                                  if (m_requests.find(unUniqueID) != m_requests.end())
+                                  {
+                                    m_requests[unUniqueID]->strBuffer[1] = strResponse;
+                                  }
+                                  m_mutexRequests.unlock();
                                 }
-                                m_mutexRequests.lock();
-                                if (m_requests.find(unUniqueID) != m_requests.end())
-                                {
-                                  m_requests[unUniqueID]->strBuffer[1] = strResponse;
-                                }
-                                m_mutexRequests.unlock();
+                                response.clear();
+                                delete ptJson;
                               }
-                              response.clear();
-                              delete ptJson;
+                            }
+                            else
+                            {
+                              response.push_back(strLine);
                             }
                           }
-                          else
-                          {
-                            response.push_back(strLine);
-                          }
                         }
+                      }
+                      else
+                      {
+                        bExit = true;
                       }
                     }
                     else
@@ -2458,6 +2473,12 @@ extern "C++"
     void ServiceJunction::setProgram(const string strProgram)
     {
       m_strProgram = strProgram;
+    }
+    // }}}
+    // {{{ setMaxPayload()
+    void ServiceJunction::setMaxPayload(const size_t unMaxPayload)
+    {
+      m_unMaxPayload = unMaxPayload;
     }
     // }}}
     // {{{ setThrottle()

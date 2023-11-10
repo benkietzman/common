@@ -82,6 +82,7 @@ extern "C++"
       map<int, sjreqdata *> m_requests;
       map<string, map<string, string> > m_database;
       map<string, string> m_loggerLabel;
+      size_t m_unMaxPayload;
       size_t m_unThrottle;
       size_t m_unUniqueID;
       std::mutex m_mutexGetAddrInfo;
@@ -449,6 +450,11 @@ extern "C++"
       * \param label Contains default labels.
       */
       void setLogger(const string strApplication, const string strUser, const string strPassword, void (*pPush)(map<string, string> &), map<string, string> label);
+      /*! \fn void setMaxPayload(const size_t unMaxPayload)
+      * \brief Set the maximum payload.
+      * \param unMaxPayload Contains the maximum payload.
+      */
+      void setMaxPayload(const size_t unMaxPayload);
       /*! \fn void setProgram(const string strProgram)
       * \brief Set the program.
       * \param strProgram Contains the program.

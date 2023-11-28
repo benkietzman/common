@@ -35,6 +35,10 @@ class Common
     this.strPrevMenu = null;
     this.strPrevSubMenu = null;
     this.strSubMenu = null;
+    if (this.isDefined(options.alias))
+    {
+      this.alias = options.alias;
+    }
     if (this.isDefined(options.application))
     {
       this.application = options.application;

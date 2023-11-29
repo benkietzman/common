@@ -120,7 +120,14 @@ class Common
       });
       Handlebars.registerHelper('date', (unTimestamp, strFormat) =>
       {
-        return (new Date(unTimestamp * 1000)).format(strFormat);
+        let date = new Date(unTimestamp * 1000);
+        let unYear = date.getFullYear();
+        let unMonth = date.getMonth() + 1;
+        let unDay = date.getDate();
+        let unHour = date.getHours();
+        let unMinute = date.getMinutes();
+        let unSecond = date.getSeconds();
+        return unYear.padStart(4, '0')+'-'+unMonth.padStart(2, '0')+'-'+unDay.padStart(2, '0')+' '+unHour.padStart(2, '0')+':'+unMinute.padStart(2, '0')+':'+unSecond.padStart(2, '0');
       });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {

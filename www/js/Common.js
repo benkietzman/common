@@ -118,7 +118,15 @@ class Common
       {
         return (v1 + v2);
       });
-      Handlebars.registerHelper('date', (unTimestamp, strFormat) =>
+      Handlebars.registerHelper('date', (unTimestamp) =>
+      {
+        let date = new Date(unTimestamp * 1000);
+        let unYear = date.getFullYear();
+        let unMonth = date.getMonth() + 1;
+        let unDay = date.getDate();
+        return unYear.padStart(4, '0')+'-'+unMonth.padStart(2, '0')+'-'+unDay.padStart(2, '0');
+      });
+      Handlebars.registerHelper('datetime', (unTimestamp) =>
       {
         let date = new Date(unTimestamp * 1000);
         let unYear = date.getFullYear();

@@ -120,7 +120,7 @@ class Common
       });
       Handlebars.registerHelper('date', (unTimestamp, strFormat) =>
       {
-        return new Date(unTimestamp * 1000).format(strFormat);
+        return new Date(unTimestamp * 1000).toString(strFormat);
       });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {

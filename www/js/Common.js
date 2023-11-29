@@ -118,9 +118,9 @@ class Common
       {
         return (v1 + v2);
       });
-      Handlebars.registerHelper('date', (unTimestamp, strFormat) =>
+      Handlebars.registerHelper('date', (unTimestamp) =>
       {
-        return new Date(unTimestamp * 1000).toString(strFormat);
+        return new Date(unTimestamp * 1000).toString();
       });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {

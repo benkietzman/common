@@ -847,6 +847,58 @@ class ServiceJunction
     return $bResult;
   }
   // }}}
+  // {{{ logger()
+  public function logger($strApplication, $strUser, $strPassword, $strFunction, $strMessage, $label, &$result)
+  {
+    $bResult = false;
+
+    $request = array();
+    $request['Application'] = $strApplication;
+    if ($this->m_strApplication != '')
+    {
+      $request['reqApp'] = $this->m_strApplication;
+    }
+    if ($this->m_strProgram != '')
+    {
+      $request['reqProg'] = $this->m_strProgram;
+    }
+    $request['Service'] = 'logger';
+    $request['User'] = $strUser;
+    $request['Password'] = $strPassword;
+    $request['Function'] = $strFunction;
+    $request['Message'] = $strMessage;
+    $request['Label'] = $label;
+    $response = null;
+    if ($this->request(array(json_encode($request)), $response))
+    {
+      if (sizeof($response) >= 1)
+      {
+        $status = json_decode($response[0], true);
+        if (isset($status['Status']) && $status['Status'] == 'okay')
+        {
+          $bResult = true;
+          for ($i = 1; $i < sizeof($response); $i++)
+          {
+            $result[] = json_decode($response[$i], true);
+          }
+        }
+        else if (isset($status['Error']) && $status['Error'] != '')
+        {
+          $this->setError($status['Error']);
+        }
+        else
+        {
+          $this->setError('Encountered an unkonwn error.');
+        }
+        unset($status);
+      }
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ mssqlQuery()
   public function mssqlQuery($strUser, $strPassword, $strServer, $strQuery, &$result)
   {

@@ -40,6 +40,21 @@ extern "C++"
     {
     }
     // }}}
+    // {{{ cleanNonPrintable()
+    string StringManip::cleanNonPrintable(string &strClean, const string strString)
+    {
+      strClean = strString;
+      for (size_t nPosition = 0; nPosition < strClean.size(); nPosition++)
+      {
+        if (!isprint(strString[nPosition]))
+        {
+          strClean = purgeChar(strClean, strClean, strClean.substr(nPosition--, 1));
+        }
+      }
+
+      return strClean;
+    }
+    // }}}
     // {{{ decodeBase64()
     string StringManip::decodeBase64(const string strIn, string &strOut)
     {
@@ -67,7 +82,7 @@ extern "C++"
       unsigned char block_4[4], block_3[3];
       strOut.clear();
       in_len = strlen(str);
-      while (in_len-- && (str[in_] != '=') && is_base64(str[in_]))
+      while (in_len-- && (str[in_] != '=') && isBase64(str[in_]))
       {
         block_4[i++] = str[in_];
         in_++;
@@ -440,75 +455,6 @@ extern "C++"
       return (strOut = ssResult.str());
     }
     // }}} 
-    // {{{ is_base64()
-    int StringManip::is_base64(char c)
-    {
-      if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || (c == '+') || (c == '/') || (c == '='))
-      {
-        return true;
-      }
-  
-      return false;
-    }
-    // }}}
-    // {{{ toCase()
-    string StringManip::toCase(string &strCase, const string strString, int nCase)
-    {
-      strCase = strString;
-      for (size_t nPosition = 0; nPosition < strCase.size(); nPosition++)
-      {
-        if (nCase == 0)
-        {
-          strCase[nPosition] = tolower(strCase[nPosition]);
-        }
-        else
-        {
-          strCase[nPosition] = toupper(strCase[nPosition]);
-        }
-      }
-
-      return strCase;
-    }
-
-    string StringManip::toLower(string &strLower, const string strString)
-    {
-      return toCase(strLower, strString, 0);
-    }
-
-    string StringManip::toUpper(string &strUpper, const string strString)
-    {
-      return toCase(strUpper, strString, 1);
-    }
-    // }}}
-    // {{{ purgeChar()
-    string StringManip::purgeChar(string &strPurge, const string strString, const string strChar)
-    {
-      size_t nPosition = 0;
-
-      strPurge = strString;
-      while ((nPosition = strPurge.find(strChar, 0)) != string::npos)
-      {
-        strPurge.erase(nPosition, strChar.size());
-      }
-
-      return strPurge;
-    }
-    // }}}
-    // {{{ cleanNonPrintable()
-    string StringManip::cleanNonPrintable(string &strClean, const string strString)
-    {
-      strClean = strString;
-      for (size_t nPosition = 0; nPosition < strClean.size(); nPosition++)
-      {
-        if (!isprint(strString[nPosition]))
-        {
-          strClean = purgeChar(strClean, strClean, strClean.substr(nPosition--, 1));
-        }
-      }
-
-      return strClean;
-    }
-    // }}}
     // {{{ getToken()
     string StringManip::getToken(string &strToken, const string strString, const int nIndex, const string strDelimiter, const bool bIgnoreBlanks)
     {
@@ -680,6 +626,17 @@ extern "C++"
       return strNew;
     }
     // }}}
+    // {{{ isBase64()
+    int StringManip::isBase64(char c)
+    {
+      if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || (c == '+') || (c == '/') || (c == '='))
+      {
+        return true;
+      }
+  
+      return false;
+    }
+    // }}}
     // {{{ isNumeric()
     bool StringManip::isNumeric(const string strValue)
     {
@@ -700,53 +657,16 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ trim()
-    string StringManip::trim(string &strTrim, const string strString, const int nSide)
+    // {{{ lpad()
+    string StringManip::lpad(string &strPad, const string strString, const char cPad, const int nPad)
     {
-      bool bDone = false;
-
-      strTrim = strString;
-      if (!strTrim.empty() && (nSide == 0 || nSide == 1))
-      {
-        for (size_t i = 0; !bDone && i < strTrim.size(); i++)
-        {
-          if (isspace(strTrim[i]))
-          {
-            strTrim.erase(i--, 1);
-          }
-          else
-          {
-            bDone = true;
-          }
-        }
-      }
-      bDone = false;
-      if (!strTrim.empty() && (nSide == 0 || nSide == 2))
-      {
-        for (size_t i = strTrim.size() - 1; !bDone && i >= 0; i--)
-        {
-          if (isspace(strTrim[i]))
-          {
-            strTrim.erase(i, 1);
-          }
-          else
-          {
-            bDone = true;
-          }
-        }
-      }
-
-      return strTrim;
+      return pad(strPad, strString, cPad, nPad, 0);
     }
-
+    // }}}
+    // {{{ ltrim()
     string StringManip::ltrim(string &strTrim, const string strString)
     {
       return trim(strTrim, strString, 1);
-    }
-
-    string StringManip::rtrim(string &strTrim, const string strString)
-    {
-      return trim(strTrim, strString, 2);
     }
     // }}}
     // {{{ pad()
@@ -760,15 +680,132 @@ extern "C++"
 
       return strPad;
     }
-
-    string StringManip::lpad(string &strPad, const string strString, const char cPad, const int nPad)
+    // }}}
+    // {{{ purgeChar()
+    string StringManip::purgeChar(string &strPurge, const string strString, const string strChar)
     {
-      return pad(strPad, strString, cPad, nPad, 0);
-    }
+      size_t nPosition = 0;
 
+      strPurge = strString;
+      while ((nPosition = strPurge.find(strChar, 0)) != string::npos)
+      {
+        strPurge.erase(nPosition, strChar.size());
+      }
+
+      return strPurge;
+    }
+    // }}}
+    // {{{ rpad()
     string StringManip::rpad(string &strPad, const string strString, const char cPad, const int nPad)
     {
       return pad(strPad, strString, cPad, nPad, 1);
+    }
+    // }}}
+    // {{{ rtrim()
+    string StringManip::rtrim(string &strTrim, const string strString)
+    {
+      return trim(strTrim, strString, 2);
+    }
+    // }}}
+    // {{{ toCase()
+    string StringManip::toCase(string &strCase, const string strString, int nCase)
+    {
+      strCase = strString;
+      for (size_t nPosition = 0; nPosition < strCase.size(); nPosition++)
+      {
+        if (nCase == 0)
+        {
+          strCase[nPosition] = tolower(strCase[nPosition]);
+        }
+        else
+        {
+          strCase[nPosition] = toupper(strCase[nPosition]);
+        }
+      }
+
+      return strCase;
+    }
+    // }}}
+    // {{{ toLower()
+    string StringManip::toLower(string &strLower, const string strString)
+    {
+      return toCase(strLower, strString, 0);
+    }
+    // }}}
+    // {{{ toShort()
+    string StringManip::toShort(float fNumber, string &strNumber)
+    {
+      bool bNegative = false;
+      string strSuffix;
+      stringstream ssNumber;
+
+      if (fNumber < 0)
+      {
+        bNegative = true;
+        fNumber *= -1;
+      }
+      if (fNumber >= 1000)
+      {
+        strSuffix = "K";
+        fNumber /= 1000;
+        if (fNumber >= 1000)
+        {
+          strSuffix = "M";
+          fNumber /= 1000;
+          if (fNumber >= 1000)
+          {
+            strSuffix = "B";
+            fNumber /= 1000;
+            if (fNumber >= 1000)
+            {
+              strSuffix = "T";
+              fNumber /= 1000;
+            }
+          }
+        }
+      }
+      ssNumber << ((bNegative)?"-":"") << fixed << setprecision(2) << fNumber << strSuffix;
+      strNumber = ssNumber.str();
+
+      return strNumber;
+    }
+    // }}}
+    // {{{ toShortByte()
+    string StringManip::toShortByte(float fNumber, string &strNumber)
+    {
+      bool bNegative = false;
+      string strSuffix;
+      stringstream ssNumber;
+
+      if (fNumber < 0)
+      {
+        bNegative = true;
+        fNumber *= -1;
+      }
+      if (fNumber >= 1024)
+      {
+        strSuffix = "KB";
+        fNumber /= 1024;
+        if (fNumber >= 1024)
+        {
+          strSuffix = "MB";
+          fNumber /= 1024;
+          if (fNumber >= 1024)
+          {
+            strSuffix = "GB";
+            fNumber /= 1024;
+            if (fNumber >= 1024)
+            {
+              strSuffix = "TB";
+              fNumber /= 1024;
+            }
+          }
+        }
+      }
+      ssNumber << ((bNegative)?"-":"") << fixed << setprecision(2) << fNumber << strSuffix;
+      strNumber = ssNumber.str();
+
+      return strNumber;
     }
     // }}}
     // {{{ toString()
@@ -851,6 +888,51 @@ extern "C++"
     string StringManip::toString(const char szValue[], string &strResult)
     {
       return strResult = szValue;
+    }
+    // }}}
+    // {{{ toUpper()
+    string StringManip::toUpper(string &strUpper, const string strString)
+    {
+      return toCase(strUpper, strString, 1);
+    }
+    // }}}
+    // {{{ trim()
+    string StringManip::trim(string &strTrim, const string strString, const int nSide)
+    {
+      bool bDone = false;
+
+      strTrim = strString;
+      if (!strTrim.empty() && (nSide == 0 || nSide == 1))
+      {
+        for (size_t i = 0; !bDone && i < strTrim.size(); i++)
+        {
+          if (isspace(strTrim[i]))
+          {
+            strTrim.erase(i--, 1);
+          }
+          else
+          {
+            bDone = true;
+          }
+        }
+      }
+      bDone = false;
+      if (!strTrim.empty() && (nSide == 0 || nSide == 2))
+      {
+        for (size_t i = strTrim.size() - 1; !bDone && i >= 0; i--)
+        {
+          if (isspace(strTrim[i]))
+          {
+            strTrim.erase(i, 1);
+          }
+          else
+          {
+            bDone = true;
+          }
+        }
+      }
+
+      return strTrim;
     }
     // }}}
     // {{{ urlDecode()

@@ -37,6 +37,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <map>
 #ifdef COMMON_OPENSSL
 #include <openssl/bio.h>
@@ -59,196 +60,45 @@ extern "C++"
     class StringManip
     {
       private:
-      int is_base64(char c);
-      string toCase(string &, const string, int);
+      int isBase64(char c);
       string pad(string &, const string, const char, const int, const int);
+      string toCase(string &, const string, int);
 
       public:
       StringManip();
       ~StringManip();
+      string cleanNonPrintable(string &strClean, const string strString);
       string decodeBase64(string strIn, string &strOut);
 			string decryptAes(const string strIn, const string strSecret, string &strOut, string &strError);
       string encodeBase64(string strIn, string &strOut);
       string encryptAes(const string strIn, const string strSecret, string &strOut, string &strError);
       string escape(const string strIn, string &strOut);
-      //! Converts a string to lowercase.
-      /*!
-      * \param strLower - Returns the lowercase string.
-      * \param strString - The original string.
-      * \sa toUpper(string &strUpper, const string strString)
-      */
-      string toLower(string &strLower, const string strString);
-      //! Converts a string to uppercase.
-      /*!
-      * \param strUpper - Returns the uppercase string.
-      * \param strString - The original string.
-      * \sa toLower(string &strLower, const string strString)
-      */
-      string toUpper(string &strUpper, const string strString);
-      //! Purges all the occurances of the given string from the string.
-      /*!
-      * \param strPurge - Returns the purged string.
-      * \param strString - The original string.
-      * \param strChar - Contains the string to purge.
-      */
-      string purgeChar(string &strPurge, const string strString, const string strChar);
-      //! Removes all non-printable characters from the string.
-      /*!
-      * \param strClean - Returns the clean string.
-      * \param strString - The original string.
-      */
-      string cleanNonPrintable(string &strClean, const string strString);
-      //! Parses out tokens from a given string using the given index and delimiter.
-      /*!
-      * \param strToken - Returns the token.
-      * \param strString - The original string.
-      * \param nIndex - The index of the token to be retrieved.
-      * \param strDelimiter - The token delimiter.
-      * \param bIgnoreBlanks - Determines whether empty tokens are returned.  By ignoring blanks only non-empty tokens will return.
-      */
       string getToken(string &strToken, const string strString, const int nIndex, const string strDelimiter, const bool bIgnoreBlanks = false);
-      /*! \fn string htmlEntityDecode(const string strOld, string &strNew)
-      * \brief Decodes HTML entities.
-      * \param strOld Contains the old string.
-      * \param strNew Contains the new string.
-      * \return Returns the new string.
-      */
       string htmlEntityDecode(const string strOld, string &strNew);
-      /*! \fn string htmlEntityEncode(const string strOld, string &strNew)
-      * \brief Encodes HTML entities.
-      * \param strOld Contains the old string.
-      * \param strNew Contains the new string.
-      * \return Returns the new string.
-      */
       string htmlEntityEncode(const string strOld, string &strNew);
-      /*! \fn bool isNumeric(const string strValue)
-      * \brief Determines whether a string is numeric.
-      * \param strValue Contains the string.
-      * \return Returns a boolean true/false value.
-      */
       bool isNumeric(const string strValue);
-      //! Trims white space from either side of a string.
-      /*!
-      * \param strTrim - Returns the trimmed string.
-      * \param strString - The original string.
-      * \param nSide - Determines which side to trim.  0=both, 1=left, 2=right
-      * \sa ltrim(string &strTrim, const string strString)
-      * \sa rtrim(string &strTrim, const string strString)
-      */
-      string trim(string &strTrim, const string strString, const int nSide = 0);
-      //! Trims white space from the left side of a string.
-      /*!
-      * \param strTrim - Returns the trimmed string.
-      * \param strString - The original string.
-      * \sa trim(string &strTrim, const string strString, const int nSide = 0)
-      * \sa rtrim(string &strTrim, const string strString)
-      */
-      string ltrim(string &strTrim, const string strString);
-      //! Trims white space from the right side of a string.
-      /*!
-      * \param strTrim - Returns the trimmed string.
-      * \param strString - The original string.
-      * \sa trim(string &strTrim, const string strString, const int nSide = 0)
-      * \sa ltrim(string &strTrim, const string strString)
-      */
-      string rtrim(string &strTrim, const string strString);
-      //! Pads the string on the left with given character to the given width.
-      /*!
-      * \param strPad - Returns the padded string.
-      * \param strString - The original string.
-      * \param cPad - The character used for padding.
-      * \param nPad - The width to pad upto.
-      * \sa rpad(string &strPad, const string strString, const char cPad, const int nPad)
-      */
       string lpad(string &strPad, const string strString, const char cPad, const int nPad);
-      //! Pads the string on the right with given character to the given width.
-      /*!
-      * \param strPad - Returns the padded string.
-      * \param strString - The original string.
-      * \param cPad - The character used for padding.
-      * \param nPad - The width to pad upto.
-      * \sa lpad(string &strPad, const string strString, const char cPad, const int nPad)
-      */
+      string ltrim(string &strTrim, const string strString);
+      string purgeChar(string &strPurge, const string strString, const string strChar);
       string rpad(string &strPad, const string strString, const char cPad, const int nPad);
-      //! Converts a string to a string.
-      /*!
-      * \param strValue - The original value.
-      * \param strResult - The resultant value.
-      */
+      string rtrim(string &strTrim, const string strString);
+      string toLower(string &strLower, const string strString);
+      string toShort(float fNumber, string &strNumber);
+      string toShortByte(float fNumber, string &strNumber);
       string toString(const string strValue, string &strResult);
-      //! Converts an unsigned integer to a string.
-      /*!
-      * \param unValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const unsigned int unValue, string &strResult);
-      //! Converts an integer to a string.
-      /*!
-      * \param nValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const int nValue, string &strResult);
-      //! Converts a float to a string.
-      /*!
-      * \param fValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const float fValue, string &strResult);
-      //! Converts a double to a string.
-      /*!
-      * \param dValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const double dValue, string &strResult);
-      //! Converts an unsigned long to a string.
-      /*!
-      * \param ulValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const unsigned long ulValue, string &strResult);
-      //! Converts a long to a string.
-      /*!
-      * \param lValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const long lValue, string &strResult);
-      //! Converts an unsigned long long to a string.
-      /*!
-      * \param ullValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const unsigned long long ullValue, string &strResult);
-      //! Converts a long long to a string.
-      /*!
-      * \param llValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const long long llValue, string &strResult);
-      //! Converts a character to a string.
-      /*!
-      * \param cValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const char cValue, string &strResult);
-      //! Converts a character array to a string.
-      /*!
-      * \param szValue - The original value.
-      * \param strResult - The resultant value.
-      */
       string toString(const char szValue[], string &strResult);
-      //! URL decodes a string.
-      /*!
-      * \param strDecoded - Returns the decoded string.
-      * \param strString - The original string.
-      * \return Returns the decoded string.
-      */
+      string toUpper(string &strUpper, const string strString);
+      string trim(string &strTrim, const string strString, const int nSide = 0);
       string urlDecode(string &strDecoded, const string strData);
-      //! URL encodes a string.
-      /*!
-      * \param strEncoded - Returns the encoded string.
-      * \param strString - The original string.
-      * \return Returns the encoded string.
-      */
       string urlEncode(string &strEncoded, const string strData);
     };
     // }}}

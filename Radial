@@ -119,6 +119,9 @@ extern "C++"
       void setServer(const string strServer);
       void setThrottle(const size_t unThrottle);
       void setTimeout(const string strTimeout);
+      bool sshCommand(string &strSession, const string strCommand, list<string> &messages, string &strError);
+      bool sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, list<string> &messages, string &strError);
+      bool sshDisconnect(string &strSession, string &strError);
       bool storageAdd(list<string> keys, Json *ptData, string &strError);
       bool storageRemove(list<string> keys, string &strError);
       bool storageRetrieve(list<string> keys, Json *ptData, string &strError);

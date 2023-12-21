@@ -1080,6 +1080,94 @@ void Radial::setTimeout(const string strTimeout)
 }
 // }}}
 // }}}
+// {{{ ssh
+// {{{ sshCommand()
+bool Radial::sshCommand(string &strSession, const string strCommand, list<string> &messages, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "ssh");
+  ptRequest->i("Function", "command");
+  ptRequest->i("Session", strSession);
+  ptRequest->i("Command", strCommand);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  if (ptResponse->m.find("Response") != ptResponse->m.end())
+  {
+    for (auto &i : ptResponse->m["Response"]->l)
+    {
+      messages.push_back(i->v);
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ sshConnect()
+bool Radial::sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, list<string> &messages, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "ssh");
+  ptRequest->i("Function", "connect");
+  ptRequest->i("Server", strServer);
+  ptRequest->i("Port", strPort);
+  ptRequest->i("User", strUser);
+  ptRequest->i("Password", strPassword);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    if (ptResponse->m.find("Session") != ptResponse->m.end() && !ptResponse->m["Session"]->v.empty())
+    {
+      strSession = ptResponse->m["Session"]->v;
+    }
+    if (ptResponse->m.find("Response") != ptResponse->m.end())
+    {
+      for (auto &i : ptResponse->m["Response"]->l)
+      {
+        messages.push_back(i->v);
+      }
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ sshDisconnect()
+bool Radial::sshDisconnect(string &strSession, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "ssh");
+  ptRequest->i("Function", "disconnect");
+  ptRequest->i("Session", strSession);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// }}}
 // {{{ storage
 // {{{ storageAdd()
 bool Radial::storageAdd(list<string> keys, Json *ptData, string &strError)

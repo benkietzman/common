@@ -1126,6 +1126,7 @@ bool Radial::sshConnect(const string strServer, const string strPort, const stri
   ptRequest->i("Password", strPassword);
   if (request(ptRequest, ptResponse, strError))
   {
+    bResult = true;
     if (ptResponse->m.find("Session") != ptResponse->m.end() && !ptResponse->m["Session"]->v.empty())
     {
       strSession = ptResponse->m["Session"]->v;

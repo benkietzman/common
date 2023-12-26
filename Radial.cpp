@@ -1089,10 +1089,11 @@ bool Radial::sshConnect(const string strServer, const string strPort, const stri
 
   ptRequest->i("Interface", "ssh");
   ptRequest->i("Function", "connect");
-  ptRequest->i("Server", strServer);
-  ptRequest->i("Port", strPort);
-  ptRequest->i("User", strUser);
-  ptRequest->i("Password", strPassword);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Server", strServer);
+  ptRequest->m["Request"]->i("Port", strPort);
+  ptRequest->m["Request"]->i("User", strUser);
+  ptRequest->m["Request"]->i("Password", strPassword);
   if (request(ptRequest, ptResponse, strError))
   {
     bResult = true;

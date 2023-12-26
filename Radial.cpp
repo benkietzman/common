@@ -1082,7 +1082,7 @@ void Radial::setTimeout(const string strTimeout)
 // }}}
 // {{{ ssh
 // {{{ sshCommand()
-bool Radial::sshCommand(string &strSession, const string strCommand, list<string> &messages, string &strError)
+bool Radial::sshCommand(string &strSession, const string strCommand, string &strData, string &strError)
 {
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
@@ -1099,12 +1099,9 @@ bool Radial::sshCommand(string &strSession, const string strCommand, list<string
   {
     strSession.clear();
   }
-  if (ptResponse->m.find("Response") != ptResponse->m.end())
+  if (ptResponse->m.find("Response") != ptResponse->m.end() && !ptResponse->m["Response"]->v.empty())
   {
-    for (auto &i : ptResponse->m["Response"]->l)
-    {
-      messages.push_back(i->v);
-    }
+    strData = ptResponse->m["Response"]->v;
   }
   delete ptRequest;
   delete ptResponse;
@@ -1127,17 +1124,14 @@ bool Radial::sshConnect(const string strServer, const string strPort, const stri
   if (request(ptRequest, ptResponse, strError))
   {
     bResult = true;
-    if (ptResponse->m.find("Session") != ptResponse->m.end() && !ptResponse->m["Session"]->v.empty())
-    {
-      strSession = ptResponse->m["Session"]->v;
-    }
-    if (ptResponse->m.find("Response") != ptResponse->m.end())
-    {
-      for (auto &i : ptResponse->m["Response"]->l)
-      {
-        messages.push_back(i->v);
-      }
-    }
+  }
+  if (ptResponse->m.find("Session") != ptResponse->m.end() && !ptResponse->m["Session"]->v.empty())
+  {
+    strSession = ptResponse->m["Session"]->v;
+  }
+  if (ptResponse->m.find("Response") != ptResponse->m.end() && !ptResponse->m["Response"]->v.empty())
+  {
+    strData = ptResponse->m["Response"]->v;
   }
   delete ptRequest;
   delete ptResponse;

@@ -1110,7 +1110,7 @@ bool Radial::sshCommand(string &strSession, const string strCommand, string &str
 }
 // }}}
 // {{{ sshConnect()
-bool Radial::sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, list<string> &messages, string &strError)
+bool Radial::sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, string &strData, string &strError)
 {
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;

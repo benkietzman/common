@@ -116,9 +116,9 @@ void Radial::databaseFree(list<map<string, string> > *result)
     }
     result->clear();
     delete result;
-    result = NULL; 
+    result = NULL;
   }
-} 
+}
 // }}}
 // {{{ databaseQuery()
 list<map<string, string> > *Radial::databaseQuery(const string strDatabase, const string strQuery, string &strError)
@@ -198,7 +198,7 @@ bool Radial::databaseUpdate(const string strDatabase, const string strUpdate, un
 void Radial::dbFree(list<map<string, string> > *result)
 {
   databaseFree(result);
-} 
+}
 // }}}
 // {{{ dbQuery()
 list<map<string, string> > *Radial::dbQuery(const string strDatabase, const string strQuery, string &strError)
@@ -332,7 +332,7 @@ bool Radial::mysqlQuery(const string strUser, const string strPassword, const st
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
   string strJson;
-  
+
   result.clear();
   ptRequest->i("Interface", "mysql");
   ptRequest->i("User", strUser);
@@ -1266,6 +1266,611 @@ bool Radial::storageUpdate(list<string> keys, Json *ptData, string &strError)
   if (request(ptRequest, ptResponse, strError))
   {
     bResult = true;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// }}}
+// {{{ terminal
+// {{{ terminalConnect()
+bool Radial::terminalConnect(const string strServer, const string strPort, string &strSession, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal");
+  ptRequest->i("Function", "connect");
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Server", strServer);
+  ptRequest->m["Request"]->i("Port", strPort);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") != ptResponse->m.end() && !ptResponse->m["Session"]->v.empty())
+  {
+    strSession = ptResponse->m["Session"]->v;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalDisconnect()
+bool Radial::terminalDisconnect(string &strSession, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal");
+  ptRequest->i("Function", "disconnect");
+  ptRequest->i("Session", strSession);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalGetSocketTimeout()
+bool Radial::terminalGetSocketTimeout(string &strSession, int &nShort, int &nLong, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "getSocketTimeout");
+  ptRequest->i("Session", strSession);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  if (ptResponse->m.find("Response") != ptResponse->m.end())
+  {
+    if (ptResponse->m["Response"]->m.find("Short") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Short"]->v.empty())
+    {
+      stringstream ssShort(ptResponse->m["Response"]->m["Short"]->v);
+      ssShort >> nShort;
+    }
+    if (ptResponse->m["Response"]->m.find("Long") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Long"]->v.empty())
+    {
+      stringstream ssLong(ptResponse->m["Response"]->m["Long"]->v);
+      ssLong >> nLong;
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalScreen()
+bool Radial::terminalScreen(string &strSession, vector<string> &screen, string &strError)
+{
+  size_t unCol, unCols, unRow, unRows;
+
+  return terminalScreen(strSession, screen, unCol, unCols, unRow, unRows, strError);
+}
+bool Radial::terminalScreen(string &strSession, vector<string> &screen, size_t &unCol, size_t &unCols, size_t &unRow, size_t &unRows, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  screen.clear();
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "screen");
+  ptRequest->i("Session", strSession);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  if (ptResponse->m.find("Response") != ptResponse->m.end())
+  {
+    if (ptResponse->m["Response"]->m.find("Screen") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Screen"]->v.empty())
+    {
+      for (auto &i : ptResponse->m["Response"]->m["Screen"]->l)
+      {
+        screen.push_back(i->v);
+      }
+    }
+    if (ptResponse->m["Response"]->m.find("Col") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Col"]->v.empty())
+    {
+      stringstream ssCol(ptResponse->m["Response"]->m["Col"]->v);
+      ssCol >> unCol;
+    }
+    if (ptResponse->m["Response"]->m.find("Cols") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Cols"]->v.empty())
+    {
+      stringstream ssCols(ptResponse->m["Response"]->m["Cols"]->v);
+      ssCols >> unCols;
+    }
+    if (ptResponse->m["Response"]->m.find("Row") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Row"]->v.empty())
+    {
+      stringstream ssRow(ptResponse->m["Response"]->m["Row"]->v);
+      ssRow >> unRow;
+    }
+    if (ptResponse->m["Response"]->m.find("Rows") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Rows"]->v.empty())
+    {
+      stringstream ssRows(ptResponse->m["Response"]->m["Rows"]->v);
+      ssRows >> unRows;
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSend()
+bool Radial::terminalSend(string &strSession, const string strData, const size_t unCount, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "send");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Data", strData);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendCtrl()
+bool Radial::terminalSendCtrl(string &strSession, const char cData, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssData;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendCtrl");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssData << cData;
+  ptRequest->m["Request"]->i("Data", ssData.str());
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendDown()
+bool Radial::terminalSendDown(string &strSession, const size_t unCount, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendDown");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendEnter()
+bool Radial::terminalSendEnter(string &strSession, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendEnter");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendEscape()
+bool Radial::terminalSendEscape(string &strSession, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendEscape");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendFunction()
+bool Radial::terminalSendFunction(string &strSession, const int nKey, string &strError)
+{
+  bool bResult = false;
+  stringstream ssKey;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendFunction");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssKey << nKey;
+  ptRequest->m["Request"]->i("Data", ssKey.str(), 'n');
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendHome()
+bool Radial::terminalSendHome(string &strSession, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendHome");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendKey()
+bool Radial::terminalSendKey(string &strSession, const char cData, const size_t unCount, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssData, ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendKey");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssData << cData;
+  ptRequest->m["Request"]->i("Data", ssData.str());
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendKeypadEnter()
+bool Radial::terminalSendKeypadEnter(string &strSession, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendKeypadEnter");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendLeft()
+bool Radial::terminalSendLeft(string &strSession, const size_t unCount, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendLeft");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendRight()
+bool Radial::terminalSendRight(string &strSession, const size_t unCount, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendRight");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendShiftFunction()
+bool Radial::terminalSendShiftFunction(string &strSession, const int nKey, string &strError)
+{
+  bool bResult = false;
+  stringstream ssKey;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendShiftFunction");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssKey << nKey;
+  ptRequest->m["Request"]->i("Data", ssKey.str(), 'n');
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendTab()
+bool Radial::terminalSendTab(string &strSession, const size_t unCount, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendTab");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendUp()
+bool Radial::terminalSendUp(string &strSession, const size_t unCount, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  stringstream ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendUp");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSendWait()
+bool Radial::terminalSendWait(string &strSession, const string strData, const size_t unCount, string &strError)
+{
+  bool bResult = false;
+  stringstream ssCount;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "sendWait");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Data", strData);
+  ssCount << unCount;
+  ptRequest->m["Request"]->i("Count", ssCount.str(), 'n');
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalSetSocketTimeout()
+bool Radial::terminalSetSocketTimeout(string &strSession, const int nShort, const int nLong, string &strError)
+{
+  bool bResult = false;
+  stringstream ssLong, ssShort;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "setSocketTimeout");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ssShort << nShort;
+  ptRequest->m["Request"]->i("Short", ssShort.str(), 'n');
+  ssLong << nLong;
+  ptRequest->m["Request"]->i("Long", ssLong.str(), 'n');
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ terminalWait()
+bool Radial::terminalWait(string &strSession, const bool bWait, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "terminal"); 
+  ptRequest->i("Function", "wait");
+  ptRequest->i("Session", strSession);
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Wait", ((bWait)?"1":"0"), ((bWait)?'1':'0'));
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Session") == ptResponse->m.end() || ptResponse->m["Session"]->v.empty())
+  {
+    strSession.clear();
   }
   delete ptRequest;
   delete ptResponse;

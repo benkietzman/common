@@ -967,6 +967,7 @@ extern "C++"
         char szBuffer[4096];
         int nReturn;
         size_t unSize;
+        m_mutex.lock();
         while (!bExit)
         {
           pollfd fds[2];
@@ -1030,6 +1031,7 @@ extern "C++"
           }
         }
         parse();
+        m_mutex.unlock();
       }
       else
       {

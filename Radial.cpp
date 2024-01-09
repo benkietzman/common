@@ -1278,7 +1278,7 @@ bool Radial::storageUpdate(list<string> keys, Json *ptData, string &strError)
 // {{{ terminalConnect()
 bool Radial::terminalConnect(radialTerminalInfo &tInfo, const string strServer, const string strPort, string &strError)
 {
-  return terminalRequest(tInfo, "connect", {{"Server", strServer}, {"Port", strPort}}, strError);;
+  return terminalRequest(tInfo, "connect", {{"Server", strServer}, {"Port", strPort}, {"Wait", "1"}}, strError);;
 }
 // }}}
 // {{{ terminalDisconnect()

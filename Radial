@@ -161,7 +161,7 @@ extern "C++"
       bool terminalSendTab(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError);
       bool terminalSendUp(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError);
       bool terminalSetSocketTimeout(radialTerminalInfo &tInfo, const int nShort, const int nLong, string &strError);
-      bool terminalWait(radialTerminalInfo &tInfo, const bool bWait, string &strError);
+      bool terminalWait(radialTerminalInfo &tInfo, string &strError);
       void useSingleSocket(const bool bUseSingleSocket = true);
       Utility *utility();
     };

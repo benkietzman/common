@@ -179,7 +179,7 @@ extern "C++"
       void setSocketTimeout(const int nShort, const int nLong);
       void type(const string strType);
       void uncaught(const bool bUncaught);
-      bool wait(const bool bWait = true);
+      bool wait();
     };
     // }}}
   }

@@ -1604,25 +1604,18 @@ extern "C++"
     }
     // }}}
     // {{{ wait()
-    bool Terminal::wait(const bool bWait)
+    bool Terminal::wait()
     {
-      bool bResult = true;
+      bool bResult = false;
 
-      if (bWait)
+      m_bWait = true;
+      if (read())
       {
-        m_bWait = true;
+        bResult = true;
       }
-      if (m_bWait)
+      else
       {
-        bResult = false;
-        if (read())
-        {
-          bResult = true;
-        }
-        else
-        {
-          prefix("wait()");
-        }
+        prefix("wait()");
       }
 
       return bResult;

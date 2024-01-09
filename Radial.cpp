@@ -1358,7 +1358,7 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
   if (ptResponse->m.find("Response") != ptResponse->m.end())
   {
     ptJson->parse(ptResponse->m["Response"]->j(strJson));
-    if (ptJson->m.find("Screen") != ptJson->m.end() && !ptJson->l.empty())
+    if (ptJson->m.find("Screen") != ptJson->m.end() && !ptJson->m["Screen"]->l.empty())
     {
       tInfo.screen.clear();
       for (auto &i : ptJson->m["Screen"]->l)

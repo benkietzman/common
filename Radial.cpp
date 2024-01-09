@@ -1546,7 +1546,7 @@ bool Radial::terminalSetSocketTimeout(radialTerminalInfo &tInfo, const int nShor
 // {{{ terminalWait()
 bool Radial::terminalWait(radialTerminalInfo &tInfo, string &strError)
 {
-  return terminalRequest(tInfo, "wait", strError);
+  return terminalRequest(tInfo, "wait", {{"Wait", "1"}}, strError);
 }
 // }}}
 // }}}

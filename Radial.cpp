@@ -1281,10 +1281,52 @@ bool Radial::terminalConnect(radialTerminalInfo &tInfo, const string strServer, 
   return terminalRequest(tInfo, "connect", {{"Server", strServer}, {"Port", strPort}, {"Wait", ((bWait)?"1":"0")}}, strError);;
 }
 // }}}
+// {{{ terminalCtrl()
+bool Radial::terminalCtrl(radialTerminalInfo &tInfo, const char cData, const bool bWait, string &strError)
+{
+  stringstream ssData;
+
+  ssData << cData;
+
+  return terminalRequest(tInfo, "sendCtrl", {{"Data", ssData.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
 // {{{ terminalDisconnect()
 bool Radial::terminalDisconnect(radialTerminalInfo &tInfo, string &strError)
 {
   return terminalRequest(tInfo, "disconnect", strError);
+}
+// }}}
+// {{{ terminalDown()
+bool Radial::terminalDown(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+{
+  stringstream ssCount;
+
+  ssCount << unCount;
+
+  return terminalRequest(tInfo, "down", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalEnter()
+bool Radial::terminalEnter(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+{
+  return terminalRequest(tInfo, "enter", {{"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalEscape()
+bool Radial::terminalEscape(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+{
+  return terminalRequest(tInfo, "escape", {{"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalFunction()
+bool Radial::terminalFunction(radialTerminalInfo &tInfo, const int nKey, string &strError)
+{
+  stringstream ssKey;
+
+  ssKey << nKey;
+
+  return terminalRequest(tInfo, "function", {{"Data", ssKey.str()}}, strError);
 }
 // }}}
 // {{{ terminalGetSocketTimeout()
@@ -1310,6 +1352,39 @@ bool Radial::terminalGetSocketTimeout(radialTerminalInfo &tInfo, int &nShort, in
   delete ptJson;
 
   return bResult;
+}
+// }}}
+// {{{ terminalHome()
+bool Radial::terminalHome(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+{
+  return terminalRequest(tInfo, "home", {{"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalKey()
+bool Radial::terminalKey(radialTerminalInfo &tInfo, const char cData, const size_t unCount, const bool bWait, string &strError)
+{
+  stringstream ssData, ssCount;
+
+  ssData << cData;
+  ssCount << unCount;
+
+  return terminalRequest(tInfo, "key", {{"Data", ssData.str()}, {"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalKeypadEnter()
+bool Radial::terminalKeypadEnter(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+{
+  return terminalRequest(tInfo, "keypadEnter", {{"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalLeft()
+bool Radial::terminalLeft(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+{
+  stringstream ssCount;
+
+  ssCount << unCount;
+
+  return terminalRequest(tInfo, "left", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalRequest()
@@ -1401,6 +1476,16 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
   return bResult;
 }
 // }}}
+// {{{ terminalRight()
+bool Radial::terminalRight(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+{
+  stringstream ssCount;
+
+  ssCount << unCount;
+
+  return terminalRequest(tInfo, "right", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
 // {{{ terminalScreen()
 bool Radial::terminalScreen(radialTerminalInfo &tInfo, string &strError)
 {
@@ -1417,121 +1502,6 @@ bool Radial::terminalSend(radialTerminalInfo &tInfo, const string strData, const
   return terminalRequest(tInfo, "send", {{"Data", strData}, {"Count", ssCount.str()}}, strError);
 }
 // }}}
-// {{{ terminalSendCtrl()
-bool Radial::terminalSendCtrl(radialTerminalInfo &tInfo, const char cData, const bool bWait, string &strError)
-{
-  stringstream ssData;
-
-  ssData << cData;
-
-  return terminalRequest(tInfo, "sendCtrl", {{"Data", ssData.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendDown()
-bool Radial::terminalSendDown(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
-{
-  stringstream ssCount;
-
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendDown", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendEnter()
-bool Radial::terminalSendEnter(radialTerminalInfo &tInfo, const bool bWait, string &strError)
-{
-  return terminalRequest(tInfo, "sendEnter", {{"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendEscape()
-bool Radial::terminalSendEscape(radialTerminalInfo &tInfo, const bool bWait, string &strError)
-{
-  return terminalRequest(tInfo, "sendEscape", {{"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendFunction()
-bool Radial::terminalSendFunction(radialTerminalInfo &tInfo, const int nKey, string &strError)
-{
-  stringstream ssKey;
-
-  ssKey << nKey;
-
-  return terminalRequest(tInfo, "sendFunction", {{"Data", ssKey.str()}}, strError);
-}
-// }}}
-// {{{ terminalSendHome()
-bool Radial::terminalSendHome(radialTerminalInfo &tInfo, const bool bWait, string &strError)
-{
-  return terminalRequest(tInfo, "sendHome", {{"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendKey()
-bool Radial::terminalSendKey(radialTerminalInfo &tInfo, const char cData, const size_t unCount, const bool bWait, string &strError)
-{
-  stringstream ssData, ssCount;
-
-  ssData << cData;
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendKey", {{"Data", ssData.str()}, {"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendKeypadEnter()
-bool Radial::terminalSendKeypadEnter(radialTerminalInfo &tInfo, const bool bWait, string &strError)
-{
-  return terminalRequest(tInfo, "sendKeypadEnter", {{"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendLeft()
-bool Radial::terminalSendLeft(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
-{
-  stringstream ssCount;
-
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendLeft", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendRight()
-bool Radial::terminalSendRight(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
-{
-  stringstream ssCount;
-
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendRight", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendShiftFunction()
-bool Radial::terminalSendShiftFunction(radialTerminalInfo &tInfo, const int nKey, string &strError)
-{
-  stringstream ssKey;
-
-  ssKey << nKey;
-
-  return terminalRequest(tInfo, "sendShiftFunction", {{"Data", ssKey.str()}}, strError);
-}
-// }}}
-// {{{ terminalSendTab()
-bool Radial::terminalSendTab(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
-{
-  stringstream ssCount;
-
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendTab", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendUp()
-bool Radial::terminalSendUp(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
-{
-  stringstream ssCount;
-
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendUp", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
 // {{{ terminalSetSocketTimeout()
 bool Radial::terminalSetSocketTimeout(radialTerminalInfo &tInfo, const int nShort, const int nLong, string &strError)
 {
@@ -1541,6 +1511,36 @@ bool Radial::terminalSetSocketTimeout(radialTerminalInfo &tInfo, const int nShor
   ssLong << nLong;
 
   return terminalRequest(tInfo, "setSocketTimeout", {{"Short", ssShort.str()}, {"Long", ssLong.str()}}, strError);
+}
+// }}}
+// {{{ terminalShiftFunction()
+bool Radial::terminalShiftFunction(radialTerminalInfo &tInfo, const int nKey, string &strError)
+{
+  stringstream ssKey;
+
+  ssKey << nKey;
+
+  return terminalRequest(tInfo, "shiftFunction", {{"Data", ssKey.str()}}, strError);
+}
+// }}}
+// {{{ terminalTab()
+bool Radial::terminalTab(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+{
+  stringstream ssCount;
+
+  ssCount << unCount;
+
+  return terminalRequest(tInfo, "tab", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
+}
+// }}}
+// {{{ terminalUp()
+bool Radial::terminalUp(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+{
+  stringstream ssCount;
+
+  ssCount << unCount;
+
+  return terminalRequest(tInfo, "up", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalWait()

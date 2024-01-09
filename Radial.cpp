@@ -1408,7 +1408,7 @@ bool Radial::terminalScreen(radialTerminalInfo &tInfo, string &strError)
 }
 // }}}
 // {{{ terminalSend()
-bool Radial::terminalSend(radialTerminalInfo &tInfo, const string strData, const size_t unCount, string &strError)
+bool Radial::terminalSend(radialTerminalInfo &tInfo, const string strData, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1530,16 +1530,6 @@ bool Radial::terminalSendUp(radialTerminalInfo &tInfo, const size_t unCount, con
   ssCount << unCount;
 
   return terminalRequest(tInfo, "sendUp", {{"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
-}
-// }}}
-// {{{ terminalSendWait()
-bool Radial::terminalSendWait(radialTerminalInfo &tInfo, const string strData, const size_t unCount, string &strError)
-{
-  stringstream ssCount;
-
-  ssCount << unCount;
-
-  return terminalRequest(tInfo, "sendWait", {{"Data", strData}, {"Count", ssCount.str()}}, strError);
 }
 // }}}
 // {{{ terminalSetSocketTimeout()

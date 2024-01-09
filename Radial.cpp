@@ -1346,6 +1346,11 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
   {
     ptRequest->m["Request"] = new Json(data);
   }
+  if (ptRequest->m.find("Request") == ptRequest->m.end())
+  {
+    ptRequest->m["Request"] = new Json;
+  }
+  ptRequest->m["Request"]->i("Screen", "1", '1');
   if (request(ptRequest, ptResponse, strError))
   {
     bResult = true;

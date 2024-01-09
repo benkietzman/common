@@ -161,7 +161,7 @@ extern "C++"
       bool terminalShiftFunction(radialTerminalInfo &tInfo, const int nKey, string &strError);
       bool terminalTab(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError);
       bool terminalUp(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError);
-      bool terminalWait(radialTerminalInfo &tInfo, string &strError);
+      bool terminalWait(radialTerminalInfo &tInfo, const bool bWait, string &strError);
       void useSingleSocket(const bool bUseSingleSocket = true);
       Utility *utility();
     };

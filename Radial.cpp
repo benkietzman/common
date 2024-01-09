@@ -1544,9 +1544,9 @@ bool Radial::terminalUp(radialTerminalInfo &tInfo, const size_t unCount, const b
 }
 // }}}
 // {{{ terminalWait()
-bool Radial::terminalWait(radialTerminalInfo &tInfo, string &strError)
+bool Radial::terminalWait(radialTerminalInfo &tInfo, const bool bWait, string &strError)
 {
-  return terminalRequest(tInfo, "wait", {{"Wait", "1"}}, strError);
+  return terminalRequest(tInfo, "wait", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // }}}

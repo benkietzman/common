@@ -1464,7 +1464,7 @@ extern "C++"
 
       if (send(strData, unCount))
       {
-        bResult = wait(false);
+        bResult = wait(true);
       }
       else
       {

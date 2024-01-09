@@ -1499,7 +1499,7 @@ bool Radial::terminalSend(radialTerminalInfo &tInfo, const string strData, const
 
   ssCount << unCount;
 
-  return terminalRequest(tInfo, "send", {{"Data", strData}, {"Count", ssCount.str()}}, strError);
+  return terminalRequest(tInfo, "send", {{"Data", strData}, {"Count", ssCount.str()}, {"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalSetSocketTimeout()

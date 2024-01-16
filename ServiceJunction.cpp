@@ -978,33 +978,10 @@ extern "C++"
               {
                 strService = ptSubJson->m["Service"]->v;
               }
-              if (strService == "ners" && ptSubJson->m.find("GUID") != ptSubJson->m.end() && !ptSubJson->m["GUID"]->v.empty())
+              if (ptSubJson->m.find("Password") != ptSubJson->m.end() && !ptSubJson->m["Password"]->v.empty())
               {
-                ptSubJson->m["GUID"]->v.clear();
+                ptSubJson->m["Password"]->v.clear();
               }
-              else if (ptSubJson->m.find("Password") != ptSubJson->m.end() && !ptSubJson->m["Password"]->v.empty())
-              {
-                ptSubJson->m["Password"]->v = "";
-              }
-            }
-            if (ptSubJson->m.find("companyPassword") != ptSubJson->m.end() && !ptSubJson->m["companyPassword"]->v.empty())
-            {
-              ptSubJson->m["companyPassword"]->v = "";
-            }
-            if (ptSubJson->m.find("CompanyPassword") != ptSubJson->m.end() && !ptSubJson->m["CompanyPassword"]->v.empty())
-            {
-              ptSubJson->m["CompanyPassword"]->v = "";
-            }
-            if (strService == "wfac")
-            {
-              if (ptSubJson->m.find("routeToInformation") != ptSubJson->m.end() && ptSubJson->m["routeToInformation"]->m.find("userpassword") != ptSubJson->m["routeToInformation"]->m.end() && !ptSubJson->m["routeToInformation"]->m["userpassword"]->v.empty())
-              {
-                ptSubJson->m["routeToInformation"]->m["userpassword"]->v.clear();
-              }
-              if (ptSubJson->m.find("inputRequest") != ptSubJson->m.end() && ptSubJson->m["inputRequest"]->m.find("transactionData") != ptSubJson->m["inputRequest"]->m.end() && !ptSubJson->m["inputRequest"]->m["transactionData"]->l.empty() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m.find("data") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m.end() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m.find("WFA") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m.end() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m.find("REQUEST") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m.end() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m.find("PASSWORD") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m.end() && !ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m["PASSWORD"]->v.empty())
-               {
-                 ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m["PASSWORD"]->v.clear();
-               }
             }
             ptJson->m["Request"]->l.push_back(ptSubJson);
           }
@@ -1019,24 +996,9 @@ extern "C++"
               {
                 strService = ptSubJson->m["Service"]->v;
               }
-              if (strService == "ners" && ptSubJson->m.find("GUID") != ptSubJson->m.end() && !ptSubJson->m["GUID"]->v.empty())
-              {
-                ptSubJson->m["GUID"]->v.clear();
-              }
-              else if (strService == "wfac")
-              {
-                if (ptSubJson->m.find("routeToInformation") != ptSubJson->m.end() && ptSubJson->m["routeToInformation"]->m.find("userpassword") != ptSubJson->m["routeToInformation"]->m.end() && !ptSubJson->m["routeToInformation"]->m["userpassword"]->v.empty())
-                {
-                  ptSubJson->m["routeToInformation"]->m["userpassword"]->v.clear();
-                }
-                if (ptSubJson->m.find("inputRequest") != ptSubJson->m.end() && ptSubJson->m["inputRequest"]->m.find("transactionData") != ptSubJson->m["inputRequest"]->m.end() && !ptSubJson->m["inputRequest"]->m["transactionData"]->l.empty() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m.find("data") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m.end() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m.find("WFA") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m.end() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m.find("REQUEST") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m.end() && ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m.find("PASSWORD") != ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m.end() && !ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m["PASSWORD"]->v.empty())
-                 {
-                   ptSubJson->m["inputRequest"]->m["transactionData"]->l.front()->m["data"]->m["WFA"]->m["REQUEST"]->m["PASSWORD"]->v.clear();
-                 }
-              }
               else if (ptSubJson->m.find("Password") != ptSubJson->m.end() && !ptSubJson->m["Password"]->v.empty())
               {
-                ptSubJson->m["Password"]->v = "";
+                ptSubJson->m["Password"]->v.clear();
               }
             }
             ptJson->m["Response"]->l.push_back(ptSubJson);

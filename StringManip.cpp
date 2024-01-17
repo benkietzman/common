@@ -644,10 +644,11 @@ extern "C++"
 
       if (!strValue.empty())
       {
+        size_t unDecimals = 0;
         bResult = true;
         for (size_t i = 0; bResult && i < strValue.size(); i++)
         {
-          if ((i != 0 || strValue[i] != '-') && !isdigit(strValue[i]))
+          if ((i != 0 || strValue[i] != '-') && (i == 0 || strValue[i] != '.' || ++unDecimals != 1) && !isdigit(strValue[i]))
           {
             bResult = false;
           }

@@ -76,6 +76,7 @@ extern "C++"
       int m_nSocketTimeout[2];
       list<string> m_caught;
       list<string> m_uncaught;
+      mutex m_mutex;
       mutex m_mutexRead;
       mutex m_mutexWrite;
       string m_strBuffer;

@@ -567,8 +567,10 @@ extern "C++"
     // {{{ getSocketTimeout()
     void Terminal::getSocketTimeout(int &nShort, int &nLong)
     {
+      m_mutex.lock();
       nShort = m_nSocketTimeout[0];
       nLong = m_nSocketTimeout[1];
+      m_mutex.unlock();
     }
     // }}}
     // {{{ left()
@@ -967,6 +969,7 @@ extern "C++"
         char szBuffer[4096];
         int nReturn;
         size_t unSize;
+        m_mutex.lock();
         while (!bExit)
         {
           pollfd fds[2];
@@ -1030,6 +1033,7 @@ extern "C++"
           }
         }
         parse();
+        m_mutex.unlock();
       }
       else
       {
@@ -1509,8 +1513,10 @@ extern "C++"
     // {{{ setSocketTimeout()
     void Terminal::setSocketTimeout(const int nShort, const int nLong)
     {
+      m_mutex.lock();
       m_nSocketTimeout[0] = nShort;
       m_nSocketTimeout[1] = nLong;
+      m_mutex.unlock();
     }
     // }}}
     // {{{ tab()
@@ -1642,6 +1648,7 @@ extern "C++"
 
       if (m_fdServerWrite >= 0)
       {
+        m_mutex.lock();
         if (::write(m_fdServerWrite, pszData, unSize) == (ssize_t)unSize)
         {
           bResult = m_bWait = true;
@@ -1653,6 +1660,7 @@ extern "C++"
           ssPrefix << "write()->write(" << errno << ")";
           error(ssPrefix.str(), strerror(errno));
         }
+        m_mutex.unlock();
       }
       else
       {

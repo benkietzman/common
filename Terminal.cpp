@@ -969,7 +969,7 @@ extern "C++"
         char szBuffer[4096];
         int nReturn;
         size_t unSize;
-        m_mutex.lock();
+        m_mutexRead.lock();
         while (!bExit)
         {
           pollfd fds[2];
@@ -1033,7 +1033,7 @@ extern "C++"
           }
         }
         parse();
-        m_mutex.unlock();
+        m_mutexRead.unlock();
       }
       else
       {
@@ -1648,7 +1648,7 @@ extern "C++"
 
       if (m_fdServerWrite >= 0)
       {
-        m_mutex.lock();
+        m_mutexWrite.lock();
         if (::write(m_fdServerWrite, pszData, unSize) == (ssize_t)unSize)
         {
           bResult = m_bWait = true;
@@ -1660,7 +1660,7 @@ extern "C++"
           ssPrefix << "write()->write(" << errno << ")";
           error(ssPrefix.str(), strerror(errno));
         }
-        m_mutex.unlock();
+        m_mutexWrite.unlock();
       }
       else
       {

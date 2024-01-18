@@ -1413,13 +1413,17 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
 
   ptRequest->i("Interface", "terminal");
   ptRequest->i("Function", strFunction);
-  if (!tInfo.strSession.empty())
-  {
-    ptRequest->i("Session", tInfo.strSession);
-  }
   if (!data.empty())
   {
     ptRequest->m["Request"] = new Json(data);
+  }
+  else
+  {
+    ptRequest->m["Request"] = new Json;
+  }
+  if (!tInfo.strSession.empty())
+  {
+    ptRequest->m["Request"]->i("Session", tInfo.strSession);
   }
   if (request(ptRequest, ptResponse, strError))
   {
@@ -1428,6 +1432,14 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
   if (ptResponse->m.find("Response") != ptResponse->m.end())
   {
     ptJson->parse(ptResponse->m["Response"]->j(strJson));
+    if (ptJson->m.find("Session") != ptJson->m.end() && !ptJson->m["Session"]->v.empty())
+    {
+      tInfo.strSession = ptJson->m["Session"]->v;
+    }
+    else
+    {
+      tInfo.strSession.clear();
+    }
     if (ptJson->m.find("Screen") != ptJson->m.end() && !ptJson->m["Screen"]->l.empty())
     {
       tInfo.screen.clear();
@@ -1456,14 +1468,6 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
       stringstream ssRows(ptJson->m["Rows"]->v);
       ssRows >> tInfo.unRows;
     }
-  }
-  if (ptResponse->m.find("Session") != ptResponse->m.end() && !ptResponse->m["Session"]->v.empty())
-  {
-    tInfo.strSession = ptResponse->m["Session"]->v;
-  }
-  else
-  {
-    tInfo.strSession.clear();
   }
   delete ptRequest;
   delete ptResponse;

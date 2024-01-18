@@ -567,10 +567,8 @@ extern "C++"
     // {{{ getSocketTimeout()
     void Terminal::getSocketTimeout(int &nShort, int &nLong)
     {
-      m_mutex.lock();
       nShort = m_nSocketTimeout[0];
       nLong = m_nSocketTimeout[1];
-      m_mutex.unlock();
     }
     // }}}
     // {{{ left()
@@ -1513,10 +1511,8 @@ extern "C++"
     // {{{ setSocketTimeout()
     void Terminal::setSocketTimeout(const int nShort, const int nLong)
     {
-      m_mutex.lock();
       m_nSocketTimeout[0] = nShort;
       m_nSocketTimeout[1] = nLong;
-      m_mutex.unlock();
     }
     // }}}
     // {{{ tab()

@@ -1276,13 +1276,13 @@ bool Radial::storageUpdate(list<string> keys, Json *ptData, string &strError)
 // }}}
 // {{{ terminal
 // {{{ terminalConnect()
-bool Radial::terminalConnect(radialTerminalInfo &tInfo, const string strServer, const string strPort, const bool bWait, string &strError)
+bool Radial::terminalConnect(radialTerminal &tInfo, const string strServer, const string strPort, const bool bWait, string &strError)
 {
   return terminalRequest(tInfo, "connect", {{"Server", strServer}, {"Port", strPort}, {"Wait", ((bWait)?"1":"0")}}, strError);;
 }
 // }}}
 // {{{ terminalCtrl()
-bool Radial::terminalCtrl(radialTerminalInfo &tInfo, const char cData, const bool bWait, string &strError)
+bool Radial::terminalCtrl(radialTerminal &tInfo, const char cData, const bool bWait, string &strError)
 {
   stringstream ssData;
 
@@ -1292,13 +1292,13 @@ bool Radial::terminalCtrl(radialTerminalInfo &tInfo, const char cData, const boo
 }
 // }}}
 // {{{ terminalDisconnect()
-bool Radial::terminalDisconnect(radialTerminalInfo &tInfo, string &strError)
+bool Radial::terminalDisconnect(radialTerminal &tInfo, string &strError)
 {
   return terminalRequest(tInfo, "disconnect", strError);
 }
 // }}}
 // {{{ terminalDown()
-bool Radial::terminalDown(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalDown(radialTerminal &tInfo, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1308,19 +1308,19 @@ bool Radial::terminalDown(radialTerminalInfo &tInfo, const size_t unCount, const
 }
 // }}}
 // {{{ terminalEnter()
-bool Radial::terminalEnter(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+bool Radial::terminalEnter(radialTerminal &tInfo, const bool bWait, string &strError)
 {
   return terminalRequest(tInfo, "enter", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalEscape()
-bool Radial::terminalEscape(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+bool Radial::terminalEscape(radialTerminal &tInfo, const bool bWait, string &strError)
 {
   return terminalRequest(tInfo, "escape", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalFunction()
-bool Radial::terminalFunction(radialTerminalInfo &tInfo, const int nKey, string &strError)
+bool Radial::terminalFunction(radialTerminal &tInfo, const int nKey, string &strError)
 {
   stringstream ssKey;
 
@@ -1330,7 +1330,7 @@ bool Radial::terminalFunction(radialTerminalInfo &tInfo, const int nKey, string 
 }
 // }}}
 // {{{ terminalGetSocketTimeout()
-bool Radial::terminalGetSocketTimeout(radialTerminalInfo &tInfo, int &nShort, int &nLong, string &strError)
+bool Radial::terminalGetSocketTimeout(radialTerminal &tInfo, int &nShort, int &nLong, string &strError)
 {
   bool bResult = false;
   Json *ptJson = new Json;
@@ -1355,13 +1355,13 @@ bool Radial::terminalGetSocketTimeout(radialTerminalInfo &tInfo, int &nShort, in
 }
 // }}}
 // {{{ terminalHome()
-bool Radial::terminalHome(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+bool Radial::terminalHome(radialTerminal &tInfo, const bool bWait, string &strError)
 {
   return terminalRequest(tInfo, "home", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalKey()
-bool Radial::terminalKey(radialTerminalInfo &tInfo, const char cData, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalKey(radialTerminal &tInfo, const char cData, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssData, ssCount;
 
@@ -1372,13 +1372,13 @@ bool Radial::terminalKey(radialTerminalInfo &tInfo, const char cData, const size
 }
 // }}}
 // {{{ terminalKeypadEnter()
-bool Radial::terminalKeypadEnter(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+bool Radial::terminalKeypadEnter(radialTerminal &tInfo, const bool bWait, string &strError)
 {
   return terminalRequest(tInfo, "keypadEnter", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
 // {{{ terminalLeft()
-bool Radial::terminalLeft(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalLeft(radialTerminal &tInfo, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1388,11 +1388,11 @@ bool Radial::terminalLeft(radialTerminalInfo &tInfo, const size_t unCount, const
 }
 // }}}
 // {{{ terminalRequest()
-bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction, string &strError)
+bool Radial::terminalRequest(radialTerminal &tInfo, const string strFunction, string &strError)
 {
   return terminalRequest(tInfo, strFunction, {}, strError);
 }
-bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction, map<string, string> data, string &strError)
+bool Radial::terminalRequest(radialTerminal &tInfo, const string strFunction, map<string, string> data, string &strError)
 {
   bool bResult = false;
   Json *ptJson = new Json;
@@ -1405,7 +1405,7 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
 
   return bResult;
 }
-bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction, map<string, string> data, Json *ptJson, string &strError)
+bool Radial::terminalRequest(radialTerminal &tInfo, const string strFunction, map<string, string> data, Json *ptJson, string &strError)
 {
   bool bResult = false;
   string strJson;
@@ -1476,7 +1476,7 @@ bool Radial::terminalRequest(radialTerminalInfo &tInfo, const string strFunction
 }
 // }}}
 // {{{ terminalRight()
-bool Radial::terminalRight(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalRight(radialTerminal &tInfo, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1486,13 +1486,13 @@ bool Radial::terminalRight(radialTerminalInfo &tInfo, const size_t unCount, cons
 }
 // }}}
 // {{{ terminalScreen()
-bool Radial::terminalScreen(radialTerminalInfo &tInfo, string &strError)
+bool Radial::terminalScreen(radialTerminal &tInfo, string &strError)
 {
   return terminalRequest(tInfo, "screen", strError);
 }
 // }}}
 // {{{ terminalSend()
-bool Radial::terminalSend(radialTerminalInfo &tInfo, const string strData, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalSend(radialTerminal &tInfo, const string strData, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1502,7 +1502,7 @@ bool Radial::terminalSend(radialTerminalInfo &tInfo, const string strData, const
 }
 // }}}
 // {{{ terminalSetSocketTimeout()
-bool Radial::terminalSetSocketTimeout(radialTerminalInfo &tInfo, const int nShort, const int nLong, string &strError)
+bool Radial::terminalSetSocketTimeout(radialTerminal &tInfo, const int nShort, const int nLong, string &strError)
 {
   stringstream ssLong, ssShort;
 
@@ -1513,7 +1513,7 @@ bool Radial::terminalSetSocketTimeout(radialTerminalInfo &tInfo, const int nShor
 }
 // }}}
 // {{{ terminalShiftFunction()
-bool Radial::terminalShiftFunction(radialTerminalInfo &tInfo, const int nKey, string &strError)
+bool Radial::terminalShiftFunction(radialTerminal &tInfo, const int nKey, string &strError)
 {
   stringstream ssKey;
 
@@ -1523,7 +1523,7 @@ bool Radial::terminalShiftFunction(radialTerminalInfo &tInfo, const int nKey, st
 }
 // }}}
 // {{{ terminalTab()
-bool Radial::terminalTab(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalTab(radialTerminal &tInfo, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1533,7 +1533,7 @@ bool Radial::terminalTab(radialTerminalInfo &tInfo, const size_t unCount, const 
 }
 // }}}
 // {{{ terminalUp()
-bool Radial::terminalUp(radialTerminalInfo &tInfo, const size_t unCount, const bool bWait, string &strError)
+bool Radial::terminalUp(radialTerminal &tInfo, const size_t unCount, const bool bWait, string &strError)
 {
   stringstream ssCount;
 
@@ -1543,7 +1543,7 @@ bool Radial::terminalUp(radialTerminalInfo &tInfo, const size_t unCount, const b
 }
 // }}}
 // {{{ terminalWait()
-bool Radial::terminalWait(radialTerminalInfo &tInfo, const bool bWait, string &strError)
+bool Radial::terminalWait(radialTerminal &tInfo, const bool bWait, string &strError)
 {
   return terminalRequest(tInfo, "wait", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }

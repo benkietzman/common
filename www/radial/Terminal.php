@@ -131,13 +131,13 @@ class Terminal extends Radial
     $bResult = false;
 
     $request['Interface'] = 'terminal';
-    if ($m_strSession != '')
+    if ($this->m_strSession != '')
     {
       if (!isset($request['Request']))
       {
         $request['Request'] = [];
       }
-      $request['Request']['Session'] = $m_strSession;
+      $request['Request']['Session'] = $this->m_strSession;
     }
     if (parent::request($request, $response))
     {
@@ -145,11 +145,11 @@ class Terminal extends Radial
       {
         if (isset($response['Response']['Session']) && $response['Response']['Session'] != '')
         {
-          $m_strSession = $response['Response']['Session'];
+          $this->m_strSession = $response['Response']['Session'];
         }
         else
         {
-          $m_strSession = null;
+          $this->m_strSession = null;
         }
         if (isset($response['Response']['Screen']) && is_array($response['Response']['Screen']))
         {

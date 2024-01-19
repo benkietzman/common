@@ -968,7 +968,6 @@ extern "C++"
         bool bExit = false, bIncoming = false;
         char szBuffer[4096];
         int nReturn;
-        size_t unSize;
         m_mutexRead.lock();
         while (!bExit)
         {
@@ -981,9 +980,9 @@ extern "C++"
           {
             if (fds[0].fd == m_fdClientRead && (fds[0].revents & POLLIN))
             {
-              if ((unSize = ::read(m_fdClientRead, szBuffer, 4096)) > 0)
+              if ((nReturn = ::read(m_fdClientRead, szBuffer, 4096)) > 0)
               {
-                if (!write(szBuffer, unSize))
+                if (!write(szBuffer, nReturn))
                 {
                   bExit = true;
                   prefix("read()");
@@ -996,14 +995,14 @@ extern "C++"
             }
             if (fds[1].fd == m_fdServerRead && (fds[1].revents & (POLLHUP | POLLIN)))
             {
-              if ((unSize = ::read(m_fdServerRead, szBuffer, 4096)) > 0)
+              if ((nReturn = ::read(m_fdServerRead, szBuffer, 4096)) > 0)
               {
                 bIncoming = bResult = true;
                 m_bWait = false;
-                m_strBuffer.append(szBuffer, unSize);
+                m_strBuffer.append(szBuffer, nReturn);
                 if (m_fdClientWrite >= 0)
                 {
-                  if (::write(m_fdClientWrite, szBuffer, unSize) != (ssize_t)unSize)
+                  if (::write(m_fdClientWrite, szBuffer, nReturn) != nReturn)
                   {
                     m_fdClientRead = m_fdClientWrite = -1;
                   }

@@ -35,8 +35,9 @@ class Terminal extends Radial
 
     $request = [];
     $request['Function'] = 'connect';
-    $request['Server'] = $strServer;
-    $request['Port'] = $strPort;
+    $request['Request'] = [];
+    $request['Request']['Server'] = $strServer;
+    $request['Request']['Port'] = $strPort;
     $response = null;
     if ($this->request($request, $response))
     {

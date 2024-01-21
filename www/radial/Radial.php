@@ -643,7 +643,7 @@ class Radial
       }
       $request['Request']['Session'] = $t['Session'];
     }
-    if (request($request, $response))
+    if ($this->request($request, $response))
     {
       $bResult = true;
     }

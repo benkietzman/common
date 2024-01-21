@@ -635,6 +635,10 @@ class Radial
     $bResult = false;
 
     $request['Interface'] = 'terminal';
+    if (!is_array($t))
+    {
+      $t = ['Session'=>null, 'Screen'=>[], 'Col'=>null, 'Cols'=>null, 'Row'=>null, 'Rows'=>null];
+    }
     if (isset($t['Session']) && $t['Session'] != '')
     {
       if (!isset($request['Request']))
@@ -646,10 +650,6 @@ class Radial
     if ($this->request($request, $response))
     {
       $bResult = true;
-    }
-    if (!is_array($t))
-    {
-      $t = ['Session'=>null, 'Screen'=>[], 'Col'=>null, 'Cols'=>null, 'Row'=>null, 'Rows'=>null];
     }
     if (isset($response['Response']) && is_array($response['Response']))
     {

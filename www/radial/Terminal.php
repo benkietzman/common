@@ -56,7 +56,6 @@ class Terminal extends Radial
 
     $request = [];
     $request['Function'] = 'disconnect';
-    $request['Request'] = [];
     $response = null;
     if ($this->request($request, $response))
     {

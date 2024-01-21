@@ -239,6 +239,29 @@ class Terminal extends Radial
     return $bResult;
   }
   // }}}
+  // {{{ sendEnter()
+  public function sendEnter($bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'enter';
+    if ($bWait)
+    {
+      $request['Request'] = [];
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ sendFunction()
   public function sendFunction($nKey)
   {
@@ -248,6 +271,29 @@ class Terminal extends Radial
     $request['Function'] = 'function';
     $request['Request'] = [];
     $request['Request']['Data'] = $nKey;
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ sendKeypadEnter()
+  public function sendKeypadEnter($bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'keypadEnter';
+    if ($bWait)
+    {
+      $request['Request'] = [];
+      $request['Request']['Wait'] = true;
+    }
     $response = null;
     if ($this->request($request, $response))
     {

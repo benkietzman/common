@@ -359,5 +359,467 @@ class Radial
     $this->m_streamContext = stream_context_create($context);
   }
   // }}}
+  // {{{ terminal
+  // {{{ terminalConnect()
+  public function terminalConnect(&$t, $strServer = null, $strPort = null)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'connect';
+    $request['Request'] = [];
+    $request['Request']['Server'] = $strServer;
+    $request['Request']['Port'] = $strPort;
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalCtrl()
+  public function terminalCtrl(&$t, $cKey, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'ctrl';
+    $request['Request'] = [];
+    $request['Request']['Data'] = $cKey;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalDisconnect()
+  public function terminalDisconnect(&$t)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'disconnect';
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalDown()
+  public function terminalDown(&$t, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'down';
+    $request['Request'] = [];
+    $request['Request']['Count'] = $unCount;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalEnter()
+  public function terminalEnter(&$t, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'enter';
+    if ($bWait)
+    {
+      $request['Request'] = [];
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalFunction()
+  public function terminalFunction(&$t, $nKey)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'function';
+    $request['Request'] = [];
+    $request['Request']['Data'] = $nKey;
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalGetSocketTimeout()
+  public function terminalGetSocketTimeout(&$t, &$nShort, &$nLong)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'getSocketTimeout';
+    $request['Request'] = [];
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+      if (isset($response['Response']) && is_array($response['Response']))
+      {
+        $nShort = $response['Response']['Short'];
+        $nLong = $response['Response']['Long'];
+      }
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalKeypadEnter()
+  public function terminalKeypadEnter(&$t, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'keypadEnter';
+    if ($bWait)
+    {
+      $request['Request'] = [];
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalShiftFunction()
+  public function terminalShiftFunction(&$t, $nKey)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'shiftFunction';
+    $request['Request'] = [];
+    $request['Request']['Data'] = $nKey;
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalHome()
+  public function terminalHome(&$t, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'home';
+    $request['Request'] = [];
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalKey()
+  public function terminalKey(&$t, $cKey, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'key';
+    $request['Request'] = [];
+    $request['Request']['Data'] = $cKey;
+    $request['Request']['Count'] = $unCount;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalLeft()
+  public function terminalLeft(&$t, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'left';
+    $request['Request'] = [];
+    $request['Request']['Count'] = $unCount;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalRequest()
+  public function terminalRequest($t, $request, &$response)
+  {
+    $bResult = false;
+
+    $request['Interface'] = 'terminal';
+    if (isset($t['Session']) && $t['Session'] != '')
+    {
+      if (!isset($request['Request']))
+      {
+        $request['Request'] = [];
+      }
+      $request['Request']['Session'] = $t['Session'];
+    }
+    if (request($request, $response))
+    {
+      $bResult = true;
+      if (isset($response['Response']) && is_array($response['Response']))
+      {
+        if (isset($response['Response']['Session']) && $response['Response']['Session'] != '')
+        {
+          $t['Session'] = $response['Response']['Session'];
+        }
+        else
+        {
+          $t['Session'] = null;
+        }
+        if (isset($response['Response']['Screen']) && is_array($response['Response']['Screen']))
+        {
+          $t['Screen'] = $response['Response']['Screen'];
+        }
+        if (isset($response['Response']['Col']) && $response['Response']['Col'] != '')
+        {
+          $t['Col'] = $response['Response']['Col'];
+        }
+        if (isset($response['Response']['Cols']) && $response['Response']['Cols'] != '')
+        {
+          $t['Cols'] = $response['Response']['Cols'];
+        }
+        if (isset($response['Response']['Row']) && $response['Response']['Row'] != '')
+        {
+          $t['Row'] = $response['Response']['Row'];
+        }
+        if (isset($response['Response']['Rows']) && $response['Response']['Rows'] != '')
+        {
+          $t['Rows'] = $response['Response']['Rows'];
+        }
+      }
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalRight()
+  public function terminalRight(&$t, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'right';
+    $request['Request'] = [];
+    $request['Request']['Count'] = $unCount;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalSend()
+  public function terminalSend(&$t, $strData, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'send';
+    $request['Request'] = [];
+    $request['Request']['Data'] = $strData;
+    $request['Request']['Count'] = $unCount;
+    $request['Request']['Wait'] = $bWait;
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalSetSocketTimeout()
+  public function terminalSetSocketTimeout(&$t, $nShort, $nLong)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'setSocketTimeout';
+    $request['Request'] = [];
+    $request['Request']['Short'] = $nShort;
+    $request['Request']['Long'] = $nLong;
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalTab()
+  public function terminalTab(&$t, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'tab';
+    $request['Request'] = [];
+    $request['Request']['Count'] = $unCount;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalUp()
+  public function terminalUp(&$t, $unCount = 1, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'up';
+    $request['Request'] = [];
+    $request['Request']['Count'] = $unCount;
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalWait()
+  public function terminalWait(&$t, $bWait = true)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'wait';
+    $request['Request'] = [];
+    if ($bWait)
+    {
+      $request['Request']['Wait'] = true;
+    }
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // }}}
 }
 ?>

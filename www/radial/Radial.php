@@ -649,7 +649,7 @@ class Radial
     }
     if (!is_array($t))
     {
-      $t = [];
+      $t = ['Session'=>null, 'Screen'=>[], 'Col'=>null, 'Cols'=>null, 'Row'=>null, 'Rows'=>null];
     }
     if (isset($response['Response']) && is_array($response['Response']))
     {

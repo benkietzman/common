@@ -142,6 +142,7 @@ class Terminal extends Radial
     }
     if (parent::request($request, $response))
     {
+      $bResult = true;
       if (isset($response['Response']) && is_array($response['Response']))
       {
         if (isset($response['Response']['Session']) && $response['Response']['Session'] != '')

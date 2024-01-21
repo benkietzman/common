@@ -646,36 +646,40 @@ class Radial
     if (request($request, $response))
     {
       $bResult = true;
-      if (isset($response['Response']) && is_array($response['Response']))
+    }
+    if (!is_array($t))
+    {
+      $t = [];
+    }
+    if (isset($response['Response']) && is_array($response['Response']))
+    {
+      if (isset($response['Response']['Session']) && $response['Response']['Session'] != '')
       {
-        if (isset($response['Response']['Session']) && $response['Response']['Session'] != '')
-        {
-          $t['Session'] = $response['Response']['Session'];
-        }
-        else
-        {
-          $t['Session'] = null;
-        }
-        if (isset($response['Response']['Screen']) && is_array($response['Response']['Screen']))
-        {
-          $t['Screen'] = $response['Response']['Screen'];
-        }
-        if (isset($response['Response']['Col']) && $response['Response']['Col'] != '')
-        {
-          $t['Col'] = $response['Response']['Col'];
-        }
-        if (isset($response['Response']['Cols']) && $response['Response']['Cols'] != '')
-        {
-          $t['Cols'] = $response['Response']['Cols'];
-        }
-        if (isset($response['Response']['Row']) && $response['Response']['Row'] != '')
-        {
-          $t['Row'] = $response['Response']['Row'];
-        }
-        if (isset($response['Response']['Rows']) && $response['Response']['Rows'] != '')
-        {
-          $t['Rows'] = $response['Response']['Rows'];
-        }
+        $t['Session'] = $response['Response']['Session'];
+      }
+      else
+      {
+        $t['Session'] = null;
+      }
+      if (isset($response['Response']['Screen']) && is_array($response['Response']['Screen']))
+      {
+        $t['Screen'] = $response['Response']['Screen'];
+      }
+      if (isset($response['Response']['Col']) && $response['Response']['Col'] != '')
+      {
+        $t['Col'] = $response['Response']['Col'];
+      }
+      if (isset($response['Response']['Cols']) && $response['Response']['Cols'] != '')
+      {
+        $t['Cols'] = $response['Response']['Cols'];
+      }
+      if (isset($response['Response']['Row']) && $response['Response']['Row'] != '')
+      {
+        $t['Row'] = $response['Response']['Row'];
+      }
+      if (isset($response['Response']['Rows']) && $response['Response']['Rows'] != '')
+      {
+        $t['Rows'] = $response['Response']['Rows'];
       }
     }
 

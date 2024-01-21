@@ -11,6 +11,10 @@ include_once('Radial.php');
 class Terminal extends Radial
 {
   // {{{ variables
+  protected $m_col;
+  protected $m_cols;
+  protected $m_row;
+  protected $m_rows;
   protected $m_screen;
   protected $m_strSession;
   // }}}
@@ -26,6 +30,18 @@ class Terminal extends Radial
   {
     unset($this->m_screen);
     parent::__destruct();
+  }
+  // }}}
+  // {{{ col()
+  public function col()
+  {
+    return $this->m_col;
+  }
+  // }}}
+  // {{{ cols()
+  public function cols()
+  {
+    return $this->m_cols;
   }
   // }}}
   // {{{ connect()
@@ -156,10 +172,38 @@ class Terminal extends Radial
         {
           $this->m_screen = $response['Response']['Screen'];
         }
+        if (isset($response['Response']['Col']) && $response['Response']['Col'] != '')
+        {
+          $this->m_col = $response['Response']['Col'];
+        }
+        if (isset($response['Response']['Cols']) && $response['Response']['Cols'] != '')
+        {
+          $this->m_cols = $response['Response']['Cols'];
+        }
+        if (isset($response['Response']['Row']) && $response['Response']['Row'] != '')
+        {
+          $this->m_row = $response['Response']['Row'];
+        }
+        if (isset($response['Response']['Rows']) && $response['Response']['Rows'] != '')
+        {
+          $this->m_rows = $response['Response']['Rows'];
+        }
       }
     }
 
     return $bResult;
+  }
+  // }}}
+  // {{{ row()
+  public function row()
+  {
+    return $this->m_row;
+  }
+  // }}}
+  // {{{ rows()
+  public function rows()
+  {
+    return $this->m_rows;
   }
   // }}}
   // {{{ screen()

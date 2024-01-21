@@ -630,7 +630,7 @@ class Radial
   }
   // }}}
   // {{{ terminalRequest()
-  public function terminalRequest($t, $request, &$response)
+  public function terminalRequest(&$t, $request, &$response)
   {
     $bResult = false;
 

@@ -665,6 +665,10 @@ class Radial
       {
         $t['Screen'] = $response['Response']['Screen'];
       }
+      if (!is_array($t['Screen']))
+      {
+        $t['Screen'] = [];
+      }
       if (isset($response['Response']['Col']) && $response['Response']['Col'] != '')
       {
         $t['Col'] = $response['Response']['Col'];

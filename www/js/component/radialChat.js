@@ -148,16 +148,16 @@ export default
     <div style="position: relative; z-index: 1000;">
       <div id="radial-slide-panel" class="bg-info" style="position: fixed; top: 160px; right: 0px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-info float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
-        {{#if menu}}
+        {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
-            {{#each users}}
+            {{#each @root.users}}
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history" style="max-height: 200px; max-width: 400px;">
             <table class="table table-condensed table-striped">
-              {{#each history}}
+              {{#each @root.history}}
               <tr>
                 <td>{{User}}</td>
                 <td>{{Message}}</td>

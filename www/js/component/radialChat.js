@@ -144,7 +144,7 @@ export default
         <button id="radial-slide-opener" class="btn btn-sm btn-info float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
         {{#if menu}}
         <div id="radial-slide-content" style="padding: 10px;">
-          <select class="form-control form-control-sm" c-model="user">
+          <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
             {{#each users}}
             <option value="{{.}}">{{.}}</option>
             {{/each}}
@@ -157,7 +157,7 @@ export default
               </div>
             {{/each}}
           </div>
-          <input type="text" class="form-control form-control-sm" c-model="message" c-keyup="enter()">
+          <input type="text" class="form-control form-control-sm" c-model="message" c-keyup="enter()" style="margin-top: 10px;">
         </div>
         {{/if}}
       </div>

@@ -155,10 +155,12 @@ export default
           <ul class="list-group">
           {{#each history}}
             <li class="list-group-item">
-              <div class="row">
-                <div class="col">{{User}}</div>
-                <div class="col">{{Message}}</div>
-              </div>
+              <table class="table table-condensed">
+                <tr>
+                  <td>{{User}}</td>
+                  <td>{{Message}}</td>
+                </tr>
+              </table>
             </li>
           {{/each}}
           </ul>

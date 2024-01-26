@@ -65,6 +65,7 @@ export default
           {
             s.history.shift();
           }
+          s.u();
         }
       });
       let request = {Interface: 'link', 'Function': 'status'};

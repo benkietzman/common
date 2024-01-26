@@ -21,9 +21,28 @@ export default
       },
       // }}}
       c: c,
+      history: [],
       menu: false,
+      user: null,
       users: []
     });
+    // }}}
+    // {{{ chat()
+    s.chat = () =>
+    {
+      let request = {Interface: 'live', 'Function': 'message', Request: {"User": s.user, Message: {Action: 'chat', Message: s.message}}};
+      s.message = null;
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
+      s.u();
+    };
+    // }}}
+    // {{{ clear()
+    s.clear = () =>
+    {
+      s.history = null;
+      s.history = [];
+      s.u();
+    };
     // }}}
     // {{{ slide()
     s.slide = () =>
@@ -35,6 +54,10 @@ export default
     // {{{ init()
     s.init = () =>
     {
+      c.attachEvent('commonWsMessage_'+c.application, (data) =>
+      {
+        console.log(data);
+      });
       let request = {Interface: 'link', 'Function': 'status'};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -111,11 +134,17 @@ export default
         <button id="radial-slide-opener" class="btn btn-sm btn-info float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
         {{#if menu}}
         <div id="radial-slide-content" style="padding: 10px;">
-          <select class="form-control form-control-sm" c-model="user">
+          <select class="form-control form-control-sm" c-model="user" c-change="clear()">
             {{#each users}}
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
+          <div>
+            {{#each history}}
+              {{.}}<br>
+            {{/each}}
+          </div>
+          <input type="text"
         </div>
         {{/if}}
       </div>

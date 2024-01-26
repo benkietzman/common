@@ -23,6 +23,7 @@ export default
       c: c,
       history: [],
       menu: false,
+      message: null,
       user: null,
       users: []
     });
@@ -30,8 +31,8 @@ export default
     // {{{ chat()
     s.chat = () =>
     {
-      let request = {Interface: 'live', 'Function': 'message', Request: {"User": s.user, Message: {Action: 'chat', Message: s.message}} };
-      s.message = null;
+      let request = {Interface: 'live', 'Function': 'message', Request: {"User": s.user, Message: {Action: 'chat', Message: s.message.v}} };
+      s.message.v = null;
       c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
       s.u();
     };
@@ -60,10 +61,10 @@ export default
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
         {
           s.history.push(data.detail.Message);
-        }
-        while (s.history.length > 50)
-        {
-          s.history.shift();
+          while (s.history.length > 50)
+          {
+            s.history.shift();
+          }
         }
       });
       let request = {Interface: 'link', 'Function': 'status'};

@@ -134,7 +134,7 @@ export default
     };
     // }}}
     // {{{ main
-    c.attachEvent('commonAuthReady_radial', (data) =>
+    c.attachEvent('commonWsReady_radial', (data) =>
     {
       s.init();
     });

@@ -31,7 +31,7 @@ export default
     // {{{ chat()
     s.chat = () =>
     {
-      let request = {Interface: 'live', 'Function': 'message', Request: {"User": s.user, Message: {Action: 'chat', Message: s.message.v}} };
+      let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}} };
       s.message.v = null;
       c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
       s.u();
@@ -58,9 +58,9 @@ export default
     {
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
-        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
+        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
         {
-          s.history.push(data.detail.Message);
+          s.history.push(data.detail);
           while (s.history.length > 50)
           {
             s.history.shift();
@@ -151,7 +151,10 @@ export default
           </select>
           <div class="card card-body card-inverse">
             {{#each history}}
-              {{.}}<br>
+              <div class="row">
+                <div class="col-md">{{User}}</div>
+                <div class="col-md">{{Message}}</div>
+              </div>
             {{/each}}
           </div>
           <input type="text" class="form-control form-control-sm" c-model="message" c-keyup="enter()">

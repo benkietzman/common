@@ -112,7 +112,7 @@ export default
                   }
                 }
                 s.users.sort();
-                if (s.user.length > 0)
+                if (s.users.length > 0)
                 {
                   s.user = s.users[0];
                 }

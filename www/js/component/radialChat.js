@@ -149,7 +149,7 @@ export default
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
-          <div>
+          <div class="card card-body card-inverse">
             {{#each history}}
               {{.}}<br>
             {{/each}}

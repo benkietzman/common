@@ -31,13 +31,16 @@ export default
     // {{{ chat()
     s.chat = () =>
     {
-      s.history.push({Message: s.message.v, User: c.getUserID()});
-      let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}} };
-      s.message.v = null;
-      c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
-      s.u();
-      document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
-      document.getElementById('message').focus();
+      if (c.isValid() && s.user.v)
+      {
+        s.history.push({Message: s.message.v, User: c.getUserID()});
+        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}} };
+        s.message.v = null;
+        c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
+        s.u();
+        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+        document.getElementById('message').focus();
+      }
     };
     // }}}
     // {{{ enter()
@@ -120,7 +123,7 @@ export default
                 s.users.sort();
                 if (s.users.length > 0)
                 {
-                  s.user = s.users[0];
+                  s.user.v = s.users[0];
                 }
                 s.u();
               }
@@ -131,7 +134,7 @@ export default
     };
     // }}}
     // {{{ main
-    c.attachEvent('commonWsReady_radial', (data) =>
+    c.attachEvent('commonAuthReady_radial', (data) =>
     {
       s.init();
     });

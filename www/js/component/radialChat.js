@@ -152,18 +152,16 @@ export default
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
-          <ul class="list-group">
-          {{#each history}}
-            <li class="list-group-item">
-              <table class="table table-condensed">
-                <tr>
-                  <td>{{User}}</td>
-                  <td>{{Message}}</td>
-                </tr>
-              </table>
-            </li>
-          {{/each}}
-          </ul>
+          <div class="card card-body card-inverse table-responsive">
+            <table class="table table-condensed table-striped">
+              {{#each history}}
+              <tr>
+                <td>{{User}}</td>
+                <td>{{Message}}</td>
+              </tr>
+              {{/each}}
+            </table>
+          </div>
           <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" style="margin-top: 10px;">
         </div>
         {{/if}}

@@ -22,7 +22,7 @@ export default
       // }}}
       c: c,
       menu: false,
-      users: [];
+      users: []
     });
     // }}}
     // {{{ slide()

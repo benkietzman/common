@@ -107,8 +107,8 @@ export default
   // {{{ template
   template: `
     <div style="position: relative; z-index: 1000;">
-      <div id="radial-slide-panel" class="bg-warning" style="position: fixed; top: 160px; right: 0px;">
-        <button id="radial-slide-opener" class="btn btn-sm btn-warning float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat"></i></button>
+      <div id="radial-slide-panel" class="bg-info" style="position: fixed; top: 160px; right: 0px;">
+        <button id="radial-slide-opener" class="btn btn-sm btn-info float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
         {{#if menu}}
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user">

@@ -31,10 +31,12 @@ export default
     // {{{ chat()
     s.chat = () =>
     {
+      s.history.push({Message: s.message.v, User: c.getUserID()});
       let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}} };
       s.message.v = null;
       c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
       s.u();
+      document.getElementById('message').focus();
     };
     // }}}
     // {{{ enter()
@@ -66,6 +68,7 @@ export default
             s.history.shift();
           }
           s.u();
+          document.getElementById('message').focus();
         }
       });
       let request = {Interface: 'link', 'Function': 'status'};
@@ -149,14 +152,16 @@ export default
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse">
-            {{#each history}}
+          <ul class="list-group">
+          {{#each history}}
+            <li class="list-group-item">
               <div class="row">
-                <div class="col-md">{{User}}</div>
-                <div class="col-md">{{Message}}</div>
+                <div class="col">{{User}}</div>
+                <div class="col">{{Message}}</div>
               </div>
-            {{/each}}
-          </div>
+            </li>
+          {{/each}}
+          </ul>
           <input type="text" class="form-control form-control-sm" c-model="message" c-keyup="enter()" style="margin-top: 10px;">
         </div>
         {{/if}}

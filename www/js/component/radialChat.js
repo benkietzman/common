@@ -152,7 +152,7 @@ export default
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse table-responsive">
+          <div class="card card-body card-inverse table-responsive" style="max-height: 200px;">
             <table class="table table-condensed table-striped">
               {{#each history}}
               <tr>

@@ -36,6 +36,7 @@ export default
       s.message.v = null;
       c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
       s.u();
+      document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
       document.getElementById('message').focus();
     };
     // }}}
@@ -69,6 +70,7 @@ export default
           }
           s.u();
           document.getElementById('message').focus();
+          document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
         }
       });
       let request = {Interface: 'link', 'Function': 'status'};
@@ -152,7 +154,7 @@ export default
             <option value="{{.}}">{{.}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse table-responsive" style="max-height: 200px; max-width: 400px;">
+          <div class="card card-body card-inverse table-responsive" id="history" style="max-height: 200px; max-width: 400px;">
             <table class="table table-condensed table-striped">
               {{#each history}}
               <tr>

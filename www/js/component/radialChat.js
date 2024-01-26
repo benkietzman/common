@@ -134,14 +134,10 @@ export default
     };
     // }}}
     // {{{ main
-    c.attachEvent('commonWsReady_radial', (data) =>
+    c.attachEvent('commonAuthReady', (data) =>
     {
       s.init();
     });
-    if (c.m_ws['radial'].Connected)
-    {
-      s.init();
-    }
     // }}}
   },
   // }}}

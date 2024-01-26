@@ -162,7 +162,7 @@ export default
             </li>
           {{/each}}
           </ul>
-          <input type="text" class="form-control form-control-sm" c-model="message" c-keyup="enter()" style="margin-top: 10px;">
+          <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" style="margin-top: 10px;">
         </div>
         {{/if}}
       </div>

@@ -94,6 +94,7 @@ export default
               nodes.push(response.Response.Links[i]);
             }
           }
+          s.u();
           for (let i = 0; i < nodes.length; i++)
           {
             let request = {Interface: 'live', 'Function': 'list', Node: nodes[i], Request: {i: i}};
@@ -136,7 +137,6 @@ export default
     // {{{ main
     c.attachEvent('commonAuthReady', (data) =>
     {
-console.log('HERE');
       s.init();
     });
     // }}}

@@ -85,6 +85,10 @@ export default
           {
             s.history.shift();
           }
+          if (!s.user || !s.user.v || s.user.v != data.detail.User)
+          {
+            s.user.v = data.detail.User;
+          }
           s.u();
           document.getElementById('message').focus();
           document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
@@ -123,10 +127,6 @@ export default
               }
             }
           }
-          if (s.users.length > 0)
-          {
-            s.user = s.users[0];
-          }
           s.u();
         }
       });
@@ -149,6 +149,7 @@ export default
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
+            <option value="" selected>-- Select Person --</option>
             {{#each @root.users}}
             <option value="{{User}}">{{LastName}}, {{FirstName}} ({{User}})</option>
             {{/each}}
@@ -163,7 +164,7 @@ export default
               {{/each}}
             </table>
           </div>
-          <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" style="margin-top: 10px;">
+          <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" placeholder="Type message and hit enter..." style="margin-top: 10px;">
         </div>
         {{/if}}
       </div>

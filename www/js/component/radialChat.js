@@ -85,7 +85,7 @@ export default
           {
             s.history.shift();
           }
-          if (!s.user || !s.user.v || s.user.v != data.detail.User)
+          if (!s.user.v || s.user.v != data.detail.User)
           {
             s.user.v = data.detail.User;
           }

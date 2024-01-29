@@ -96,7 +96,16 @@ export default
               }
               if (!bFound)
               {
-                s.users.push(data.User);
+                let user = {User: data.User};
+                if (c.isDefined(data.FirstName))
+                {
+                  user.FirstName = data.FirstName;
+                }
+                if (c.isDefined(data.LastName))
+                {
+                  user.LastName = data.LastName;
+                }
+                s.users.push(user);
               }
             }
           }
@@ -128,7 +137,7 @@ export default
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
             {{#each @root.users}}
-            <option value="{{.}}">{{.}}</option>
+            <option value="{{User}}">{{LastName}}, {{FirstName}}</option>
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history" style="max-height: 200px; max-width: 400px;">

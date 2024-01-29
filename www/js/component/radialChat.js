@@ -73,7 +73,6 @@ export default
     s.init = () =>
     {
       s.u();
-      s.user.v = '';
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
@@ -130,6 +129,10 @@ export default
             }
           }
           s.u();
+          if (s.users.length > 0)
+          {
+            s.user.v = s.users[0].User;
+          }
         }
       });
     };
@@ -151,7 +154,6 @@ export default
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
-            <option value="" selected>-- Select Person --</option>
             {{#each @root.users}}
             <option value="{{User}}">{{LastName}}, {{FirstName}} ({{User}})</option>
             {{/each}}

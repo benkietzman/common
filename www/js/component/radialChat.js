@@ -21,7 +21,6 @@ export default
       },
       // }}}
       c: c,
-      focused: false,
       notify: false,
       history: [],
       menu: false,
@@ -29,12 +28,6 @@ export default
       user: null,
       users: []
     });
-    // }}}
-    // {{{ blur()
-    s.blur = () =>
-    {
-      s.focused = false;
-    };
     // }}}
     // {{{ chat()
     s.chat = () =>
@@ -60,18 +53,20 @@ export default
       }
     };
     // }}}
-    // {{{ focus()
-    s.focus = () =>
-    {
-      s.focused = true;
-      s.notify = false;
-    };
-    // }}}
     // {{{ slide()
     s.slide = () =>
     {
       s.menu = !s.menu;
+      if (s.menu)
+      {
+        s.notify = false;
+      }
       s.u();
+      if (s.menu)
+      {
+        document.getElementById('message').focus();
+        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+      }
     };
     // }}}
     // {{{ init()
@@ -81,7 +76,10 @@ export default
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
         {
-          s.notify = true;
+          if (!s.menu)
+          {
+            s.notify = true;
+          }
           s.history.push(data.detail);
           while (s.history.length > 50)
           {
@@ -146,8 +144,8 @@ export default
   template: `
     {{#isValid}}
     <div style="position: relative; z-index: 1000;">
-      <div id="radial-slide-panel" class="bg-{{#if notify}}warning{{else}}info{{/if}}" c-blur="blur()" c-focus="focus()" style="position: fixed; top: 180px; right: 0px;">
-        <button id="radial-slide-opener" class="btn btn-sm btn-{{#if notify}}warning{{else}}info{{/if}} float-start" c-blur="blur()" c-click="slide()" c-focus="focus()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
+      <div id="radial-slide-panel" class="bg-{{#if notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 180px; right: 0px;">
+        <button id="radial-slide-opener" class="btn btn-sm btn-{{#if notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">

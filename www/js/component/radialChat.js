@@ -132,6 +132,7 @@ export default
           if (s.users.length > 0)
           {
             s.user.v = s.users[0].User;
+console.log('set user to ' + s.users[0].User);
           }
         }
       });

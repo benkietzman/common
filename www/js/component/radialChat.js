@@ -53,47 +53,11 @@ export default
       }
     };
     // }}}
-    // {{{ slide()
-    s.slide = () =>
+    // {{{ getUsers()
+    s.getUsers = () =>
     {
-      s.menu = !s.menu;
-      if (s.menu)
-      {
-        s.notify = false;
-      }
-      s.u();
-      if (s.menu)
-      {
-        document.getElementById('message').focus();
-        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
-      }
-    };
-    // }}}
-    // {{{ init()
-    s.init = () =>
-    {
-      c.attachEvent('commonWsMessage_'+c.application, (data) =>
-      {
-        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
-        {
-          if (!s.menu)
-          {
-            s.notify = true;
-          }
-          s.history.push(data.detail);
-          while (s.history.length > 50)
-          {
-            s.history.shift();
-          }
-          if (!s.user.v || s.user.v != data.detail.User)
-          {
-            s.user.v = data.detail.User;
-          }
-          s.u();
-          document.getElementById('message').focus();
-          document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
-        }
-      });
+      s.users = null;
+      s.users = [];
       let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -102,7 +66,7 @@ export default
         {
           for (let [strSession, data] of Object.entries(response.Response))
           {
-            if (c.isDefined(data.User))
+            if (c.isDefined(data.User) && c.getUserID() != data.User)
             {
               let bFound = false;
               for (let i = 0; !bFound && i < s.users.length; i++)
@@ -128,12 +92,59 @@ export default
             }
           }
           s.u();
-          if (s.users.length > 0)
+          if ((!s.user || !s.user.v) && s.users.length > 0)
           {
             s.user.v = s.users[0].User;
           }
         }
       });
+    };
+    // }}}
+    // {{{ slide()
+    s.slide = () =>
+    {
+      s.menu = !s.menu;
+      if (s.menu)
+      {
+        s.notify = false;
+      }
+      s.u();
+      if (s.menu)
+      {
+        document.getElementById('message').focus();
+        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+      }
+    };
+    // }}}
+    // {{{ init()
+    s.init = () =>
+    {
+      c.attachEvent('commonWsMessage_'+c.application, (data) =>
+      {
+        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
+        {
+          if (c.getUserID() != data.detail.User)
+          {
+            if (!s.menu)
+            {
+              s.notify = true;
+            }
+            s.history.push(data.detail);
+            while (s.history.length > 50)
+            {
+              s.history.shift();
+            }
+            if (!s.user.v || s.user.v != data.detail.User)
+            {
+              s.user.v = data.detail.User;
+            }
+            s.u();
+            document.getElementById('message').focus();
+            document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+          }
+        }
+      });
+      s.getUsers();
     };
     // }}}
     // {{{ main

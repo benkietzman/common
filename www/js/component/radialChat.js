@@ -33,7 +33,7 @@ export default
     {
       if (c.isValid() && s.user.v)
       {
-        s.history.push({Message: s.message.v, User: c.getUserID()});
+        s.history.push({Message: s.message.v, User: c.getUserID(), FirstName: c.getFirstName(), LastName: c.getLastName()});
         let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}, FirstName: c.getFirstName(), LastName: c.getLastName()} };
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});

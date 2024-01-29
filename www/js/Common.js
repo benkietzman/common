@@ -680,29 +680,6 @@ class Common
             o.subscribe('bind', () => {e.innerHTML = ((e.hasAttribute('c-json'))?JSON.stringify(o.v):o.v);});
           }
           // }}}
-          // {{{ blur
-          if (e.hasAttribute('c-blur'))
-          {
-            e.onblur = () =>
-            {
-              if (this.isDefined(o.onblur))
-              {
-                o.onblur();
-              }
-              eval('s.' + e.getAttribute('c-blur'));
-            };
-          }
-          else
-          {
-            e.onblur = () =>
-            {
-              if (this.isDefined(o.onblur))
-              {
-                o.onblur();
-              }
-            };
-          }
-          // }}}
           // {{{ change
           if (e.hasAttribute('c-change'))
           {
@@ -884,29 +861,6 @@ class Common
               if (this.isDefined(o.onclick))
               {
                 o.onclick();
-              }
-            };
-          }
-          // }}}
-          // {{{ focus
-          if (e.hasAttribute('c-focus'))
-          {
-            e.onfocus = () =>
-            {
-              if (this.isDefined(o.onfocus))
-              {
-                o.onfocus();
-              }
-              eval('s.' + e.getAttribute('c-focus'));
-            };
-          }
-          else
-          {
-            e.onfocus = () =>
-            {
-              if (this.isDefined(o.onfocus))
-              {
-                o.onfocus();
               }
             };
           }
@@ -1815,10 +1769,6 @@ class Common
       {
         e.focus();
       });
-      document.querySelectorAll('#' + id + ' [c-blur]').forEach(e =>
-      {
-        e.onblur = () => eval('s.' + e.getAttribute('c-blur'));
-      });
       document.querySelectorAll('#' + id + ' [c-change]').forEach(e =>
       {
         e.onchange = () => eval('s.' + e.getAttribute('c-change'));
@@ -1826,10 +1776,6 @@ class Common
       document.querySelectorAll('#' + id + ' [c-click]').forEach(e =>
       {
         e.onclick = () => eval('s.' + e.getAttribute('c-click'));
-      });
-      document.querySelectorAll('#' + id + ' [c-focus]').forEach(e =>
-      {
-        e.onfocus = () => eval('s.' + e.getAttribute('c-focus'));
       });
       document.querySelectorAll('#' + id + ' [c-keydown]').forEach(e =>
       {

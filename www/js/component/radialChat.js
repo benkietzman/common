@@ -72,7 +72,6 @@ export default
     // {{{ init()
     s.init = () =>
     {
-      s.u();
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
@@ -131,8 +130,14 @@ export default
           s.u();
           if (s.users.length > 0)
           {
-            s.user.v = s.users[0].User;
-console.log('set user to ' + s.users[0].User);
+            if (c.isDefined(s.user.v))
+            {
+              s.user.v = s.users[0].User;
+            }
+            else
+            {
+              s.user = s.users[0].User;
+            }
           }
         }
       });

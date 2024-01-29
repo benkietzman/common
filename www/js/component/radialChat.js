@@ -34,7 +34,7 @@ export default
       if (c.isValid() && s.user.v)
       {
         s.history.push({Message: s.message.v, User: c.getUserID()});
-        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}} };
+        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID()}, FirstName: c.getFirstName(), LastName: c.getLastName()} };
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
         s.u();
@@ -143,7 +143,7 @@ export default
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>
-                <td>{{User}}</td>
+                <td>{{LastName}}, {{FirstName}} ({{User}})</td>
                 <td>{{Message}}</td>
               </tr>
               {{/each}}

@@ -25,7 +25,7 @@ export default
       history: [],
       menu: false,
       message: null,
-      user: null,
+      user: new Observable,
       users: []
     });
     // }}}
@@ -130,14 +130,7 @@ export default
           s.u();
           if (s.users.length > 0)
           {
-            if (c.isDefined(s.user.v))
-            {
-              s.user.v = s.users[0].User;
-            }
-            else
-            {
-              s.user = s.users[0].User;
-            }
+            s.user.v = s.users[0].User;
           }
         }
       });

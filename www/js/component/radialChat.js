@@ -76,36 +76,59 @@ export default
           document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
         }
       });
-      let request = {Interface: 'live', 'Function': 'list'};
+      let request = {Interface: 'link', 'Function': 'status'};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
         if (c.wsResponse(response, error) && c.isDefined(response.Response))
         {
-          for (let [strSession, data] of Object.entries(response.Response))
+          let nodes = [];
+          if (c.isDefined(response.Response.Node))
           {
-            if (c.isDefined(data.User))
+            nodes.push(response.Response.Node);
+          }
+          if (c.isDefined(response.Response.Links))
+          {
+            for (let i = 0; i < response.Response.Links.length; i++)
             {
-              let bFound = false;
-              for (let i = 0; !bFound && i < s.users.length; i++)
-              {
-                if (s.users[i] == data.User)
-                {
-                  bFound = true;
-                }
-              }
-              if (!bFound)
-              {
-                s.users.push(data.User);
-              }
+              nodes.push(response.Response.Links[i]);
             }
           }
-          s.users.sort();
-          if (s.users.length > 0)
+          for (let i = 0; i < nodes.length; i++)
           {
-            s.user = s.users[0];
+            let request = {Interface: 'live', 'Function': 'list', Node: nodes[i], Request: {i: i}};
+            c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+            {
+              let error = {};
+              if (c.wsResponse(response, error) && c.isDefined(response.Response))
+              {
+                for (let [strSession, data] of Object.entries(response.Response))
+                {
+                  if (c.isDefined(data.User))
+                  {
+                    let bFound = false;
+                    for (let i = 0; !bFound && i < s.users.length; i++)
+                    {
+                      if (s.users[i] == data.User)
+                      {
+                        bFound = true;
+                      }
+                    }
+                    if (!bFound)
+                    {
+                      s.users.push(data.User);
+                    }
+                  }
+                }
+                s.users.sort();
+                if (s.users.length > 0)
+                {
+                  s.user = s.users[0];
+                }
+                s.u();
+              }
+            });
           }
-          s.u();
         }
       });
     };

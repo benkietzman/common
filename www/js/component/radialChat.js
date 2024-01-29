@@ -121,9 +121,9 @@ export default
     {
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
-        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))
+        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && c.isDefined(data.detail.User) && c.getUserID() != data.detail.User)
         {
-          if (c.getUserID() != data.detail.User)
+          if (data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
           {
             if (!s.menu)
             {
@@ -141,6 +141,45 @@ export default
             s.u();
             document.getElementById('message').focus();
             document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+          }
+          else if (data.detail.Action == 'connect')
+          {
+            let bFound = false;
+            for (let i = 0; !bFound && i < s.users.length; i++)
+            {
+              if (s.users[i].User == data.detail.User)
+              {
+                bFound = true;
+              }
+            }
+            if (!bFound)
+            {
+              let user = {User: data.detail.User};
+              if (c.isDefined(data.detail.FirstName))
+              {
+                user.FirstName = data.detail.FirstName;
+              }
+              if (c.isDefined(data.detail.LastName))
+              {
+                user.LastName = data.detail.LastName;
+              }
+              s.users.push(user);
+              s.u();
+            }
+          }
+          else if (data.detail.Action == 'disconnect')
+          {
+            let users = [];
+            for (let i = 0; i < s.users.length; i++)
+            {
+              if (s.users[i].User != data.detail.User)
+              {
+                users.push(s.user[i]);
+              }
+            }
+            s.users = null;
+            s.users = users;
+            s.u();
           }
         }
       });

@@ -72,6 +72,8 @@ export default
     // {{{ init()
     s.init = () =>
     {
+      s.u();
+      s.user.v = '';
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && data.detail.Action == 'chat' && c.isDefined(data.detail.Message) && c.isDefined(data.detail.User))

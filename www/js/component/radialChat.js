@@ -89,7 +89,7 @@ export default
               let bFound = false;
               for (let i = 0; !bFound && i < s.users.length; i++)
               {
-                if (s.users[i] == data.User)
+                if (s.users[i].User == data.User)
                 {
                   bFound = true;
                 }
@@ -109,7 +109,6 @@ export default
               }
             }
           }
-          s.users.sort();
           if (s.users.length > 0)
           {
             s.user = s.users[0];

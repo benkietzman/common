@@ -136,7 +136,7 @@ export default
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
             {{#each @root.users}}
-            <option value="{{User}}">{{LastName}}, {{FirstName}}</option>
+            <option value="{{User}}">{{LastName}}, {{FirstName}} ({{User}})</option>
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history" style="max-height: 200px; max-width: 400px;">

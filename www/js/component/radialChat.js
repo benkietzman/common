@@ -26,7 +26,7 @@ export default
       menu: false,
       message: null,
       user: new Observable,
-      users: null
+      users: {}
     });
     // }}}
     // {{{ chat()
@@ -62,6 +62,7 @@ export default
     s.getUsers = () =>
     {
       s.users = null;
+      s.users = {};
       let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -72,10 +73,6 @@ export default
           {
             if (c.isDefined(data.User) && c.getUserID() != data.User)
             {
-              if (!c.isObject(s.users))
-              {
-                s.users = {};
-              }
               if (!s.users[data.User])
               {
                 s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
@@ -140,10 +137,6 @@ export default
           {
             if (c.getUserID() != data.detail.User)
             {
-              if (!c.isObject(s.users))
-              {
-                s.users = {};
-              }
               if (!s.users[data.detail.User])
               {
                 s.users[data.detail.User] = {FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: []};
@@ -174,10 +167,6 @@ export default
               else
               {
                 delete s.users[data.detail.User];
-                if (s.users.length == 0)
-                {
-                  s.users = null;
-                }
               }
               s.u();
             }
@@ -199,7 +188,6 @@ export default
   // {{{ template
   template: `
     {{#isValid}}
-    {{#if @root.users}}
     <div style="position: relative; z-index: 999;">
       <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 180px; right: 0px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
@@ -225,7 +213,6 @@ export default
         {{/if}}
       </div>
     </div>
-    {{/if}}
     {{/isValid}}
   `
   // }}}

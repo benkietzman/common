@@ -26,7 +26,7 @@ export default
       menu: false,
       message: null,
       user: new Observable,
-      users: []
+      users: {}
     });
     // }}}
     // {{{ chat()
@@ -34,7 +34,6 @@ export default
     {
       if (c.isValid() && s.user.v)
       {
-        s.history.push({Message: s.message.v, User: c.getUserID(), FirstName: c.getUserFirstName(), LastName: c.getUserLastName()});
         let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID(), FirstName: c.getUserFirstName(), LastName: c.getUserLastName()}} };
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
@@ -68,34 +67,14 @@ export default
           {
             if (c.isDefined(data.User) && c.getUserID() != data.User)
             {
-              let bFound = false;
-              for (let i = 0; !bFound && i < s.users.length; i++)
+              if (!c.isDefined(s.users[data.User]))
               {
-                if (s.users[i].User == data.User)
-                {
-                  bFound = true;
-                }
+                s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
               }
-              if (!bFound)
-              {
-                let user = {User: data.User};
-                if (c.isDefined(data.FirstName))
-                {
-                  user.FirstName = data.FirstName;
-                }
-                if (c.isDefined(data.LastName))
-                {
-                  user.LastName = data.LastName;
-                }
-                s.users.push(user);
-              }
+              s.users[data.User].sessions.push(data.wsRequestID);
             }
           }
           s.u();
-          if ((!s.user || !s.user.v) && s.users.length > 0)
-          {
-            s.user.v = s.users[0].User;
-          }
         }
       });
     };
@@ -121,7 +100,7 @@ export default
     {
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
-        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && c.isDefined(data.detail.User) && c.getUserID() != data.detail.User)
+        if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && c.isDefined(data.detail.User))
         {
           if (data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
           {
@@ -144,42 +123,39 @@ export default
           }
           else if (data.detail.Action == 'connect')
           {
-            let bFound = false;
-            for (let i = 0; !bFound && i < s.users.length; i++)
+            if (c.getUserID() != data.detail.User)
             {
-              if (s.users[i].User == data.detail.User)
+              if (!c.isDefined(s.users[data.detail.User]))
               {
-                bFound = true;
+                s.users[data.detail.User] = {FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: []};
               }
-            }
-            if (!bFound)
-            {
-              let user = {User: data.detail.User};
-              if (c.isDefined(data.detail.FirstName))
-              {
-                user.FirstName = data.detail.FirstName;
-              }
-              if (c.isDefined(data.detail.LastName))
-              {
-                user.LastName = data.detail.LastName;
-              }
-              s.users.push(user);
+              s.users[data.detail.User].sessions.push(data.detail.wsRequestID);
               s.u();
             }
           }
           else if (data.detail.Action == 'disconnect')
           {
-            let users = [];
-            for (let i = 0; i < s.users.length; i++)
+            if (c.getUserID() != data.detail.User && c.isDefined(s.users[data.detail.User]))
             {
-              if (s.users[i].User != data.detail.User)
+              let sessions = [];
+              for (let i = 0; i < s.users[data.detail.User].length; i++)
               {
-                users.push(s.user[i]);
+                if (s.users[data.detail.User].sessions[i] != data.detail.wsRequestID)
+                {
+                  sessions.push(s.users[data.detail.User].sessions[i]);
+                }
               }
+              if (session.length > 0)
+              {
+                s.users[data.detail.User].sessions = null;
+                s.users[data.detail.User].sessions = sessions;
+              }
+              else
+              {
+                delete s.users[data.detail.User];
+              }
+              s.u();
             }
-            s.users = null;
-            s.users = users;
-            s.u();
           }
         }
       });
@@ -205,7 +181,7 @@ export default
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
             {{#each @root.users}}
-            <option value="{{User}}">{{LastName}}, {{FirstName}} ({{User}})</option>
+            <option value="{{@key}}">{{LastName}}, {{FirstName}} ({{@key}})</option>
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history" style="max-height: 200px; max-width: 400px;">

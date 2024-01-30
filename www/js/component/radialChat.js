@@ -26,7 +26,7 @@ export default
       menu: false,
       message: null,
       user: null,
-      users: {}
+      users: null
     });
     // }}}
     // {{{ chat()
@@ -62,7 +62,6 @@ export default
     s.getUsers = () =>
     {
       s.users = null;
-      s.users = {};
       let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -73,6 +72,10 @@ export default
           {
             if (c.isDefined(data.User) && c.getUserID() != data.User)
             {
+              if (!c.isObject(s.users))
+              {
+                s.users = {};
+              }
               if (!s.users[data.User])
               {
                 s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
@@ -133,6 +136,10 @@ export default
           {
             if (c.getUserID() != data.detail.User)
             {
+              if (!c.isObject(s.users))
+              {
+                s.users = {};
+              }
               if (!s.users[data.detail.User])
               {
                 s.users[data.detail.User] = {FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: []};
@@ -145,7 +152,7 @@ export default
           // {{{ disconnect
           else if (data.detail.Action == 'disconnect')
           {
-            if (c.getUserID() != data.detail.User && s.users[data.detail.User])
+            if (c.getUserID() != data.detail.User && c.isObject(s.users) && s.users[data.detail.User])
             {
               let sessions = [];
               for (let i = 0; i < s.users[data.detail.User].length; i++)
@@ -163,6 +170,10 @@ export default
               else
               {
                 delete s.users[data.detail.User];
+                if (s.users.length == 0)
+                {
+                  s.users = null;
+                }
               }
               s.u();
             }

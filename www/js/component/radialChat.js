@@ -132,7 +132,7 @@ export default
                   sessions.push(s.users[data.detail.User].sessions[i]);
                 }
               }
-              if (session.length > 0)
+              if (sessions.length > 0)
               {
                 s.users[data.detail.User].sessions = null;
                 s.users[data.detail.User].sessions = sessions;

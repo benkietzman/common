@@ -25,7 +25,7 @@ export default
       history: [],
       menu: false,
       message: null,
-      user: null,
+      user: new Observable,
       users: null
     });
     // }}}
@@ -122,6 +122,10 @@ export default
             while (s.history.length > 50)
             {
               s.history.shift();
+            }
+            if (c.getUserID() != data.detail.User && s.user.v != data.detail.User)
+            {
+              s.user.v = data.detail.User;
             }
             s.u();
             if (s.menu)

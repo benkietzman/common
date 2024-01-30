@@ -185,7 +185,7 @@ export default
   template: `
     {{#isValid}}
     {{#if @root.users}}
-    <div style="position: relative; z-index: 1000;">
+    <div style="position: relative; z-index: 999;">
       <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 180px; right: 0px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>
         {{#if @root.menu}}

@@ -25,7 +25,7 @@ export default
       history: [],
       menu: false,
       message: null,
-      user: new Observable,
+      user: null,
       users: {}
     });
     // }}}
@@ -56,7 +56,7 @@ export default
     s.getUsers = () =>
     {
       s.users = null;
-      s.users = [];
+      s.users = {};
       let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -67,7 +67,7 @@ export default
           {
             if (c.isDefined(data.User) && c.getUserID() != data.User)
             {
-              if (!c.isDefined(s.users[data.User]))
+              if (!s.users[data.User])
               {
                 s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
               }
@@ -102,6 +102,7 @@ export default
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && c.isDefined(data.detail.User))
         {
+          // {{{ chat
           if (data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
           {
             if (!s.menu)
@@ -113,19 +114,20 @@ export default
             {
               s.history.shift();
             }
-            if (!s.user.v || s.user.v != data.detail.User)
-            {
-              s.user.v = data.detail.User;
-            }
             s.u();
-            document.getElementById('message').focus();
-            document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+            if (s.menu)
+            {
+              document.getElementById('message').focus();
+              document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+            }
           }
+          // }}}
+          // {{{ connect
           else if (data.detail.Action == 'connect')
           {
             if (c.getUserID() != data.detail.User)
             {
-              if (!c.isDefined(s.users[data.detail.User]))
+              if (!s.users[data.detail.User])
               {
                 s.users[data.detail.User] = {FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: []};
               }
@@ -133,9 +135,11 @@ export default
               s.u();
             }
           }
+          // }}}
+          // {{{ disconnect
           else if (data.detail.Action == 'disconnect')
           {
-            if (c.getUserID() != data.detail.User && c.isDefined(s.users[data.detail.User]))
+            if (c.getUserID() != data.detail.User && s.users[data.detail.User])
             {
               let sessions = [];
               for (let i = 0; i < s.users[data.detail.User].length; i++)
@@ -157,6 +161,7 @@ export default
               s.u();
             }
           }
+          // }}}
         }
       });
       s.getUsers();
@@ -173,7 +178,7 @@ export default
   // {{{ template
   template: `
     {{#isValid}}
-    {{#if users}}
+    {{#if @root.users}}
     <div style="position: relative; z-index: 1000;">
       <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 180px; right: 0px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;"><i class="bi bi-chat-fill"></i></button>

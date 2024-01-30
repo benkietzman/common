@@ -34,7 +34,13 @@ export default
     {
       if (c.isValid() && s.user.v)
       {
-        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: {Action: 'chat', Message: s.message.v, User: c.getUserID(), FirstName: c.getUserFirstName(), LastName: c.getUserLastName()}} };
+        let message = {Action: 'chat', Message: s.message.v, User: c.getUserID(), FirstName: c.getUserFirstName(), LastName: c.getUserLastName()};
+        s.history.push(message);
+        while (s.history.length > 50)
+        {
+          s.history.shift();
+        }
+        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: message}};
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
         s.u();

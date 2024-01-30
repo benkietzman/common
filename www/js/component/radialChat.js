@@ -58,33 +58,6 @@ export default
       }
     };
     // }}}
-    // {{{ getUsers()
-    s.getUsers = () =>
-    {
-      s.users = null;
-      s.users = {};
-      let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
-      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
-      {
-        let error = {};
-        if (c.wsResponse(response, error) && c.isDefined(response.Response))
-        {
-          for (let [strSession, data] of Object.entries(response.Response))
-          {
-            if (c.isDefined(data.User) && c.getUserID() != data.User)
-            {
-              if (!s.users[data.User])
-              {
-                s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
-              }
-              s.users[data.User].sessions.push(data.wsRequestID);
-            }
-          }
-          s.u();
-        }
-      });
-    };
-    // }}}
     // {{{ slide()
     s.slide = () =>
     {
@@ -174,11 +147,32 @@ export default
           // }}}
         }
       });
-      s.getUsers();
+      s.users = null;
+      s.users = {};
+      let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+      {
+        let error = {};
+        if (c.wsResponse(response, error) && c.isDefined(response.Response))
+        {
+          for (let [strSession, data] of Object.entries(response.Response))
+          {
+            if (c.isDefined(data.User) && c.getUserID() != data.User)
+            {
+              if (!s.users[data.User])
+              {
+                s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
+              }
+              s.users[data.User].sessions.push(data.wsRequestID);
+            }
+          }
+          s.u();
+        }
+      });
     };
     // }}}
     // {{{ main
-    c.attachEvent('commonAuthReady', (data) =>
+    c.attachEvent('commonWsConnected', (data) =>
     {
       s.init();
     });

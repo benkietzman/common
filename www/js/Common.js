@@ -406,6 +406,7 @@ class Common
                   {
                     this.m_wsRequestID = response.wsRequestID;
                     this.m_bConnecting = false;
+                    this.dispatchEvent('commonWsConnected', null);
                   }
                 });
               }

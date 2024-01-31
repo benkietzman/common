@@ -22,6 +22,7 @@ export default
       // }}}
       c: c,
       notify: false,
+      histories: {},
       history: [],
       menu: false,
       message: null,
@@ -35,11 +36,16 @@ export default
       if (c.isValid() && s.user.v)
       {
         let message = {Action: 'chat', Message: s.message.v, User: c.getUserID(), FirstName: c.getUserFirstName(), LastName: c.getUserLastName()};
-        s.history.push(message);
-        while (s.history.length > 50)
+        if (!s.histories[s.user.v])
         {
-          s.history.shift();
+          s.histories[s.user.v] = [];
         }
+        s.histories[s.user.v].push(message);
+        while (s.histories[s.user.v].length > 50)
+        {
+          s.histories[s.user.v].shift();
+        }
+        s.history = s.histories[s.user.v];
         let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: message}};
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
@@ -58,14 +64,16 @@ export default
       }
     };
     // }}}
-    // {{{ slide()
-    s.slide = () =>
+    // {{{ hist()
+    s.hist = () =>
     {
-      s.menu = !s.menu;
-      if (s.menu)
+      s.notify = false;
+      if (!s.histories[s.user.v])
       {
-        s.notify = false;
+        s.histories[s.user.v] = [];
       }
+      s.history = s.histories[s.user.v];
+      s.users[s.user.v].unread = 0;
       s.u();
       if (s.menu)
       {
@@ -84,21 +92,43 @@ export default
           // {{{ chat
           if (data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
           {
+            let bFound = false;
             if (!s.menu)
             {
               s.notify = true;
             }
-            s.history.push(data.detail);
-            while (s.history.length > 50)
+            if (!s.users[data.detail.User])
             {
-              s.history.shift();
+              s.users[data.detail.User] = {connected: true, FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: [], unread: 0};
             }
-            if (c.getUserID() != data.detail.User && s.user.v != data.detail.User)
+            s.users[data.detail.User].connected = true;
+            for (let i = 0; !bFound && i < s.users[data.detail.User].sessions.length; i++)
             {
-              s.user.v = data.detail.User;
+              if (s.users[data.detail.User].sessions[i] == data.detail.wsRequestID)
+              {
+                bFound = true;
+              }
+            }
+            if (!bFound)
+            {
+              s.users[data.detail.User].sessions.push(data.detail.wsRequestID);
+            }
+            if (s.user.v != data.detail.User)
+            {
+              s.notify = true;
+              s.users[data.detail.User].unread++;
+            }
+            if (!s.histories[data.detail.User])
+            {
+              s.histories[data.detail.User] = [];
+            }
+            s.histories[data.detail.User].push(data.detail);
+            while (s.histories[data.detail.User].length > 50)
+            {
+              s.histories[data.detail.User].shift();
             }
             s.u();
-            if (s.menu)
+            if (s.menu && s.user.v == data.detail.User)
             {
               document.getElementById('message').focus();
               document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
@@ -112,8 +142,9 @@ export default
             {
               if (!s.users[data.detail.User])
               {
-                s.users[data.detail.User] = {FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: []};
+                s.users[data.detail.User] = {connected: true, FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: [], unread: 0};
               }
+              s.users[data.detail.User].connected = true;
               s.users[data.detail.User].sessions.push(data.detail.wsRequestID);
               s.u();
             }
@@ -122,7 +153,7 @@ export default
           // {{{ disconnect
           else if (data.detail.Action == 'disconnect')
           {
-            if (c.getUserID() != data.detail.User && c.isObject(s.users) && s.users[data.detail.User])
+            if (c.getUserID() != data.detail.User && s.users[data.detail.User])
             {
               let sessions = [];
               for (let i = 0; i < s.users[data.detail.User].length; i++)
@@ -139,7 +170,7 @@ export default
               }
               else
               {
-                delete s.users[data.detail.User];
+                s.users[data.detail.User].connected = false;
               }
               s.u();
             }
@@ -161,7 +192,7 @@ export default
             {
               if (!s.users[data.User])
               {
-                s.users[data.User] = {FirstName: data.FirstName, LastName: data.LastName, sessions: []};
+                s.users[data.User] = {connected: true, FirstName: data.FirstName, LastName: data.LastName, sessions: [], unread: 0};
               }
               s.users[data.User].sessions.push(data.wsRequestID);
             }
@@ -169,6 +200,22 @@ export default
           s.u();
         }
       });
+    };
+    // }}}
+    // {{{ slide()
+    s.slide = () =>
+    {
+      s.menu = !s.menu;
+      if (s.menu)
+      {
+        s.notify = false;
+      }
+      s.u();
+      if (s.menu)
+      {
+        document.getElementById('message').focus();
+        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+      }
     };
     // }}}
     // {{{ main
@@ -187,12 +234,12 @@ export default
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;" title="chat"><i class="bi bi-chat"></i></button>
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">
-          <select class="form-control form-control-sm" c-model="user" style="margin-bottom: 10px;">
+          <select class="form-select form-select-sm" c-model="user" c-change="hist()" style="margin-bottom: 10px;">
             {{#each @root.users}}
-            <option value="{{@key}}">{{LastName}}, {{FirstName}} ({{@key}})</option>
+            <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}&#x0001F4A1;{{else}}&nbsp;{{/if}}&nbsp;{{LastName}}, {{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse table-responsive" id="history" style="max-height: 200px; max-width: 400px;">
+          <div class="card card-body card-inverse table-responsive" id="history" style="height: 300px; max-height: 300px; max-width: 500px; width: 500px;">
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>

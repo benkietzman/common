@@ -243,7 +243,7 @@ export default
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>
-                <td>{{LastName}}, {{FirstName}} ({{User}})</td>
+                <td>{{FirstName}}</td>
                 <td>{{Message}}</td>
               </tr>
               {{/each}}

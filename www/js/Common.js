@@ -1426,9 +1426,16 @@ class Common
             this.login.info = null;
             if (this.wsResponse(response, error))
             {
-              if (this.isDefined(response.Error) && this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1 && response.Error.Message.search('Failed to find key.') == -1)
+              if (this.isDefined(response.Error))
               {
-                this.login.message = response.Error.Message;
+                if (this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
+                {
+                  this.login.message = response.Error.Message;
+                }
+                else if (response.Error.length > 0 && response.Error.search('Please provide the User.') == -1)
+                {
+                  this.login.message = response.Error;
+                }
               }
               if (this.isDefined(response.Response.auth))
               {

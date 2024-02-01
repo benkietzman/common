@@ -42,7 +42,7 @@ extern "C++"
     class Storage
     {
       private:
-      mutex m_mutexStorage;
+      std::mutex m_mutexStorage;
       Json *m_ptStorage;
 
       public:

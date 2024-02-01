@@ -142,7 +142,7 @@ class Bridge
                 $unPick = 0;
               }
               $strServer = $servers[$unPick];
-              if ($handle = stream_socket_client((($i == 0)?'tls://':'').$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+              if ($handle = stream_socket_client((($i == 0)?'ssl://':'').$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
               {
                 $bConnected = true;
               }
@@ -588,7 +588,7 @@ class Bridge
             $unPick = 0;
           }
           $strServer = $servers[$unPick];
-          if ($handle = stream_socket_client((($i == 0)?'tls://':'').$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+          if ($handle = stream_socket_client((($i == 0)?'ssl://':'').$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
           { 
             $bConnected = true;
           }

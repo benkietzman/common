@@ -58,7 +58,7 @@ function sessionRead($strSessionID)
   $handle = null;
   $nErrorNo = null;
   $strError = null;
-  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
+  if ($handle = stream_socket_client('ssl://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -131,7 +131,7 @@ function sessionWrite($strSessionID, $strSessionData)
   $handle = null;
   $nErrorNo = null;
   $strError = null;
-  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
+  if ($handle = stream_socket_client('ssl://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';
@@ -200,7 +200,7 @@ function sessionDestroy($strSessionID)
   $handle = null;
   $nErrorNo = null;
   $strError = null;
-  if ($handle = stream_socket_client('tls://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
+  if ($handle = stream_socket_client('ssl://'.$GLOBALS['sess_server'].':12199', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $streamContext))
   {
     $request = array();
     $request['Section'] = 'session';

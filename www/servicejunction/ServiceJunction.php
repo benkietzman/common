@@ -164,7 +164,7 @@ class ServiceJunction
           $unPick = 0;
         }
         $strServer = $junctionServer[$unPick];
-        if ($handle = stream_socket_client(($i == 0)?'tls://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+        if ($handle = stream_socket_client(($i == 0)?'ssl://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
         {
           $bConnected = true;
         }
@@ -1271,7 +1271,7 @@ class ServiceJunction
           $unPick = 0;
         }
         $strServer = $junctionServer[$unPick];
-        if ($handle = stream_socket_client(($i == 0)?'tls://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+        if ($handle = stream_socket_client(($i == 0)?'ssl://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
         {
           $bConnected = true;
         }

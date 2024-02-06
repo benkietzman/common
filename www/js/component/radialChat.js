@@ -99,9 +99,25 @@ export default
             }
             if (!s.users[data.detail.User])
             {
-              s.users[data.detail.User] = {connected: true, FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: [], unread: 0};
+              s.users[data.detail.User] = {sessions: [], unread: 0};
             }
             s.users[data.detail.User].connected = true;
+            if (c.isDefined(s.users[data.detail.User].FirstName))
+            {
+              data.detail.FirstName = s.users[data.detail.User].FirstName;
+            }
+            if (c.isDefined(s.users[data.detail.User].LastName))
+            {
+              data.detail.LasName = s.users[data.detail.User].LastName;
+            }
+            if (c.isDefined(data.detail.FirstName))
+            {
+              s.users[data.detail.User].FirstName = data.detail.FirstName;
+            }
+            if (c.isDefined(data.detail.LastName))
+            {
+              s.users[data.detail.User].LastName = data.detail.LastName;
+            }
             for (let i = 0; !bFound && i < s.users[data.detail.User].sessions.length; i++)
             {
               if (s.users[data.detail.User].sessions[i] == data.detail.wsRequestID)
@@ -142,9 +158,17 @@ export default
             {
               if (!s.users[data.detail.User])
               {
-                s.users[data.detail.User] = {connected: true, FirstName: data.detail.FirstName, LastName: data.detail.LastName, sessions: [], unread: 0};
+                s.users[data.detail.User] = {sessions: [], unread: 0};
               }
               s.users[data.detail.User].connected = true;
+              if (c.isDefined(data.detail.FirstName))
+              {
+                s.users[data.detail.User].FirstName = data.detail.FirstName;
+              }
+              if (c.isDefined(data.detail.LastName))
+              {
+                s.users[data.detail.User].LastName = data.detail.LastName;
+              }
               s.users[data.detail.User].sessions.push(data.detail.wsRequestID);
               s.u();
             }
@@ -179,7 +203,7 @@ export default
         }
       });
       s.users = null;
-      s.users = {};
+      s.users = {'radial_bot': {connected: true, sessions: [], unread: 0}};
       let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -236,14 +260,14 @@ export default
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-select form-select-sm" c-model="user" c-change="hist()" style="margin-bottom: 10px;">
             {{#each @root.users}}
-            <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}&#x0001F4A1;{{else}}&nbsp;{{/if}}&nbsp;{{LastName}}, {{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
+            <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}&#x0001F4A1;{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{FirstName}} ({{@key}}){{else}}{{@key}}{{/if}}{{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history" style="height: 300px; max-height: 300px; max-width: 500px; width: 500px;">
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>
-                <td>{{FirstName}}</td>
+                <td>{{#if FirstName}}{{FirstName}}{{else}}{{User}}{{/if}}</td>
                 <td>{{Message}}</td>
               </tr>
               {{/each}}

@@ -144,7 +144,7 @@ export default
               s.histories[data.detail.User].shift();
             }
             s.u();
-            if (s.menu && s.user.v == data.detail.User)
+            if (s.menu)
             {
               document.getElementById('message').focus();
               document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
@@ -197,6 +197,11 @@ export default
                 s.users[data.detail.User].connected = false;
               }
               s.u();
+              if (s.menu)
+              {
+                document.getElementById('message').focus();
+                document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+              }
             }
           }
           // }}}

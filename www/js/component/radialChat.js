@@ -408,7 +408,7 @@ export default
             <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}&#x0001F4A1;{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{/if}}{{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse table-responsive" id="history">
+          <div class="card card-body card-inverse table-responsive" id="history" style="padding: 0px;">
             <table class="table table-condensed table-striped" style="margin: 0px;">
               {{#each @root.history}}
               <tr>

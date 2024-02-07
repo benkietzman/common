@@ -1,4 +1,4 @@
-// vim600: fdm=marker
+// vim: fmr=[[[,]]]
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2024-01-26
@@ -7,14 +7,15 @@
 ///////////////////////////////////////////
 export default
 {
-  // {{{ controller()
+  // [[[ controller()
   controller(id)
   {
-    // {{{ prep work
+    // [[[ prep work
     let c = common;
     let s = c.store('radialChat',
     {
       c: c,
+      blurred: false,
       notify: false,
       histories: {},
       history: [],
@@ -23,8 +24,8 @@ export default
       user: new Observable,
       users: {}
     });
-    // }}}
-    // {{{ chat()
+    // ]]]
+    // [[[ chat()
     s.chat = () =>
     {
       if (c.isValid() && s.user.v)
@@ -48,8 +49,8 @@ export default
         document.getElementById('message').focus();
       }
     };
-    // }}}
-    // {{{ convert()
+    // ]]]
+    // [[[ convert()
     s.convert = (m) =>
     {
       let b = false;
@@ -171,8 +172,8 @@ export default
 
       return h;
     };
-    // }}}
-    // {{{ enter()
+    // ]]]
+    // [[[ enter()
     s.enter = () =>
     {
       if (window.event.keyCode == 13)
@@ -180,8 +181,8 @@ export default
         s.chat();
       }
     };
-    // }}}
-    // {{{ hist()
+    // ]]]
+    // [[[ hist()
     s.hist = () =>
     {
       s.notify = false;
@@ -198,19 +199,15 @@ export default
         document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
       }
     };
-    // }}}
-    // {{{ init()
+    // ]]]
+    // [[[ init()
     s.init = () =>
     {
-      window.addEventListener('resize', () =>
-      {
-        s.resize();
-      });
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && c.isDefined(data.detail.User))
         {
-          // {{{ chat
+          // [[[ chat
           if (data.detail.Action == 'chat' && c.isDefined(data.detail.Message))
           {
             let bFound = false;
@@ -271,9 +268,30 @@ export default
               document.getElementById('message').focus();
               document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
             }
+            if (s.blurred && 'Notification' in window)
+            {
+              Notification.requestPermission((permission) =>
+              {
+                let strTitle = 'Radial Chat - ';
+                if (c.isDefined(data.detail.LastName))
+                {
+                  strTitle += data.detail.LastName + ', ';
+                }
+                if (c.isDefined(data.detail.FirstName))
+                {
+                  strTitle += data.detail.FirstName;
+                }
+                strTitle += ' (' + data.detail.User + ')';
+                let notification = new Notification(strTitle, {body: data.detail.Message, dir: 'auto'});
+                setTimeout(() =>
+                {
+                  notification.close();
+                }, 5000);
+              });
+            }
           }
-          // }}}
-          // {{{ connect
+          // ]]]
+          // [[[ connect
           else if (data.detail.Action == 'connect')
           {
             if (c.getUserID() != data.detail.User)
@@ -295,8 +313,8 @@ export default
               s.u();
             }
           }
-          // }}}
-          // {{{ disconnect
+          // ]]]
+          // [[[ disconnect
           else if (data.detail.Action == 'disconnect')
           {
             if (c.getUserID() != data.detail.User && s.users[data.detail.User])
@@ -326,7 +344,7 @@ export default
               }
             }
           }
-          // }}}
+          // ]]]
         }
       });
       s.users = null;
@@ -352,8 +370,8 @@ export default
         }
       });
     };
-    // }}}
-    // {{{ resize()
+    // ]]]
+    // [[[ resize()
     s.resize = () =>
     {
       if (s.menu)
@@ -369,7 +387,8 @@ export default
         document.getElementById('message').focus();
       }
     };
-    // {{{ slide()
+    // ]]]
+    // [[[ slide()
     s.slide = () =>
     {
       s.menu = !s.menu;
@@ -379,23 +398,35 @@ export default
       }
       s.u();
     };
-    // }}}
-    // {{{ u()
+    // ]]]
+    // [[[ u()
     s.u = () =>
     {
       c.render(id, this);
       s.resize();
     };
-    // }}}
-    // {{{ main
+    // ]]]
+    // [[[ main
     c.attachEvent('commonWsConnected', (data) =>
     {
       s.init();
     });
-    // }}}
+    window.addEventListener('resize', () =>
+    {
+      s.resize();
+    });
+    window.onblur = () =>
+    {
+      s.blurred = true;
+    };
+    window.onfocus = () =>
+    {
+      s.blurred = false;
+    };
+    // ]]]
   },
-  // }}}
-  // {{{ template
+  // ]]]
+  // [[[ template
   template: `
     {{#isValid}}
     <div style="position: relative; z-index: 1000;">
@@ -425,5 +456,5 @@ export default
     </div>
     {{/isValid}}
   `
-  // }}}
+  // ]]] 
 }

@@ -148,6 +148,8 @@ extern "C++"
       bool terminalDown(radialTerminal &tInfo, const size_t unCount, const bool bWait, string &strError);
       bool terminalEnter(radialTerminal &tInfo, const bool bWait, string &strError);
       bool terminalEscape(radialTerminal &tInfo, const bool bWait, string &strError);
+      bool terminalFind(radialTerminal &tInfo, const string strData);
+      bool terminalFind(radialTerminal &tInfo, const string strData, size_t &unRow, size_t &unCol);
       bool terminalFunction(radialTerminal &tInfo, const int nKey, string &strError);
       bool terminalGetSocketTimeout(radialTerminal &tInfo, int &nShort, int &nLong, string &strError);
       bool terminalHome(radialTerminal &tInfo, const bool bWait, string &strError);

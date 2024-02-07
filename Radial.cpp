@@ -1319,6 +1319,31 @@ bool Radial::terminalEscape(radialTerminal &t, const bool bWait, string &strErro
   return terminalRequest(t, "escape", {{"Wait", ((bWait)?"1":"0")}}, strError);
 }
 // }}}
+// {{{ terminalFind()
+bool Radial::terminalFind(radialTerminal &t, const string strData)
+{
+  size_t unCol = 0, unRow = 0;
+
+  return terminalFind(t, strData, unRow, unCol);
+}
+bool Radial::terminalFind(radialTerminal &t, const string strData, size_t &unRow, size_t &unCol)
+{
+  bool bResult = false;
+  size_t unPosition;
+
+  for (size_t i = 0; !bResult && i < t.screen.size(); i++)
+  {
+    if ((unPosition = t.screen[i].find(strData)) != string::npos)
+    {
+      bResult = true;
+      unRow = i;
+      unCol = unPosition;
+    }
+  }
+
+  return bResult;
+}
+// }}}
 // {{{ terminalFunction()
 bool Radial::terminalFunction(radialTerminal &t, const int nKey, string &strError)
 {

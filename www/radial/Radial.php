@@ -470,6 +470,38 @@ class Radial
     return $bResult;
   }
   // }}}
+  // {{{ terminalFind()
+  public function terminalFind(&$t, $strData)
+  {
+    $unRow = null;
+    $unCol = null;
+    
+    return $this->terminalFindPos($t, $strData, $unRow, $unCol);
+
+  }
+  // }}}
+  // {{{ terminalFindPos()
+  public function terminalFindPos($t, $strData, &$unRow, &$unCol)
+  { 
+    $bResult = false;
+ 
+    if (isset($t['Screen']) && is_array($t['Screen']))
+    { 
+      $unSize = sizeof($t['Screen']);
+      for ($i = 0; !$bResult && $i < $unSize; $i++)
+      {
+        if (($unPosition = strpos($t['Screen'][$i], $strData)) !== false)
+        {
+          $bResult = true;
+          $unRow = $i;
+          $unCol = $unPosition;
+        }
+      }
+    }
+
+    return $bResult;
+  }
+  // }}}
   // {{{ terminalFunction()
   public function terminalFunction(&$t, $nKey)
   {

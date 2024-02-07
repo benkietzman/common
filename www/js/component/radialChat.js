@@ -55,6 +55,89 @@ export default
       }
     };
     // }}}
+    // {{{ convert()
+    s.convert = (m) =>
+    {
+      let h = '';
+
+      for (let i = 0; i < m.length; i++)
+      {
+        switch (m[i])
+        {
+          case '\u0003':
+          {
+            if (isFinite(m.substr((i + 1), 2)))
+            {
+              h += '<span style="color:';
+              switch (m.substr((i + 1), 2))
+              {
+                case '00': h += 'white'; break;
+                case '01': h += 'black'; break;
+                case '02': h += 'blue'; break;
+                case '03': h += 'green'; break;
+                case '04': h += 'red'; break;
+                case '05': h += 'brown'; break;
+                case '06': h += 'magenta'; break;
+                case '07': h += 'orange'; break;
+                case '08': h += 'yellow'; break;
+                case '09': h += 'light-green'; break;
+                case '10': h += 'cyan'; break;
+                case '11': h += 'light-cyan'; break;
+                case '12': h += 'light-blue'; break;
+                case '13': h += 'pink'; break;
+                case '14': h += 'grey'; break;
+                case '15': h += 'light-grey'; break;
+              }
+              h += ';';
+              if (m.substr((i + 3), 1) == ',' && isFinite(m.substr((i + 4), 2)))
+              {
+                h += ' background:';
+                switch (m.substr((i + 4), 2))
+                {
+                  case '00': h += 'white'; break;
+                  case '01': h += 'black'; break;
+                  case '02': h += 'blue'; break;
+                  case '03': h += 'green'; break;
+                  case '04': h += 'red'; break;
+                  case '05': h += 'brown'; break;
+                  case '06': h += 'magenta'; break;
+                  case '07': h += 'orange'; break;
+                  case '08': h += 'yellow'; break;
+                  case '09': h += 'light-green'; break;
+                  case '10': h += 'cyan'; break;
+                  case '11': h += 'light-cyan'; break;
+                  case '12': h += 'light-blue'; break;
+                  case '13': h += 'pink'; break;
+                  case '14': h += 'grey'; break;
+                  case '15': h += 'light-grey'; break;
+                }
+                h += ';';
+                i += 3;
+              }
+              h += ' border-radius: 10px; border-style:solid; border-width:0px;">';
+              i += 2;
+            }
+            else
+            {
+              h += '</span>';
+            }
+            break;
+          }
+          case ' ':
+          {
+            h += '&nbsp;';
+            break;
+          }
+          default:
+          {
+            h += m[i];
+          }
+        }
+      }
+
+      return h;
+    };
+    // }}}
     // {{{ enter()
     s.enter = () =>
     {
@@ -138,6 +221,7 @@ export default
             {
               s.histories[data.detail.User] = [];
             }
+            data.detail.Message = s.convert(data.detail.Message);
             s.histories[data.detail.User].push(data.detail);
             while (s.histories[data.detail.User].length > 50)
             {
@@ -272,8 +356,8 @@ export default
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>
-                <td>{{#if FirstName}}{{FirstName}}{{else}}{{User}}{{/if}}</td>
-                <td>{{Message}}</td>
+                <td><pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{#if FirstName}}{{FirstName}}{{else}}{{User}}{{/if}}</pre></td>
+                <td><pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{{Message}}}</pre></td>
               </tr>
               {{/each}}
             </table>

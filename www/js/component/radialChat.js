@@ -412,8 +412,8 @@ export default
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>
-                <td><pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{#if FirstName}}{{FirstName}}{{else}}{{User}}{{/if}}</pre></td>
-                <td><pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{{Message}}}</pre></td>
+                <td><pre style="background: inherit; color: inherit; margin: 0px; white-space: pre-wrap;">{{#if FirstName}}{{FirstName}}{{else}}{{User}}{{/if}}</pre></td>
+                <td><pre style="background: inherit; color: inherit; margin: 0px; white-space: pre-wrap;">{{{Message}}}</pre></td>
               </tr>
               {{/each}}
             </table>

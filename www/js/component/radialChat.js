@@ -409,7 +409,7 @@ export default
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history">
-            <table class="table table-condensed table-striped">
+            <table class="table table-condensed table-striped" style="margin: 0px;">
               {{#each @root.history}}
               <tr>
                 <td><pre style="background: inherit; color: inherit; margin: 0px; white-space: pre-wrap;">{{#if FirstName}}{{FirstName}}{{else}}{{User}}{{/if}}</pre></td>

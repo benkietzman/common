@@ -66,7 +66,7 @@ export default
   // {{{ template
   template: `
     <div style="position: relative; z-index: 999;">
-      <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 120px; right: 0px;">
+      <div id="central-slide-panel" class="bg-success" style="position: fixed; top: 80px; right: 0px;">
         <button id="central-slide-opener" class="btn btn-sm btn-success float-start" c-click="slideMenu()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;" title="applications"><i class="bi bi-app"></i></button>
         {{#if c.centralMenu.show}}
         <div id="central-slide-content" style="padding: 10px;">

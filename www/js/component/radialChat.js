@@ -66,7 +66,7 @@ export default
         {
           case '\u0003':
           {
-            if (isFinite(m.substr((i + 1), 2)) && m.substr((i + 1), 2) != ' ')
+            if (isFinite(m.substr((i + 1), 2)) && m.substr((i + 1), 2) != '  ')
             {
               h += '<span style="color:';
               switch (m.substr((i + 1), 2))
@@ -89,7 +89,7 @@ export default
                 case '15': h += 'light-grey'; break;
               }
               h += ';';
-              if (m.substr((i + 3), 1) == ',' && isFinite(m.substr((i + 4), 2)) && m.substr((i + 4), 2) != ' ')
+              if (m.substr((i + 3), 1) == ',' && isFinite(m.substr((i + 4), 2)) && m.substr((i + 4), 2) != '  ')
               {
                 h += ' background:';
                 switch (m.substr((i + 4), 2))

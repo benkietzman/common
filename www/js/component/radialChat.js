@@ -14,12 +14,6 @@ export default
     let c = common;
     let s = c.store('radialChat',
     {
-      // {{{ u()
-      u: () =>
-      {
-        c.render(id, this);
-      },
-      // }}}
       c: c,
       notify: false,
       histories: {},
@@ -58,18 +52,35 @@ export default
     // {{{ convert()
     s.convert = (m) =>
     {
+      let b = false;
       let h = '';
+      let i = false;
+      let u = false;
 
-      for (let i = 0; i < m.length; i++)
+      for (let n = 0; n < m.length; n++)
       {
-        switch (m[i])
+        switch (m[n])
         {
+          case '\u0002':
+          {
+            if (b)
+            {
+              b = false;
+              h += '</b>';
+            }
+            else
+            {
+              b = true;
+              h += '<b>';
+            }
+            break;
+          }
           case '\u0003':
           {
-            if (isFinite(m.substr((i + 1), 2)) && m.substr((i + 1), 2) != '  ')
+            if (isFinite(m.substr((n + 1), 2)) && m.substr((n + 1), 2) != '  ')
             {
               h += '<span style="color:';
-              switch (m.substr((i + 1), 2))
+              switch (m.substr((n + 1), 2))
               {
                 case '00': h += 'white'; break;
                 case '01': h += 'black'; break;
@@ -89,10 +100,10 @@ export default
                 case '15': h += 'light-grey'; break;
               }
               h += ';';
-              if (m.substr((i + 3), 1) == ',' && isFinite(m.substr((i + 4), 2)) && m.substr((i + 4), 2) != '  ')
+              if (m.substr((n + 3), 1) == ',' && isFinite(m.substr((n + 4), 2)) && m.substr((n + 4), 2) != '  ')
               {
                 h += ' background:';
-                switch (m.substr((i + 4), 2))
+                switch (m.substr((n + 4), 2))
                 {
                   case '00': h += 'white'; break;
                   case '01': h += 'black'; break;
@@ -112,10 +123,10 @@ export default
                   case '15': h += 'light-grey'; break;
                 }
                 h += ';';
-                i += 3;
+                n += 3;
               }
               h += ' border-radius: 10px; border-style:solid; border-width:0px;">';
-              i += 2;
+              n += 2;
             }
             else
             {
@@ -123,9 +134,37 @@ export default
             }
             break;
           }
+          case '\u001D':
+          {
+            if (i)
+            {
+              i = false;
+              h += '</i>';
+            }
+            else
+            {
+              i = true;
+              h += '<i>';
+            }
+            break;
+          }
+          case '\u001F':
+          {
+            if (u)
+            {
+              u = false;
+              h += '</u>';
+            }
+            else
+            {
+              u = true;
+              h += '<u>';
+            }
+            break;
+          }
           default:
           {
-            h += m[i];
+            h += m[n];
           }
         }
       }
@@ -163,6 +202,10 @@ export default
     // {{{ init()
     s.init = () =>
     {
+      window.addEventListener('resize', () =>
+      {
+        s.resize();
+      });
       c.attachEvent('commonWsMessage_'+c.application, (data) =>
       {
         if (c.isDefined(data.detail) && c.isDefined(data.detail.Action) && c.isDefined(data.detail.User))
@@ -310,6 +353,22 @@ export default
       });
     };
     // }}}
+    // {{{ resize()
+    s.resize = () =>
+    {
+      if (s.menu)
+      {
+        let history = document.getElementById('history');
+        let width = Math.floor((window.innerWidth * 0.8));
+        let height = Math.floor(((window.innerHeight - 180) * 0.8));
+        history.style.minWidth = ((width > 500)?500:width) + 'px';
+        history.style.maxWidth = width + 'px';
+        history.style.minHeight = ((height > 300)?300:width) + 'px';
+        history.style.maxHeight = height + 'px';
+        history.scrollTop = history.scrollHeight;
+        document.getElementById('message').focus();
+      }
+    };
     // {{{ slide()
     s.slide = () =>
     {
@@ -319,11 +378,13 @@ export default
         s.notify = false;
       }
       s.u();
-      if (s.menu)
-      {
-        document.getElementById('message').focus();
-        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
-      }
+    };
+    // }}}
+    // {{{ u()
+    s.u = () =>
+    {
+      c.render(id, this);
+      s.resize();
     };
     // }}}
     // {{{ main
@@ -337,7 +398,7 @@ export default
   // {{{ template
   template: `
     {{#isValid}}
-    <div style="position: relative; z-index: 999;">
+    <div style="position: relative; z-index: 1000;">
       <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 180px; right: 0px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;" title="chat"><i class="bi bi-chat"></i></button>
         {{#if @root.menu}}
@@ -347,7 +408,7 @@ export default
             <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}&#x0001F4A1;{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{/if}}{{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse table-responsive" id="history" style="height: 300px; max-height: 300px; max-width: 500px; width: 500px;">
+          <div class="card card-body card-inverse table-responsive" id="history">
             <table class="table table-condensed table-striped">
               {{#each @root.history}}
               <tr>

@@ -378,7 +378,11 @@ export default
       {
         let history = document.getElementById('history');
         let maxWidth = document.documentElement.clientWidth - 80;
-        let maxHeight = document.documentElement.clientHeight - 300;
+        let maxHeight = document.documentElement.clientHeight - 240;
+        if (maxWidth > 800)
+        {
+          maxWidth = 800;
+        }
         history.style.minWidth = ((maxWidth > 500)?500:maxWidth) + 'px';
         history.style.maxWidth = maxWidth + 'px';
         history.style.minHeight = ((maxHeight > 300)?300:maxHeight) + 'px';
@@ -430,7 +434,7 @@ export default
   template: `
     {{#isValid}}
     <div style="position: relative; z-index: 1000;">
-      <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 180px; right: 0px;">
+      <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 120px; right: 0px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;" title="chat"><i class="bi bi-chat"></i></button>
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">

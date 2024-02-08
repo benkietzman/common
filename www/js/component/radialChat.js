@@ -427,6 +427,10 @@ export default
     {
       s.blurred = false;
     };
+    if ('Notification' in window)
+    {
+      Notification.requestPermission((permission) => {});
+    }
     // ]]]
   },
   // ]]]

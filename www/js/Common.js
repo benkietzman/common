@@ -100,6 +100,10 @@ class Common
     {
       this.footer = {...this.footer, ...options.footer};
     }
+    if ('Notification' in window)
+    {
+      Notification.requestPermission((permission) => {});
+    }
     if (typeof Handlebars !== 'undefined')
     {
       Handlebars.registerHelper('add', (v1, v2) =>
@@ -947,7 +951,7 @@ class Common
     {
       this.bind(this.id, this.name);
     }
-  } 
+  }
   // }}}
   // {{{ clearMenu()
   clearMenu()
@@ -1134,7 +1138,7 @@ class Common
   getParam(nav, param)
   {
     let result = null;
-    
+
     if (this.isObject(nav.data) && this.isDefined(nav.data[param]))
     {
       result = nav.data[param];
@@ -1804,7 +1808,7 @@ class Common
       }
       this.render(this.id, this.name, this.component);
     }
-  } 
+  }
   // }}}
   // {{{ request()
   request(strFunction, request, callback)
@@ -2285,7 +2289,7 @@ class Common
     {
       this.render(this.id, this.name, this.component);
     }
-  } 
+  }
   // }}}
   // {{{ wsCreate()
   wsCreate(strName, strServer, strPort, bSecure, strProtocol)
@@ -2470,27 +2474,21 @@ class Common
               this.m_messages[this.m_messages.length - 1].Index = (this.m_messages.length - 1);
               this.render('messages', this.autoLoads['messages']);
             }
-            else if (response.Action == 'notification')
+            else if (response.Action == 'notification' && response.Title && response.Body && 'Notification' in window)
             {
-              if ('Notification' in window)
+              Notification.requestPermission(function (permission)
               {
-                if (response.Title && response.Body)
+                let nDuration = 5000;
+                if (response.Duration)
                 {
-                  Notification.requestPermission(function (permission)
-                  {
-                    let nDuration = 5000;
-                    if (response.Duration)
-                    {
-                      nDuration = response.Duration * 1000;
-                    }
-                    let notification = new Notification(response.Title, {body: response.Body, icon: null, dir: 'auto'});
-                    setTimeout(() =>
-                    {
-                      notification.close();
-                    }, nDuration);
-                  });
+                  nDuration = response.Duration * 1000;
                 }
-              }
+                let notification = new Notification(response.Title, {body: response.Body, icon: null, dir: 'auto'});
+                setTimeout(() =>
+                {
+                  notification.close();
+                }, nDuration);
+              });
             }
           }
         }

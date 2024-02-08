@@ -495,7 +495,7 @@ export default
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;" title="chat"><i class="bi bi-chat"></i></button>
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">
-          <select class="form-select form-select-sm" c-model="user" c-change="hist()" style="margin-bottom: 10px;">
+          <select class="form-select form-select-sm" c-model="user" c-change="hist()" style="font-family: monospace, monospace; margin-bottom: 10px;">
             {{#each @root.users}}
             <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}{{{icon}}}{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{/if}}{{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
@@ -510,7 +510,7 @@ export default
               {{/each}}
             </table>
           </div>
-          <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" placeholder="Type message and hit enter..." style="margin-top: 10px;">
+          <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" placeholder="Type message and hit enter..." style="font-family: monospace, monospace; margin-top: 10px;">
         </div>
         {{/if}}
       </div>

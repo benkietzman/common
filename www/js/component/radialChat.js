@@ -217,7 +217,7 @@ export default
             }
             if (!s.users[data.detail.User])
             {
-              s.users[data.detail.User] = {sessions: [], unread: 0};
+              s.users[data.detail.User] = {icon: '&#x0001F4A1;', sessions: [], unread: 0};
             }
             s.users[data.detail.User].connected = true;
             if (c.isDefined(s.users[data.detail.User].FirstName))
@@ -299,7 +299,7 @@ export default
             {
               if (!s.users[data.detail.User])
               {
-                s.users[data.detail.User] = {sessions: [], unread: 0};
+                s.users[data.detail.User] = {icon: '&#x0001F4A1;', sessions: [], unread: 0};
               }
               s.users[data.detail.User].connected = true;
               if (c.isDefined(data.detail.FirstName))
@@ -350,7 +350,7 @@ export default
         }
       });
       s.users = null;
-      s.users = {'radial_bot': {connected: true, FirstName: 'Radial', sessions: [], unread: 0}};
+      s.users = {'radial_bot': {connected: true, FirstName: 'Radial', icon: '&#x0001F916;', sessions: [], unread: 0}};
       let request = {Interface: 'live', 'Function': 'list', Request: {Scope: 'all'}};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
@@ -363,7 +363,7 @@ export default
             {
               if (!s.users[data.User])
               {
-                s.users[data.User] = {connected: true, FirstName: data.FirstName, LastName: data.LastName, sessions: [], unread: 0};
+                s.users[data.User] = {connected: true, FirstName: data.FirstName, LastName: data.LastName, icon: '&#x0001F4A1;', sessions: [], unread: 0};
               }
               s.users[data.User].sessions.push(data.wsRequestID);
             }
@@ -497,7 +497,7 @@ export default
         <div id="radial-slide-content" style="padding: 10px;">
           <select class="form-select form-select-sm" c-model="user" c-change="hist()" style="margin-bottom: 10px;">
             {{#each @root.users}}
-            <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}&#x0001F4A1;{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{/if}}{{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
+            <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}{{{icon}}}{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{/if}}{{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
           </select>
           <div class="card card-body card-inverse table-responsive" id="history" style="padding: 0px;">

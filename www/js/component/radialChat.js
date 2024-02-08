@@ -236,6 +236,7 @@ export default
             {
               s.users[data.detail.User].LastName = data.detail.LastName;
             }
+            s.sort();
             for (let i = 0; !bFound && i < s.users[data.detail.User].sessions.length; i++)
             {
               if (s.users[data.detail.User].sessions[i] == data.detail.wsRequestID)
@@ -309,6 +310,7 @@ export default
               {
                 s.users[data.detail.User].LastName = data.detail.LastName;
               }
+              s.sort();
               s.users[data.detail.User].sessions.push(data.detail.wsRequestID);
               s.u();
             }
@@ -366,6 +368,7 @@ export default
               s.users[data.User].sessions.push(data.wsRequestID);
             }
           }
+          s.sort();
           s.u();
         }
       });
@@ -401,6 +404,60 @@ export default
         s.notify = false;
       }
       s.u();
+    };
+    // ]]]
+    // [[[ sort()
+    s.sort = () =>
+    {
+      for (let key of Object.keys(s.users))
+      {
+        s.users[key].display = '';
+        if (c.isDefined(s.users[key].LastName))
+        {
+          s.users[key].display = s.users[key].LastName + ', ';
+        }
+        if (c.isDefined(s.users[key].FirstName))
+        {
+          s.users[key].display += s.users[key].FirstName + ' ';
+        }
+        s.users[key].display += '(' + key + ')';
+      }
+      var arr = [];
+      for (let key in s.users)
+      {
+        let obj = {};
+        obj[key] = s.users[key];
+        obj[key].User = key;
+        obj.tempSortName = s.users[key].display.toLowerCase();
+        arr.push(obj);
+      }
+      arr.sort((a, b) =>
+      {
+        let at = a.tempSortName, bt = b.tempSortName;
+        return ((at > bt)?1:((at < bt)?-1:0));
+      });
+      let result = [];
+      for (let i = 0, l = arr.length; i < l; i++)
+      {
+        let id = null;
+        let obj = arr[i];
+        delete obj.tempSortName;
+        for (let key in obj)
+        {
+          if (obj.hasOwnProperty(key))
+          {
+            id = key;
+          }
+        }
+        let item = obj[id];
+        result.push(item);
+      }
+      s.users = null;
+      s.users = {};
+      for (let i = 0; i < result.length; i++)
+      {
+        s.users[result[i].User] = result[i];
+      }
     };
     // ]]]
     // [[[ u()

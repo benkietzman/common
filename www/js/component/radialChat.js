@@ -377,8 +377,8 @@ export default
       if (s.menu)
       {
         let history = document.getElementById('history');
-        let width = Math.floor((window.innerWidth * 0.8));
-        let height = Math.floor(((window.innerHeight - 140) * 0.8));
+        let width = document.documentElement.clientWidth - 80;
+        let height = document.documentElement.clientHeight - 260;
         history.style.minWidth = ((width > 500)?500:width) + 'px';
         history.style.maxWidth = width + 'px';
         history.style.minHeight = ((height > 300)?300:width) + 'px';

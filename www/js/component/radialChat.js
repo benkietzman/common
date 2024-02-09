@@ -491,7 +491,7 @@ export default
   template: `
     {{#isValid}}
     <div style="position: relative; z-index: 1000;">
-      <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 120px; right: 0px;">
+      <div id="radial-slide-panel" class="bg-{{#if @root.notify}}warning{{else}}info{{/if}}" style="position: fixed; top: 120px; right: 0px; border-style: solid; border-width: 0px; border-radius: 0px 0px 0px 10px;">
         <button id="radial-slide-opener" class="btn btn-sm btn-{{#if @root.notify}}warning{{else}}info{{/if}} float-start" c-click="slide()" style="width: 33px; height: 33px; font-size: 18px; font-weight: bold; margin: 0px 0px 0px -33px; border-radius: 10px 0px 0px 10px; vertical-align: top;" title="chat"><i class="bi bi-chat"></i></button>
         {{#if @root.menu}}
         <div id="radial-slide-content" style="padding: 10px;">

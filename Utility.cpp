@@ -95,7 +95,7 @@ extern "C++"
                 bool bDone = false;
                 bConnected[0] = true;
                 fdNonBlocking(fdSocket, strError);
-                while (!bDone && (CTime[1] - CTime[0]) > 5)
+                while (!bDone && (CTime[1] - CTime[0]) <= 5)
                 {
                   if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                   {
@@ -110,8 +110,8 @@ extern "C++"
                   else
                   {
                     msleep(10);
+                    time(&(CTime[1]));
                   }
-                  time(&(CTime[1]));
                 }
                 if (fdSocket != -1)
                 {
@@ -135,7 +135,7 @@ extern "C++"
                 stringstream ssBuffer;
                 ssBuffer << "CONNECT " << strServer << ":" << strPort << " HTTP/1.0\r\n\r\n";
                 strBuffers[1] = ssBuffer.str();
-                while (!bExit && (CTime[1] - CTime[0]) > 5)
+                while (!bExit && (CTime[1] - CTime[0]) <= 5)
                 {
                   pollfd fds[1];
                   fds[0].fd = fdSocket;
@@ -218,7 +218,10 @@ extern "C++"
                     ssError << "poll(" << errno << ") error:  " << strerror(errno);
                     strError = ssError.str();
                   }
-                  time(&(CTime[1]));
+                  if (!bExit)
+                  {
+                    time(&(CTime[1]));
+                  }
                 }
                 if (bClose)
                 {

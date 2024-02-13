@@ -72,7 +72,6 @@ extern "C++"
           bool bUseProxy = false;
           int nReturn;
           string strDestServer = strServer, strDestPort = strPort;
-          time_t CTime[2];
           memset(&hints, 0, sizeof(addrinfo));
           hints.ai_family = AF_UNSPEC;
           hints.ai_socktype = SOCK_STREAM;
@@ -82,8 +81,6 @@ extern "C++"
             strDestServer = strProxyServer;
             strDestPort = strProxyPort;
           }
-          time(&(CTime[0]));
-          CTime[1] = CTime[0];
           if ((nReturn = getaddrinfo(strDestServer.c_str(), strDestPort.c_str(), &hints, &result)) == 0)
           {
             bool bConnected[2] = {false, false};
@@ -92,34 +89,15 @@ extern "C++"
               bConnected[0] = false;
               if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
               {
-                bool bDone = false;
                 bConnected[0] = true;
-                fdNonBlocking(fdSocket, strError);
-                while (!bDone && (CTime[1] - CTime[0]) > 5)
+                if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                 {
-                  if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
-                  {
-                    bDone = bConnected[1] = true;
-                  }
-                  else if (errno != EAGAIN && errno != EALREADY && errno != EINPROGRESS)
-                  {
-                    bDone = true;
-                    close(fdSocket);
-                    fdSocket = -1;
-                  }
-                  else
-                  {
-                    msleep(10);
-                  }
-                  time(&(CTime[1]));
+                  bConnected[1] = true;
                 }
-                if (fdSocket != -1)
+                else
                 {
-                  fdBlocking(fdSocket, strError);
-                }
-                else if (!bDone)
-                {
-                  strError = "Timed out due to connection taking longer than five seconds.";
+                  close(fdSocket);
+                  fdSocket = -1;
                 }
               }
             }
@@ -135,7 +113,7 @@ extern "C++"
                 stringstream ssBuffer;
                 ssBuffer << "CONNECT " << strServer << ":" << strPort << " HTTP/1.0\r\n\r\n";
                 strBuffers[1] = ssBuffer.str();
-                while (!bExit && (CTime[1] - CTime[0]) > 5)
+                while (!bExit)
                 {
                   pollfd fds[1];
                   fds[0].fd = fdSocket;
@@ -218,15 +196,10 @@ extern "C++"
                     ssError << "poll(" << errno << ") error:  " << strerror(errno);
                     strError = ssError.str();
                   }
-                  time(&(CTime[1]));
                 }
                 if (bClose)
                 {
                   close(fdSocket);
-                }
-                if (!bExit)
-                {
-                  strError = "Timed out due to proxy connection taking longer than five seconds.";
                 }
               }
               else

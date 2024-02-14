@@ -221,7 +221,7 @@ extern "C++"
     void Syslog::log(Json *ptMessage, const string strEventDetails, const int nPriority)
     {
       char szBuffer[20] = "\0", szDateTime[37] = "\0";
-      int nMillisecond;
+      int nMillisecond = 0;
       struct timeval tv;
       struct tm tTime;
       string strMessage;
@@ -240,7 +240,9 @@ extern "C++"
         ptMessage->insert("Event Details", strEventDetails);
       }
       gettimeofday(&tv, NULL);
+      #ifdef COMMON_LINUX
       nMillisecond = lrint(tv.tv_usec/1000.0);
+      #endif
       if (nMillisecond >= 1000)
       {
         nMillisecond -= 1000;

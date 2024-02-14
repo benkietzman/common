@@ -27,7 +27,9 @@
 #define _COMMON_SYSLOG_
 // {{{ includes
 #include <arpa/inet.h>
+#ifdef COMMON_LINUX
 #include <cmath>
+#endif
 #include <ctime>
 #include <pwd.h>
 #include <sstream>

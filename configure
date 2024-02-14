@@ -129,7 +129,7 @@ elif [ $bRunningMacOS -eq 1 ]; then
 elif [ $bRunningUbuntu -eq 1 ]; then
   printf "not found - sudo apt install libtar-dev";
 else
-  printf "not found - skipping (http://www.feep.net/libtar/#Download)";
+  printf "not found - skipping (https://repo.or.cz/libtar.git)";
 fi
 printf "\n";
 printf "Configuring XMLRPC...";

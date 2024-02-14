@@ -109,7 +109,7 @@ extern "C++"
                   }
                   else
                   {
-                    msleep(10);
+                    msleep(100);
                     time(&(CTime[1]));
                   }
                 }

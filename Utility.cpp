@@ -86,7 +86,7 @@ extern "C++"
           CTime[1] = CTime[0];
           if ((nReturn = getaddrinfo(strDestServer.c_str(), strDestPort.c_str(), &hints, &result)) == 0)
           {
-            bool bConnected[2] = {false, false};
+            bool bConnected[2] = {false, false}, bTimeout = false;
             for (addrinfo *rp = result; !bConnected[1] && rp != NULL; rp = rp->ai_next)
             {
               bConnected[0] = false;
@@ -119,7 +119,7 @@ extern "C++"
                 }
                 if (!bDone)
                 {
-                  strError = "Timed out due to connection taking longer than five seconds.";
+                  bTimeout = true;
                 }
               }
             }
@@ -236,6 +236,10 @@ extern "C++"
               {
                 bResult = true;
               }
+            }
+            else if (bTimeout)
+            {
+              strError = "Timed out due to connection taking longer than five seconds.";
             }
             else
             {

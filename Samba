@@ -26,7 +26,9 @@
 #ifndef _COMMON_SAMBA_
 #define _COMMON_SAMBA_
 // {{{ includes
+#include <cerrno>
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <cstring>
 #include <sstream>
@@ -56,17 +58,14 @@ extern "C++"
     class Samba
     {
       private:
-      list<string> m_directoryList;
-      list<string>::iterator m_directoryIterator;
       pid_t m_nPid;
       string m_strPid;
       string m_strServer;
       string m_strShare;
       string m_strPath;
-      smbc_dirent *m_pDirectoryItem;
 
       static void authenticate(const char *pszServer, const char *pszShare, char *pszWorkgroup, int nWGLength, char *pszUsername, int nUNLength, char *pszPassword, int nPWLength);
-      smbc_dirent *getDirectoryEntry(const string strPath);
+      smbc_dirent *getDirectoryEntry(const string strPath, string &strError);
       string getPath(const string strPath);
 
       public:
@@ -76,23 +75,22 @@ extern "C++"
       //! Determines if a directory exists.
       /*!
       * \param strPath - The path to the directory.
+      * \param strError - Contains the error.
       */
-      bool directoryExist(const string strPath);
+      bool directoryExist(const string strPath, string &strError);
       //! Performs a directory listing and stores the results in a list.
       /*!
       * \param strPath - The path to the directory.
+      * \param dirList - Contains the directory list.
+      * \param strError - Contains the error.
       */
-      list<string> directoryList(const string strPath = "./");
+      bool directoryList(const string strPath, list<string> &dirList, string &strError);
       //! Creates a directory and any parent directories that might be missing.
       /*!
       * \param strPath - The path to the directory.
+      * \param strError - Contains the error.
       */
-      bool establishDirectory(const string strPath);
-      //! Fetches the next item out of the directory listing.
-      /*!
-      * \param strItem - Returns the item.
-      */
-      bool fetchDirectoryItem(string &strItem);
+      bool establishDirectory(const string strPath, string &strError);
       //! Determines when the file was last accessed.
       /*!
       * \param strPath - The path to the file.
@@ -102,8 +100,9 @@ extern "C++"
       * \param nHour - Returns the military hour.
       * \param nMinute - Returns the minute.
       * \param nSecond - Returns the second.
+      * \param strError - Contains the error.
       */
-      bool fileAccessDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      bool fileAccessDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond, string &strError);
       //! Determines when the file was last changed.
       /*!
       * \param strPath - The path to the file.
@@ -113,19 +112,23 @@ extern "C++"
       * \param nHour - Returns the military hour.
       * \param nMinute - Returns the minute.
       * \param nSecond - Returns the second.
+      * \param strError - Contains the error.
       */
-      bool fileChangeDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond);
+      bool fileChangeDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond, string &strError);
       //! Determines if a file is empty.
       /*!
       * \param strPath - The path to the file.
+      * \param bEmpty - Returns the empty boolean value.
+      * \param strError - Contains the error.
       */
-      bool fileEmpty(const string strPath);
+      bool fileEmpty(const string strPath, bool &bEmpty, string &strError);
       //! Determines if a file exists.
       /*!
       * \param strLocalPath - The path to the local file.
+      * \param bExist - Returns the exist boolean value.
       * \param strRemotePath - The path to the remote file.
       */
-      bool fileExist(const string strPath);
+      bool fileExist(const string strPath, bool &bExist, string &strError);
       //! Determines when the file was last modified.
       /*!
       * \param strPath - The path to the file.
@@ -140,20 +143,24 @@ extern "C++"
       //! Determines the size in bytes of a file.
       /*!
       * \param strPath - The path to the file.
+      * \param lSize - Returns the file size.
+      * \param strError - Contains the error.
       */
-      long fileSize(const string strPath);
+      bool fileSize(const string strPath, long &lSize, string &strError);
       //! Retrieves a remote file.
       /*!
       * \param strRemotePath - The path to the remote file.
       * \param strLocalPath - The path to the local file.
+      * \param strError - Contains the error.
       */
-      bool get(const string strRemotePath, const string strLocalPath);
+      bool get(const string strRemotePath, const string strLocalPath, string &strError);
       //! Retrieves a remote file.
       /*!
       * \param strRemotePath - The path to the remote file.
       * \param ssLocalData - The local data.
+      * \param strError - Contains the error.
       */
-      bool get(const string strRemotePath, stringstream &ssData);
+      bool get(const string strRemotePath, stringstream &ssData, string &strError);
       //! Initiate the Samba session.
       /*!
       * \param strServer - The server name or ip address of the remote Windows machine.
@@ -161,41 +168,48 @@ extern "C++"
       * \param strWorkgroup - The workgroup/domain of which the remote Windows user account belongs.
       * \param strUsername - The user name of the account used to connect to the remote Windows network.
       * \param strPassword - The user account password on the remote Windows network.
+      * \param strError - Contains the error.
       */
-      bool init(const string strServer, const string strShare, const string strWorkgroup, const string strUsername, const string strPassword);
+      bool init(const string strServer, const string strShare, const string strWorkgroup, const string strUsername, const string strPassword, string &strError);
       //! Creates a directory.
       /*!
       * \param strPath - The path to the directory.
+      * \param strError - Contains the error.
       */
-      bool makeDirectory(const string strPath);
+      bool makeDirectory(const string strPath, string &strError);
       //! Stores a file remotely.
       /*!
       * \param strLocalPath - The path to the local file.
       * \param strRemotePath - The path to the remote file.
+      * \param strError - Contains the error.
       */
-      bool put(const string strLocalPath, const string strRemotePath);
+      bool put(const string strLocalPath, const string strRemotePath, string &strError);
       //! Stores a file remotely.
       /*!
       * \param strRemotePath - The path to the remote file.
       * \param ssLocalData - The local file.
+      * \param strError - Contains the error.
       */
-      bool put(stringstream &ssLocalData, const string strRemotePath);
+      bool put(stringstream &ssLocalData, const string strRemotePath, string &strError);
       //! Removes a file/directory.
       /*!
       * \param strPath - The path to the file/directory.
+      * \param strError - Contains the error.
       */
-      bool remove(const string strPath);
+      bool remove(const string strPath, string &strError);
       //! Recursively removes a directory.
       /*!
       * \param strPath - The path to the directory.
+      * \param strError - Contains the error.
       */
-      bool removeDirectory(const string strPath);
+      bool removeDirectory(const string strPath, string &strError);
       //! Renames a file/directory.
       /*!
       * \param strOldPath - The old path to the file/directory.
       * \param strNewPath - The new path to the file/directory.
+      * \param strError - Contains the error.
       */
-      bool rename(const string strOldPath, const string strNewPath);
+      bool rename(const string strOldPath, const string strNewPath, string &strError);
     };
     // }}}
   }

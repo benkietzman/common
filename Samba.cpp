@@ -38,13 +38,11 @@ extern "C++"
       m_nPid = getpid();
       sprintf(szPid, "%ld", (long int)m_nPid);
       m_strPid = szPid;
-      m_pDirectoryItem = NULL;
     }
     // }}}
     // {{{ ~Samba()
     Samba::~Samba()
     {
-      m_directoryList.clear();
     }
     // }}}
     // {{{ authenticate()
@@ -59,50 +57,61 @@ extern "C++"
     }
     // }}}
     // {{{ directoryExist()
-    bool Samba::directoryExist(const string strPath)
+    bool Samba::directoryExist(const string strPath, string &strError)
     {
       bool bResult = false;
-      smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath);
+      smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath, strError);
 
-      if (pDirectoryEntry != NULL && pDirectoryEntry->smbc_type == SMBC_DIR)
+      if (pDirectoryEntry != NULL)
       {
-        bResult = true;
+        if (pDirectoryEntry->smbc_type == SMBC_DIR)
+        {
+          bResult = true;
+        }
+        else
+        {
+          strError = "Not a directory.";
+        }
       }
 
       return bResult;
     }
     // }}}
     // {{{ directoryList()
-    list<string> Samba::directoryList(const string strPath)
+    bool Samba::directoryList(const string strPath, list<string> &dirList, string &strError)
     {
-      bool bDone = false;
+      bool bResult = false;
       int nDirectory = smbc_opendir(getPath(strPath).c_str());
 
-      m_directoryList.clear();
-      while (!bDone && nDirectory >= 0)
-      {
-        smbc_dirent *pDirectoryItem = NULL;
-        if ((pDirectoryItem = smbc_readdir(nDirectory)) != NULL)
-        {
-          m_directoryList.push_back(pDirectoryItem->name);
-        }
-        else
-        {
-          bDone = true;
-        }
-      }
+      dirList.clear();
       if (nDirectory >= 0)
       {
+        bool bDone = false;
+        while (!bDone && nDirectory >= 0)
+        {
+          smbc_dirent *pDirectoryItem = NULL;
+          if ((pDirectoryItem = smbc_readdir(nDirectory)) != NULL)
+          {
+            dirList.push_back(pDirectoryItem->name);
+          }
+          else
+          {
+            bDone = true;
+          }
+        }
         smbc_closedir(nDirectory);
+        dirList.sort();
       }
-      m_directoryList.sort();
-      m_directoryIterator = m_directoryList.begin();
+      else
+      {
+        strError = strerror(errno);
+      }
 
-      return m_directoryList;
+      return bResult;
     }
     // }}}
     // {{{ establishDirectory()
-    bool Samba::establishDirectory(const string strPath)
+    bool Samba::establishDirectory(const string strPath, string &strError)
     {
       bool bResult = true;
       size_t unIndex = 0;
@@ -113,30 +122,12 @@ extern "C++"
       }
       for (size_t nPosition = unIndex; bResult && nPosition != string::npos; nPosition = strPath.find("/", nPosition))
       {
-        if (!directoryExist(getPath(strPath.substr(0, nPosition))) && !makeDirectory(getPath(strPath.substr(0, nPosition))))
+        if (!directoryExist(getPath(strPath.substr(0, nPosition)), strError) && !makeDirectory(getPath(strPath.substr(0, nPosition)), strError))
         {
           bResult = false;
         }
       }
-      if (!directoryExist(getPath(strPath)) && !makeDirectory(getPath(strPath)))
-      {
-        bResult = false;
-      }
-
-      return bResult;
-    }
-    // }}}
-    // {{{ fetchDirectoryItem()
-    bool Samba::fetchDirectoryItem(string &strItem)
-    {
-      bool bResult = true;
-
-      if (m_directoryIterator != m_directoryList.end())
-      {
-        strItem = *m_directoryIterator;
-        m_directoryIterator++;
-      }
-      else
+      if (!directoryExist(getPath(strPath), strError) && !makeDirectory(getPath(strPath), strError))
       {
         bResult = false;
       }
@@ -145,7 +136,7 @@ extern "C++"
     }
     // }}}
     // {{{ fileAccessDate()
-    bool Samba::fileAccessDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond)
+    bool Samba::fileAccessDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond, string &strError)
     {
       bool bResult = false;
       struct stat tStat;
@@ -162,12 +153,16 @@ extern "C++"
         nMinute = ptDateTime->tm_min;
         nSecond = ptDateTime->tm_sec;
       }
+      else
+      {
+        strError = strerror(errno);
+      }
 
       return bResult;
     }
     // }}}
     // {{{ fileChangeDate()
-    bool Samba::fileChangeDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond)
+    bool Samba::fileChangeDate(const string strPath, int &nYear, int &nMonth, int &nDay, int &nHour, int &nMinute, int &nSecond, string &strError)
     {
       bool bResult = false;
       struct stat tStat;
@@ -184,16 +179,21 @@ extern "C++"
         nMinute = ptDateTime->tm_min;
         nSecond = ptDateTime->tm_sec;
       }
+      else
+      {
+        strError = strerror(errno);
+      }
 
       return bResult;
     }
     // }}}
     // {{{ fileEmpty()
-    bool Samba::fileEmpty(const string strPath)
+    bool Samba::fileEmpty(const string strPath, bool &bEmpty, string &strError)
     {
       bool bResult = true;
+      long lSize;
 
-      if (fileSize(strPath))
+      if (fileSize(strPath, lSize, strError))
       {
         bResult = false;
       }
@@ -202,14 +202,21 @@ extern "C++"
     }
     // }}}
     // {{{ fileExist()
-    bool Samba::fileExist(const string strPath)
+    bool Samba::fileExist(const string strPath, bool &bExist, string &strError)
     {
       bool bResult = false;
-      smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath);
+      smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath, strError);
 
-      if (pDirectoryEntry != NULL && pDirectoryEntry->smbc_type == SMBC_FILE)
+      if (pDirectoryEntry != NULL)
       {
-        bResult = true;
+        if (pDirectoryEntry->smbc_type == SMBC_FILE)
+        {
+          bResult = true;
+        }
+        else
+        {
+          strError = "Not a file.";
+        }
       }
 
       return bResult;
@@ -238,53 +245,67 @@ extern "C++"
     }
     // }}}
     // {{{ fileSize()
-    long Samba::fileSize(const string strPath)
+    bool Samba::fileSize(const string strPath, long &lSize, string &strError)
     {
-      long lSize = 0;
+      bool bResult = false;
       struct stat tStat;
 
       if (smbc_stat(getPath(strPath).c_str(), &tStat) == 0)
       {
+        bResult = true;
         lSize = tStat.st_size;
       }
+      else
+      {
+        strError = strerror(errno);
+      }
 
-      return lSize;
+      return bResult;
     }
     // }}}
     // {{{ get()
-    bool Samba::get(const string strRemotePath, const string strLocalPath)
+    bool Samba::get(const string strRemotePath, const string strLocalPath, string &strError)
     {
-      bool bResult = true;
+      bool bResult = false;
       int nInFile = smbc_open(getPath(strRemotePath).c_str(), O_RDONLY, 0666);
-      ofstream outFile(strLocalPath.c_str(), ios::out|ios::binary);
 
-      if (nInFile >= 0 && outFile)
+      if (nInFile >= 0)
       {
-        long lSize = 0;
-        char szBuffer[4096] = "\0";
-        while ((lSize = smbc_read(nInFile, &szBuffer, 4096)) > 0)
+        ofstream outFile(strLocalPath.c_str(), ios::out|ios::binary);
+        if (outFile)
         {
-          outFile.write(szBuffer, lSize);
+          long lSize = 0;
+          char szBuffer[4096] = "\0";
+          bResult = true;
+          while ((lSize = smbc_read(nInFile, &szBuffer, 4096)) > 0)
+          {
+            outFile.write(szBuffer, lSize);
+          }
         }
+        else
+        {
+          strError = strerror(errno);
+        }
+        outFile.close();
         smbc_close(nInFile);
       }
       else
       {
-        bResult = false;
+        strError = strerror(errno);
       }
-      outFile.close();
 
       return bResult;
     }
-    bool Samba::get(const string strRemotePath, stringstream &ssLocalData)
+    bool Samba::get(const string strRemotePath, stringstream &ssLocalData, string &strError)
     {
-      bool bResult = true;
+      bool bResult = false;
       int nInFile = smbc_open(getPath(strRemotePath).c_str(), O_RDONLY, 0666);
 
       if (nInFile >= 0)
       {
         long lSize = 0;
         char szBuffer[4096] = "\0";
+        bResult = true;
         while ((lSize = smbc_read(nInFile, &szBuffer, 4096)) > 0)
         {
           ssLocalData.write(szBuffer, lSize);
@@ -293,20 +314,20 @@ extern "C++"
       }
       else
       {
-        bResult = false;
+        strError = strerror(errno);
       }
 
       return bResult;
     }
     // }}}
     // {{{ getDirectoryEntry()
-    smbc_dirent *Samba::getDirectoryEntry(const string strPath)
+    smbc_dirent *Samba::getDirectoryEntry(const string strPath, string &strError)
     {
-      bool bDone = false;
       size_t nPosition = 0;
       int nDirectory = 0;
       string strDirectory;
       string strFilename;
+      smbc_dirent *pDirectoryItem = NULL;
 
       if ((nPosition = strPath.rfind("/", strPath.size() - 1)) == string::npos)
       {
@@ -318,20 +339,28 @@ extern "C++"
         strDirectory = strPath.substr(0, nPosition);
         strFilename = strPath.substr(nPosition, strPath.size() - nPosition);
       }
-      nDirectory = smbc_opendir(getPath(strDirectory).c_str());
-      while (!bDone && nDirectory >= 0)
+      if ((nDirectory = smbc_opendir(getPath(strDirectory).c_str())) >= 0)
       {
-        if ((m_pDirectoryItem = smbc_readdir(nDirectory)) == NULL || (string)m_pDirectoryItem->name == strFilename)
+        bool bDone = false;
+        while (!bDone && nDirectory >= 0)
         {
-          bDone = true;
+          if ((pDirectoryItem = smbc_readdir(nDirectory)) == NULL || (string)pDirectoryItem->name == strFilename)
+          {
+            bDone = true;
+          }
+        }
+        smbc_closedir(nDirectory);
+        if (pDirectoryItem == NULL)
+        {
+          strError = "Not found.";
         }
       }
-      if (nDirectory >= 0)
+      else
       {
-        smbc_closedir(nDirectory);
+        strError = strerror(errno);
       }
 
-      return m_pDirectoryItem;
+      return pDirectoryItem;
     }
     // }}}
     // {{{ getPath()
@@ -348,7 +377,7 @@ extern "C++"
     }
     // }}}
     // {{{ init()
-    bool Samba::init(const string strServer, const string strShare, const string strWorkgroup, const string strUsername, const string strPassword)
+    bool Samba::init(const string strServer, const string strShare, const string strWorkgroup, const string strUsername, const string strPassword, string &strError)
     {
       bool bResult = false;
 
@@ -361,12 +390,16 @@ extern "C++"
       {
         bResult = true;
       }
+      else
+      {
+        strError = strerror(errno);
+      }
 
       return bResult;
     }
     // }}}
     // {{{ makeDirectory()
-    bool Samba::makeDirectory(const string strPath)
+    bool Samba::makeDirectory(const string strPath, string &strError)
     {
       bool bResult = false;
       mode_t mode = 00777;
@@ -375,42 +408,55 @@ extern "C++"
       {
         bResult = true;
       }
+      else
+      {
+        strError = strerror(errno);
+      }
 
       return bResult;
     }
     // }}}
     // {{{ put()
-    bool Samba::put(const string strLocalPath, const string strRemotePath)
+    bool Samba::put(const string strLocalPath, const string strRemotePath, string &strError)
     {
-      bool bResult = true;
+      bool bResult = false;
       int nOutFile = smbc_open(getPath(strRemotePath).c_str(), O_CREAT|O_WRONLY, 0666);
-      ifstream inFile(strLocalPath.c_str(), ios::in|ios::binary);
 
-      if (nOutFile >= 0 && inFile)
+      if (nOutFile >= 0)
       {
-        char cBuffer = '\0';
-        while (inFile.read(&cBuffer, 1))
+        ifstream inFile(strLocalPath.c_str(), ios::in|ios::binary);
+        if (inFile)
         {
-          smbc_write(nOutFile, &cBuffer, 1);
+          char cBuffer = '\0';
+          bResult = true;
+          while (inFile.read(&cBuffer, 1))
+          {
+            smbc_write(nOutFile, &cBuffer, 1);
+          }
         }
+        else
+        {
+          strError = strerror(errno);
+        }
+        inFile.close();
         smbc_close(nOutFile);
       }
       else
       {
-        bResult = false;
+        strError = strerror(errno);
       }
-      inFile.close();
 
       return bResult;
     }
-    bool Samba::put(stringstream &ssLocalData, const string strRemotePath)
+    bool Samba::put(stringstream &ssLocalData, const string strRemotePath, string &strError)
     {
-      bool bResult = true;
+      bool bResult = false;
       int nOutFile = smbc_open(getPath(strRemotePath).c_str(), O_CREAT|O_WRONLY, 0666);
 
       if (nOutFile >= 0)
       {
         char cBuffer = '\0';
+        bResult = true;
         while (ssLocalData.read(&cBuffer, 1))
         {
           smbc_write(nOutFile, &cBuffer, 1);
@@ -419,14 +465,14 @@ extern "C++"
       }
       else
       {
-        bResult = false;
+        strError = strerror(errno);
       }
 
       return bResult;
     }
     // }}}
     // {{{ remove()
-    bool Samba::remove(const string strPath)
+    bool Samba::remove(const string strPath, string &strError)
     {
       bool bResult = false;
 
@@ -434,62 +480,66 @@ extern "C++"
       {
         bResult = true;
       }
+      else
+      {
+        strError = strerror(errno);
+      }
 
       return bResult;
     }
     // }}}
     // {{{ removeDirectory()
-    bool Samba::removeDirectory(const string strPath)
+    bool Samba::removeDirectory(const string strPath, string &strError)
     {
       bool bResult = true;
+      list<string> dirList[2];
 
-      if (!directoryList(strPath).empty())
+      if (directoryList(strPath, dirList[0], strError))
       {
-        string strItem;
-        list<string> directoryList;
-        while (fetchDirectoryItem(strItem))
+        for (list<string>::iterator i = dirList[0].begin(); i != dirList[0].end(); i++)
         {
-          if (strItem != "." && strItem != "..")
+          if ((*i) != "." && (*i) != "..")
           {
-            if (directoryExist(strPath + (string)"/" + strItem))
+            if (directoryExist(strPath + (string)"/" + (*i), strError))
             {
-              directoryList.push_back(strItem);
+              dirList[1].push_back(*i);
             }
-            else if (!remove(strPath + (string)"/" + strItem))
+            else if (!remove(strPath + (string)"/" + (*i), strError))
             {
               bResult = false;
             }
           }
         }
-        for (list<string>::iterator i = directoryList.begin(); i != directoryList.end(); i++)
+        for (list<string>::iterator i = dirList[1].begin(); i != dirList[1].end(); i++)
         {
-          if (!removeDirectory(strPath + (string)"/" + *i))
+          if (!removeDirectory(strPath + (string)"/" + (*i), strError))
           {
             bResult = false;
           }
         }
-        directoryList.clear();
-        if (bResult && !remove(strPath))
+        dirList[1].clear();
+        if (bResult && !remove(strPath, strError))
         {
           bResult = false;
         }
       }
-      else
-      {
-        bResult = false;
-      }
+      dirList[0].clear();
 
       return bResult;
     }
     // }}}
     // {{{ rename()
-    bool Samba::rename(const string strOldPath, const string strNewPath)
+    bool Samba::rename(const string strOldPath, const string strNewPath, string &strError)
     {
       bool bResult = false;
 
       if (smbc_rename(getPath(strOldPath).c_str(), getPath(strNewPath).c_str()) == 0)
       {
         bResult = true;
+      }
+      else
+      {
+        strError = strerror(errno);
       }
 
       return bResult;

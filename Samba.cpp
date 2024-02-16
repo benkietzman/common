@@ -62,13 +62,11 @@ extern "C++"
       bool bResult = false;
       smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath, strError);
 
-      bExist = false;
       if (pDirectoryEntry != NULL)
       {
-        bResult = true;
         if (pDirectoryEntry->smbc_type == SMBC_DIR)
         {
-          bExist = true;
+          bResult = true;
         }
         else
         {
@@ -204,18 +202,16 @@ extern "C++"
     }
     // }}}
     // {{{ fileExist()
-    bool Samba::fileExist(const string strPath, bool &bExist, string &strError)
+    bool Samba::fileExist(const string strPath, string &strError)
     {
       bool bResult = false;
       smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath, strError);
 
-      bExist = false;
       if (pDirectoryEntry != NULL)
       {
-        bResult = true;
         if (pDirectoryEntry->smbc_type == SMBC_FILE)
         {
-          bExist = true;
+          bResult = true;
         }
         else
         {

@@ -75,10 +75,9 @@ extern "C++"
       //! Determines if a directory exists.
       /*!
       * \param strPath - The path to the directory.
-      * \param bExist - Returns the exist boolean value.
       * \param strError - Contains the error.
       */
-      bool directoryExist(const string strPath, bool &bExist, string &strError);
+      bool directoryExist(const string strPath, string &strError);
       //! Performs a directory listing and stores the results in a list.
       /*!
       * \param strPath - The path to the directory.
@@ -126,10 +125,9 @@ extern "C++"
       //! Determines if a file exists.
       /*!
       * \param strLocalPath - The path to the local file.
-      * \param bExist - Returns the exist boolean value.
       * \param strRemotePath - The path to the remote file.
       */
-      bool fileExist(const string strPath, bool &bExist, string &strError);
+      bool fileExist(const string strPath, string &strError);
       //! Determines when the file was last modified.
       /*!
       * \param strPath - The path to the file.

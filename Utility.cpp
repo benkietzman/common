@@ -104,8 +104,6 @@ extern "C++"
                   else if (errno != EAGAIN && errno != EALREADY && errno != EINPROGRESS)
                   {
                     bDone = true;
-                    close(fdSocket);
-                    fdSocket = -1;
                   }
                   else
                   {
@@ -113,11 +111,13 @@ extern "C++"
                     time(&(CTime[1]));
                   }
                 }
-                if (fdSocket != -1)
+                fdBlocking(fdSocket, strError);
+                if (!bConnected[1])
                 {
-                  fdBlocking(fdSocket, strError);
+                  close(fdSocket);
+                  fdSocket = -1;
                 }
-                else if (!bDone)
+                if (!bDone)
                 {
                   strError = "Timed out due to connection taking longer than five seconds.";
                 }

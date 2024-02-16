@@ -75,9 +75,10 @@ extern "C++"
       //! Determines if a directory exists.
       /*!
       * \param strPath - The path to the directory.
+      * \param bExist - Returns the exist boolean value.
       * \param strError - Contains the error.
       */
-      bool directoryExist(const string strPath, string &strError);
+      bool directoryExist(const string strPath, bool &bExist, string &strError);
       //! Performs a directory listing and stores the results in a list.
       /*!
       * \param strPath - The path to the directory.

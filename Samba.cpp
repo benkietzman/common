@@ -62,11 +62,13 @@ extern "C++"
       bool bResult = false;
       smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath, strError);
 
+      bExist = false;
       if (pDirectoryEntry != NULL)
       {
+        bResult = true;
         if (pDirectoryEntry->smbc_type == SMBC_DIR)
         {
-          bResult = true;
+          bExist = true;
         }
         else
         {
@@ -207,11 +209,13 @@ extern "C++"
       bool bResult = false;
       smbc_dirent *pDirectoryEntry = getDirectoryEntry(strPath, strError);
 
+      bExist = false;
       if (pDirectoryEntry != NULL)
       {
+        bResult = true;
         if (pDirectoryEntry->smbc_type == SMBC_FILE)
         {
-          bResult = true;
+          bExist = true;
         }
         else
         {

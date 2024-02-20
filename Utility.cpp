@@ -128,7 +128,7 @@ extern "C++"
             {
               if (bUseProxy)
               {
-                bool bClose = false, bExit = false;
+                bool bExit = false;
                 char cChar;
                 size_t unPosition;
                 string strBuffers[2];
@@ -164,7 +164,6 @@ extern "C++"
                           }
                           else
                           {
-                            bClose = true;
                             strError = strLine;
                             while (!bExit && getline(ssData, strLine))
                             {
@@ -184,7 +183,7 @@ extern "C++"
                       }
                       else
                       {
-                        bClose = bExit = true;
+                        bExit = true;
                         if (nReturn < 0)
                         {
                           stringstream ssError;
@@ -201,7 +200,7 @@ extern "C++"
                       }
                       else
                       {
-                        bClose = bExit = true;
+                        bExit = true;
                         if (nReturn < 0)
                         {
                           stringstream ssError;
@@ -214,22 +213,20 @@ extern "C++"
                   else if (nReturn < 0)
                   {
                     stringstream ssError;
-                    bClose = bExit = true;
+                    bExit = true;
                     ssError << "poll(" << errno << ") error:  " << strerror(errno);
                     strError = ssError.str();
                   }
-                  if (!bExit)
-                  {
-                    time(&(CTime[1]));
-                  }
+                  time(&(CTime[1]));
                 }
-                if (bClose)
+                if (!bResult)
                 {
                   close(fdSocket);
-                }
-                if (!bExit)
-                {
-                  strError = "Timed out due to proxy connection taking longer than five seconds.";
+                  fdSocket = -1;
+                  if (!bExit)
+                  {
+                    strError = "Timed out due to proxy connection taking longer than five seconds.";
+                  }
                 }
               }
               else

@@ -29,7 +29,7 @@ class ServiceJunctionOracleConnection extends ServiceJunctionConnection
   public function __construct($bError = false)
   {
     parent::__construct($bError);
-    $this->m_strService = 'oracle';
+    $this->setService('oracle');
   }
   // }}}
   // {{{ __destruct()
@@ -39,7 +39,7 @@ class ServiceJunctionOracleConnection extends ServiceJunctionConnection
   }
   // }}}
   // {{{ connect()
-  public function connect($strSchema, $strPassword, $strTnsName)
+  public function connect($strSchema, $strPassword, $strTnsName, $strIgnore = null)
   {
     parent::__construct($strSchema, $strPassword, null, $strTnsName);
   }

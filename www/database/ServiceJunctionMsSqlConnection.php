@@ -29,7 +29,7 @@ class ServiceJunctionMsSqlConnection extends ServiceJunctionConnection
   public function __construct($bError = false)
   {
     parent::__construct($bError);
-    $this->m_strService = 'mssql';
+    $this->setService('mssql');
   }
   // }}}
   // {{{ __destruct()
@@ -39,9 +39,9 @@ class ServiceJunctionMsSqlConnection extends ServiceJunctionConnection
   }
   // }}}
   // {{{ connect()
-  public function connect($strUser, $strPassword, $strServer)
+  public function connect($strUser, $strPassword, $strServer, $strIgnore = null)
   {
-    parent::__construct($strUser, $strPassword, $strServer);
+    parent::__construct($strUser, $strPassword, $strServer, $strIgnore);
   }
   // }}}
 }

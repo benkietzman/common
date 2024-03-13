@@ -24,6 +24,10 @@ include_once('OracleConnection.php');
 include_once('PdoConnection.php');
 include_once('PostgreConnection.php');
 include_once('RadialConnection.php');
+include_once('ServiceJunctionConnection.php');
+include_once('ServiceJunctionMsSqlConnection.php');
+include_once('ServiceJunctionMySqlConnection.php');
+include_once('ServiceJunctionOracleConnection.php');
 // }}}
 //! Database Class
 /*!

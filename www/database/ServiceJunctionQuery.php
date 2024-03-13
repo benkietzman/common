@@ -27,9 +27,10 @@ class ServiceJunctionQuery extends DatabaseQuery
 {
   // {{{ variables
   private $m_junction;
-  private $m_strQuery;
   private $m_bFirst;
   private $m_bExecute;
+  private $m_strQuery;
+  private $m_strService;
   private $m_unRow;
   private $m_unRows;
   // }}}
@@ -51,23 +52,6 @@ class ServiceJunctionQuery extends DatabaseQuery
     parent::__destruct();
   }
   // }}}
-  // {{{ getQuery()
-  public function getQuery()
-  {
-    return $this->m_strQuery;
-  }
-  // }}}
-  // {{{ parse()
-  public function parse($strQuery)
-  {
-    $this->m_strQuery = $strQuery;
-  }
-  // }}}
-  // {{{ setPreFetch()
-  public function setPreFetch($nPreFetch = 1000)
-  {
-  }
-  // }}}
   // {{{ bind()
   public function bind($strBind, $strValue, $bUseQuotes = true)
   {
@@ -79,6 +63,7 @@ class ServiceJunctionQuery extends DatabaseQuery
   {
     $bQuery = ((strlen($this->m_strQuery) >= 7 && strtolower(substr($this->m_strQuery, 0, 7)) == 'select ')?true:false);
     $backtrace = $this->m_error->setBacktrace();
+    $req = array();
     $request = array();
     $request['Service'] = $this->m_strService;
     if ($this->m_strService == 'mssql')
@@ -101,53 +86,61 @@ class ServiceJunctionQuery extends DatabaseQuery
       $request['tnsName'] = $this->m_db['Database'];
     }
     $request[(($bQuery)?'Query':'Update')] = $this->m_strQuery;
-    $response = null;
-    if ($this->m_radial->request($request, $response))
+    $req[] = json_encode($request);
+    unset($request);
+    $res = null;
+    if ($this->m_junction->request($req, $res))
     {
-      if (isset($response['Status']) && $response['Status'] == 'okay')
+      if (sizeof($res) > 0)
       {
-        $this->m_bExecute = false;
-        if ($bQuery)
+        $status = json_decode($res[0], true);
+        if (isset($status['Status']) && $status['Status'] == 'okay')
         {
-          if (isset($response['Response']) && is_array($response['Response']))
+          $this->m_bExecute = false;
+          if ($bQuery)
           {
-            $this->m_query = $response['Response'];
-            $this->m_unRows = sizeof($this->m_query);
+            if (sizeof($res) > 1)
+            {
+              $this->m_query = array();
+              for ($i = 1; $i < sizeof($res); $i++)
+              {
+                $this->m_query[] = json_decode($res[$i], true);
+              }
+              $this->m_unRows = sizeof($this->m_query);
+            }
+            else
+            {
+              $this->m_query = true;
+            }
           }
           else
           {
             $this->m_query = true;
           }
         }
+        else if (isset($status['Error']) && $status['Error'] != '')
+        {
+          $this->m_strError = $status['Error'];
+        }
         else
         {
-          $this->m_query = true;
+          $this->m_strError = 'Encountered an unknown error.';
         }
-      }
-      else if (isset($response['Error']) && $response['Error'] != '')
-      {
-        $this->m_strError = $response['Error'];
+        unset($status);
       }
       else
       {
-        $this->m_strError = 'Encountered an unknown error.';
+        $this->m_strError = 'Failed to receive a response.';
       }
     }
     else
     {
       $this->m_strError = $this->m_radial->getError();
     }
-    unset($request);
-    unset($response);
+    unset($req);
+    unset($res);
 
     return $this->m_query;
-  }
-  // }}}
-  // {{{ numRows()
-  public function numRows()
-  {
-    $backtrace = $this->m_error->setBacktrace();
-    return $this->m_unRows;
   }
   // }}}
   // {{{ fetch()
@@ -183,6 +176,36 @@ class ServiceJunctionQuery extends DatabaseQuery
     {
       unset($this->m_query);
     }
+  }
+  // }}}
+  // {{{ getQuery()
+  public function getQuery()
+  {
+    return $this->m_strQuery;
+  }
+  // }}}
+  // {{{ numRows()
+  public function numRows()
+  {
+    $backtrace = $this->m_error->setBacktrace();
+    return $this->m_unRows;
+  }
+  // }}}
+  // {{{ parse()
+  public function parse($strQuery)
+  {
+    $this->m_strQuery = $strQuery;
+  }
+  // }}}
+  // {{{ setPreFetch()
+  public function setPreFetch($nPreFetch = 1000)
+  {
+  }
+  // }}}
+  // {{{ setService()
+  public function setService($strService)
+  {
+    $this->m_strService = $strService;
   }
   // }}}
 }

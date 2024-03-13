@@ -29,7 +29,7 @@ class ServiceJunctionMySqlConnection extends ServiceJunctionConnection
   public function __construct($bError = false)
   {
     parent::__construct($bError);
-    $this->m_strService = 'mysql';
+    $this->setService('mysql');
   }
   // }}}
   // {{{ __destruct()
@@ -41,7 +41,7 @@ class ServiceJunctionMySqlConnection extends ServiceJunctionConnection
   // {{{ connect()
   public function connect($strUser, $strPassword, $strServer, $strDatabase = null)
   {
-    parent::__construct($strUser, $strPassword, $strServer, $strDatabase);
+    parent::connect($strUser, $strPassword, $strServer, $strDatabase);
   }
   // }}}
 }

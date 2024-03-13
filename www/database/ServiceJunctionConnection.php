@@ -30,12 +30,12 @@ class ServiceJunctionConnection extends DatabaseConnection
   protected $m_strService;
   // }}}
   // {{{ __construct()
-  public function __construct($strService = 'mysql', $bError = false)
+  public function __construct($bError = false)
   {
     parent::__construct($bError);
     $this->m_bDatabaseSelected = false;
     $this->m_db = array();
-    $this->m_strService = $strService;
+    $this->m_strService = 'mysql';
   }
   // }}}
   // {{{ __destruct()
@@ -83,6 +83,7 @@ class ServiceJunctionConnection extends DatabaseConnection
   public function parse($strQuery)
   {
     $query = new ServiceJunctionQuery($this->m_bError);
+    $query->setService($this->m_strService);
     $query->setDatabase($this->m_db);
     $query->parse($strQuery);
     return $query;
@@ -101,6 +102,12 @@ class ServiceJunctionConnection extends DatabaseConnection
   // {{{ setCharset()
   public function setCharset($strCharset)
   { 
+  }
+  // }}}
+  // {{{ setService()
+  public function setService($strService)
+  {
+    $this->m_strService = $strService;
   }
   // }}}
 }

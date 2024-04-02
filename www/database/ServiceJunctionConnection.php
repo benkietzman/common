@@ -1,9 +1,9 @@
 <?php
 // vim600: fdm=marker
 //////////////////////////////////////////////////////////////////////////
-// Radial Connection
+// Service Junction Connection
 // -------------------
-// begin                : 2023-02-18
+// begin                : 2024-03-13
 // copyright            : kietzman.org
 // email                : ben@kietzman.org
 //////////////////////////////////////////////////////////////////////////
@@ -17,39 +17,46 @@
 
 // {{{ includes
 include_once('DatabaseConnection.php');
-include_once('RadialQuery.php');
+include_once('ServiceJunctionQuery.php');
 // }}}
-//! RadialConnection Class
+//! ServiceJunctionConnection Class
 /*!
-* Provides functions for establishing database connections through Radial.
+* Provides functions for establishing database connections through the Service Junction.
 */
-class RadialConnection extends DatabaseConnection
+class ServiceJunctionConnection extends DatabaseConnection
 {
   // {{{ variables
   private $m_bGood;
+  protected $m_strService;
   // }}}
   // {{{ __construct()
   public function __construct($bError = false)
   {
     parent::__construct($bError);
     $this->m_bDatabaseSelected = false;
+    $this->m_db = array();
+    $this->m_strService = 'mysql';
   }
   // }}}
   // {{{ __destruct()
   public function __destruct()
   {
     parent::__destruct();
+    unset($this->m_db);
   }
   // }}}
   // {{{ connect()
-  public function connect($strUser, $strPassword, $strDatabase)
+  public function connect($strUser, $strPassword, $strServer, $strDatabase = null)
   {
     $backtrace = $this->m_error->setBacktrace();
     $this->m_bGood = true;
     $this->m_strUser = $strUser;
     $this->m_strPassword = $strPassword;
-    $this->m_strServer = $strDatabase;
-    $this->m_db = array('User'=>$strUser, 'Password'=>$strPassword, 'Database'=>$strDatabase);
+    $this->m_strServer = $strServer;
+    $this->m_db['Database'] = $strDatabase;
+    $this->m_db['Password'] = $strPassword;
+    $this->m_db['Server'] = $strServer;
+    $this->m_db['User'] = $strUser;
   }
   // }}}
   // {{{ disconnect()
@@ -75,7 +82,8 @@ class RadialConnection extends DatabaseConnection
   // {{{ parse()
   public function parse($strQuery)
   {
-    $query = new RadialQuery($this->m_bError);
+    $query = new ServiceJunctionQuery($this->m_bError);
+    $query->setService($this->m_strService);
     $query->setDatabase($this->m_db);
     $query->parse($strQuery);
     return $query;
@@ -85,9 +93,21 @@ class RadialConnection extends DatabaseConnection
     return $this->parse($strQuery);
   }
   // }}}
+  // {{{ selectDatabase()
+  public function selectDatabase($strDatabase)
+  {
+    $this->m_db['Database'] = $strDatabase;
+  }
+  // }}}
   // {{{ setCharset()
   public function setCharset($strCharset)
   { 
+  }
+  // }}}
+  // {{{ setService()
+  public function setService($strService)
+  {
+    $this->m_strService = $strService;
   }
   // }}}
 }

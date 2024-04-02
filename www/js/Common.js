@@ -960,6 +960,19 @@ class Common
     this.menu = {left: [], right: []};
   }
   // }}}
+  // {{{ detachEvent()
+  detachEvent(strHandle, callback)
+  {
+    if (document.removeEventListener)
+    {
+      document.removeEventListener(strHandle, callback, false);
+    }
+    else
+    {
+      document.detachEvent(strHandle, callback);
+    }
+  }
+  // }}}
   // {{{ dispatchEvent()
   dispatchEvent(strHandle, data)
   {

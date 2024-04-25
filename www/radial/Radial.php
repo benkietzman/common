@@ -569,26 +569,6 @@ class Radial
     return $bResult;
   }
   // }}}
-  // {{{ terminalShiftFunction()
-  public function terminalShiftFunction(&$t, $nKey)
-  {
-    $bResult = false;
-
-    $request = [];
-    $request['Function'] = 'shiftFunction';
-    $request['Request'] = [];
-    $request['Request']['Data'] = $nKey;
-    $response = null;
-    if ($this->terminalRequest($t, $request, $response))
-    {
-      $bResult = true;
-    }
-    unset($request);
-    unset($response);
-
-    return $bResult;
-  }
-  // }}}
   // {{{ terminalHome()
   public function terminalHome(&$t, $bWait = true)
   {
@@ -778,6 +758,26 @@ class Radial
     $request['Request'] = [];
     $request['Request']['Short'] = $nShort;
     $request['Request']['Long'] = $nLong;
+    $response = null;
+    if ($this->terminalRequest($t, $request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ terminalShiftFunction()
+  public function terminalShiftFunction(&$t, $nKey)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Function'] = 'shiftFunction';
+    $request['Request'] = [];
+    $request['Request']['Data'] = $nKey;
     $response = null;
     if ($this->terminalRequest($t, $request, $response))
     {

@@ -47,7 +47,7 @@ export default
         <div class="col-md-4 text-muted credit" style="font-size:10px;">
           {{#if c.footer.year}}&copy; {{c.footer.year}}{{/if}}
           {{#if c.footer.website}}{{#if c.footer.company}}<a href="{{c.footer.website}}" target="_new">{{c.footer.company}}</a>{{/if}}{{/if}}
-          {{#if c.footer.version}} (v: {{c.footer.version}}){{/if}}
+          {{#if c.footer.version}} (v{{c.footer.version}}){{/if}}
           {{#if c.footer.email}}<br><a href="mailto:{{c.footer.email}}?subject={{c.footer.subject}}">Contact Admin</a>{{/if}}
         </div>
         <div class="col-md-4 hidden-xs text-muted credit" style="font-size:9px;text-align:center;">

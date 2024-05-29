@@ -826,6 +826,30 @@ extern "C++"
 
       return ssl;
     }
+    SSL *Utility::sslConnect(SSL *ssl, bool &bRetry, string &strError)
+    {
+      bool bGood = false;
+      int nReturn;
+
+      bRetry = false; 
+      ERR_clear_error();
+      if ((nReturn = SSL_connect(ssl)) != 1)
+      {
+        strError = (string)"SSL_connect() " + sslstrerror(ssl, nReturn, bRetry);
+      }
+      else
+      {
+        bGood = true;
+      }
+      if (!bRetry && !bGood && ssl != NULL)
+      {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        ssl = NULL;
+      }
+
+      return ssl;
+    }
     // }}}
     // {{{ sslDeinit()
     void Utility::sslDeinit()

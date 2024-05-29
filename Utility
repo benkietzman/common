@@ -323,6 +323,14 @@ extern "C++"
       * \return SSL contains the SSL handle.
       */
       SSL *sslConnect(SSL_CTX *ctx, int fdSocket, bool &bRetry, string &strError);
+      /*! \fn SSL *sslConnect(SSL *ssl, bool &bRetry, string &strError)
+      * \brief OpenSSL SSL_connect() retry wrapper function.
+      * \param ssl Contains the SSL handle.
+      * \param bRetry Contains the retry.
+      * \param strError Returns an error message.
+      * \return SSL contains the SSL handle.
+      */
+      SSL *sslConnect(SSL *ssl, bool &bRetry, string &strError);
       /*! \fn void sslDeinit()
       * \brief OpenSSL deinitialization.
       */

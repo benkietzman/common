@@ -792,6 +792,14 @@ class Common
                       v.push(((sube.hasAttribute('c-json'))?JSON.parse(sube.value):sube.value));
                     }
                   });
+                  if (v.length == 0)
+                  {
+                    v = null;
+                  }
+                  else if (v.length == 1)
+                  {
+                    v = v[0];
+                  }
                   c = ((JSON.stringify(o.v) != JSON.stringify(v))?true:false);
                   if (c)
                   {

@@ -705,7 +705,7 @@ class Common
                   });
                   if (v.length == 0)
                   {
-                    v = null;
+                    v = false;
                   }
                   else if (v.length == 1)
                   {
@@ -794,7 +794,7 @@ class Common
                   });
                   if (v.length == 0)
                   {
-                    v = null;
+                    v = false;
                   }
                   else if (v.length == 1)
                   {

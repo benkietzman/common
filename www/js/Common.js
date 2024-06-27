@@ -1239,7 +1239,7 @@ class Common
   {
     let bResult = false;
 
-    if (typeof variable === 'object' && variable !== null && variable instanceof Computed)
+    if (this.isObject(variable) && variable instanceof Computed)
     {
       bResult = true;
     }
@@ -1341,7 +1341,7 @@ class Common
   {
     let bResult = false;
 
-    if (typeof variable === 'object' && variable !== null && variable instanceof Observable)
+    if (this.isObject(variable) && variable instanceof Observable)
     {
       bResult = true;
     }

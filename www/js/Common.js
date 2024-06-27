@@ -144,10 +144,10 @@ class Common
         {
           for (let i = 0; i < k.length; i++)
           {
-            subks.push(((k[i] instanceof Observable) || (k[i] instanceof Computed))?k[i].v:k[i]);
+            subks.push((this.isObservable(k[i]) || this.isComputed(k[i]))?k[i].v:k[i]);
           }
         }
-        else if ((k instanceof Observable) || (k instanceof Computed))
+        else if (this.isObservable(k) || this.isComputed(k))
         {
           subks.push(k.v);
         }
@@ -155,7 +155,7 @@ class Common
         {
           subks = k.split(',');
         }
-        let subv = (((v instanceof Observable) || (v instanceof Computed))?v.v:v);
+        let subv = ((this.isObservable(v) || this.isComputed(v))?v.v:v);
         if (this.isArray(a) || this.isObject(a))
         {
           a.forEach((deepv, deepk) =>
@@ -480,7 +480,7 @@ class Common
                 o.id(e.getAttribute('id'));
               }
             }
-            if (!(o instanceof Observable) && !(o instanceof Computed))
+            if (!this.isObservable(o) && !this.isComputed(o))
             {
               o = new Observable(o);
               _.set(s, e.getAttribute('c-model'), o);
@@ -501,7 +501,7 @@ class Common
               }
             }
             o = s[e.getAttribute('c-model')];
-            if (!(o instanceof Observable) && !(o instanceof Computed))
+            if (!this.isObservable(o) && !this.isComputed(o))
             {
               o = new Observable(o);
               s[e.getAttribute('c-model')] = o;
@@ -1234,6 +1234,19 @@ class Common
     return bResult;
   }
   // }}}
+  // {{{ isComputed()
+  isComputed(variable)
+  {
+    let bResult = false;
+
+    if (typeof variable === 'object' && variable !== null && variable instanceof Computed)
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
   // {{{ isCookie()
   isCookie(strName)
   {
@@ -1316,6 +1329,19 @@ class Common
     let bResult = false;
 
     if (typeof variable === 'object' && !Array.isArray(variable) && variable !== null)
+    {
+      bResult = true;
+    }
+
+    return bResult;
+  }
+  // }}}
+  // {{{ isObservable()
+  isObservable(variable)
+  {
+    let bResult = false;
+
+    if (typeof variable === 'object' && variable !== null && variable instanceof Observable)
     {
       bResult = true;
     }
@@ -2164,7 +2190,7 @@ class Common
   {
     let simple = null;
 
-    if ((data instanceof Observable) || (data instanceof Computed))
+    if (this.isObservable(data) || this.isComputed(data))
     {
       simple = this.simplify(data.v);
     }

@@ -1148,11 +1148,11 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
+      while ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
       {
         strBuffer.erase(0, nReturn);
       }
-      else
+      if (nReturn <= 0)
       {
         switch (SSL_get_error(ssl, nReturn))
         {

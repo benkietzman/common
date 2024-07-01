@@ -1148,6 +1148,20 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
+      {
+        strBuffer.erase(0, nReturn);
+      }
+      else
+      {
+        switch (SSL_get_error(ssl, nReturn))
+        {
+          case SSL_ERROR_ZERO_RETURN:
+          case SSL_ERROR_SYSCALL:
+          case SSL_ERROR_SSL: bResult = false; break;
+        }
+      }
+      /*
       while ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
       {
         strBuffer.erase(0, nReturn);
@@ -1161,6 +1175,7 @@ extern "C++"
           case SSL_ERROR_SSL: bResult = false; break;
         }
       }
+      */
       if (bBlocking)
       {
         fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);

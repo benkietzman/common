@@ -1149,7 +1149,7 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if ((nReturn = SSL_write_ex(ssl, strBuffer.c_str(), ((strBuffer.size() < 1048576)?strBuffer.size():1048576))) > 0)
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 1048576)?strBuffer.size():1048576))) > 0)
       {
         strBuffer.erase(0, nReturn);
       }

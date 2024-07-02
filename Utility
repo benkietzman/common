@@ -67,6 +67,7 @@ extern "C++"
     {
       private:
       bool m_bSslInit;
+      size_t m_unSslWriteSize;
       std::mutex m_mutexConf;
       string m_strProxyPort;
       string m_strProxyServer;
@@ -266,6 +267,11 @@ extern "C++"
       * \param strPort Contains the port.
       */
       void setProxy(const string strServer, const string strPort);
+      /*! \fn void setSslWriteSize(const size_t unSize)
+      * \brief Sets the SSL write size.
+      * \param unSize Contains the size.
+      */
+      void setSslWriteSize(const size_t unSize);
       /*! \fn bool socketType(int fdSocket, common_socket_type &eType, string &strError)
       * \brief Take a peek of the current socket to determine if it's a regular or encrypted one.
       * \param fdSocket Contains the socket descriptor.

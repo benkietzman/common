@@ -35,6 +35,7 @@ extern "C++"
     {
       m_bSslInit = false;
       m_ulModifyTime = 0;
+      m_unSslWriteSize = 8192;
       m_strConf = "/etc/central.conf";
       m_conf = new Json;
       readConf(strError);
@@ -713,6 +714,12 @@ extern "C++"
       m_strProxyPort = strPort;
     }
     // }}}
+    // {{{ setSslWriteSize()
+    void Utility::setSslWriteSize(const size_t unSize)
+    {
+      m_unSslWriteSize = unSize;
+    }
+    // }}}
     // {{{ socketType()
     bool Utility::socketType(int fdSocket, common_socket_type &eType, string &strError)
     {
@@ -1149,7 +1156,7 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 1048576)?strBuffer.size():1048576))) > 0)
+      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < m_unSslWriteSize)?strBuffer.size():m_unSslWriteSize))) > 0)
       {
         strBuffer.erase(0, nReturn);
       }

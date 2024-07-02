@@ -890,6 +890,7 @@ extern "C++"
         if (bVerifyPeer)
         {
           SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+          SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
           if (SSL_CTX_set_default_verify_paths(ctx) == 1)
           {
             SSL_CTX_set_verify(ctx, ((bSslServer)?SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT:SSL_VERIFY_PEER), NULL);
@@ -1148,9 +1149,12 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
+      if (SSL_write_ex(ssl, strBuffer.c_str(), ((strBuffer.size() < 65536)?strBuffer.size():65536), &nReturn))
       {
-        strBuffer.erase(0, nReturn);
+        if (nReturn > 0)
+        {
+          strBuffer.erase(0, nReturn);
+        }
       }
       else
       {
@@ -1161,21 +1165,6 @@ extern "C++"
           case SSL_ERROR_SSL: bResult = false; break;
         }
       }
-      /*
-      while ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < 8192)?strBuffer.size():8192))) > 0)
-      {
-        strBuffer.erase(0, nReturn);
-      }
-      if (nReturn <= 0)
-      {
-        switch (SSL_get_error(ssl, nReturn))
-        {
-          case SSL_ERROR_ZERO_RETURN:
-          case SSL_ERROR_SYSCALL:
-          case SSL_ERROR_SSL: bResult = false; break;
-        }
-      }
-      */
       if (bBlocking)
       {
         fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);

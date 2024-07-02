@@ -361,8 +361,8 @@ extern "C++"
     bool Utility::fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bResult = true;
-      char szBuffer[65536];
-      int nSize = 65536;
+      char szBuffer[131072];
+      int nSize = 131072;
 
       strRead.clear();
       if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
@@ -1006,8 +1006,8 @@ extern "C++"
     bool Utility::sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bBlocking = false, bResult = true;
-      char szBuffer[65536];
-      int nPending, nSize = 65536;
+      char szBuffer[131072];
+      int nPending, nSize = 131072;
       long lArg, lArgOrig;
 
       strRead.clear();
@@ -1149,7 +1149,7 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if (SSL_write_ex(ssl, strBuffer.c_str(), ((strBuffer.size() < 65536)?strBuffer.size():65536), (size_t *)&nReturn))
+      if (SSL_write_ex(ssl, strBuffer.c_str(), ((strBuffer.size() < 131072)?strBuffer.size():131072), (size_t *)&nReturn))
       {
         if (nReturn > 0)
         {

@@ -363,19 +363,20 @@ extern "C++"
     bool Utility::fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bResult = true;
-      char szBuffer[m_unReadSize];
+      char *pszBuffer = new char[m_unReadSize];
       int nSize = m_unReadSize;
 
       strRead.clear();
-      if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
+      if ((nReturn = read(fdSocket, pszBuffer, nSize)) > 0)
       {
-        strBuffer.append(szBuffer, nReturn);
-        strRead.append(szBuffer, nReturn);
+        strBuffer.append(pszBuffer, nReturn);
+        strRead.append(pszBuffer, nReturn);
       }
       else
       {
         bResult = false;
       }
+      delete[] pszBuffer;
 
       return bResult;
     }
@@ -1020,7 +1021,7 @@ extern "C++"
     bool Utility::sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bBlocking = false, bResult = true;
-      char szBuffer[m_unReadSize];
+      char *pszBuffer = new char[m_unReadSize];
       int nPending, nSize = m_unReadSize;
       long lArg, lArgOrig;
 
@@ -1031,20 +1032,20 @@ extern "C++"
         lArg |= O_NONBLOCK;
         fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
       }
-      if ((nReturn = SSL_read(ssl, szBuffer, nSize)) > 0)
+      if ((nReturn = SSL_read(ssl, pszBuffer, nSize)) > 0)
       {
-        strBuffer.append(szBuffer, nReturn);
-        strRead.append(szBuffer, nReturn);
+        strBuffer.append(pszBuffer, nReturn);
+        strRead.append(pszBuffer, nReturn);
         while ((nPending = SSL_pending(ssl)) > 0)
         {
           if (nPending > nSize)
           {
             nPending = nSize;
           }
-          if ((nReturn = SSL_read(ssl, szBuffer, nPending)) > 0)
+          if ((nReturn = SSL_read(ssl, pszBuffer, nPending)) > 0)
           {
-            strBuffer.append(szBuffer, nReturn);
-            strRead.append(szBuffer, nReturn);
+            strBuffer.append(pszBuffer, nReturn);
+            strRead.append(pszBuffer, nReturn);
           }
           else
           {
@@ -1070,6 +1071,7 @@ extern "C++"
       {
         fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
       }
+      delete[] pszBuffer;
 
       return bResult;
     }

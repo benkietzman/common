@@ -67,6 +67,7 @@ extern "C++"
     {
       private:
       bool m_bSslInit;
+      size_t m_unReadSize;
       size_t m_unSslWriteSize;
       std::mutex m_mutexConf;
       string m_strProxyPort;
@@ -267,6 +268,11 @@ extern "C++"
       * \param strPort Contains the port.
       */
       void setProxy(const string strServer, const string strPort);
+      /*! \fn void setReadSize(const size_t unSize)
+      * \brief Sets the read size.
+      * \param unSize Contains the size.
+      */
+      void setReadSize(const size_t unSize);
       /*! \fn void setSslWriteSize(const size_t unSize)
       * \brief Sets the SSL write size.
       * \param unSize Contains the size.

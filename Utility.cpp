@@ -35,6 +35,7 @@ extern "C++"
     {
       m_bSslInit = false;
       m_ulModifyTime = 0;
+      m_unReadSize = 65536;
       m_unSslWriteSize = 8192;
       m_strConf = "/etc/central.conf";
       m_conf = new Json;
@@ -362,8 +363,8 @@ extern "C++"
     bool Utility::fdRead(int fdSocket, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bResult = true;
-      char szBuffer[1048576];
-      int nSize = 1048576;
+      char szBuffer[m_unReadSize];
+      int nSize = m_unReadSize;
 
       strRead.clear();
       if ((nReturn = read(fdSocket, szBuffer, nSize)) > 0)
@@ -714,6 +715,12 @@ extern "C++"
       m_strProxyPort = strPort;
     }
     // }}}
+    // {{{ setReadSize()
+    void Utility::setReadSize(const size_t unSize)
+    {
+      m_unReadSize = unSize;
+    }
+    // }}}
     // {{{ setSslWriteSize()
     void Utility::setSslWriteSize(const size_t unSize)
     {
@@ -1013,8 +1020,8 @@ extern "C++"
     bool Utility::sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
     {
       bool bBlocking = false, bResult = true;
-      char szBuffer[1048576];
-      int nPending, nSize = 1048576;
+      char szBuffer[m_unReadSize];
+      int nPending, nSize = m_unReadSize;
       long lArg, lArgOrig;
 
       strRead.clear();

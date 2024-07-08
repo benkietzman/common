@@ -372,6 +372,7 @@ export default
           s.u();
         }
         s.user.v = 'radial_bot';
+        s.hist();
       });
     };
     // ]]]

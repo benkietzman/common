@@ -41,12 +41,12 @@ export default
           s.histories[s.user.v].shift();
         }
         s.history = s.histories[s.user.v];
-        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: message}};
+        let request = {Interface: 'live', 'Function': 'common_radial_message', Request: {User: s.user.v, Message: message}};
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
         s.u();
-        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
-        document.getElementById('message').focus();
+        document.getElementById('common_radial_history').scrollTop = document.getElementById('common_radial_history').scrollHeight;
+        document.getElementById('common_radial_message').focus();
       }
     };
     // ]]]
@@ -195,8 +195,8 @@ export default
       s.u();
       if (s.menu)
       {
-        document.getElementById('message').focus();
-        document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+        document.getElementById('common_radial_message').focus();
+        document.getElementById('common_radial_history').scrollTop = document.getElementById('common_radial_history').scrollHeight;
       }
     };
     // ]]]
@@ -266,8 +266,8 @@ export default
             s.u();
             if (s.menu)
             {
-              document.getElementById('message').focus();
-              document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+              document.getElementById('common_radial_message').focus();
+              document.getElementById('common_radial_history').scrollTop = document.getElementById('common_radial_history').scrollHeight;
             }
             if (s.blurred && 'Notification' in window)
             {
@@ -341,8 +341,8 @@ export default
               s.u();
               if (s.menu)
               {
-                document.getElementById('message').focus();
-                document.getElementById('history').scrollTop = document.getElementById('history').scrollHeight;
+                document.getElementById('common_radial_message').focus();
+                document.getElementById('common_radial_history').scrollTop = document.getElementById('common_radial_history').scrollHeight;
               }
             }
           }
@@ -371,6 +371,7 @@ export default
           s.sort();
           s.u();
         }
+        s.user.v = s.users['radial_bot'];
       });
     };
     // ]]]
@@ -379,7 +380,7 @@ export default
     {
       if (s.menu)
       {
-        let history = document.getElementById('history');
+        let history = document.getElementById('common_radial_history');
         let maxWidth = document.documentElement.clientWidth - 80;
         let maxHeight = document.documentElement.clientHeight - 240;
         if (maxWidth > 800)
@@ -391,7 +392,7 @@ export default
         history.style.minHeight = ((maxHeight > 300)?300:maxHeight) + 'px';
         history.style.maxHeight = maxHeight + 'px';
         history.scrollTop = history.scrollHeight;
-        document.getElementById('message').focus();
+        document.getElementById('common_radial_message').focus();
       }
     };
     // ]]]
@@ -500,7 +501,7 @@ export default
             <option value="{{@key}}"{{#if unread}} class="bg-warning"{{/if}}>{{#if connected}}{{{icon}}}{{else}}&nbsp;{{/if}}&nbsp;{{#if LastName}}{{LastName}}, {{/if}}{{FirstName}} ({{@key}}){{#if unread}} [{{unread}}]{{/if}}</option>
             {{/each}}
           </select>
-          <div class="card card-body card-inverse table-responsive" id="history" style="padding: 0px;">
+          <div class="card card-body card-inverse table-responsive" id="common_radial_history" style="padding: 0px;">
             <table class="table table-condensed table-striped" style="margin: 0px;">
               {{#each @root.history}}
               <tr>
@@ -510,7 +511,7 @@ export default
               {{/each}}
             </table>
           </div>
-          <input type="text" class="form-control form-control-sm" id="message" c-model="message" c-keyup="enter()" placeholder="Type message and hit enter..." style="font-family: monospace, monospace; margin-top: 10px;">
+          <input type="text" class="form-control form-control-sm" id="common_radial_message" c-model="message" c-keyup="enter()" placeholder="Type message and hit enter..." style="font-family: monospace, monospace; margin-top: 10px;">
         </div>
         {{/if}}
       </div>

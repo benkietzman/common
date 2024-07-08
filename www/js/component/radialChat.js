@@ -41,7 +41,7 @@ export default
           s.histories[s.user.v].shift();
         }
         s.history = s.histories[s.user.v];
-        let request = {Interface: 'live', 'Function': 'common_radial_message', Request: {User: s.user.v, Message: message}};
+        let request = {Interface: 'live', 'Function': 'message', Request: {User: s.user.v, Message: message}};
         s.message.v = null;
         c.wsRequest(c.m_strAuthProtocol, request).then((response) => {});
         s.u();

@@ -371,7 +371,7 @@ export default
           s.sort();
           s.u();
         }
-        s.user.v = s.users['radial_bot'];
+        s.user.v = 'radial_bot';
       });
     };
     // ]]]

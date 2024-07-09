@@ -1171,6 +1171,7 @@ class Common
                       if (nNumber >= 1000)
                       {
                         strSuffix = 'Q';
+                        nNumber /= 1000;
                       }
                     }
                   }

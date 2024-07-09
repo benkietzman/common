@@ -761,6 +761,36 @@ extern "C++"
             {
               strSuffix = "T";
               fNumber /= 1000;
+              if (fNumber >= 1000)
+              {
+                strSuffix = "P";
+                fNumber /= 1000;
+                if (fNumber >= 1000)
+                {
+                  strSuffix = "E";
+                  fNumber /= 1000;
+                  if (fNumber >= 1000)
+                  {
+                    strSuffix = "Z";
+                    fNumber /= 1000;
+                    if (fNumber >= 1000)
+                    {
+                      strSuffix = "Y";
+                      fNumber /= 1000;
+                      if (fNumber >= 1000)
+                      {
+                        strSuffix = "R";
+                        fNumber /= 1000;
+                        if (fNumber >= 1000)
+                        {
+                          strSuffix = "Q";
+                          fNumber /= 1000;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -799,6 +829,26 @@ extern "C++"
             {
               strSuffix = "TB";
               fNumber /= 1024;
+              if (fNumber >= 1024)
+              {
+                strSuffix = "PB";
+                fNumber /= 1024;
+                if (fNumber >= 1024)
+                {
+                  strSuffix = "EB";
+                  fNumber /= 1024;
+                  if (fNumber >= 1024)
+                  {
+                    strSuffix = "ZB";
+                    fNumber /= 1024;
+                    if (fNumber >= 1024)
+                    {
+                      strSuffix = "YB";
+                      fNumber /= 1024;
+                    }
+                  }
+                }
+              }
             }
           }
         }

@@ -1071,6 +1071,26 @@ class Common
           {
             strSuffix = 'TB';
             nNumber /= 1024;
+            if (nNumber >= 1024)
+            {
+              strSuffix = 'PB';
+              nNumber /= 1024;
+              if (nNumber >= 1024)
+              {
+                strSuffix = 'EB';
+                nNumber /= 1024;
+                if (nNumber >= 1024)
+                {
+                  strSuffix = 'ZB';
+                  nNumber /= 1024;
+                  if (nNumber >= 1024)
+                  {
+                    strSuffix = 'YB';
+                    nNumber /= 1024;
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1128,6 +1148,35 @@ class Common
           {
             strSuffix = 'T';
             nNumber /= 1000;
+            if (nNumber >= 1000)
+            {
+              strSuffix = 'P';
+              nNumber /= 1000;
+              if (nNumber >= 1000)
+              {
+                strSuffix = 'E';
+                nNumber /= 1000;
+                if (nNumber >= 1000)
+                {
+                  strSuffix = 'Z';
+                  nNumber /= 1000;
+                  if (nNumber >= 1000)
+                  {
+                    strSuffix = 'Y';
+                    nNumber /= 1000;
+                    if (nNumber >= 1000)
+                    {
+                      strSuffix = 'R';
+                      nNumber /= 1000;
+                      if (nNumber >= 1000;
+                      {
+                        strSuffix = 'Q';
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -1168,7 +1168,7 @@ class Common
                     {
                       strSuffix = 'R';
                       nNumber /= 1000;
-                      if (nNumber >= 1000;
+                      if (nNumber >= 1000)
                       {
                         strSuffix = 'Q';
                       }

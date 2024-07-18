@@ -110,6 +110,11 @@ extern "C++"
       ~Radial();
 
       bool alert(const string strUser, const string strMessage, string &strError);
+      bool centralApplicationNotify(const string strApplication, const string strMessage, string &strError);
+      bool centralGroupNotify(const string strGroup, const string strMessage, string &strError);
+      bool centralNotify(const string strType, const string strName, const string strMessage, string &strError);
+      bool centralServerNotify(const string strServer, const string strMessage, string &strError);
+      bool centralUserNotify(const string strUser, const string strMessage, string &strError);
       void databaseFree(list<map<string, string> > *result);
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError);
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);

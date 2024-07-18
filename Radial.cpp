@@ -104,6 +104,53 @@ bool Radial::alert(const string strUser, const string strMessage, string &strErr
   return bResult;
 }
 // }}}
+// {{{ central
+// {{{ centralApplicationNotify()
+bool Radial::centralApplicationNotify(const string strApplication, const string strMessage, string &strError)
+{
+  return centralNotify("application", strApplication, strMessage, strError);
+}
+// }}}
+// {{{ centralGroupNotify()
+bool Radial::centralGroupNotify(const string strGroup, const string strMessage, string &strError)
+{
+  return centralNotify("group", strGroup, strMessage, strError);
+}
+// }}}
+// {{{ centralNotify()
+bool Radial::centralNotify(const string strType, const string strName, const string strMessage, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "central");
+  ptRequest->i("Function", strType + "Notify");
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i(((strType == "user")?"userid":"name"), strName);
+  ptRequest->m["Request"]->i("notification", strMessage);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ centralServerNotify()
+bool Radial::centralServerNotify(const string strServer, const string strMessage, string &strError)
+{
+  return centralNotify("server", strServer, strMessage, strError);
+}
+// }}}
+// {{{ centralUserNotify()
+bool Radial::centralUserNotify(const string strUser, const string strMessage, string &strError)
+{
+  return centralNotify("user", strUser, strMessage, strError);
+}
+// }}}
+// }}}
 // {{{ database
 // {{{ databaseFree()
 void Radial::databaseFree(list<map<string, string> > *result)

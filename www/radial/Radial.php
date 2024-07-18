@@ -66,6 +66,54 @@ class Radial
     unset($this->m_strBuffer);
   }
   // }}}
+  // {{{ central
+  // {{{ centralApplicationNotify()
+  public function centralApplicationNotify($strApplication, $strMessage)
+  {
+    return centralNotify('application', $strApplication, $strMessage);
+  }
+  // }}}
+  // {{{ centralGroupNotify()
+  public function centralGroupNotify($strGroup, $strMessage)
+  {
+    return centralNotify('group', $strGroup, $strMessage);
+  }
+  // }}}
+  // {{{ centralNotify()
+  public function centralNotify($strType, $strName, $strMessage)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Interface'] = 'central';
+    $request['Function'] = $strType.'Notify';
+    $request['Request'] = [];
+    $request['Request'][(($strType == 'user')?'userid':'name')] = $strName;
+    $request['Request']['notification'] = $strMessage;
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ centralServerNotify()
+  public function centralServerNotify($strServer, $strMessage)
+  {
+    return centralNotify('server', $strServer, $strMessage);
+  }
+  // }}}
+  // {{{ centralUserNotify()
+  public function centralUserNotify($strUser, $strMessage)
+  {
+    return centralNotify('user', $strUser, $strMessage);
+  }
+  // }}}
+  // }}}
   // {{{ databaseQuery()
   public function databaseQuery($strDatabase, $strQuery, &$result)
   {
@@ -78,21 +126,10 @@ class Radial
     $response = null;
     if ($this->request($request, $response))
     {
-      if (isset($response['Status']) && $response['Status'] == 'okay')
+      $bResult = true;
+      if (isset($response['Response']) && is_array($response['Response']))
       {
-        $bResult = true;
-        if (isset($response['Response']) && is_array($response['Response']))
-        {
-          $result = $response['Response'];
-        }
-      }
-      else if (isset($response['Error']) && $response['Error'] != '')
-      {
-        $this->setError($response['Error']);
-      }
-      else
-      {
-        $this->setError('Encountered an unknown error.');
+        $result = $response['Response'];
       }
     }
 
@@ -119,21 +156,10 @@ class Radial
     $response = null;
     if ($this->request($request, $response))
     {
-      if (isset($response['Status']) && $response['Status'] == 'okay')
+      $bResult = true;
+      if (isset($response['ID']))
       {
-        $bResult = true;
-        if (isset($response['ID']))
-        {
-          $nID = $response['ID'];
-        }
-      }
-      else if (isset($response['Error']) && $response['Error'] != '')
-      {
-        $this->setError($response['Error']);
-      }
-      else
-      {
-        $this->setError('Encountered an unknown error.');
+        $nID = $response['ID'];
       }
     }
 

@@ -120,6 +120,11 @@ extern "C++"
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
       bool databaseUpdate(const string strDatabase, const string strUpdate, string &strError);
       bool databaseUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
+      bool db(const string strFunction, Json *ptData, string &strError);
+      bool db(const string strFunction, Json *ptData, string &strID, string &strError);
+      bool db(const string strFunction, Json *ptData, list<map<string, string> > &rows, string &strError);
+      bool db(const string strFunction, Json *ptData, list<map<string, string> > &rows, string &strID, string &strError);
+      bool db(const string strFunction, Json *ptData, map<string, string> &row, string &strError);
       void dbFree(list<map<string, string> > *result);
       list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, string &strError);
       list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);

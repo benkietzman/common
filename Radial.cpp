@@ -268,6 +268,71 @@ bool Radial::dbUpdate(const string strDatabase, const string strUpdate, unsigned
 }
 // }}}
 // }}}
+// {{{ db
+bool Radial::db(const string strFunction, Json *ptData, string &strError)
+{
+  string strID;
+
+  return db(strFunction, ptData, strID, strError);
+}
+bool Radial::db(const string strFunction, Json *ptData, string &strID, string &strError)
+{
+  list<map<string, string> > rows;
+
+  return db(strFunction, ptData, rows, strID, strError);
+}
+bool Radial::db(const string strFunction, Json *ptData, list<map<string, string> > &rows, string &strError)
+{
+  string strID;
+
+  return db(strFunction, ptData, rows, strID, strError);
+}
+bool Radial::db(const string strFunction, Json *ptData, list<map<string, string> > &rows, string &strID, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Interface", "db");
+  ptRequest->i("Function", strFunction);
+  if (ptData != NULL)
+  {
+    ptRequest->m["Request"] = new Json(ptData);
+  }
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+    if (ptResponse->m.find("ID") != ptResponse->m.end() && !ptResponse->m["ID"]->v.empty())
+    {
+      strID = ptResponse->m["ID"]->v;
+    }
+    if (ptResponse->m.find("Response") != ptResponse->m.end() && !ptResponse->m["Response"]->l.empty())
+    {
+      for (auto &ptRow : ptResponse->m["Response"]->l)
+      {
+        map<string, string> row;
+        ptRow->flatten(row, true, false);
+        rows.push_back(row);
+      }
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+bool Radial::db(const string strFunction, Json *ptData, map<string, string> &row, string &strError)
+{
+  bool bResult = false;
+  list<map<string, string> > rows;
+
+  if ((bResult = db(strFunction, ptData, rows, strError)) && !rows.empty())
+  {
+    row = rows.front();
+  }
+
+  return bResult;
+}
+// }}}
 // {{{ hub
 // {{{ hubList()
 bool Radial::hubList(map<string, map<string, string> > &interfaces, string &strError)

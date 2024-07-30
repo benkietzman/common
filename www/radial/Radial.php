@@ -196,6 +196,27 @@ class Radial
     return $this->m_strError;
   }
   // }}}
+  // {{{ ircChat()
+  public function ircChat($strTarget, $strMessage)
+  {
+    $bResult = false;
+
+    $request = [];
+    $request['Interface'] = 'irc';
+    $request['Function'] = 'chat';
+    $request['Target'] = $strTarget;
+    $request['Message'] = $strMessage;
+    $response = null;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ readConf()
   public function readConf()
   {

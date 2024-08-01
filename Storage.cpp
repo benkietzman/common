@@ -124,8 +124,7 @@ extern "C++"
           {
             if (strAction == "add")
             {
-              delete ptCurrent;
-              ptCurrent = new Json;
+              m_ptStorage->clear();
             }
           }
           else

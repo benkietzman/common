@@ -399,12 +399,12 @@ extern "C++"
       bool bResult = false;
       stringstream ssMessage;
 
+      bResult = true;
       m_strServer = strServer;
       m_strShare = strShare;
       smb_gstrWorkgroup = strWorkgroup;
       smb_gstrUsername = strUsername;
       smb_gstrPassword = strPassword;
-        bResult = true;
 
       return bResult;
     }

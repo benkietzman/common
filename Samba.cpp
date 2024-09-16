@@ -38,11 +38,28 @@ extern "C++"
       m_nPid = getpid();
       sprintf(szPid, "%ld", (long int)m_nPid);
       m_strPid = szPid;
+      if ((m_pContext = smbc_new_context()) != NULL)
+      {
+        smbc_setFunctionAuthData(m_pContext, Samba::authenticate);
+        if (smbc_init_context(m_pContext))
+        {
+          smbc_set_context(m_pContext);
+        }
+        else
+        {
+          smbc_free_context(m_pContext, 1);
+          m_pContext = NULL;
+        }
+      }
     }
     // }}}
     // {{{ ~Samba()
     Samba::~Samba()
     {
+      if (m_pContext != NULL)
+      {
+        smbc_free_context(m_pContext, 1);
+      }
     }
     // }}}
     // {{{ authenticate()
@@ -380,20 +397,14 @@ extern "C++"
     bool Samba::init(const string strServer, const string strShare, const string strWorkgroup, const string strUsername, const string strPassword, string &strError)
     {
       bool bResult = false;
+      stringstream ssMessage;
 
       m_strServer = strServer;
       m_strShare = strShare;
       smb_gstrWorkgroup = strWorkgroup;
       smb_gstrUsername = strUsername;
       smb_gstrPassword = strPassword;
-      if (smbc_init(Samba::authenticate, 0) == 0)
-      {
         bResult = true;
-      }
-      else
-      {
-        strError = strerror(errno);
-      }
 
       return bResult;
     }

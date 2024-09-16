@@ -63,6 +63,7 @@ extern "C++"
       string m_strServer;
       string m_strShare;
       string m_strPath;
+      SMBCCTX *m_pContext;
 
       static void authenticate(const char *pszServer, const char *pszShare, char *pszWorkgroup, int nWGLength, char *pszUsername, int nUNLength, char *pszPassword, int nPWLength);
       smbc_dirent *getDirectoryEntry(const string strPath, string &strError);

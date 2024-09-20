@@ -45,7 +45,7 @@ export default
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col fs-6">
+              <div class="col fs-5">
                 User
               </div>
               <div class="col">
@@ -53,7 +53,7 @@ export default
               </div>
             </div>
             <div class="row" style="margin-top: 10px;">
-              <div class="col fs-6">
+              <div class="col fs-5">
                 Password
               </div>
               <div class="col">

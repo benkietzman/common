@@ -43,12 +43,12 @@ export default
       </div>
       <div class="col-md-4">
         <div class="card">
-          <div class="card-header bg-info fs-4 text-white">
+          <div class="card-header bg-info text-white">
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col fs-5">
+              <div class="col">
                 User
               </div>
               <div class="col">
@@ -56,7 +56,7 @@ export default
               </div>
             </div>
             <div class="row" style="margin-top: 10px;">
-              <div class="col fs-5">
+              <div class="col">
                 Password
               </div>
               <div class="col">
@@ -66,10 +66,10 @@ export default
           </div>
           <div class="card-footer">
             {{#if c.login.message}}
-            <b class="fs-5 text-danger">{{c.login.message}}</b>
+            <b class="text-danger">{{c.login.message}}</b>
             {{/if}}
             {{#if c.login.info}}
-            <span class="fs-5 text-warning">{{c.login.info}}</span>
+            <span class="text-warning">{{c.login.info}}</span>
             {{/if}}
             <button class="btn btn-success float-end" c-click="c.processLogin()">Login</button>
           </div>

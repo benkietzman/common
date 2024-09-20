@@ -1498,7 +1498,6 @@ class Common
       request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
-        this.login.info = null;
         if (this.m_strLoginType == null)
         {
           this.m_strLoginType = 'password';
@@ -1574,6 +1573,7 @@ class Common
                 }
                 else
                 {
+                  this.login.info = 'Processing login...';
                   let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
                   request.Request = {Type: this.m_strLoginType, Return: document.location.href};
                   this.wsRequest(this.m_strAuthProtocol, request).then((response) =>

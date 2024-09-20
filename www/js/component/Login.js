@@ -36,11 +36,8 @@ export default
   // }}}
   // {{{ template
   template: `
-    <br><br><br>
     {{#if c.login.showForm}}
-    <div class="row">
-      <div class="col">
-      </div>
+    <div class="row justify-content-md-center">
       <div class="col-md-auto">
         <div class="card">
           <div class="card-header bg-info text-white">
@@ -74,8 +71,6 @@ export default
             <button class="btn btn-success float-end" c-click="c.processLogin()">Login</button>
           </div>
         </div>
-      </div>
-      <div class="col">
       </div>
     </div>
     {{else}}

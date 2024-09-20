@@ -37,7 +37,7 @@ export default
   // {{{ template
   template: `
     {{#if c.login.showForm}}
-    <div class="row align-items-center justify-content-md-center">
+    <div class="row justify-content-md-center" style="margin-top: 40px;">
       <div class="col-md-auto">
         <div class="card">
           <div class="card-header bg-info text-white">

@@ -55,7 +55,7 @@ export default
                 <input class="form-control" type="text" c-model="c.login.login.userid" maxlength="20" c-keyup="processLoginKey()" autofocus>
               </div>
             </div>
-            <div class="row">
+            <div class="row" style="margin-top: 10px;">
               <div class="col fs-5">
                 Password
               </div>

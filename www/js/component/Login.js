@@ -47,12 +47,22 @@ export default
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
           </div>
           <div class="card-body">
-            <table class="table">
-            <tbody>
-            <tr><th class="fs-5">User</th><td><input class="form-control" type="text" c-model="c.login.login.userid" maxlength="20" c-keyup="processLoginKey()" autofocus></td</tr>
-            <tr><th class="fs-5">Password</th><td><input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()"></td></tr>
-            </tbody>
-            </table>
+            <div class="row">
+              <div class="col fs-5">
+                User
+              </div>
+              <div class="col">
+                <input class="form-control" type="text" c-model="c.login.login.userid" maxlength="20" c-keyup="processLoginKey()" autofocus>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col fs-5">
+                Password
+              </div>
+              <div class="col">
+                <input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()">
+              </div>
+            </div>
           </div>
           <div class="card-footer">
             {{#if c.login.message}}

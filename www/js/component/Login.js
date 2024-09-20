@@ -39,9 +39,9 @@ export default
     <br><br><br>
     {{#if c.login.showForm}}
     <div class="row">
-      <div class="col-md-4">
+      <div class="col">
       </div>
-      <div class="col-md-4">
+      <div class="col-md-auto">
         <div class="card">
           <div class="card-header bg-info text-white">
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
@@ -75,7 +75,7 @@ export default
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col">
       </div>
     </div>
     {{else}}

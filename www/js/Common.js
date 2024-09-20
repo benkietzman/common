@@ -1828,6 +1828,10 @@ class Common
     {
       message.Class = strClass;
     }
+    if (strMessage)
+    {
+      message.Body = strMessage;
+    }
     if (strTitle)
     {
       message.Title = strTitle;

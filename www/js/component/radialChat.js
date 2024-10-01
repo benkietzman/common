@@ -78,7 +78,7 @@ export default
           }
           case '\u0003':
           {
-            if (isFinite(m.substr((n + 1), 2)) && m.substr((n + 1), 2) != '  ')
+            if ((n + 2) < m.length && s.isNumeric(m.substr((n + 1), 2)))
             {
               h += '<span style="color:';
               switch (m.substr((n + 1), 2))
@@ -101,7 +101,7 @@ export default
                 case '15': h += 'light-grey'; break;
               }
               h += ';';
-              if (m.substr((n + 3), 1) == ',' && isFinite(m.substr((n + 4), 2)) && m.substr((n + 4), 2) != '  ')
+              if ((n + 5) < m.length && m[n + 3] == ',' && s.isNumeric(m.substr((n + 4), 2)))
               {
                 h += ' background:';
                 switch (m.substr((n + 4), 2))
@@ -374,6 +374,22 @@ export default
         s.user.v = 'radial_bot';
         s.hist();
       });
+    };
+    // ]]]
+    // [[[ isNumeric()
+    s.isNumeric(v)
+    {
+      let b = true;
+
+      for (let i = 0; b && i < v.length; i++)
+      {
+        if (v[i] < '0' || v[i] > '9')
+        {
+          b = false;
+        }
+      }
+
+      return b;
     };
     // ]]]
     // [[[ resize()

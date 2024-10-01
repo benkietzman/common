@@ -377,7 +377,7 @@ export default
     };
     // ]]]
     // [[[ isNumeric()
-    s.isNumeric(v)
+    s.isNumeric = (v) =>
     {
       let b = true;
 

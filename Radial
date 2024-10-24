@@ -144,6 +144,11 @@ extern "C++"
       void setServer(const string strServer);
       void setThrottle(const size_t unThrottle);
       void setTimeout(const string strTimeout);
+      bool sqliteList(map<string, map<string, string> > &databases, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, size_t &unID, size_t &unRows, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, size_t &unID, size_t &unRows, string &strError);
       bool sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, string &strData, string &strError);
       bool sshDisconnect(string &strSession, string &strError);
       bool sshSend(string &strSession, const string strCommand, string &strData, string &strError);

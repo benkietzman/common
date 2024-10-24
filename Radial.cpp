@@ -1192,6 +1192,101 @@ void Radial::setTimeout(const string strTimeout)
 }
 // }}}
 // }}}
+// {{{ sqlite
+// {{{ sqliteList()
+bool Radial::sqliteList(map<string, map<string, string> > &databases, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  databases.clear();
+  ptRequest->i("Interface", "sqlite");
+  ptRequest->i("Function", "list");
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+    if (ptResponse->m.find("Response") != ptResponse->m.end())
+    {
+      for (auto &database : ptResponse->m["Response"]->m)
+      {
+        databases[database.first] = {};
+        for (auto &node : database.second->m)
+        {
+          databases[database.first][node.first] = node.second->v;
+        }
+      }
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ sqliteQuery()
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, size_t &unID, size_t &unRows, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  resultSet.clear();
+  ptRequest->i("Interface", "sqlite");
+  ptRequest->i("Function", "query");
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Database", strDatabase);
+  ptRequest->m["Request"]->i("Statement", strStatement);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+    if (ptResponse->m.find("Response") != ptResponse->m.end())
+    {
+      if (ptResponse->m["Response"]->m.find("ID") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["ID"]->v.empty())
+      {
+        stringstream ssID(ptResponse->m["Response"]->m["ID"]->v);
+        ssID >> unID;
+      }
+      if (ptResponse->m["Response"]->m.find("ResultSet") != ptResponse->m["Response"]->m.end())
+      {
+        for (auto &row : ptResponse->m["Response"]->m["ResultSet"]->l)
+        {
+          map<string, string> r;
+          row->flatten(r, true, false);
+          resultSet.push_back(r);
+        }
+      }
+      if (ptResponse->m["Response"]->m.find("Rows") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Rows"]->v.empty())
+      {
+        stringstream ssRows(ptResponse->m["Response"]->m["Rows"]->v);
+        ssRows >> unRows;
+      }
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, string &strError)
+{
+  size_t unID, unRows;
+
+  return sqliteQuery(strDatabase, strStatement, resultSet, unID, unRows, strError);
+}
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, string &strError)
+{
+  list<map<string, string> > resultSet;
+  size_t unID, unRows;
+
+  return sqliteQuery(strDatabase, strStatement, resultSet, unID, unRows, strError);
+}
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, size_t &unID, size_t &unRows, string &strError)
+{
+  list<map<string, string> > resultSet;
+
+  return sqliteQuery(strDatabase, strStatement, resultSet, unID, unRows, strError);
+}
+// }}}
+// }}}
 // {{{ ssh
 // {{{ sshConnect()
 bool Radial::sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, string &strData, string &strError)

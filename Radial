@@ -144,6 +144,8 @@ extern "C++"
       void setServer(const string strServer);
       void setThrottle(const size_t unThrottle);
       void setTimeout(const string strTimeout);
+      bool sqliteCreate(const string strDatabase, const string strNode, string &strError);
+      bool sqliteDrop(const string strDatabase, const string strNode, string &strError);
       bool sqliteList(map<string, map<string, string> > &databases, string &strError);
       bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, string &strError);
       bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, size_t &unID, size_t &unRows, string &strError);

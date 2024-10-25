@@ -1193,6 +1193,50 @@ void Radial::setTimeout(const string strTimeout)
 // }}}
 // }}}
 // {{{ sqlite
+// {{{ sqliteCreate()
+bool Radial::sqliteCreate(const string strDatabase, const string strNode, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  databases.clear();
+  ptRequest->i("Interface", "sqlite");
+  ptRequest->i("Function", "create");
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Database", strDatabase);
+  ptRequest->m["Request"]->i("Node", strNode);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ sqliteDrop()
+bool Radial::sqliteDrop(const string strDatabase, const string strNode, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  databases.clear();
+  ptRequest->i("Interface", "sqlite");
+  ptRequest->i("Function", "drop");
+  ptRequest->m["Request"] = new Json;
+  ptRequest->m["Request"]->i("Database", strDatabase);
+  ptRequest->m["Request"]->i("Node", strNode);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
 // {{{ sqliteList()
 bool Radial::sqliteList(map<string, map<string, string> > &databases, string &strError)
 {

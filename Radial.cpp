@@ -1199,7 +1199,6 @@ bool Radial::sqliteCreate(const string strDatabase, const string strNode, string
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
 
-  databases.clear();
   ptRequest->i("Interface", "sqlite");
   ptRequest->i("Function", "create");
   ptRequest->m["Request"] = new Json;
@@ -1221,7 +1220,6 @@ bool Radial::sqliteDrop(const string strDatabase, const string strNode, string &
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
 
-  databases.clear();
   ptRequest->i("Interface", "sqlite");
   ptRequest->i("Function", "drop");
   ptRequest->m["Request"] = new Json;

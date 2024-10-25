@@ -1235,15 +1235,15 @@ bool Radial::sqliteDrop(const string strDatabase, const string strNode, string &
   return bResult;
 }
 // }}}
-// {{{ sqliteList()
-bool Radial::sqliteList(map<string, map<string, string> > &databases, string &strError)
+// {{{ sqliteDatabases()
+bool Radial::sqliteDatabases(map<string, map<string, string> > &databases, string &strError)
 {
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
 
   databases.clear();
   ptRequest->i("Interface", "sqlite");
-  ptRequest->i("Function", "list");
+  ptRequest->i("Function", "databases");
   if (request(ptRequest, ptResponse, strError))
   {
     bResult = true;

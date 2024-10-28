@@ -39,9 +39,10 @@ extern "C++"
       m_pFile = new File;
       m_pJunction = new ServiceJunction(strError);
       m_pManip = new StringManip;
-      m_pRadial = new Radial(strError);
-      m_pUtility = new Utility(strError);
       m_pMysql = NULL;
+      m_pRadial = new Radial(strError);
+      m_pSqlite = NULL;
+      m_pUtility = new Utility(strError);
     }
     // }}}
     // {{{ ~Central()
@@ -814,6 +815,32 @@ extern "C++"
             result = NULL;
           }
         }
+        else if (m_database[strName]->credentials["Type"] == "sqlite")
+        {
+          size_t unID = 0, unRows = 0;
+          result = new list<map<string, string> >;
+          if (m_pSqlite != NULL && (*m_pSqlite)("query", strName, strQuery, result, unID, unRows, strError))
+          {
+            ullRows = unRows;
+            if (result->empty())
+            {
+              strError = "No rows returned.";
+            }
+          }
+          else if (radial()->sqliteQuery(m_database[strName]->credentials["Database"], strQuery, *result, unID, unRows, strError))
+          {
+            ullRows = unRows;
+            if (result->empty())
+            {
+              strError = "No rows returned.";
+            }
+          }
+          else
+          {
+            delete result;
+            result = NULL;
+          }
+        }
         else if (m_database[strName]->credentials["Type"] == "teradata")
         {
           result = new list<map<string, string> >;
@@ -976,6 +1003,12 @@ extern "C++"
       m_strRoom = strRoom;
     }
     // }}}
+    // {{{ setSqlite()
+    void Central::setSqlite(bool (*pSqlite)(const string, const string, const string, list<map<string, string> > *, size_t &, size_t &, string &))
+    {
+      m_pSqlite = pSqlite;
+    }
+    // }}}
     // {{{ update()
     bool Central::update(const string strName, const string strUpdate, string &strError)
     {
@@ -1054,6 +1087,23 @@ extern "C++"
             bResult = true;
             ssID >> ullID;
             ssRows >> ullRows;
+          }
+        }
+        else if (m_database[strName]->credentials["Type"] == "sqlite")
+        {
+          size_t unID = 0, unRows = 0;
+          string strID, strRows;
+          if (m_pSqlite != NULL && (*m_pSqlite)("update", strName, strUpdate, NULL, unID, unRows, strError))
+          {
+            bResult = true;
+            ullID = unID;
+            ullRows = unRows;
+          }
+          else if (radial()->sqliteQuery(m_database[strName]->credentials["Database"], strUpdate, unID, unRows, strError))
+          {
+            bResult = true;
+            ullID = unID;
+            ullRows = unRows;
           }
         }
         else if (m_database[strName]->credentials["Type"] == "teradata")

@@ -72,6 +72,8 @@ extern "C++"
       protected:
       bool m_bLock;
       bool m_bTimestamp;
+      bool (*m_pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &);
+      bool (*m_pSqlite)(const string, const string, const string, list<map<string, string> > *, size_t &, size_t &, string &);
       map<string, list<string> > m_alert;
       map<string, commonDatabase *> m_database;
       std::mutex m_mutexAlert;
@@ -86,7 +88,6 @@ extern "C++"
       string m_strRoom;
       string m_strServer;
       string m_strUser;
-      bool (*m_pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &);
       Acorn *m_pAcorn;
       Archive *m_pArchive;
       DateTime *m_pDate;
@@ -326,6 +327,11 @@ extern "C++"
       * \param pMysql Contains the MySQL function.
       */
       void setMysql(bool (*pMysql)(const string, const string, const string, list<map<string, string> > *, unsigned long long &, unsigned long long &, string &));
+      /*! \fn void setSqlite(bool (*pSqlite)(const string, const string, const string, list<map<string, string> > *, size_t &, size_t &, string &))
+      * \brief Set the SQLite function.
+      * \param pSqlite Contains the SQLite function.
+      */
+      void setSqlite(bool (*pSqlite)(const string, const string, const string, list<map<string, string> > *, size_t &, size_t &, string &));
       /*! \fn void setRoom(const string strRoom)
       * \brief Set the room.
       * \param strRoom Contains the room.

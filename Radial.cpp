@@ -1266,12 +1266,12 @@ bool Radial::sqliteDatabases(map<string, map<string, string> > &databases, strin
 }
 // }}}
 // {{{ sqliteQuery()
-bool Radial::sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, size_t &unID, size_t &unRows, string &strError)
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, Json *ptResultSet, size_t &unID, size_t &unRows, string &strError)
 {
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
 
-  resultSet.clear();
+  ptResultSet->clear();
   ptRequest->i("Interface", "sqlite");
   ptRequest->i("Function", "query");
   ptRequest->m["Request"] = new Json;
@@ -1289,11 +1289,10 @@ bool Radial::sqliteQuery(const string strDatabase, const string strStatement, li
       }
       if (ptResponse->m["Response"]->m.find("ResultSet") != ptResponse->m["Response"]->m.end())
       {
-        for (auto &row : ptResponse->m["Response"]->m["ResultSet"]->l)
+        while (!ptResponse->m["Response"]->m["ResultSet"]->l.empty())
         {
-          map<string, string> r;
-          row->flatten(r, true, false);
-          resultSet.push_back(r);
+          ptResultSet->l.push_back(ptResponse->m["Response"]->m["ResultSet"]->l.front());
+          ptResponse->m["Response"]->m["ResultSet"]->l.pop_front();
         }
       }
       if (ptResponse->m["Response"]->m.find("Rows") != ptResponse->m["Response"]->m.end() && !ptResponse->m["Response"]->m["Rows"]->v.empty())
@@ -1305,6 +1304,31 @@ bool Radial::sqliteQuery(const string strDatabase, const string strStatement, li
   }
   delete ptRequest;
   delete ptResponse;
+
+  return bResult;
+}
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, Json *ptResultSet, string &strError)
+{
+  size_t unID, unRows;
+
+  return sqliteQuery(strDatabase, strStatement, ptResultSet, unID, unRows, strError);
+}
+bool Radial::sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, size_t &unID, size_t &unRows, string &strError)
+{
+  bool bResult = false;
+  Json *ptResultSet = new Json;
+
+  resultSet.clear();
+  bResult = sqliteQuery(strDatabase, strStatement, ptResultSet, unID, unRows, strError);
+  while (!ptResultSet->l.empty())
+  {
+    map<string, string> r;
+    ptResultSet->l.front()->flatten(r, true, false);
+    resultSet.push_back(r);
+    delete ptResultSet->l.front();
+    ptResultSet->l.pop_front();
+  }
+  delete ptResultSet;
 
   return bResult;
 }

@@ -147,8 +147,10 @@ extern "C++"
       bool sqliteCreate(const string strDatabase, const string strNode, string &strError);
       bool sqliteDatabases(map<string, map<string, string> > &databases, string &strError);
       bool sqliteDrop(const string strDatabase, const string strNode, string &strError);
-      bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, Json *ptResultSet, size_t &unID, size_t &unRows, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, Json *ptResultSet, string &strError);
       bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, size_t &unID, size_t &unRows, string &strError);
+      bool sqliteQuery(const string strDatabase, const string strStatement, list<map<string, string> > &resultSet, string &strError);
       bool sqliteQuery(const string strDatabase, const string strStatement, string &strError);
       bool sqliteQuery(const string strDatabase, const string strStatement, size_t &unID, size_t &unRows, string &strError);
       bool sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, string &strData, string &strError);

@@ -191,20 +191,13 @@ extern "C++"
           }
           else if (credentials["Type"] == "sqlite")
           {
-            if (credentials.find("User") != credentials.end() && !credentials["User"].empty())
+            if (credentials.find("Database") != credentials.end() && !credentials["Database"].empty())
             {
-              if (credentials.find("Database") != credentials.end() && !credentials["Database"].empty())
-              {
-                bResult = true;
-              }
-              else
-              {
-                strError = "Please provide a SQLite Database.";
-              }
+              bResult = true;
             }
             else
             {
-              strError = "Please provide a SQLite User.";
+              strError = "Please provide a SQLite Database.";
             }
           }
           else if (credentials["Type"] == "teradata")

@@ -82,7 +82,7 @@ extern "C++"
 
       if (!strName.empty())
       {
-        if (credentials.find("Type") != credentials.end() && (credentials["Type"] == "fusion" || credentials["Type"] == "mssql" || credentials["Type"] == "mysql" || credentials["Type"] == "oracle"))
+        if (credentials.find("Type") != credentials.end() && (credentials["Type"] == "fusion" || credentials["Type"] == "mssql" || credentials["Type"] == "mysql" || credentials["Type"] == "oracle" || credentials["Type"] == "sqlite" || credentials["Type"] == "teradata"))
         {
           if (credentials["Type"] == "fusion")
           {
@@ -187,6 +187,24 @@ extern "C++"
             else
             {
               strError = "Please provide an Oracle Schema.";
+            }
+          }
+          else if (credentials["Type"] == "sqlite")
+          {
+            if (credentials.find("User") != credentials.end() && !credentials["User"].empty())
+            {
+              if (credentials.find("Database") != credentials.end() && !credentials["Database"].empty())
+              {
+                bResult = true;
+              }
+              else
+              {
+                strError = "Please provide a SQLite Database.";
+              }
+            }
+            else
+            {
+              strError = "Please provide a SQLite User.";
             }
           }
           else if (credentials["Type"] == "teradata")

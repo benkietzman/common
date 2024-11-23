@@ -2878,3 +2878,13 @@ class Computed extends Observable
   // }}}
 }
 // }}}
+// {{{ theme - auto mode
+window.addEventListener('DOMContentLoaded', (event) =>
+{
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (prefersDark)
+  {
+    document.documentElement.setAttribute("data-bs-theme", "dark");
+  }
+});
+// }}}

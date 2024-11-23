@@ -41,7 +41,7 @@ export default
         </div>
       </nav>
       {{#if c.submenu}}
-      <nav class="container navbar navbar-expand-lg navbar-dark bg-secondary bg-gradient">
+      <nav class="container navbar navbar-expand-lg navbar-dark bg-dark bg-gradient">
         <div class="container-fluid">
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#subnavigationbar" aria-controls="subnavigationbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

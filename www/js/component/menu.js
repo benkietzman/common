@@ -34,7 +34,7 @@ export default
             </ul>
             <ul class="navbar-nav navbar-right">
               {{#each c.menu.right}}
-              <li class="nav-item {{background {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
+              <li class="nav-item {{background}} {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
               {{/each}}
             </ul>
           </div>
@@ -49,12 +49,12 @@ export default
           <div class="collapse navbar-collapse" id="subnavigationbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               {{#each c.submenu.left}}
-              <li class="nav-item {{background {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
+              <li class="nav-item {{background}} {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
               {{/each}}
             </ul>
             <ul class="navbar-nav navbar-right">
               {{#each c.submenu.right}}
-              <li class="nav-item {{background {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
+              <li class="nav-item {{background}} {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
               {{/each}}
             </ul>
           </div>

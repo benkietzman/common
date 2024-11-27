@@ -1819,6 +1819,12 @@ class Common
     }
   }
   // }}}
+  // {{{ pushErrorMessage()
+  pushErrorMessage(strMessage)
+  {
+    this.pushMessage(strMessage, 'Error Message', 'danger');
+  }
+  // }}}
   // {{{ pushMessage()
   pushMessage(strMessage, strTitle, strClass)
   {

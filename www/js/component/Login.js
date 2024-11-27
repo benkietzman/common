@@ -68,7 +68,7 @@ export default
             {{#if c.login.info}}
             <span class="fs-6 text-warning">{{c.login.info}}</span>
             {{/if}}
-            <button class="btn btn-success float-end" c-click="c.processLogin()">Login</button>
+            <button class="btn btn-primary float-end" c-click="c.processLogin()">Login</button>
           </div>
         </div>
       </div>

@@ -40,10 +40,10 @@ export default
     <div class="row justify-content-md-center" style="margin-top: 100px;">
       <div class="col-md-auto">
         <div class="card">
-          <div class="card-header bg-primary fs-5 text-white" style="font-weight: bold;">
+          <div class="card-header bg-primary fs-5 fw-b">
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
           </div>
-          <div class="card-body">
+          <div class="card-body bg-primary-subtle">
             <div class="row">
               <div class="col fs-5">
                 User

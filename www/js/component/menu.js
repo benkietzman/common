@@ -29,12 +29,12 @@ export default
           <div class="collapse navbar-collapse" id="navigationbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               {{#each c.menu.left}}
-              <li class="nav-item {{background}} {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
+              <li class="nav-item {{background}}"><a class="nav-link {{active}} {{text}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
               {{/each}}
             </ul>
             <ul class="navbar-nav navbar-right">
               {{#each c.menu.right}}
-              <li class="nav-item {{background}} {{text}}"><a class="nav-link {{active}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
+              <li class="nav-item {{background}}"><a class="nav-link {{active}} {{text}}" href="#{{href}}">{{#if icon}}<i class="bi bi-{{icon}}"></i> {{/if}}{{value}}</a></li>
               {{/each}}
             </ul>
           </div>

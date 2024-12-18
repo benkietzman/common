@@ -27,10 +27,10 @@ export default
         }
         c.m_messages = null;
         c.m_messages = messages;
-        c.dispatchEvent('commonMessagesReady', null);
         c.render('messages', c.autoLoads['messages']);
       }
     });
+    c.dispatchEvent('commonMessagesReady', null);
   },
   // }}}
   // {{{ template

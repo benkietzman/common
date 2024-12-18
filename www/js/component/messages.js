@@ -38,10 +38,10 @@ export default
     <div class="alert alert-{{Class}} alert-dismissible fade show" role="alert">
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close" c-click="close({{Index}})"></button>
       {{#if Title}}
-      <h4 class="alert-heading">{{Title}}</h4>
+      <h4 class="alert-heading">{{{Title}}}</h4>
       {{/if}}
       {{#if Body}}
-      <pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{Body}}</pre>
+      <pre style="background: inherit; color: inherit; white-space: pre-wrap;">{{{Body}}}</pre>
       {{/if}}
       <hr>
       <div class="float-end"><i>{{Time}}</i></div>

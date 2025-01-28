@@ -12,6 +12,7 @@ class Bridge
   // {{{ variables
   protected $m_bAuthenticated;
   protected $m_buffer;
+  protected $m_bRegistered;
   protected $m_bUseSecureBridge;
   protected $m_conf;
   protected $m_CTime;

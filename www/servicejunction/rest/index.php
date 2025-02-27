@@ -18,7 +18,7 @@ if ($bRaw)
 {
   $request = $data;
 }
-else
+else if (is_array($data))
 {
   $nSize = sizeof($data);
   for ($i = 0; $i < $nSize; $i++)

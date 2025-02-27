@@ -13,6 +13,10 @@ $request = [];
 $response = [];
 $bRaw = ((isset($_GET['raw']))?true:false);
 $data = json_decode(file_get_contents('php://input'), true);
+if ($data == null)
+{
+  $data = json_decode(file_get_contents('php://stdin'), true);
+}
 header('Access-Control-Allow-Origin: *');
 if ($bRaw)
 {

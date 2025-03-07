@@ -734,7 +734,7 @@ extern "C++"
     }
     // }}}
     // {{{ toShort()
-    string StringManip::toShort(float fNumber, string &strNumber)
+    string StringManip::toShort(float fNumber, string &strNumber, const size_t unPrecision)
     {
       bool bNegative = false;
       string strSuffix;
@@ -795,14 +795,14 @@ extern "C++"
           }
         }
       }
-      ssNumber << ((bNegative)?"-":"") << fixed << setprecision(2) << fNumber << strSuffix;
+      ssNumber << ((bNegative)?"-":"") << fixed << setprecision(unPrecision) << fNumber << strSuffix;
       strNumber = ssNumber.str();
 
       return strNumber;
     }
     // }}}
     // {{{ toShortByte()
-    string StringManip::toShortByte(float fNumber, string &strNumber)
+    string StringManip::toShortByte(float fNumber, string &strNumber, const size_t unPrecision)
     {
       bool bNegative = false;
       string strSuffix;
@@ -853,7 +853,7 @@ extern "C++"
           }
         }
       }
-      ssNumber << ((bNegative)?"-":"") << fixed << setprecision(2) << fNumber << strSuffix;
+      ssNumber << ((bNegative)?"-":"") << fixed << setprecision(unPrecision) << fNumber << strSuffix;
       strNumber = ssNumber.str();
 
       return strNumber;

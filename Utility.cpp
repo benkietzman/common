@@ -388,8 +388,7 @@ extern "C++"
 
       if ((nReturn = write(fdSocket, strBuffer.c_str(), strBuffer.size())) > 0)
       {
-        string strValue = strBuffer.substr(nReturn);
-        strBuffer = strValue;
+        strBuffer.erase(0, nReturn);
       }
       else
       {
@@ -1168,8 +1167,7 @@ extern "C++"
       }
       if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < m_unSslWriteSize)?strBuffer.size():m_unSslWriteSize))) > 0)
       {
-        string strValue = strBuffer.substr(nReturn);
-        strBuffer = strValue;
+        strBuffer.erase(0, nReturn);
       }
       else
       {

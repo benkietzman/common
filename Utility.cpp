@@ -644,15 +644,11 @@ extern "C++"
     // {{{ msleep()
     void Utility::msleep(const unsigned long ulMilliSec)
     {
-      struct timespec rqtp, *rmtp = NULL;
+      struct timespec duration;
 
-      rqtp.tv_sec = (time_t)(ulMilliSec / 1000);
-      rqtp.tv_nsec = (ulMilliSec - ((ulMilliSec / 1000) * 1000)) * 1000000L;
-      nanosleep(&rqtp, rmtp);
-      if (rmtp != NULL)
-      {
-        delete rmtp;
-      }
+      duration.tv_sec = (time_t)(ulMilliSec / 1000);
+      duration.tv_nsec = (ulMilliSec - ((ulMilliSec / 1000) * 1000)) * 1000000L;
+      nanosleep(&rqtp, NULL);
     }
     // }}}
     // {{{ readConf()

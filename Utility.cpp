@@ -648,7 +648,7 @@ extern "C++"
 
       duration.tv_sec = (time_t)(ulMilliSec / 1000);
       duration.tv_nsec = (ulMilliSec - ((ulMilliSec / 1000) * 1000)) * 1000000L;
-      nanosleep(&rqtp, NULL);
+      nanosleep(&duration, NULL);
     }
     // }}}
     // {{{ readConf()

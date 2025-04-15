@@ -442,9 +442,9 @@ class ServiceJunction
   }
   // }}}
   // {{{ enableSemaphore()
-  public function enableSemaphore($strName, $bNonBlocking = false, $nTimeout = 60)
+  public function enableSemaphore($strName, $nMaxAquire = 100, $bNonBlocking = false, $nTimeout = 60)
   {
-    $this->m_sem = sem_get($this->semKey($strName), 100);
+    $this->m_sem = sem_get($this->semKey($strName), $nMaxAquire);
     $this->m_bSemNonBlocking = $bNonBlocking;
     $this->m_nSemTimeout = $nTimeout;
     $this->m_bSemaphore = true;

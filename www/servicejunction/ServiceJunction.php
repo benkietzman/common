@@ -19,8 +19,12 @@
 class ServiceJunction
 {
   // {{{ variables
+  protected $m_bSemaphore;
+  protected $m_bSemNonBlocking;
   protected $m_bUseSecureJunction;
   protected $m_conf;
+  protected $m_nSemTimeout;
+  protected $m_sem;
   protected $m_strApplication;
   protected $m_strConf;
   protected $m_streamContext;
@@ -31,7 +35,10 @@ class ServiceJunction
   // {{{ __construct()
   public function __construct($strConf = null)
   {
+    $this->m_bSemaphore = false;
+    $this->m_bSemNonBlocking = false;
     $this->m_bUseSecureJunction = false;
+    $this->m_nSemTimeout = 60;
     $this->m_ulModifyTime = 0;
     $this->m_strConf = '/etc/central.conf';
     if ($strConf != '')
@@ -142,89 +149,96 @@ class ServiceJunction
   // {{{ batch()
   public function batch($request, &$response)
   {
-    $bConnected = false;
     $bResult = false;
-    $handle = null;
-    $nErrorNo = null;
     $strError = null;
-    $unAttempt = 0;
 
-    $response = array();
-    $this->readConf();
-    $junctionServer = explode(',', $this->m_conf['Load Balancer']);
-    $unSize = sizeof($junctionServer);
-    for ($i = (($this->m_bUseSecureJunction)?0:1); !$bConnected && $i < 2; $i++)
+    if ($this->semAcquire())
     {
-      $unAttempt = 0;
-      $unPick = rand(0, ($unSize - 1));
-      while (!$bConnected && $unAttempt++ < $unSize)
-      {
-        if ($unPick == $unSize)
-        {
-          $unPick = 0;
-        }
-        $strServer = $junctionServer[$unPick];
-        if ($handle = stream_socket_client(($i == 0)?'ssl://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
-        {
-          $bConnected = true;
-        }
-      }
-    }
-    unset($junctionServer);
-    if ($bConnected)
-    {
-      $bResult = true;
-      foreach ($request as $key => $value)
-      {
-        $strMessage = null;
-        $nSize = sizeof($value);
-        for ($i = 0; $i < $nSize; $i++)
-        {
-          $strMessage .= $value[$i]."\n";
-        }
-        $strMessage .= 'end'."\n";
-        fwrite($handle, $strMessage);
-      }
-      $nRequests = sizeof($request);
-      unset($request);
+      $bConnected = false;
+      $handle = null;
+      $nErrorNo = null;
       $response = array();
-      for ($i = 0; $i < $nRequests; $i++)
+      $this->readConf();
+      $junctionServer = explode(',', $this->m_conf['Load Balancer']);
+      $unSize = sizeof($junctionServer);
+      for ($i = (($this->m_bUseSecureJunction)?0:1); !$bConnected && $i < 2; $i++)
       {
-        $data = array();
-        $bFoundEnd = false;
-        while (!$bFoundEnd && !feof($handle))
+        $unAttempt = 0;
+        $unPick = rand(0, ($unSize - 1));
+        while (!$bConnected && $unAttempt++ < $unSize)
         {
-          if (($strLine = trim(fgets($handle))) != '' && $strLine != '""')
+          if ($unPick == $unSize)
           {
-            if ($strLine == 'end')
-            {
-              $bFoundEnd = true;
-            }
-            else
-            {
-              $data[] = $strLine;
-            }
+            $unPick = 0;
+          }
+          $strServer = $junctionServer[$unPick];
+          if ($handle = stream_socket_client(($i == 0)?'ssl://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+          {
+            $bConnected = true;
           }
         }
-        if ($bFoundEnd && sizeof($data) >= 1)
-        {
-          $stat = json_decode($data[0], true);
-          if (isset($stat['UniqueID']))
-          {
-            $response[$stat['UniqueID']] = $data;
-          }
-        }
-        unset($data);
       }
-      fclose($handle);
-    }
-    else if ($strError != '')
-    {
-      $this->setError('stream_socket_client('.$nErrorNo.') '.$strError);
+      unset($junctionServer);
+      if ($bConnected)
+      {
+        $bResult = true;
+        foreach ($request as $key => $value)
+        {
+          $strMessage = null;
+          $nSize = sizeof($value);
+          for ($i = 0; $i < $nSize; $i++)
+          {
+            $strMessage .= $value[$i]."\n";
+          }
+          $strMessage .= 'end'."\n";
+          fwrite($handle, $strMessage);
+        }
+        $nRequests = sizeof($request);
+        unset($request);
+        $response = array();
+        for ($i = 0; $i < $nRequests; $i++)
+        {
+          $data = array();
+          $bFoundEnd = false;
+          while (!$bFoundEnd && !feof($handle))
+          {
+            if (($strLine = trim(fgets($handle))) != '' && $strLine != '""')
+            {
+              if ($strLine == 'end')
+              {
+                $bFoundEnd = true;
+              }
+              else
+              {
+                $data[] = $strLine;
+              }
+            }
+          }
+          if ($bFoundEnd && sizeof($data) >= 1)
+          {
+            $stat = json_decode($data[0], true);
+            if (isset($stat['UniqueID']))
+            {
+              $response[$stat['UniqueID']] = $data;
+            }
+          }
+          unset($data);
+        }
+        fclose($handle);
+      }
+      else if ($strError != '')
+      {
+        $this->setError('stream_socket_client('.$nErrorNo.') '.$strError);
+      }
+      else
+      {
+        $this->setError('Could not connect Service Junction socket.');
+      }
+      $this->semRelease();
     }
     else
     {
-      $this->setError('Could not connect Service Junction socket.');
+      $this->setError('Could not acquire the semaphore within '.$this->m_nSemTimeout.' seconds.');
     }
 
     return $bResult;
@@ -342,6 +356,12 @@ class ServiceJunction
     return $bResult;
   }
   // }}}
+  // {{{ disableSemaphore()
+  public function disableSemaphore()
+  {
+    $this->m_bSemaphore = false;
+  }
+  // }}}
   // {{{ email()
   public function email($strFrom, $strTo, $strSubject = null, $strText = null, $strHTML = null, $strFile = null)
   {
@@ -419,6 +439,15 @@ class ServiceJunction
     unset($response);
 
     return $bResult;
+  }
+  // }}}
+  // {{{ enableSemaphore()
+  public function enableSemaphore($strName, $bNonBlocking = false, $nTimeout = 60)
+  {
+    $this->m_sem = sem_get($this->semKey($strName), 100);
+    $this->m_bSemNonBlocking = $bNonBlocking;
+    $this->m_nSemTimeout = $nTimeout;
+    $this->m_bSemaphore = true;
   }
   // }}}
   // {{{ finance()
@@ -1249,98 +1278,155 @@ class ServiceJunction
   // {{{ request()
   public function request($request, &$response)
   {
-    $bConnected = false;
     $bResult = false;
-    $handle = null;
-    $nErrorNo = null;
     $strError = null;
-    $unAttempt = 0;
 
-    $response = array();
-    $this->readConf();
-    $junctionServer = explode(',', $this->m_conf['Load Balancer']);
-    $unSize = sizeof($junctionServer);
-    for ($i = (($this->m_bUseSecureJunction)?0:1); !$bConnected && $i < 2; $i++)
+    if ($this->semAcquire())
     {
-      $unAttempt = 0;
-      $unPick = rand(0, ($unSize - 1));
-      while (!$bConnected && $unAttempt++ < $unSize)
+      $bConnected = false;
+      $handle = null;
+      $nErrorNo = null;
+      $response = array();
+      $this->readConf();
+      $junctionServer = explode(',', $this->m_conf['Load Balancer']);
+      $unSize = sizeof($junctionServer);
+      for ($i = (($this->m_bUseSecureJunction)?0:1); !$bConnected && $i < 2; $i++)
       {
-        if ($unPick == $unSize)
+        $unAttempt = 0;
+        $unPick = rand(0, ($unSize - 1));
+        while (!$bConnected && $unAttempt++ < $unSize)
         {
-          $unPick = 0;
-        }
-        $strServer = $junctionServer[$unPick];
-        if ($handle = stream_socket_client(($i == 0)?'ssl://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
-        {
-          $bConnected = true;
-        }
-      }
-    }
-    unset($junctionServer);
-    if ($bConnected)
-    {
-      $nSize = sizeof($request);
-      $strMessage = null;
-      $bReturnArr = false;
-      $bReturnObj = false;
-      for ($i = 0; $i < $nSize; $i++)
-      {
-        if (is_array($request[$i]) || is_object($request[$i]) || trim($request[$i]) != 'end')
-        {
-          // check if request is a line of json or php array or object
-          if(is_array($request[$i])){
-            $bReturnArr = true;
-            $strMessage .= json_encode($request[$i])."\n";
-          } elseif(is_object($request[$i])){
-            $bReturnObj = true;  
-            $strMessage .= json_encode($request[$i])."\n";
-          } else {
-            // just process as normal if no types can be determined
-            $strMessage .= $request[$i]."\n";
+          if ($unPick == $unSize)
+          {
+            $unPick = 0;
+          }
+          $strServer = $junctionServer[$unPick];
+          if ($handle = stream_socket_client(($i == 0)?'ssl://'.$strServer.':5863':$strServer.':5862', $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+          {
+            $bConnected = true;
           }
         }
       }
-      $strMessage .= 'end'."\n";
-      fwrite($handle, $strMessage);
-      while (!$bResult && !feof($handle))
+      unset($junctionServer);
+      if ($bConnected)
       {
-        if (($strLine = trim(fgets($handle))) != '' && $strLine != '""')
+        $nSize = sizeof($request);
+        $strMessage = null;
+        $bReturnArr = false;
+        $bReturnObj = false;
+        for ($i = 0; $i < $nSize; $i++)
         {
-          if ($strLine == 'end')
+          if (is_array($request[$i]) || is_object($request[$i]) || trim($request[$i]) != 'end')
           {
-            $bResult = true;
-          }
-          else
-          {
-            if($bReturnArr){
-              $response[] = json_decode($strLine, true);
-            } elseif($bReturnObj){
-              $response[] = json_decode($strLine, false);
+            // check if request is a line of json or php array or object
+            if(is_array($request[$i])){
+              $bReturnArr = true;
+              $strMessage .= json_encode($request[$i])."\n";
+            } elseif(is_object($request[$i])){
+              $bReturnObj = true;  
+              $strMessage .= json_encode($request[$i])."\n";
             } else {
-              $response[] = $strLine;
+              // just process as normal if no types can be determined
+              $strMessage .= $request[$i]."\n";
             }
           }
         }
+        $strMessage .= 'end'."\n";
+        fwrite($handle, $strMessage);
+        while (!$bResult && !feof($handle))
+        {
+          if (($strLine = trim(fgets($handle))) != '' && $strLine != '""')
+          {
+            if ($strLine == 'end')
+            {
+              $bResult = true;
+            }
+            else
+            {
+              if($bReturnArr){
+                $response[] = json_decode($strLine, true);
+              } elseif($bReturnObj){
+                $response[] = json_decode($strLine, false);
+              } else {
+                $response[] = $strLine;
+              }
+            }
+          }
+        }
+        if (!$bResult)
+        {
+          $this->setError('Failed to receive end of Service Junction response.');
+        }
+        else if (sizeof($response) == 0)
+        {
+          $bResult = false;
+          $this->setError('Failed to receive any data from the underlying service within the Service Junction.');
+        }
+        fclose($handle);
       }
-      if (!$bResult)
+      else if ($strError != '')
       {
-        $this->setError('Failed to receive end of Service Junction response.');
+        $this->setError('stream_socket_client('.$nErrorNo.') '.$strError);
       }
-      else if (sizeof($response) == 0)
+      else
       {
-        $bResult = false;
-        $this->setError('Failed to receive any data from the underlying service within the Service Junction.');
+        $this->setError('Could not connect Service Junction socket.');
       }
-      fclose($handle);
-    }
-    else if ($strError != '')
-    {
-      $this->setError('stream_socket_client('.$nErrorNo.') '.$strError);
+      $this->semRelease();
     }
     else
     {
-      $this->setError('Could not connect Service Junction socket.');
+      $this->setError('Could not acquire the semaphore within '.$this->m_nSemTimeout.' seconds.');
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ semAcquire()
+  public function semAcquire()
+  {
+    $bResult = true;
+
+    if ($this->m_bSemaphore)
+    {
+      $bResult = false;
+      $unAttempt = 0;
+      while (!$bResult && $unAttempt < ($this->m_nSemTimeout * 4))
+      {
+        if (!($bResult = sem_acquire($this->m_sem, $this->m_bSemNonBlocking)))
+        {
+//echo $unAttempt."\n";
+          usleep(250000);
+        }
+        $unAttempt++;
+      }
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ semKey()
+  public function semKey($strName)
+  {
+    $strKey = md5($strName);
+    $nKey = 0;
+
+    for ($i = 0; $i < 32; $i++)
+    {
+      $nKey += ord($strKey[$i]) * $i;
+    }
+
+    return $nKey;
+  }
+  // }}}
+  // {{{ semRelease()
+  public function semRelease()
+  {
+    $bResult = true;
+
+    if ($this->m_bSemaphore)
+    {
+      $bResult = sem_release($this->m_sem);
     }
 
     return $bResult;

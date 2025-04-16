@@ -30,6 +30,7 @@ class ServiceJunction
   protected $m_streamContext;
   protected $m_strError;
   protected $m_strProgram;
+  protected $m_strTimeout;
   protected $m_ulModifyTime;
   // }}}
   // {{{ __construct()
@@ -1318,15 +1319,33 @@ class ServiceJunction
         {
           if (is_array($request[$i]) || is_object($request[$i]) || trim($request[$i]) != 'end')
           {
-            // check if request is a line of json or php array or object
-            if(is_array($request[$i])){
+            if (is_array($request[$i]))
+            {
               $bReturnArr = true;
+              if ($i == 0 && $this->m_strTimeout != '')
+              {
+                $request[$i]['Timeout'] = $this->m_strTimeout;
+              }
               $strMessage .= json_encode($request[$i])."\n";
-            } elseif(is_object($request[$i])){
+            }
+            else if (is_object($request[$i]))
+            {
               $bReturnObj = true;  
+              if ($i == 0 && $this->m_strTimeout != '')
+              {
+                $request[$i]['Timeout'] = $this->m_strTimeout;
+              }
               $strMessage .= json_encode($request[$i])."\n";
-            } else {
-              // just process as normal if no types can be determined
+            }
+            else if ($i == 0 && $this->m_strTimeout != '')
+            {
+              $req = json_decode($request[$i], true);
+              $req['Timeout'] = $this->m_strTimeout;
+              $strMessage .= json_encode($req)."\n";
+              unset($req);
+            }
+            else
+            {
               $strMessage .= $request[$i]."\n";
             }
           }
@@ -1341,15 +1360,13 @@ class ServiceJunction
             {
               $bResult = true;
             }
+            else if ($bReturnArr || $bReturnObj)
+            {
+              $response[] = json_decode($strLine, $bReturnArr);
+            }
             else
             {
-              if($bReturnArr){
-                $response[] = json_decode($strLine, true);
-              } elseif($bReturnObj){
-                $response[] = json_decode($strLine, false);
-              } else {
-                $response[] = $strLine;
-              }
+              $response[] = $strLine;
             }
           }
         }
@@ -1438,6 +1455,12 @@ class ServiceJunction
     $this->m_strApplication = $strApplication;
   }
   // }}}
+  // {{{ setError()
+  public function setError($strError)
+  {
+    $this->m_strError = $strError;
+  }
+  // }}}
   // {{{ setProgram()
   public function setProgram($strProgram)
   {
@@ -1450,16 +1473,16 @@ class ServiceJunction
     $this->m_streamContext = stream_context_create($context);
   }
   // }}}
+  // {{{ setTimeout()
+  public function setTimeout($strTimeout)
+  {
+    $this->m_strTimeout = $strTimeout;
+  }
+  // }}}
   // {{{ useSecureJunction()
   public function useSecureJunction($bUseSecureJunction = true)
   {
     $this->m_bUseSecureJunction = $bUseSecureJunction;
-  }
-  // }}}
-  // {{{ setError()
-  public function setError($strError)
-  {
-    $this->m_strError = $strError;
   }
   // }}}
   // {{{ weather()

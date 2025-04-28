@@ -853,7 +853,7 @@ extern "C++"
         {
           int nNumber;
           string strLine;
-          XML_Parser parser = XML_ParserCreate("US-ASCII");
+          XML_Parser parser = XML_ParserCreate(NULL);
           m_ptCurrent = this;
           m_ptParent = NULL;
           XML_SetUserData(parser, this);

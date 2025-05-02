@@ -2076,6 +2076,36 @@ class Common
     return this.store(controller, data);
   }
   // }}}
+  // {{{ scrollsRestore()
+  scrollsRestore(scrolls)
+  {
+    for (let i = 0; i < scrolls.length; i++)
+    {
+      let element = document.getElementById(scrolls[i].id);
+      if (element)
+      {
+        element.scrollLeft = scrolls[i].scrollLeft;
+        element.scrollTop = scrolls[i].scrollTop;
+      }
+    }
+  }
+  // }}}
+  // {{{ scrollsSave()
+  scrollsSave()
+  {
+    let elements = document.querySelectorAll('*');
+    let scrolls = [];
+    for (let i = 0; i < elements.length; i++)
+    {
+      if (elements[i].id && elements[i].offsetWidth < elements[i].scrollWidth || elements[i].offsetHeight < elements[i].scrollHeight)
+      {
+        scrolls.push({id: elements[i].id, scrollLeft: elements[i].scrollLeft, scrollTop: elements[i].scrollTop});
+      }
+    }
+
+    return scrolls;
+  }
+  // }}}
   // {{{ sendDebugEmail()
   sendDebugEmail()
   {
@@ -2420,7 +2450,9 @@ class Common
   {
     if (this.name == name)
     {
+      let scrolls = this.scrollsSave();
       this.render(this.id, this.name, this.component);
+      this.scrollsRestore(scrolls);
     }
   }
   // }}}

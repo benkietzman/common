@@ -1,9 +1,8 @@
 <?php
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2020-01-03
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
 ini_set('max_execution_time', '300');

@@ -1,10 +1,9 @@
 <?php
 namespace common;
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2018-12-27
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
 class Acorn

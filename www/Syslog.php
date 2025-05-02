@@ -1,9 +1,8 @@
 <?php
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2020-06-04
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
 class Syslog

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2024-11-26
-// copyright  : AT&T
+// copyright  : Ben Kietzman
 // email      : bk6471@att.com
 ///////////////////////////////////////////
 export default

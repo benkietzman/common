@@ -1,8 +1,7 @@
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2015-08-03
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
 

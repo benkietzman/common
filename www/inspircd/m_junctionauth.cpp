@@ -1,24 +1,12 @@
-// vim: syntax=cpp
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // ModuleJunctionAuth
 // -------------------------------------
 // file       : m_junctionauth.cpp
 // author     : Ben Kietzman
 // begin      : 2022-01-27
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
-
-/**************************************************************************
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-**************************************************************************/
-
 /// $CompilerFlags: find_compiler_flags("openssl" "")
 /// $LinkerFlags: find_linker_flags("openssl" "-lssl -lcrypto")
 

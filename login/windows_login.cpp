@@ -1,11 +1,9 @@
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2006-03-08
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
-
 /*! \file windows_login.cpp
 * \brief The Windows Login application.
 *

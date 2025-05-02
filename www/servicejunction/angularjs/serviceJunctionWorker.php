@@ -1,9 +1,8 @@
 <?php
-// vim600: fdm=marker
 ///////////////////////////////////////////
 // author     : Ben Kietzman
 // begin      : 2013-11-12
-// copyright  : kietzman.org
+// copyright  : Ben Kietzman
 // email      : ben@kietzman.org
 ///////////////////////////////////////////
 include(dirname(__FILE__).'/../ServiceJunction.php');

@@ -1362,14 +1362,7 @@ class Common
   // {{{ isModalShown()
   isModalShown(id)
   {
-    let bResult = false;
-
-    if (document.getElementById(id).classList.contains('show'))
-    {
-      bResult = true;
-    }
-
-    return bResult;
+    return document.getElementById(id).classList.contains('show');
   }
   // }}}
   // {{{ isNull()

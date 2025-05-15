@@ -1359,6 +1359,12 @@ class Common
     return bResult;
   }
   // }}}
+  // {{{ isModalShown()
+  isModalShown(id)
+  {
+    return document.getElementById('loadModal').classList.contains('show');
+  }
+  // }}}
   // {{{ isNull()
   isNull(variable)
   {

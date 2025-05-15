@@ -1362,7 +1362,7 @@ class Common
   // {{{ isModalShown()
   isModalShown(id)
   {
-    return document.getElementById('loadModal').classList.contains('show');
+    return document.getElementById(id).classList.contains('show');
   }
   // }}}
   // {{{ isNull()

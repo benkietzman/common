@@ -226,14 +226,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool notify(const string strSubject, const string strMessage, string &strError);
-      /*! \fn bool putCentralMessage(const string strMessage, string &strError, const bool bAlert = false)
-      * \brief Puts a message into the central messaging system.
-      * \param strMessage Contains the message.
-      * \param strError Contains the error message.
-      * \param bAlert Contains whether this is an alert message.
-      * \return Returns a boolean true/false value. 
-      */
-      bool putCentralMessage(const string strMessage, string &strError, const bool bAlert = false);
       /*! \fn list<map<string, string> > *query(const string strName, const string strQuery, string &strError)
       * \brief Runs a query using database list.
       * \param strName Contains the database name.

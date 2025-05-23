@@ -684,34 +684,6 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ putCentralMessage()
-    bool Central::putCentralMessage(const string strMessage, string &strError, const bool bAlert)
-    {
-      bool bResult = false;
-      time_t CTime = 0;
-      string strValue;
-      Json *ptRequest = new Json, *ptResponse = new Json;
-
-      time(&CTime);
-      ptRequest->insert("Action", "message");
-      ptRequest->insert("Type", ((bAlert)?"alert":"info"));
-      if (!m_strApplication.empty())
-      {
-        ptRequest->insert("Application", m_strApplication);
-      }
-      ptRequest->insert("Start", manip()->toString(CTime, strValue));
-      ptRequest->insert("End", manip()->toString(CTime + 1200, strValue));
-      ptRequest->insert("Message", strMessage);
-      if (junction()->sysInfo(ptRequest, ptResponse, strError))
-      {
-        bResult = true;
-      }
-      delete ptRequest;
-      delete ptResponse;
-
-      return bResult;
-    }
-    // }}}
     // {{{ query()
     list<map<string, string> > *Central::query(const string strName, const string strQuery, string &strError)
     {

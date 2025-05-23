@@ -113,23 +113,6 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool bridge(const string strUser, const string strPassword, Json *ptRequest, Json *ptResponse, string &strError);
-      /*! \fn bool centralMonitor(Json *ptRequest, Json *ptResponse, string &strError)
-      * \brief Submits a Central Monitor request via the Service Junction.
-      * \param ptRequest Contains the request.
-      * \param ptResponse Contains the response.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value. 
-      */
-      bool centralMonitor(Json *ptRequest, Json *ptResponse, string &strError);
-      /*! \fn bool centralMonitor(const string strServer, const string strProcess, Json *ptResponse, string &strError)
-      * \brief Submits a Central Monitor request via the Service Junction.
-      * \param strServer Contains the server.
-      * \param strProcess Contains the process.
-      * \param ptResponse Contains the response.
-      * \param strError Contains the error message.
-      * \return Returns a boolean true/false value. 
-      */
-      bool centralMonitor(const string strServer, const string strProcess, Json *ptResponse, string &strError);
       /*! \fn bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "")
       * Constructs and sends an email.
       * \param strURL - The input URL.

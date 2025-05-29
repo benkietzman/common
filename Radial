@@ -73,12 +73,19 @@ extern "C++"
     {
       protected:
       bool m_bUseSingleSocket;
+      int m_fdSocket;
+      list<string> m_buffer[2];
       map<int, radialreqdata *> m_requests;
       size_t m_unThrottle;
       size_t m_unUniqueID;
+      SSL *m_ssl;
+      SSL_CTX *m_ctx;
       std::mutex m_mutexGetAddrInfo;
       std::mutex m_mutexRequests;
+      std::mutex m_mutexResource;
       std::mutex m_mutexUnique;
+      string m_strBuffer[2];
+      string m_strLine;
       string m_strPassword;
       string m_strServer;
       string m_strTimeout;
@@ -103,6 +110,7 @@ extern "C++"
       bool centralNotify(const string strType, const string strName, const string strMessage, string &strError);
       bool centralServerNotify(const string strServer, const string strMessage, string &strError);
       bool centralUserNotify(const string strUser, const string strMessage, string &strError);
+      bool connect(string &strError);
       void databaseFree(list<map<string, string> > *result);
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, string &strError);
       list<map<string, string> > *databaseQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
@@ -118,6 +126,9 @@ extern "C++"
       list<map<string, string> > *dbQuery(const string strDatabase, const string strQuery, unsigned long long &ullRows, string &strError);
       bool dbUpdate(const string strDatabase, const string strUpdate, string &strError);
       bool dbUpdate(const string strDatabase, const string strUpdate, unsigned long long &ullID, unsigned long long &ullRows, string &strError);
+      bool disconnect(string &strError);
+      bool getMessages(list<Json *> &messages, string &strError);
+      bool getMessages(string &strError);
       bool hubList(map<string, map<string, string> > &interfaces, string &strError);
       bool hubPing(string &strError);
       bool ircChat(const string strTarget, const string strMessage, string &strError);
@@ -125,6 +136,7 @@ extern "C++"
       bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError);
       bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError);
       bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError);
+      void putMessages(list<Json *> &messages);
       bool request(Json *ptRequest, Json *ptResponse, string &strError);
       bool request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string &strError);
       void requestThread();

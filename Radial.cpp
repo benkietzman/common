@@ -42,6 +42,9 @@ Radial::Radial(string &strError)
   sema_init(&m_semaRadialRequestLock, 10, USYNC_THREAD, NULL);
   #endif
   m_bUseSingleSocket = false;
+  m_ctx = NULL;
+  m_fdSocket = -1;
+  m_ssl = NULL;
   m_unThrottle = 0;
   m_unUniqueID = 0;
   m_pUtility = new Utility(strError);
@@ -50,6 +53,9 @@ Radial::Radial(string &strError)
 // {{{ ~Radial()
 Radial::~Radial()
 {
+  string strError;
+
+  disconnect(strError);
   if (m_bUseSingleSocket)
   {
     useSingleSocket(false);
@@ -138,6 +144,204 @@ bool Radial::centralUserNotify(const string strUser, const string strMessage, st
   return centralNotify("user", strUser, strMessage, strError);
 }
 // }}}
+// }}}
+// {{{ connect()
+bool Radial::connect(string &strError)
+{
+  bool bResult = false;
+
+  if (m_fdSocket == -1)
+  {
+    if (!m_strUser.empty())
+    {
+      if (!m_strPassword.empty())
+      {
+        string strToken;
+        Json *ptReq = new Json, *ptRes = new Json;
+        ptReq->i("Interface", "application");
+        ptReq->i("Function", "connect");
+        if (request(ptReq, ptRes, strError))
+        {
+          if (ptRes->m.find("Response") != ptRes->m.end())
+          {
+            if (ptRes->m["Response"]->m.find("Token") != ptRes->m["Response"]->m.end() && !ptRes->m["Response"]->m["Token"]->v.empty())
+            {
+              strToken = ptRes->m["Response"]->m["Token"]->v;
+            }
+            else
+            {
+              strError = "Failed to find the Token within the Response";
+            }
+          }
+          else
+          {
+            strError = "Failed to find the Response.";
+          }
+        }
+        delete ptReq;
+        delete ptRes;
+        if (!strToken.empty())
+        {
+          list<string> server;
+          utility()->readConf(strError);
+          if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
+          {
+            server.push_back(utility()->conf()->m["Load Balancer"]->v);
+          }
+          if (utility()->conf()->m.find("Radial Server") != utility()->conf()->m.end())
+          {
+            server.push_back(utility()->conf()->m["Radial Server"]->v);
+          }
+          if (!server.empty())
+          {
+            int fdSocket = -1, nReturn = -1;
+            SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
+            if ((m_ctx = SSL_CTX_new(method)) != NULL)
+            {
+              for (auto i = server.begin(); !bResult && i != server.end(); i++)
+              {
+                bool bConnected[4] = {false, false, false, false};
+                string strServer;
+                unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
+                vector<string> radialServer;
+                for (int j = 1; !m_manip.getToken(strServer, (*i), j, ",", true).empty(); j++)
+                {
+                  radialServer.push_back(m_manip.trim(strServer, strServer));
+                }
+                srand(unSeed);
+                unPick = rand_r(&unSeed) % radialServer.size();
+                while (!bConnected[3] && unAttempt++ < radialServer.size())
+                {
+                  addrinfo hints, *result;
+                  bConnected[0] = false;
+                  if (unPick == radialServer.size())
+                  {
+                    unPick = 0;
+                  }
+                  strServer = radialServer[unPick];
+                  memset(&hints, 0, sizeof(addrinfo));
+                  hints.ai_family = AF_UNSPEC;
+                  hints.ai_socktype = SOCK_STREAM;
+                  m_mutexGetAddrInfo.lock();
+                  nReturn = getaddrinfo(strServer.c_str(), "7277", &hints, &result);
+                  m_mutexGetAddrInfo.unlock();
+                  if (nReturn == 0)
+                  {
+                    addrinfo *rp;
+                    bConnected[0] = true;
+                    for (rp = result; !bConnected[3] && rp != NULL; rp = rp->ai_next)
+                    {
+                      bConnected[1] = bConnected[2] = false;
+                      if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
+                      {
+                        bConnected[1] = true;
+                        if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                        {
+                          bConnected[2] = true;
+                          if ((m_ssl = utility()->sslConnect(m_ctx, fdSocket, strError)) != NULL)
+                          {
+                            bConnected[3] = true;
+                          }
+                          else
+                          {
+                            close(fdSocket);
+                          }
+                        }
+                        else
+                        {
+                          close(fdSocket);
+                        }
+                      }
+                    }
+                    freeaddrinfo(result);
+                  }
+                  unPick++;
+                }
+                radialServer.clear();
+                if (bConnected[3])
+                {
+                  bool bExit = false;
+                  list<Json *> messages;
+                  time_t CTime[2] = {0, 0};
+                  m_fdSocket = fdSocket;
+                  time(&(CTime[0]));
+                  CTime[1] = CTime[0];
+                  while (!bExit && (CTime[1] - CTime[0]) < 5 && getMessages(messages, strError))
+                  {
+                    if (!messages.empty())
+                    {
+                      bExit = true;
+                      if (messages.front()->m.find("Status") != messages.front()->m.end() && messages.front()->m["Status"]->v == "okay")
+                      {
+                        bResult = true;
+                      }
+                      else if (messages.front()->m.find("Error") != messages.front()->m.end() && !messages.front()->m["Error"]->v.empty())
+                      {
+                        strError = messages.front()->m["Error"]->v;
+                      }
+                      else
+                      {
+                        strError = "Encountered an unknown error.";
+                      }
+                    }
+                    else
+                    {
+                      time(&(CTime[1]));
+                    }
+                  }
+                  while (!messages.empty())
+                  {
+                    delete messages.front();
+                    messages.pop_front();
+                  }
+                }
+                else
+                {
+                  stringstream ssError;
+                  if (!bConnected[0])
+                  {
+                    ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
+                  }
+                  else if (!bConnected[2])
+                  {
+                    ssError << ((!bConnected[1])?"socket":"connect") << "(" << errno << ") " << strerror(errno);
+                  }
+                  else
+                  {
+                    ssError << "Central::utilty()->sslConnect() error [" << strError << "]  ";
+                  }
+                  strError = ssError.str();
+                }
+              }
+            }
+            else
+            {
+              strError = "Failed to initialize SSL context.";
+            }
+          }
+          else
+          {
+            strError = (string)"Please provide the Load Balancer server via the " + utility()->getConfPath() + (string)" file.";
+          }
+        }
+      }
+      else
+      {
+        strError = "Please provide the Password.";
+      }
+    }
+    else
+    {
+      strError = "Please provide the User.";
+    }
+  }
+  else
+  {
+    strError = "Already connected.";
+  }
+
+  return bResult;
+}
 // }}}
 // {{{ database
 // {{{ databaseFree()
@@ -321,6 +525,165 @@ bool Radial::db(const string strFunction, Json *ptData, map<string, string> &row
   return bResult;
 }
 // }}}
+// {{{ disconnect()
+bool Radial::disconnect(string &strError)
+{
+  bool bResult = false;
+
+  if (m_fdSocket != -1)
+  {
+    if (m_ssl != NULL)
+    {
+      SSL_shutdown(m_ssl);
+      SSL_free(m_ssl);
+      m_ssl = NULL;
+    }
+    if (m_ctx != NULL)
+    {
+      SSL_CTX_free(m_ctx);
+      m_ctx = NULL;
+    }
+    if (close(m_fdSocket) == 0)
+    {
+      bResult = true;
+    }
+    else
+    {
+      strError = strerror(errno);
+    }
+    m_fdSocket = -1;
+  }
+  m_strBuffer[0].clear();
+  if (!m_strBuffer[1].empty() && !m_strLine.empty())
+  {
+    m_buffer[1].push_front(m_strLine);
+  }
+  m_strBuffer[1].clear();
+  m_strLine.clear();
+
+  return bResult;
+}
+// }}}
+// {{{ getMessages()
+bool Radial::getMessages(list<Json *> &messages, string &strError)
+{
+  bool bResult = false;
+
+  if (getMessages(strError))
+  {
+    bResult = true;
+    m_mutexResource.lock();
+    while (!m_buffer[0].empty())
+    {
+      messages.push_back(new Json(m_buffer[0].front()));
+      m_buffer[0].pop_front();
+    }
+    m_mutexResource.unlock();
+  }
+
+  return bResult;
+}
+bool Radial::getMessages(string &strError)
+{
+  bool bResult = false;
+
+  m_mutexResource.lock();
+  if ((m_fdSocket != -1) || connect(strError))
+  {
+    if (!m_buffer[0].empty())
+    {
+      bResult = true;
+    }
+    else
+    {
+      bool bClose = false, bExit = false;
+      int nReturn;
+      size_t unPosition;
+      string strLine;
+      while (!bExit)
+      {
+        pollfd fds[1];
+        fds[0].fd = m_fdSocket;
+        fds[0].events = POLLIN;
+        if (m_strBuffer[1].empty() && !m_buffer[1].empty())
+        {
+          m_strBuffer[1].append(m_buffer[1].front()+"\n");
+          m_strLine = m_buffer[1].front();
+          m_buffer[1].pop_front();
+        }
+        if (!m_strBuffer[1].empty())
+        {
+          fds[0].events |= POLLOUT;
+        }
+        if ((nReturn = poll(fds, 1, 10)) > 0)
+        {
+          if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLIN))
+          {
+            if (utility()->sslRead(m_ssl, m_strBuffer[0], nReturn))
+            {
+              while ((unPosition = m_strBuffer[0].find("\n")) != string::npos)
+              {
+                bResult = true;
+                m_buffer[0].push_back(m_strBuffer[0].substr(0, unPosition));
+                m_strBuffer[0].erase(0, (unPosition + 1));
+              }
+            }
+            else
+            {
+              stringstream ssError;
+              bClose = bExit = true;
+              if (m_ssl != NULL)
+              {
+                ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror(m_ssl, nReturn);
+              }
+              else
+              {
+                ssError << "Central::utility()->fdRead(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
+              }
+              strError = ssError.str();
+            }
+          }
+          if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLOUT))
+          {
+            if (!(m_ssl != NULL && utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn)) && !(m_ssl == NULL && utility()->fdWrite(m_fdSocket, m_strBuffer[1], nReturn)))
+            {
+              stringstream ssError;
+              bClose = bExit = true;
+              if (m_ssl != NULL)
+              {
+                ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " <<  utility()->sslstrerror(m_ssl, nReturn);
+              }
+              else
+              {
+                ssError << "Central::utility()->fdWrite(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
+              }
+              strError = ssError.str();
+            }
+          }
+        }
+        else if (nReturn < 0)
+        {
+          stringstream ssError;
+          bClose = bExit = true;
+          ssError << "poll(" << errno << ") " << strerror(errno);
+          strError = ssError.str();
+        }
+        else
+        {
+          bExit = bResult = true;
+        }
+      }
+      if (bClose)
+      {
+        disconnect(strError);
+      }
+    }
+  }
+  m_mutexResource.unlock();
+
+  return bResult;
+}
+// }}}
 // {{{ hub
 // {{{ hubList()
 bool Radial::hubList(map<string, map<string, string> > &interfaces, string &strError)
@@ -495,6 +858,21 @@ bool Radial::mysqlUpdate(const string strUser, const string strPassword, const s
   string strID, strRows;
 
   return mysqlUpdate(strUser, strPassword, strServer, strDatabase, strUpdate, strID, strRows, strError);
+}
+// }}}
+// {{{ putMessages()
+void Radial::putMessages(list<Json *> &messages)
+{
+  string strJson;
+
+  m_mutexResource.lock();
+  while (!messages.empty())
+  {
+    m_buffer[1].push_back(messages.front()->json(strJson));
+    delete messages.front();
+    messages.pop_front();
+  }
+  m_mutexResource.unlock();
 }
 // }}}
 // {{{ request
@@ -717,7 +1095,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
               if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
               {
                 bConnected[1] = true;
-                if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                 {
                   bConnected[2] = true;
                   if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
@@ -948,7 +1326,7 @@ void Radial::requestThread()
               {
                 if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                 {
-                  if (connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                  if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                   {
                     if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
                     {

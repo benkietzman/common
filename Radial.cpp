@@ -617,7 +617,7 @@ bool Radial::getMessages(string &strError)
         }
         if ((nReturn = poll(fds, 1, 10)) > 0)
         {
-          if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLIN))
+          if (fds[0].revents & POLLIN)
           {
             if (utility()->sslRead(m_ssl, m_strBuffer[0], nReturn))
             {
@@ -643,7 +643,7 @@ bool Radial::getMessages(string &strError)
               strError = ssError.str();
             }
           }
-          if (fds[0].fd == m_fdSocket && (fds[0].revents & POLLOUT))
+          if (fds[0].revents & POLLOUT)
           {
             if (!(m_ssl != NULL && utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn)) && !(m_ssl == NULL && utility()->fdWrite(m_fdSocket, m_strBuffer[1], nReturn)))
             {
@@ -659,6 +659,16 @@ bool Radial::getMessages(string &strError)
               }
               strError = ssError.str();
             }
+          }
+          if (fds[0].revents & POLLERR)
+          {
+            bExit = true;
+            strError = "poll() Encountered a POLLERR.";
+          }
+          if (fds[0].revents & POLLNVAL)
+          {
+            bExit = true;
+            strError = "poll() Encountered a POLLNVAL.";
           }
         }
         else if (nReturn < 0)
@@ -994,6 +1004,16 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
               }
             }
           }
+          if (fds[0].revents & POLLERR)
+          {
+            bExit = true;
+            strError = "poll() Encountered a POLLERR.";
+          }
+          if (fds[0].revents & POLLNVAL)
+          {
+            bExit = true;
+            strError = "poll() Encountered a POLLNVAL.";
+          }
         }
         else if (nReturn < 0)
         {
@@ -1048,196 +1068,206 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
       SSL_CTX *ctx = SSL_CTX_new(method);
       if (ctx != NULL)
       {
-        //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
-      }
-      for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
-      {
-        bool bConnected[4] = {false, false, false, false};
-        int fdSocket = -1, nReturn = -1;
-        SSL *ssl = NULL;
-        string strServer;
-        unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
-        vector<string> radialServer;
-        for (int j = 1; !m_manip.getToken(strServer, (*i), j, ",", true).empty(); j++)
+        for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
         {
-          radialServer.push_back(m_manip.trim(strServer, strServer));
-        }
-        srand(unSeed);
-        unPick = rand_r(&unSeed) % radialServer.size();
-        #ifdef COMMON_LINUX
-        sem_wait(&m_semaRadialRequestLock);
-        #endif
-        #ifdef COMMON_SOLARIS
-        sema_wait(&m_semaRadialRequestLock);
-        #endif
-        while (!bConnected[3] && unAttempt++ < radialServer.size())
-        {
-          addrinfo hints, *result;
-          bConnected[0] = bConnected[1] = bConnected[2] = false;
-          if (unPick == radialServer.size())
+          bool bConnected[4] = {false, false, false, false};
+          int fdSocket = -1, nReturn = -1;
+          SSL *ssl = NULL;
+          string strServer;
+          unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
+          vector<string> radialServer;
+          for (int j = 1; !m_manip.getToken(strServer, (*i), j, ",", true).empty(); j++)
           {
-            unPick = 0;
+            radialServer.push_back(m_manip.trim(strServer, strServer));
           }
-          strServer = radialServer[unPick];
-          memset(&hints, 0, sizeof(addrinfo));
-          hints.ai_family = AF_UNSPEC;
-          hints.ai_socktype = SOCK_STREAM;
-          m_mutexGetAddrInfo.lock();
-          nReturn = getaddrinfo(strServer.c_str(), "7234", &hints, &result);
-          m_mutexGetAddrInfo.unlock();
-          if (nReturn == 0)
+          srand(unSeed);
+          unPick = rand_r(&unSeed) % radialServer.size();
+          #ifdef COMMON_LINUX
+          sem_wait(&m_semaRadialRequestLock);
+          #endif
+          #ifdef COMMON_SOLARIS
+          sema_wait(&m_semaRadialRequestLock);
+          #endif
+          while (!bConnected[3] && unAttempt++ < radialServer.size())
           {
-            addrinfo *rp;
-            bConnected[0] = true;
-            for (rp = result; !bConnected[3] && rp != NULL; rp = rp->ai_next)
+            addrinfo hints, *result;
+            bConnected[0] = bConnected[1] = bConnected[2] = false;
+            if (unPick == radialServer.size())
             {
-              bConnected[1] = bConnected[2] = false;
-              if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
+              unPick = 0;
+            }
+            strServer = radialServer[unPick];
+            memset(&hints, 0, sizeof(addrinfo));
+            hints.ai_family = AF_UNSPEC;
+            hints.ai_socktype = SOCK_STREAM;
+            m_mutexGetAddrInfo.lock();
+            nReturn = getaddrinfo(strServer.c_str(), "7234", &hints, &result);
+            m_mutexGetAddrInfo.unlock();
+            if (nReturn == 0)
+            {
+              addrinfo *rp;
+              bConnected[0] = true;
+              for (rp = result; !bConnected[3] && rp != NULL; rp = rp->ai_next)
               {
-                bConnected[1] = true;
-                if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
+                bConnected[1] = bConnected[2] = false;
+                if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
                 {
-                  bConnected[2] = true;
-                  if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
+                  bConnected[1] = true;
+                  if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                   {
-                    bConnected[3] = true;
+                    bConnected[2] = true;
+                    if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
+                    {
+                      bConnected[3] = true;
+                    }
+                    else
+                    {
+                      close(fdSocket);
+                    }
                   }
                   else
                   {
                     close(fdSocket);
                   }
                 }
-                else
-                {
-                  close(fdSocket);
-                }
               }
+              freeaddrinfo(result);
             }
-            freeaddrinfo(result);
+            unPick++;
           }
-          unPick++;
-        }
-        #ifdef COMMON_LINUX
-        sem_post(&m_semaRadialRequestLock);
-        #endif
-        #ifdef COMMON_SOLARIS
-        sema_post(&m_semaRadialRequestLock);
-        #endif
-        radialServer.clear();
-        if (bConnected[3])
-        {
-          bool bExit = false;
-          size_t unPosition;
-          string strBuffer[2];
-          bDone = true;
-          ptRequest->j(strBuffer[1]);
-          strBuffer[1] += "\n";
-          while (!bExit)
+          #ifdef COMMON_LINUX
+          sem_post(&m_semaRadialRequestLock);
+          #endif
+          #ifdef COMMON_SOLARIS
+          sema_post(&m_semaRadialRequestLock);
+          #endif
+          radialServer.clear();
+          if (bConnected[3])
           {
-            pollfd fds[1];
-            fds[0].fd = fdSocket;
-            fds[0].events = POLLIN;
-            if (!strBuffer[1].empty())
+            bool bExit = false;
+            size_t unPosition;
+            string strBuffer[2];
+            bDone = true;
+            ptRequest->j(strBuffer[1]);
+            strBuffer[1] += "\n";
+            while (!bExit)
             {
-              fds[0].events |= POLLOUT;
-            }
-            if ((nReturn = poll(fds, 1, 250)) > 0)
-            {
-              if (fds[0].fd == fdSocket && (fds[0].revents & POLLIN))
+              pollfd fds[1];
+              fds[0].fd = fdSocket;
+              fds[0].events = POLLIN;
+              if (!strBuffer[1].empty())
               {
-                if (utility()->sslRead(ssl, strBuffer[0], nReturn))
+                fds[0].events |= POLLOUT;
+              }
+              if ((nReturn = poll(fds, 1, 250)) > 0)
+              {
+                if (fds[0].revents & POLLIN)
                 {
-                  if ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                  if (utility()->sslRead(ssl, strBuffer[0], nReturn))
+                  {
+                    if ((unPosition = strBuffer[0].find("\n")) != string::npos)
+                    {
+                      bExit = true;
+                      ptResponse->parse(strBuffer[0].substr(0, unPosition));
+                      strBuffer[0].erase(0, unPosition + 1);
+                      if (ptResponse->m.find("Status") != ptResponse->m.end() && ptResponse->m["Status"]->v == "okay")
+                      {
+                        bResult = true;
+                      }
+                      else if (ptResponse->m.find("Error") != ptResponse->m.end() && !ptResponse->m["Error"]->v.empty())
+                      {
+                        strError = ptResponse->m["Error"]->v;
+                      }
+                      else
+                      {
+                        strError = "Encountered an unknown error.";
+                      }
+                    }
+                  }
+                  else
                   {
                     bExit = true;
-                    ptResponse->parse(strBuffer[0].substr(0, unPosition));
-                    strBuffer[0].erase(0, unPosition + 1);
-                    if (ptResponse->m.find("Status") != ptResponse->m.end() && ptResponse->m["Status"]->v == "okay")
+                    if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
                     {
-                      bResult = true;
-                    }
-                    else if (ptResponse->m.find("Error") != ptResponse->m.end() && !ptResponse->m["Error"]->v.empty())
-                    {
-                      strError = ptResponse->m["Error"]->v;
-                    }
-                    else
-                    {
-                      strError = "Encountered an unknown error.";
+                      stringstream ssError;
+                      ssError << "Utility::sslRead(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
+                      strError = ssError.str();
                     }
                   }
                 }
-                else
+                if (fds[0].revents & POLLOUT)
+                {
+                  if (!utility()->sslWrite(ssl, strBuffer[1], nReturn))
+                  {
+                    bExit = true;
+                    if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
+                    {
+                      stringstream ssError;
+                      ssError << "Utility::sslWrite(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
+                      strError = ssError.str();
+                    }
+                  }
+                }
+                if (fds[0].revents & POLLERR)
                 {
                   bExit = true;
-                  if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
-                  {
-                    stringstream ssError;
-                    ssError << "Utility::sslRead(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
-                    strError = ssError.str();
-                  }
+                  strError = "poll() Encountered a POLLERR.";
+                }
+                if (fds[0].revents & POLLNVAL)
+                {
+                  bExit = true;
+                  strError = "poll() Encountered a POLLNVAL.";
                 }
               }
-              if (fds[0].fd == fdSocket && (fds[0].revents & POLLOUT))
+              else if (nReturn < 0)
               {
-                if (!utility()->sslWrite(ssl, strBuffer[1], nReturn))
-                {
-                  bExit = true;
-                  if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
-                  {
-                    stringstream ssError;
-                    ssError << "Utility::sslWrite(" << SSL_get_error(ssl, nReturn) << ") " << utility()->sslstrerror(ssl, nReturn);
-                    strError = ssError.str();
-                  }
-                }
+                stringstream ssError;
+                bExit = true;
+                ssError << "poll(" << errno << ") " << strerror(errno);
+                strError = ssError.str();
+              }
+              time(&CEnd);
+              if ((CEnd - CStart) > CTimeout)
+              {
+                bExit = true;
+                strError = "Timeout expired.";
               }
             }
-            else if (nReturn < 0)
-            {
-              stringstream ssError;
-              bExit = true;
-              ssError << "poll(" << errno << ") " << strerror(errno);
-              strError = ssError.str();
-            }
-            time(&CEnd);
-            if ((CEnd - CStart) > CTimeout)
-            {
-              bExit = true;
-              strError = "Timeout expired.";
-            }
-          }
-          SSL_shutdown(ssl);
-          SSL_free(ssl);
-          close(fdSocket);
-        }
-        else
-        {
-          stringstream ssError;
-          if (!bConnected[0])
-          {
-            ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
-          }
-          else if (!bConnected[1])
-          {
-            ssError << "socket(" << errno << ") " << strerror(errno);
-          }
-          else if (!bConnected[2])
-          {
-            ssError << "connect(" << errno << ") " << strerror(errno);
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            close(fdSocket);
           }
           else
           {
-            ssError << "Utility::sslConnect() " << strError;
+            stringstream ssError;
+            if (!bConnected[0])
+            {
+              ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
+            }
+            else if (!bConnected[1])
+            {
+              ssError << "socket(" << errno << ") " << strerror(errno);
+            }
+            else if (!bConnected[2])
+            {
+              ssError << "connect(" << errno << ") " << strerror(errno);
+            }
+            else
+            {
+              ssError << "Utility::sslConnect() " << strError;
+            }
+            strError = ssError.str();
           }
-          strError = ssError.str();
         }
-      }
-      if (!bResult && strError.empty())
-      {
-        strError = "Radial request failed without returning an error message.";
-      }
-      if (ctx != NULL)
-      {
+        if (!bResult && strError.empty())
+        {
+          strError = "Radial request failed without returning an error message.";
+        }
         SSL_CTX_free(ctx);
+      }
+      else
+      {
+        strError = "Failed to initialize SSL context.";
       }
     }
     else
@@ -1268,7 +1298,6 @@ void Radial::requestThread()
 
   if ((ctx = SSL_CTX_new(method)) != NULL)
   {
-    //SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
     while (m_bUseSingleSocket)
     {
       list<string> server;
@@ -1418,6 +1447,10 @@ void Radial::requestThread()
                   {
                     bExit = true;
                   }
+                }
+                if (fds[0].revents & (POLLERR | POLLNVAL))
+                {
+                  bExit = true;
                 }
                 if (unIndex > 1)
                 {

@@ -346,7 +346,7 @@ class Radial
       $bResult = true;
     }
     $this->m_strBuffer[1] = null;
-    if ($this->m_strBuffers[1] != '' && $this->m_strLine != '')
+    if ($this->m_strBuffer[1] != '' && $this->m_strLine != '')
     {
       $this->m_buffers[1][] = $this->m_strLine;
     }

@@ -9,11 +9,8 @@ namespace common;
 class Radial
 {
   // {{{ variables
-  protected $m_bAuthenticated;
   protected $m_buffer;
   protected $m_conf;
-  protected $m_CTime;
-  protected $m_bFailed;
   protected $m_handle;
   protected $m_streamContext;
   protected $m_strBuffer;
@@ -28,11 +25,7 @@ class Radial
   // {{{ __construct()
   public function __construct($strConf = null)
   {
-    $this->m_bAuthenticated = false;
-    $this->m_bFailed = false;
-    $this->m_bRegistered = false;
     $this->m_buffer = [[], []];
-    $this->m_CTime = [0, 0];
     $this->m_handle = false;
     $this->m_strBuffer = [null, null];
     $this->m_strConf = (($strConf != '')?$strConf:'/etc/central.conf');
@@ -53,14 +46,7 @@ class Radial
   // {{{ __destruct()
   public function __destruct()
   {
-    if ($this->m_bRegistered)
-    {
-      $this->unregister();
-    }
-    if ($this->m_handle !== false)
-    {
-      $this->disconnect();
-    }
+    $this->disconnect();
     unset($this->m_buffer);
     unset($this->m_strBuffer);
   }
@@ -112,6 +98,146 @@ class Radial
     return centralNotify('user', $strUser, $strMessage);
   }
   // }}}
+  // }}}
+  // {{{ connect()
+  public function connect()
+  {
+    $bResult = false;
+
+    if ($this->m_handle === false)
+    {
+      if ($this->m_strUser != '')
+      {
+        if ($this->m_strPassword != '')
+        {
+          $strToken = null;
+          $req = ['Interface'=>'application', 'Function'=>'connect'];
+          $res = null;
+          if ($this->request($req, $res))
+          {
+            if (isset($res['Response']))
+            {
+              if (isset($res['Response']['Token']) && $res['Response']['Token'] != '')
+              {
+                $strToken = $res['Response']['Token'];
+              }
+              else
+              {
+                $this->setError('Failed to find the Token within the Response');
+              }
+            }
+            else
+            {
+              $this->setError('Failed to find the Response.');
+            }
+          }
+          unset($req);
+          unset($res);
+          if ($strToken != '')
+          {
+            $servers = [];
+            $this->m_strBuffer[1] .= $strToken."\n";
+            $this->readConf();
+            if (isset($this->m_conf['Load Balancer']) && $this->m_conf['Load Balancer'] != '')
+            {
+              $server = explode(',', $this->m_conf['Load Balancer']);
+              while (sizeof($server) > 0)
+              {
+                $servers[] = array_shift($server);
+              }
+              unset($server);
+            }
+            if (isset($this->m_conf['Bridge Server']) && $this->m_conf['Bridge Server'] != '')
+            {
+              $server = explode(',', $this->m_conf['Bridge Server']);
+              while (sizeof($server) > 0)
+              {
+                $servers[] = array_shift($server);
+              }
+              unset($server);
+            }
+            if (($unSize = sizeof($servers)) > 0)
+            {
+              $bConnected = false;
+              $handle = null;
+              $nErrorNo = null;
+              $port = 7277;
+              $strError = null;
+              $unAttempt = 0;
+              $unPick = rand(0, ($unSize - 1));
+              while (!$bConnected && $unAttempt++ < $unSize)
+              {
+                if ($unPick == $unSize)
+                {
+                  $unPick = 0;
+                }
+                $strServer = $servers[$unPick];
+                if ($handle = stream_socket_client('ssl://'.$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext))
+                {
+                  $bConnected = true;
+                }
+              }
+              if ($bConnected)
+              {
+                $bExit = false;
+                $messages = [];
+                $CTime = [];
+                $this->m_handle = $handle;
+                $CTime[0] = $CTime[1] = time();
+                while (!$bExit && ($CTime[1] - $CTime[0]) < 5 && $this->getMessages($messages))
+                {
+                  if (sizeof($messages) > 0)
+                  {
+                    $bExit = true;
+                    if (isset($messages[0]['Status']) && $messages[0]['Status'] == 'okay')
+                    {
+                      $bResult = true;
+                    }
+                    else if (isset($messages[0]['Error']) && $messages[0]['Error'] != '')
+                    {
+                      $this->setError($messages[0]['Error']);
+                    }
+                    else
+                    {
+                      $this->setError('Encountered an unkown error.');
+                    }
+                  }
+                  else
+                  {
+                    $CTime[1] = time();
+                  }
+                }
+                unset($messages);
+              }
+              else
+              {
+                $this->setError('stream_socket_client() '.$strError);
+              }
+            }
+            else
+            {
+              $this->setError('Please provide the Load Balancer server via the '.$this->m_strConf.' file.');
+            }
+            unset($servers);
+          }
+        }
+        else
+        {
+          $this->setError('Please provide the Passworrd.');
+        }
+      }
+      else
+      {
+        $this->setError('Please provide the User.');
+      }
+    }
+    else
+    {
+      $this->setError('Already connected.');
+    }
+
+    return $bResult;
+  }
   // }}}
   // {{{ databaseQuery()
   public function databaseQuery($strDatabase, $strQuery, &$result)
@@ -183,6 +309,28 @@ class Radial
     return $this->databaseUpdateWithID($strDatabase, $strUpdate, $nID);
   }
   // }}}
+  // {{{ disconnect()
+  public function disconnect()
+  {
+    $bResult = false;
+
+    if ($this->m_handle !== false)
+    {
+      fclose($this->m_handle);
+      $this->m_handle = false;
+      $bResult = true;
+    }
+    $this->m_strBuffer[1] = null;
+    if ($this->m_strBuffers[1] != '' && $this->m_strLine != '')
+    {
+      $this->m_buffers[1][] = $this->m_strLine;
+    }
+    $this->m_strBuffer[1] = '';
+    $this->m_strLine = '';
+
+    return $bResult;
+  }
+  // }}}
   // {{{ getConf()
   public function getConf()
   {
@@ -193,6 +341,110 @@ class Radial
   public function getError()
   {
     return $this->m_strError;
+  }
+  // }}}
+  // {{{ getMessages()
+  public function getMessages(&$messages)
+  {
+    $bResult = false;
+
+    if ($this->getMessagesInternal())
+    {
+      $bResult = true;
+      while (sizeof($this->m_buffer[0]) > 0)
+      {
+        $messages[] = json_decode(array_shift($this->m_buffer[0]), true);
+      }
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ getMessagesInternal()
+  protected function getMessagesInternal()
+  {
+    $bResult = false;
+
+    if ($this->m_handle !== false || $this->connect())
+    {
+      if (sizeof($this->m_buffer[0]) > 0)
+      {
+        $bResult = true;
+      }
+      else
+      {
+        $bClose = false;
+        $bExit = false;
+        while (!$bExit)
+        {
+          $readfds = [$this->m_handle];
+          $writefds = [];
+          if ($this->m_strBuffer[1] == '' && sizeof($this->m_buffer[1]) > 0)
+          {
+            $this->m_strBuffer[1] .= $this->m_buffer[1][0]."\n";
+            $this->m_strLine = array_shift($this->m_buffer[1]);
+          }
+          if ($this->m_strBuffer[1] != '')
+          {
+            $writefds[] = $this->m_handle;
+          }
+          $errorfds = null;
+          if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 10000)) > 0)
+          {
+            if (in_array($this->m_handle, $readfds))
+            {
+              if (($strBuffer = fread($this->m_handle, 65536)) !== false)
+              {
+                $this->m_strBuffer[0] .= $strBuffer;
+                while (($unPosition = strpos($this->m_strBuffer[0], "\n")) !== false)
+                {
+                  $bResult = true;
+                  $this->m_buffer[0][] = substr($this->m_strBuffer[0], 0, $unPosition);
+                  $this->m_strBuffer[0] = substr($this->m_strBuffer[0], ($unPosition + 1), (strlen($this->m_strBuffer[0]) - ($unPosition + 1)));
+                }
+              }
+              else
+              {
+                $bClose = $bExit = true;
+                $strError = 'fread() Failed to read.';
+                $this->setError($strError);
+              }
+            }
+            if (in_array($this->m_handle, $writefds))
+            {
+              if (($nReturn = fwrite($this->m_handle, $this->m_strBuffer[1])) !== false)
+              {
+                $this->m_strBuffer[1] = substr($this->m_strBuffer[1], $nReturn, (strlen($this->m_strBuffer[1]) - $nReturn));
+              }
+              else
+              {
+                $bClose = $bExit = true;
+                $strError = 'fwrite() Failed to write.';
+                $this->setError($strError);
+              }
+            }
+          }
+          else if ($nReturn === false)
+          {
+            $bClose = $bExit = true;
+            $strError = 'stream_select() Failed to select.';
+            $this->setError($strError);
+          }
+          else
+          {
+            $bExit = $bResult = true;
+          }
+          unset($readfds);
+          unset($writefds);
+        }
+        if ($bClose)
+        {
+          $this->disconnect();
+        }
+      }
+    }
+
+    return $bResult;
   }
   // }}}
   // {{{ ircChat()
@@ -212,6 +464,19 @@ class Radial
     }
     unset($request);
     unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ putMessages()
+  public function putMessages(&$messages)
+  {
+    $bResult = true;
+
+    while (sizeof($messages) > 0)
+    {
+      $this->m_buffer[1][] = json_encode(array_shift($messages));
+    }
 
     return $bResult;
   }
@@ -289,7 +554,7 @@ class Radial
         }
         $strServer = $servers[$unPick];
         if (($handle = stream_socket_client('ssl://'.$strServer.':'.$port, $nErrorNo, $strError, 10, STREAM_CLIENT_CONNECT, $this->m_streamContext)) !== false)
-        { 
+        {
           $bConnected = true;
         }
       }
@@ -521,18 +786,18 @@ class Radial
   {
     $unRow = null;
     $unCol = null;
-    
+
     return $this->terminalFindPos($t, $strData, $unRow, $unCol);
 
   }
   // }}}
   // {{{ terminalFindPos()
   public function terminalFindPos($t, $strData, &$unRow, &$unCol)
-  { 
+  {
     $bResult = false;
- 
+
     if (isset($t['Screen']) && is_array($t['Screen']))
-    { 
+    {
       $unSize = sizeof($t['Screen']);
       for ($i = 0; !$bResult && $i < $unSize; $i++)
       {

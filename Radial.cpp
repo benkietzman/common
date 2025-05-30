@@ -183,6 +183,7 @@ bool Radial::connect(string &strError)
         if (!strToken.empty())
         {
           list<string> server;
+          m_strBuffer[1].append(strToken+"\n");
           utility()->readConf(strError);
           if (utility()->conf()->m.find("Load Balancer") != utility()->conf()->m.end())
           {
@@ -632,31 +633,17 @@ bool Radial::getMessages(string &strError)
             {
               stringstream ssError;
               bClose = bExit = true;
-              if (m_ssl != NULL)
-              {
-                ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror(m_ssl, nReturn);
-              }
-              else
-              {
-                ssError << "Central::utility()->fdRead(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
-              }
+              ssError << "Central::utility()->sslRead(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " << utility()->sslstrerror(m_ssl, nReturn);
               strError = ssError.str();
             }
           }
           if (fds[0].revents & POLLOUT)
           {
-            if (!(m_ssl != NULL && utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn)) && !(m_ssl == NULL && utility()->fdWrite(m_fdSocket, m_strBuffer[1], nReturn)))
+            if (!utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn))
             {
               stringstream ssError;
               bClose = bExit = true;
-              if (m_ssl != NULL)
-              {
-                ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " <<  utility()->sslstrerror(m_ssl, nReturn);
-              }
-              else
-              {
-                ssError << "Central::utility()->fdWrite(" << errno << ") error [" << m_fdSocket << "]:  " << strerror(errno);
-              }
+              ssError << "Central::utility()->sslWrite(" << SSL_get_error(m_ssl, nReturn) << ") error [" << m_fdSocket << "]:  " <<  utility()->sslstrerror(m_ssl, nReturn);
               strError = ssError.str();
             }
           }

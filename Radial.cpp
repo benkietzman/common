@@ -98,6 +98,30 @@ bool Radial::alert(const string strUser, const string strMessage, string &strErr
   return bResult;
 }
 // }}}
+// {{{ application()
+bool Radial::application(const string strApplication, Json *ptMessage, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->insert("Interface", "application");
+  ptRequest->insert("Function", "request");
+  ptRequest->insert("Application", strApplication);
+  ptRequest->m["Request"] = new Json(ptMessage);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+    if (ptResponse->m.find("Response") != ptResponse->m.end())
+    {
+      ptMessage->merge(ptResponse->m["Response"], true, false);
+    }
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
 // {{{ central
 // {{{ centralApplicationNotify()
 bool Radial::centralApplicationNotify(const string strApplication, const string strMessage, string &strError)

@@ -51,6 +51,31 @@ class Radial
     unset($this->m_strBuffer);
   }
   // }}}
+  // {{{ application()
+  public function application($strApplication, &$message)
+  {
+    $bResult = false;
+    $request = [];
+    $response = null;
+
+    $request['Interface'] = 'application';
+    $request['Function'] = 'request';
+    $request['Application'] = $strApplication;
+    $request['Request'] = $message;
+    if ($this->request($request, $response))
+    {
+      $bResult = true;
+      if (isset($response['Response']))
+      {
+        $message = $response['Response'];
+      }
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ central
   // {{{ centralApplicationNotify()
   public function centralApplicationNotify($strApplication, $strMessage)

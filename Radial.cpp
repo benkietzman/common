@@ -105,8 +105,7 @@ bool Radial::application(const string strApplication, Json *ptMessage, string &s
   Json *ptRequest = new Json, *ptResponse = new Json;
 
   ptRequest->insert("Interface", "application");
-  ptRequest->insert("Function", "request");
-  ptRequest->insert("Application", strApplication);
+  ptRequest->insert("Function", strApplication);
   ptRequest->m["Request"] = new Json(ptMessage);
   if (request(ptRequest, ptResponse, strError))
   {

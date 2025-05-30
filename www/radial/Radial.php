@@ -59,8 +59,7 @@ class Radial
     $response = null;
 
     $request['Interface'] = 'application';
-    $request['Function'] = 'request';
-    $request['Application'] = $strApplication;
+    $request['Function'] = $strApplication;
     $request['Request'] = $message;
     if ($this->request($request, $response))
     {

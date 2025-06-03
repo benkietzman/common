@@ -1004,32 +1004,47 @@ extern "C++"
     }
     bool Utility::sslRead(SSL *ssl, string &strBuffer, string &strRead, int &nReturn)
     {
-      bool bBlocking = false, bResult = true;
-      char *pszBuffer = new char[m_unReadSize];
-      int nPending, nSize = m_unReadSize;
+      bool bResult = false;
       long lArg, lArgOrig;
 
       strRead.clear();
-      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
+      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0)
       {
-        bBlocking = true;
-        lArg |= O_NONBLOCK;
-        fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
-      }
-      if ((nReturn = SSL_read(ssl, pszBuffer, nSize)) > 0)
-      {
-        strBuffer.append(pszBuffer, nReturn);
-        strRead.append(pszBuffer, nReturn);
-        while ((nPending = SSL_pending(ssl)) > 0)
+        bool bBlocking = ((!(lArg & O_NONBLOCK))?true:false);
+        if (bBlocking)
         {
-          if (nPending > nSize)
-          {
-            nPending = nSize;
-          }
-          if ((nReturn = SSL_read(ssl, pszBuffer, nPending)) > 0)
+          lArg |= O_NONBLOCK;
+        }
+        if (!bBlocking || fcntl(SSL_get_fd(ssl), F_SETFL, lArg) == 0)
+        {
+          char *pszBuffer = new char[m_unReadSize];
+          int nPending, nSize = m_unReadSize;
+          bResult = true;
+          if ((nReturn = SSL_read(ssl, pszBuffer, nSize)) > 0)
           {
             strBuffer.append(pszBuffer, nReturn);
             strRead.append(pszBuffer, nReturn);
+            while ((nPending = SSL_pending(ssl)) > 0)
+            {
+              if (nPending > nSize)
+              {
+                nPending = nSize;
+              }
+              if ((nReturn = SSL_read(ssl, pszBuffer, nPending)) > 0)
+              {
+                strBuffer.append(pszBuffer, nReturn);
+                strRead.append(pszBuffer, nReturn);
+              }
+              else
+              {
+                switch (SSL_get_error(ssl, nReturn))
+                {
+                  case SSL_ERROR_ZERO_RETURN:
+                  case SSL_ERROR_SYSCALL:
+                  case SSL_ERROR_SSL: bResult = false; break;
+                }
+              }
+            }
           }
           else
           {
@@ -1040,22 +1055,21 @@ extern "C++"
               case SSL_ERROR_SSL: bResult = false; break;
             }
           }
+          delete[] pszBuffer;
+        }
+        else
+        {
+          nReturn = -1;
+        }
+        if (bBlocking)
+        {
+          fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
         }
       }
       else
       {
-        switch (SSL_get_error(ssl, nReturn))
-        {
-          case SSL_ERROR_ZERO_RETURN:
-          case SSL_ERROR_SYSCALL:
-          case SSL_ERROR_SSL: bResult = false; break;
-        }
+        nReturn = -1;
       }
-      if (bBlocking)
-      {
-        fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
-      }
-      delete[] pszBuffer;
 
       return bResult;
     }
@@ -1140,31 +1154,45 @@ extern "C++"
     // {{{ sslWrite()
     bool Utility::sslWrite(SSL *ssl, string &strBuffer, int &nReturn)
     {
-      bool bBlocking = false, bResult = true;
+      bool bResult = false;
       long lArg, lArgOrig;
 
-      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0 && !(lArg & O_NONBLOCK))
+      if ((lArg = lArgOrig = fcntl(SSL_get_fd(ssl), F_GETFL, NULL)) >= 0)
       {
-        bBlocking = true;
-        lArg |= O_NONBLOCK;
-        fcntl(SSL_get_fd(ssl), F_SETFL, lArg);
-      }
-      if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < m_unSslWriteSize)?strBuffer.size():m_unSslWriteSize))) > 0)
-      {
-        strBuffer.erase(0, nReturn);
+        bool bBlocking = ((!(lArg & O_NONBLOCK))?true:false);
+        if (bBlocking)
+        {
+          lArg |= O_NONBLOCK;
+        }
+        if (!bBlocking || fcntl(SSL_get_fd(ssl), F_SETFL, lArg) == 0)
+        {
+          bResult = true;
+          if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < m_unSslWriteSize)?strBuffer.size():m_unSslWriteSize))) > 0)
+          {
+            strBuffer.erase(0, nReturn);
+          }
+          else
+          {
+            switch (SSL_get_error(ssl, nReturn))
+            {
+              case SSL_ERROR_ZERO_RETURN:
+              case SSL_ERROR_SYSCALL:
+              case SSL_ERROR_SSL: bResult = false; break;
+            }
+          }
+        }
+        else
+        {
+          nReturn = -1;
+        }
+        if (bBlocking)
+        {
+          fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
+        }
       }
       else
       {
-        switch (SSL_get_error(ssl, nReturn))
-        {
-          case SSL_ERROR_ZERO_RETURN:
-          case SSL_ERROR_SYSCALL:
-          case SSL_ERROR_SSL: bResult = false; break;
-        }
-      }
-      if (bBlocking)
-      {
-        fcntl(SSL_get_fd(ssl), F_SETFL, lArgOrig);
+        nReturn = -1;
       }
 
       return bResult;

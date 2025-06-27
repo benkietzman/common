@@ -92,6 +92,7 @@ extern "C++"
       if (nDirectory >= 0)
       {
         bool bDone = false;
+        bResult = true;
         while (!bDone && nDirectory >= 0)
         {
           smbc_dirent *pDirectoryItem = NULL;

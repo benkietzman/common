@@ -232,7 +232,6 @@ extern "C++"
           error(ssError.str());
         }
         m_bConnected = false;
-        usleep(1000000);
       }
       else
       {

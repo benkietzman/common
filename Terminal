@@ -51,7 +51,6 @@ extern "C++"
       private:
       bool m_bDebug;
       bool m_bCaught;
-      bool m_bConnected;
       bool m_bNumbered;
       bool m_bUncaught;
       bool m_bWait;

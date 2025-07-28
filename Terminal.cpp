@@ -21,9 +21,9 @@ extern "C++"
     // {{{ Terminal()
     Terminal::Terminal()
     {
-      m_bCaught = m_bConnected = m_bDebug = m_bNumbered = m_bUncaught = m_bWrap = false;
+      m_bCaught = m_bDebug = m_bNumbered = m_bUncaught = m_bWrap = false;
       m_bWait = true;
-      m_fdClientRead = m_fdClientWrite = m_fdServerRead = m_fdServerWrite = -1;
+      m_fdClientRead = m_fdClientWrite = m_fdServerRead = m_fdServerWrite = m_fdSocket = -1;
       m_unSaveRow = m_unSaveCol = 0;
       m_unRow = 0;
       m_unCol = 0;
@@ -149,7 +149,7 @@ extern "C++"
     {
       bool bResult = false;
 
-      if (!m_bConnected)
+      if (m_fdSocket == -1)
       {
         addrinfo hints, *result;
         int nReturn;
@@ -163,19 +163,20 @@ extern "C++"
           timeval tTimeVal;
           tTimeVal.tv_sec = 10;
           tTimeVal.tv_usec = 0;
-          for (rp = result; !m_bConnected && rp != NULL; rp = rp->ai_next)
+          for (rp = result; m_fdSocket == -1 && rp != NULL; rp = rp->ai_next)
           {
             if ((m_fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
             {
               setsockopt(m_fdSocket, SOL_SOCKET, SO_RCVTIMEO, &tTimeVal, sizeof(timeval));
               if (::connect(m_fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
               {
-                bResult = m_bConnected = true;
+                bResult = true;
                 setServerHandle(m_fdSocket);
               }
               else
               {
                 close(m_fdSocket);
+                m_fdSocket = -1;
               }
             }
           }
@@ -201,7 +202,7 @@ extern "C++"
     // {{{ connected()
     bool Terminal::connected()
     {
-      return m_bConnected;
+      return ((m_fdSocket != -1)?true:false);
     }
     // }}}
     // {{{ debug()
@@ -219,11 +220,12 @@ extern "C++"
     {
       bool bResult = false;
   
-      if (m_bConnected)
+      if (m_fdSocket != -1)
       {
         if (close(m_fdSocket) == 0)
         {
           bResult = true;
+          m_fdSocket = -1;
         }
         else
         {
@@ -231,7 +233,6 @@ extern "C++"
           ssError << "Terminal::disconnect()->close(" << errno << ") error:  " << strerror(errno);
           error(ssError.str());
         }
-        m_bConnected = false;
       }
       else
       {

@@ -21,7 +21,7 @@ extern "C++"
     // {{{ Terminal()
     Terminal::Terminal()
     {
-      m_bConnected = m_bDebug = m_bNumbered = m_bUncaught = m_bWrap = false;
+      m_bCaught = m_bConnected = m_bDebug = m_bNumbered = m_bUncaught = m_bWrap = false;
       m_bWait = true;
       m_fdClientRead = m_fdClientWrite = m_fdServerRead = m_fdServerWrite = -1;
       m_unSaveRow = m_unSaveCol = 0;

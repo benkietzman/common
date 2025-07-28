@@ -174,7 +174,6 @@ extern "C++"
               if (::connect(m_fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
               {
                 bResult = true;
-                setServerHandle(m_fdSocket);
               }
               else
               {

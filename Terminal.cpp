@@ -981,6 +981,20 @@ extern "C++"
                 error(ssPrefix.str(), strerror(errno));
               }
             }
+            if (fds[0].revents & POLLERR)
+            {
+              stringstream ssPrefix;
+              bClose = bExit = true;
+              ssPrefix << "read()->poll()";
+              error(ssPrefix.str(), "Encountered a POLLERR.");
+            }
+            if (fds[0].revents & POLLNVAL)
+            {
+              stringstream ssPrefix;
+              bClose = bExit = true;
+              ssPrefix << "read()->poll()";
+              error(ssPrefix.str(), "Encountered a POLLNVAL.");
+            }
           }
           else if (nReturn < 0)
           {
@@ -1611,6 +1625,20 @@ extern "C++"
                 ssPrefix << "write()->write(" << errno << ")";
                 error(ssPrefix.str(), strerror(errno));
               }
+            }
+            if (fds[0].revents & POLLERR)
+            {
+              stringstream ssPrefix;
+              bClose = bExit = true;
+              ssPrefix << "write()->poll()";
+              error(ssPrefix.str(), "Encountered a POLLERR.");
+            }
+            if (fds[0].revents & POLLNVAL)
+            {
+              stringstream ssPrefix;
+              bClose = bExit = true;
+              ssPrefix << "write()->poll()";
+              error(ssPrefix.str(), "Encountered a POLLNVAL.");
             }
           }
           else if (nReturn < 0)

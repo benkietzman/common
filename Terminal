@@ -157,11 +157,7 @@ extern "C++"
       bool sendTab(const size_t unCount = 1, const bool bWait = true);
       bool sendUp(const size_t unCount = 1, const bool bWait = true);
       bool sendWait(const string strData, const size_t unCount = 1);
-      void setClientHandle(const int fdHandle);
-      void setClientHandles(const int fdRead, const int fdWrite);
       void setDebugStream(ostream *posDebug);
-      void setServerHandle(const int fdHandle);
-      void setServerHandles(const int fdRead, const int fdWrite);
       void setSocketTimeout(const int nShort, const int nLong);
       void type(const string strType);
       void uncaught(const bool bUncaught);

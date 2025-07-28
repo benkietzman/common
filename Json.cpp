@@ -234,7 +234,7 @@ extern "C++"
     {
       clearList();
       clearValue();
-      if (!strKey.empty() && m.find(strKey) != m.end())
+      if (m.find(strKey) != m.end())
       {
         delete m[strKey];
       }

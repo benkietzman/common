@@ -1607,7 +1607,7 @@ extern "C++"
           fds[0].events = POLLOUT;
           if ((nReturn = poll(fds, 1, 2000)) > 0)
           {
-            if (fds[0].fd == m_fdSocket && (fds[0].revents & (POLLHUP | POLLIN)))
+            if (fds[0].fd == m_fdSocket && (fds[0].revents & (POLLHUP | POLLOUT)))
             {
               if ((nReturn = ::write(m_fdSocket, strBuffer.c_str(), strBuffer.size())) > 0)
               {

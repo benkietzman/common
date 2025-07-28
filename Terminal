@@ -55,10 +55,6 @@ extern "C++"
       bool m_bUncaught;
       bool m_bWait;
       bool m_bWrap;
-      int m_fdClientRead;
-      int m_fdClientWrite;
-      int m_fdServerRead;
-      int m_fdServerWrite;
       int m_fdSocket;
       int m_nSocketTimeout[2];
       list<string> m_caught;
@@ -99,9 +95,8 @@ extern "C++"
       string type();
       bool uncaught();
       void up(const size_t unCount = 1);
-      bool write(const char *pszData, size_t unSize);
-      bool write(const string strData);
-      bool write(const unsigned char *pszData, size_t unSize);
+      bool write(string strBuffer);
+      bool write(vector<unsigned char> buffer);
 
       protected:
       StringManip m_manip;

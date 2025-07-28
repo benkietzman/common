@@ -23,7 +23,7 @@ extern "C++"
     {
       m_bCaught = m_bDebug = m_bNumbered = m_bUncaught = m_bWrap = false;
       m_bWait = true;
-      m_fdClientRead = m_fdClientWrite = m_fdServerRead = m_fdServerWrite = m_fdSocket = -1;
+      m_fdSocket = -1;
       m_unSaveRow = m_unSaveCol = 0;
       m_unRow = 0;
       m_unCol = 0;
@@ -147,12 +147,13 @@ extern "C++"
     // {{{ connect()
     bool Terminal::connect(const string strServer, const string strPort)
     {
-      bool bResult = false;
+      bool bResult = true;
 
       if (m_fdSocket == -1)
       {
         addrinfo hints, *result;
         int nReturn;
+        bResult = false;
         memset(&hints, 0, sizeof(addrinfo));
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_STREAM;
@@ -165,8 +166,10 @@ extern "C++"
           tTimeVal.tv_usec = 0;
           for (rp = result; m_fdSocket == -1 && rp != NULL; rp = rp->ai_next)
           {
+            bSocket = false;
             if ((m_fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
             {
+              bSocket = true;
               setsockopt(m_fdSocket, SOL_SOCKET, SO_RCVTIMEO, &tTimeVal, sizeof(timeval));
               if (::connect(m_fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
               {
@@ -218,10 +221,11 @@ extern "C++"
     // {{{ disconnect()
     bool Terminal::disconnect()
     {
-      bool bResult = false;
+      bool bResult = true;
   
       if (m_fdSocket != -1)
       {
+        bResult = false;
         if (close(m_fdSocket) == 0)
         {
           bResult = true;
@@ -233,10 +237,6 @@ extern "C++"
           ssError << "Terminal::disconnect()->close(" << errno << ") error:  " << strerror(errno);
           error(ssError.str());
         }
-      }
-      else
-      {
-        error("Terminal::disconnect() error:  Not connected.");
       }
 
       return bResult;
@@ -769,9 +769,11 @@ extern "C++"
                       case 5 : write("\033[0n"); break;
                       case 6 :
                       {
+                        string strData;
                         stringstream ssData;
                         ssData << "\033[" << (row() + 1) << ";" << (col() + 1) << "R";
-                        write(ssData.str());
+                        strData = ssData.str();
+                        write(strData);
                         break;
                       }
                     }
@@ -835,8 +837,7 @@ extern "C++"
         {
           if ((unsigned char)m_strBuffer[1] == DO && (unsigned char)m_strBuffer[2] == TELOPT_NAWS)
           {
-            unsigned char szData[12] = {IAC, WILL, TELOPT_NAWS, IAC, SB, TELOPT_NAWS, 0, (unsigned char)cols(), 0, (unsigned char)rows(), IAC, SE};
-            if (!write(szData, 12))
+            if (!write((vector<unsigned char>){IAC, WILL, TELOPT_NAWS, IAC, SB, TELOPT_NAWS, 0, (unsigned char)cols(), 0, (unsigned char)rows(), IAC, SE}))
             {
               prefix("parse()");
             }
@@ -844,33 +845,31 @@ extern "C++"
           else if ((unsigned char)m_strBuffer[1] == SB && (unsigned char)m_strBuffer[2] == TELOPT_TTYPE && m_strBuffer.size() >= 6 && (unsigned char)m_strBuffer[3] == TELQUAL_SEND && (unsigned char)m_strBuffer[4] == IAC && (unsigned char)m_strBuffer[5] == SE)
           {
             string strType = "unknown";
-            unsigned char szPrefix[4] = {IAC, SB, TELOPT_TTYPE, TELQUAL_IS}, szSuffix[2] = {IAC, SE};
             if (!m_strType.empty())
             {
               strType = m_strType;
             }
-            if (!write(szPrefix, 4) || !write(strType) || !write(szSuffix, 2))
+            if (!write((vector<unsigned char>){IAC, SB, TELOPT_TTYPE, TELQUAL_IS}) || !write(strType) || !write((vector<unsigned char>){IAC, SE}))
             {
               prefix("parse()");
             }
           }
           else
           {
-            unsigned char szBuffer[3];
-            szBuffer[0] = IAC;
+            vector<unsigned char> buffer = {IAC, '\0', '\0'};
             for (int i = 1; i < 3; i++)
             {
-              szBuffer[i] = (unsigned char)m_strBuffer[i];
-              if (szBuffer[i] == DO)
+              buffer[i] = (unsigned char)m_strBuffer[i];
+              if (buffer[i] == DO)
               {
-                szBuffer[i] = WONT;
+                buffer[i] = WONT;
               }
-              else if (szBuffer[i] == WILL)
+              else if (buffer[i] == WILL)
               {
-                szBuffer[i] = DO;
+                buffer[i] = DO;
               }
             }
-            if (!write(szBuffer, 3))
+            if (!write(buffer))
             {
               prefix("parse()");
             }
@@ -953,56 +952,31 @@ extern "C++"
     {
       bool bResult = false;
 
-      if (m_fdServerRead >= 0)
+      if (m_fdSocket != -1)
       {
-        bool bExit = false, bIncoming = false;
+        bool bClose = false, bExit = false, bIncoming = false;
         char szBuffer[4096];
         int nReturn;
         m_mutexRead.lock();
         while (!bExit)
         {
-          pollfd fds[2];
-          fds[0].fd = m_fdClientRead;
+          pollfd fds[1];
+          fds[0].fd = m_fdSocket;
           fds[0].events = POLLIN;
-          fds[1].fd = m_fdServerRead;
-          fds[1].events = POLLIN;
-          if ((nReturn = poll(fds, 2, ((bIncoming)?m_nSocketTimeout[0]:m_nSocketTimeout[1]))) > 0)
+          if ((nReturn = poll(fds, 1, ((bIncoming)?m_nSocketTimeout[0]:m_nSocketTimeout[1]))) > 0)
           {
-            if (fds[0].fd == m_fdClientRead && (fds[0].revents & POLLIN))
+            if (fds[0].fd == m_fdSocket && (fds[0].revents & (POLLHUP | POLLIN)))
             {
-              if ((nReturn = ::read(m_fdClientRead, szBuffer, 4096)) > 0)
-              {
-                if (!write(szBuffer, nReturn))
-                {
-                  bExit = true;
-                  prefix("read()");
-                }
-              }
-              else
-              {
-                m_fdClientRead = m_fdClientWrite = -1;
-              }
-            }
-            if (fds[1].fd == m_fdServerRead && (fds[1].revents & (POLLHUP | POLLIN)))
-            {
-              if ((nReturn = ::read(m_fdServerRead, szBuffer, 4096)) > 0)
+              if ((nReturn = ::read(m_fdSocket, szBuffer, 4096)) > 0)
               {
                 bIncoming = bResult = true;
                 m_bWait = false;
                 m_strBuffer.append(szBuffer, nReturn);
-                if (m_fdClientWrite >= 0)
-                {
-                  if (::write(m_fdClientWrite, szBuffer, nReturn) != nReturn)
-                  {
-                    m_fdClientRead = m_fdClientWrite = -1;
-                  }
-                }
               }
               else
               {
                 stringstream ssPrefix;
-                bExit = true;
-                m_fdServerRead = m_fdServerWrite = -1;
+                bClose = bExit = true;
                 ssPrefix << "read()->read(" << errno << ")";
                 error(ssPrefix.str(), strerror(errno));
               }
@@ -1011,8 +985,7 @@ extern "C++"
           else if (nReturn < 0)
           {
             stringstream ssPrefix;
-            bExit = true;
-            m_fdClientRead = m_fdClientWrite = m_fdServerRead = m_fdServerWrite = -1;
+            bClose = bExit = true;
             ssPrefix << "read()->poll(" << errno << ")";
             error(ssPrefix.str(), strerror(errno));
           }
@@ -1021,12 +994,16 @@ extern "C++"
             bExit = true;
           }
         }
+        if (bClose)
+        {
+          disconnect();
+        }
         parse();
         m_mutexRead.unlock();
       }
       else
       {
-        error("read()", "Server read handle is not set.");
+        error("read()", "Server handle is not set.");
       }
 
       return bResult;
@@ -1467,36 +1444,10 @@ extern "C++"
       return bResult;
     }
     // }}}
-    // {{{ setClientHandle()
-    void Terminal::setClientHandle(const int fdHandle)
-    {
-      m_fdClientRead = m_fdClientWrite = fdHandle;
-    }
-    // }}}
-    // {{{ setClientHandles()
-    void Terminal::setClientHandles(const int fdRead, const int fdWrite)
-    {
-      m_fdClientRead = fdRead;
-      m_fdClientWrite = fdWrite;
-    }
-    // }}}
     // {{{ setDebugStream()
     void Terminal::setDebugStream(ostream *posDebug)
     {
       m_posDebug = posDebug;
-    }
-    // }}}
-    // {{{ setServerHandle()
-    void Terminal::setServerHandle(const int fdHandle)
-    {
-      m_fdServerRead = m_fdServerWrite = fdHandle;
-    }
-    // }}}
-    // {{{ setServerHandles()
-    void Terminal::setServerHandles(const int fdRead, const int fdWrite)
-    {
-      m_fdServerRead = fdRead;
-      m_fdServerWrite = fdWrite;
     }
     // }}}
     // {{{ setSocketTimeout()
@@ -1623,40 +1574,71 @@ extern "C++"
     }
     // }}}
     // {{{ write()
-    bool Terminal::write(const char *pszData, const size_t unSize)
-    {
-      return write((const unsigned char *)pszData, unSize);
-    }
-    bool Terminal::write(const string strData)
-    {
-      return write(strData.c_str(), strData.size());
-    }
-    bool Terminal::write(const unsigned char *pszData, const size_t unSize)
+    bool Terminal::write(string strBuffer)
     {
       bool bResult = false;
 
-      if (m_fdServerWrite >= 0)
+      if (strBuffer.empty())
       {
+        bResult = true;
+      }
+      else if (m_fdSocket != -1)
+      {
+        bool bClose = false, bExit = false;
+        int nReturn;
         m_mutexWrite.lock();
-        if (::write(m_fdServerWrite, pszData, unSize) == (ssize_t)unSize)
+        while (!bExit)
         {
-          bResult = m_bWait = true;
-        }
-        else
-        {
-          stringstream ssPrefix;
-          m_fdServerRead = m_fdServerWrite = -1;
-          ssPrefix << "write()->write(" << errno << ")";
-          error(ssPrefix.str(), strerror(errno));
+          pollfd fds[1];
+          fds[0].fd = m_fdSocket;
+          fds[0].events = POLLOUT;
+          if ((nReturn = poll(fds, 1, 2000)) > 0)
+          {
+            if (fds[0].fd == m_fdSocket && (fds[0].revents & (POLLHUP | POLLIN)))
+            {
+              if ((nReturn = ::write(m_fdSocket, strBuffer.c_str(), strBuffer.size())) > 0)
+              {
+                strBuffer.erase(0, nReturn);
+                if (strBuffer.empty())
+                {
+                  bExit = bResult = m_bWait = true;
+                }
+              }
+              else
+              {
+                stringstream ssPrefix;
+                bClose = bExit = true;
+                ssPrefix << "write()->write(" << errno << ")";
+                error(ssPrefix.str(), strerror(errno));
+              }
+            }
+          }
+          else if (nReturn < 0)
+          {
+            stringstream ssPrefix;
+            bClose = bExit = true;
+            ssPrefix << "write()->poll(" << errno << ")";
+            error(ssPrefix.str(), strerror(errno));
+          }
         }
         m_mutexWrite.unlock();
+        if (bClose)
+        {
+          disconnect();
+        }
       }
       else
       {
-        error("write()", "Server write handle is not set.");
+        error("write()", "Server handle is not set.");
       }
 
       return bResult;
+    }
+    bool Terminal::write(vector<unsigned char> buffer)
+    {
+      string strBuffer(buffer.begin(), buffer.end());
+
+      return write(strBuffer);
     }
     // }}}
   }

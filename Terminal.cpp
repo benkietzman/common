@@ -25,6 +25,8 @@ extern "C++"
       m_bWait = true;
       m_fdClientRead = m_fdClientWrite = m_fdServerRead = m_fdServerWrite = -1;
       m_unSaveRow = m_unSaveCol = 0;
+      m_unRow = 0;
+      m_unCol = 0;
       m_unRows = 24;
       m_unCols = 80;
       m_nSocketTimeout[0] = 500;

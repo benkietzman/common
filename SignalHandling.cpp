@@ -237,7 +237,7 @@ extern "C++"
     {
       if (nSignal == SIGCHLD)
       {
-        struct sigaction action;
+        struct sigaction action = {0};
         action.sa_handler = SIG_IGN;
         sigaction(nSignal, &action, NULL);
       }

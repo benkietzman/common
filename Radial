@@ -106,6 +106,16 @@ extern "C++"
 
       bool alert(const string strUser, const string strMessage, string &strError);
       bool application(const string strApplication, Json *ptMessage, string &strError);
+      bool auth(Json *ptRequest, Json *ptResponse, string &strError);
+      bool authPassword(Json *ptReq, Json *ptRes, string &strError);
+      bool authPasswordGet(list<string> &passwords, string &strError);
+      bool authPasswordPop(string &strError);
+      bool authPasswordPush(const string strPassword, string &strError);
+      bool authPasswordPushPut(const string Action, const string strPassword, string &strError);
+      bool authPasswordPushPut(const string Action, list<string> passwords, string &strError);
+      bool authPasswordPush(list<string> passwords, string &strError);
+      bool authPasswordPut(const string strPassword, string &strError);
+      bool authPasswordPut(list<string> passwords, string &strError);
       bool centralApplicationNotify(const string strApplication, const string strMessage, string &strError);
       bool centralGroupNotify(const string strGroup, const string strMessage, string &strError);
       bool centralNotify(const string strType, const string strName, const string strMessage, string &strError);

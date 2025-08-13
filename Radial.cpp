@@ -121,6 +121,151 @@ bool Radial::application(const string strApplication, Json *ptMessage, string &s
   return bResult;
 }
 // }}}
+// {{{ auth
+// {{{ auth()
+bool Radial::auth(Json *ptRequest, Json *ptResponse, string &strError)
+{
+  bool bResult = false;
+
+  ptRequest->i("Interface", "auth");
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ authPassword
+// {{{ authPassword()
+bool Radial::authPassword(Json *ptReq, Json *ptRes, string &strError)
+{
+  bool bResult = false;
+  Json *ptRequest = new Json, *ptResponse = new Json;
+
+  ptRequest->i("Function", "password");
+  ptRequest->m["Request"] = new Json(ptReq);
+  if (request(ptRequest, ptResponse, strError))
+  {
+    bResult = true;
+  }
+  if (ptResponse->m.find("Response") != ptResponse->m.end())
+  {
+    ptRes->merge(ptResponse->m["Response"], true, false);
+  }
+  delete ptRequest;
+  delete ptResponse;
+
+  return bResult;
+}
+// }}}
+// {{{ authPasswordGet()
+bool Radial::authPasswordGet(list<string> &passwords, string &strError)
+{
+  bool bResult = false;
+  Json *ptReq = new Json, *ptRes = new Json;
+
+  passwords.clear();
+  ptReq->i("Action", "get");
+  if (authPassword(ptReq, ptRes, strError))
+  {
+    bResult = true;
+    if (!ptRes->v.empty())
+    {
+      passwords.push_back(ptRes->v);
+    }
+    else
+    {
+      for (auto &i : ptRes->l)
+      {
+        passwords.push_back(i->v);
+      }
+    }
+  }
+  delete ptReq;
+  delete ptRes;
+
+  return bResult;
+}
+// }}}
+// {{{ authPasswordPop()
+bool Radial::authPasswordPop(string &strError)
+{
+  bool bResult = false;
+  Json *ptReq = new Json, *ptRes = new Json;
+
+  ptReq->i("Action", "pop");
+  if (authPassword(ptReq, ptRes, strError))
+  {
+    bResult = true;
+  }
+  delete ptReq;
+  delete ptRes;
+
+  return bResult;
+}
+// }}}
+// {{{ authPasswordPush()
+bool Radial::authPasswordPush(const string strPassword, string &strError)
+{
+  return authPasswordPushPut("push", strPassword, strError);
+}
+bool Radial::authPasswordPush(list<string> passwords, string &strError)
+{
+  return authPasswordPushPut("push", passwords, strError);
+}
+// }}}
+// {{{ authPasswordPushPut()
+bool Radial::authPasswordPushPut(const string strAction, const string strPassword, string &strError)
+{
+  list<string> passwords;
+
+  passwords.push_back(strPassword);
+
+  return authPasswordPushPut(strAction, passwords, strError);
+}
+bool Radial::authPasswordPushPut(const string strAction, list<string> passwords, string &strError)
+{
+  bool bResult = false;
+  Json *ptReq = new Json, *ptRes = new Json;
+
+  if (strAction == "push" || strAction == "put")
+  {
+    ptReq->i("Action", strAction);
+    ptReq->m["Password"] = new Json;
+    for (auto &i : passwords)
+    {
+      ptReq->m["Password"]->pb(i);
+    }
+    if (authPassword(ptReq, ptRes, strError))
+    {
+      bResult = true;
+    }
+    delete ptReq;
+    delete ptRes;
+  }
+  else
+  {
+    strError = "Please provide a valid Action:  push, put.";
+  }
+
+  return bResult;
+}
+// }}}
+// {{{ authPasswordPut()
+bool Radial::authPasswordPut(const string strPassword, string &strError)
+{
+  return authPasswordPushPut("put", strPassword, strError);
+}
+bool Radial::authPasswordPut(list<string> passwords, string &strError)
+{
+  return authPasswordPushPut("put", passwords, strError);
+}
+// }}}
+// }}}
+// }}}
 // {{{ central
 // {{{ centralApplicationNotify()
 bool Radial::centralApplicationNotify(const string strApplication, const string strMessage, string &strError)

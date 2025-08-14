@@ -75,6 +75,144 @@ class Radial
     return $bResult;
   }
   // }}}
+  // {{{ auth
+  // {{{ auth()
+  public function auth($request, &$response, &$strError)
+  {
+    $bResult = false;
+
+    $request['Interface'] = 'auth';
+    if ($this->request($request, $response, $strError))
+    {
+      $bResult = true;
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ authPassword
+  // {{{ authPassword()
+  public function authPassword($req, &$res, &$strError)
+  {
+    $bResult = false;
+    $request = [];
+    $response = [];
+
+    $request['Function'] = 'password';
+    $request['Request'] = $req;
+    if ($this->request($request, $response, $strError))
+    {
+      $bResult = true;
+    }
+    if (isset($response['Response']))
+    {
+      $res = $response['Response'];
+    }
+    unset($request);
+    unset($response);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ authPasswordGet()
+  public function authPasswordGet(&$passwords, &$strError)
+  {
+    $bResult = false;
+    $req = [];
+    $res = [];
+
+    $passwords = [];
+    $req['Action'] = 'get';
+    if ($this->authPassword($req, $res, $strError))
+    {
+      $bResult = true;
+      if (is_array($res))
+      {
+        for ($i = 0; $i < sizeof($res); $i++)
+        {
+          $passwords[] = $res[$i];
+        }
+      }
+      else
+      {
+        $passwords[] = $res;
+      }
+    }
+    unset($req);
+    unset($res);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ authPasswordPop()
+  public function authPasswordPop(&$strError)
+  {
+    $bResult = false;
+    $req = [];
+    $res = [];
+
+    $req['Action'] = 'pop';
+    if ($this->authPassword($req, $res, $strError))
+    {
+      $bResult = true;
+    }
+    unset($req);
+    unset($res);
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ authPasswordPush()
+  public function authPasswordPush($passwords, &$strError)
+  {
+    return $this->authPasswordPushPut('push', $passwords, $strError);
+  }
+  // }}}
+  // {{{ authPasswordPushPut()
+  public function authPasswordPushPut($strAction, $passwords, &$strError)
+  {
+    $bResult = false;
+    $req = [];
+    $res = [];
+
+    if ($strAction == 'push' || $strAction == 'put')
+    {
+      $req['Action'] = $strAction;
+      if (is_array($passwords))
+      {
+        $req['Password'] = [];
+        for ($i = 0; $i < sizeof($passwords); $i++)
+        {
+          $req['Password'][] = $passwords[$i];
+        }
+      }
+      else
+      {
+        $req['Password'] = $passwords;
+      }
+      if ($this->authPassword($req, $res, $strError))
+      {
+        $bResult = true;
+      }
+      unset($req);
+      unset($res);
+    }
+    else
+    {
+      $strError = 'Please provide a valid Action:  push, put.';
+    }
+
+    return $bResult;
+  }
+  // }}}
+  // {{{ authPasswordPut()
+  public function authPasswordPut($passwords, &$strError)
+  {
+    return $this->authPasswordPushPut('put', $passwords, $strError);
+  }
+  // }}}
+  // }}}
+  // }}}
   // {{{ central
   // {{{ centralApplicationNotify()
   public function centralApplicationNotify($strApplication, $strMessage)

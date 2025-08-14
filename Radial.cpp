@@ -132,8 +132,6 @@ bool Radial::auth(Json *ptRequest, Json *ptResponse, string &strError)
   {
     bResult = true;
   }
-  delete ptRequest;
-  delete ptResponse;
 
   return bResult;
 }
@@ -147,7 +145,7 @@ bool Radial::authPassword(Json *ptReq, Json *ptRes, string &strError)
 
   ptRequest->i("Function", "password");
   ptRequest->m["Request"] = new Json(ptReq);
-  if (request(ptRequest, ptResponse, strError))
+  if (auth(ptRequest, ptResponse, strError))
   {
     bResult = true;
   }

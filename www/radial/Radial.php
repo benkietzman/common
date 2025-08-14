@@ -77,12 +77,12 @@ class Radial
   // }}}
   // {{{ auth
   // {{{ auth()
-  public function auth($request, &$response, &$strError)
+  public function auth($request, &$response)
   {
     $bResult = false;
 
     $request['Interface'] = 'auth';
-    if ($this->request($request, $response, $strError))
+    if ($this->request($request, $response))
     {
       $bResult = true;
     }
@@ -92,7 +92,7 @@ class Radial
   // }}}
   // {{{ authPassword
   // {{{ authPassword()
-  public function authPassword($req, &$res, &$strError)
+  public function authPassword($req, &$res)
   {
     $bResult = false;
     $request = [];
@@ -100,7 +100,7 @@ class Radial
 
     $request['Function'] = 'password';
     $request['Request'] = $req;
-    if ($this->request($request, $response, $strError))
+    if ($this->request($request, $response))
     {
       $bResult = true;
     }
@@ -115,7 +115,7 @@ class Radial
   }
   // }}}
   // {{{ authPasswordGet()
-  public function authPasswordGet(&$passwords, &$strError)
+  public function authPasswordGet(&$passwords)
   {
     $bResult = false;
     $req = [];
@@ -123,7 +123,7 @@ class Radial
 
     $passwords = [];
     $req['Action'] = 'get';
-    if ($this->authPassword($req, $res, $strError))
+    if ($this->authPassword($req, $res))
     {
       $bResult = true;
       if (is_array($res))
@@ -145,14 +145,14 @@ class Radial
   }
   // }}}
   // {{{ authPasswordPop()
-  public function authPasswordPop(&$strError)
+  public function authPasswordPop()
   {
     $bResult = false;
     $req = [];
     $res = null;
 
     $req['Action'] = 'pop';
-    if ($this->authPassword($req, $res, $strError))
+    if ($this->authPassword($req, $res))
     {
       $bResult = true;
     }
@@ -163,13 +163,13 @@ class Radial
   }
   // }}}
   // {{{ authPasswordPush()
-  public function authPasswordPush($passwords, &$strError)
+  public function authPasswordPush($passwords)
   {
-    return $this->authPasswordPushPut('push', $passwords, $strError);
+    return $this->authPasswordPushPut('push', $passwords);
   }
   // }}}
   // {{{ authPasswordPushPut()
-  public function authPasswordPushPut($strAction, $passwords, &$strError)
+  public function authPasswordPushPut($strAction, $passwords)
   {
     $bResult = false;
     $req = [];
@@ -190,7 +190,7 @@ class Radial
       {
         $req['Password'] = $passwords;
       }
-      if ($this->authPassword($req, $res, $strError))
+      if ($this->authPassword($req, $res))
       {
         $bResult = true;
       }
@@ -199,16 +199,16 @@ class Radial
     }
     else
     {
-      $strError = 'Please provide a valid Action:  push, put.';
+      $this->setError('Please provide a valid Action:  push, put.');
     }
 
     return $bResult;
   }
   // }}}
   // {{{ authPasswordPut()
-  public function authPasswordPut($passwords, &$strError)
+  public function authPasswordPut($passwords)
   {
-    return $this->authPasswordPushPut('put', $passwords, $strError);
+    return $this->authPasswordPushPut('put', $passwords);
   }
   // }}}
   // }}}

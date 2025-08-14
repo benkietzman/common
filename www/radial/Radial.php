@@ -96,7 +96,7 @@ class Radial
   {
     $bResult = false;
     $request = [];
-    $response = [];
+    $response = null;
 
     $request['Function'] = 'password';
     $request['Request'] = $req;
@@ -119,7 +119,7 @@ class Radial
   {
     $bResult = false;
     $req = [];
-    $res = [];
+    $res = null;
 
     $passwords = [];
     $req['Action'] = 'get';
@@ -149,7 +149,7 @@ class Radial
   {
     $bResult = false;
     $req = [];
-    $res = [];
+    $res = null;
 
     $req['Action'] = 'pop';
     if ($this->authPassword($req, $res, $strError))
@@ -173,7 +173,7 @@ class Radial
   {
     $bResult = false;
     $req = [];
-    $res = [];
+    $res = null;
 
     if ($strAction == 'push' || $strAction == 'put')
     {

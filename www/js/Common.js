@@ -2344,13 +2344,13 @@ class Common
   }
   // }}}
   // {{{ tableSort()
-  tableSort(strID, nCol, bNumeric)
+  tableSort(strID, nCol, bNumeric, strDir)
   {
     let table, tableID, rows, switching, i, x, xn, y, yn, shouldSwitch, dir, switchcount = 0;
     tableID = document.getElementById(strID);
     table = tableID.getElementsByTagName('tbody')[0];
     switching = true;
-    dir = 'asc';
+    dir = ((strDir)?strDir:'asc');
     while (switching)
     {
       switching = false;
@@ -2440,13 +2440,10 @@ class Common
         switching = true;
         switchcount ++;
       }
-      else
+      else if (!strDir && switchcount == 0 && dir == 'asc')
       {
-        if (switchcount == 0 && dir == 'asc')
-        {
-          dir = 'desc';
-          switching = true;
-        }
+        dir = 'desc';
+        switching = true;
       }
     }
   }

@@ -123,13 +123,27 @@ class Common
       });
       Handlebars.registerHelper('date', (unTimestamp) =>
       {
-        let date = new Date(unTimestamp * 1000);
-        return date.getFullYear().toString().padStart(4, '0')+'-'+(date.getMonth() + 1).toString().padStart(2, '0')+'-'+date.getDate().toString().padStart(2, '0');
+        let strDate = null;
+
+        if (unTimestamp)
+        {
+          let date = new Date(unTimestamp * 1000);
+          strDate = date.getFullYear().toString().padStart(4, '0')+'-'+(date.getMonth() + 1).toString().padStart(2, '0')+'-'+date.getDate().toString().padStart(2, '0');
+        }
+
+        return strDate;
       });
       Handlebars.registerHelper('datetime', (unTimestamp) =>
       {
-        let date = new Date(unTimestamp * 1000);
-        return date.getFullYear().toString().padStart(4, '0')+'-'+(date.getMonth() + 1).toString().padStart(2, '0')+'-'+date.getDate().toString().padStart(2, '0')+' '+date.getHours().toString().padStart(2, '0')+':'+date.getMinutes().toString().padStart(2, '0')+':'+date.getSeconds().toString().padStart(2, '0');
+        let strDate = null;
+
+        if (unTimestamp)
+        {
+          let date = new Date(unTimestamp * 1000);
+          strDate = date.getFullYear().toString().padStart(4, '0')+'-'+(date.getMonth() + 1).toString().padStart(2, '0')+'-'+date.getDate().toString().padStart(2, '0')+' '+date.getHours().toString().padStart(2, '0')+':'+date.getMinutes().toString().padStart(2, '0')+':'+date.getSeconds().toString().padStart(2, '0');
+        }
+
+        return strDate;
       });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {

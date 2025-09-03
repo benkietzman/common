@@ -383,7 +383,6 @@ class Common
           strTruncated = strValue.substr(0, nLength);
         }
 
-console.log(strTruncated);
         return strTruncated;
       });
       Handlebars.registerHelper('urlEncode', encodeURIComponent);

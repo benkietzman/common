@@ -357,6 +357,34 @@ class Common
         number = number.slice(0, 3) + '-' + number.slice(3);
         return (country + " (" + city + ") " + number).trim();
       });
+      Handlebars.registerHelper('truncate', (strValue, nLength, bDots, options) =>
+      {
+        let strTruncated = strValue;
+
+        if (!this.isDefined(options))
+        {
+          if (!this.isDefined(bDots))
+          {
+            bDots = nLength;
+            nLength = 3;
+          }
+          options = bDots;
+          bDots = false;
+        }
+        if (bDots)
+        {
+          if (strValue.length > (nLength + 3))
+          {
+            strTruncated = strValue.substr(0, nLength) + '...';
+          }
+        }
+        else if (strValue.length > nLength)
+        {
+          strTruncated = strValue.substr(0, nLength);
+        }
+
+        return strTruncated;
+      });
       Handlebars.registerHelper('urlEncode', encodeURIComponent);
     }
   }

@@ -145,6 +145,18 @@ class Common
 
         return strDate;
       });
+      Handlebars.registerHelper('dateyear', (unTimestamp) =>
+      {
+        let strDate = null;
+
+        if (unTimestamp)
+        {
+          let date = new Date(unTimestamp * 1000);
+          strDate = date.getFullYear().toString().padStart(4, '0');
+        }
+
+        return strDate;
+      });
       Handlebars.registerHelper('divide', (v1, v2) =>
       {
         return (Number(v1) / Number(v2));

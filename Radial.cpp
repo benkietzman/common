@@ -1907,7 +1907,7 @@ bool Radial::sqliteQuery(const string strDatabase, const string strStatement, si
 // }}}
 // {{{ ssh
 // {{{ sshConnect()
-bool Radial::sshConnect(const string strServer, const string strPort, const string strUser, const string strPassword, string &strSession, string &strData, string &strError)
+bool Radial::sshConnect(const string strServer, const string strPort, const string strUser, const string strPrivateKey, const string strPassphrase, const string strPassword, string &strSession, string &strData, string &strError)
 {
   bool bResult = false;
   Json *ptRequest = new Json, *ptResponse = new Json;
@@ -1918,7 +1918,18 @@ bool Radial::sshConnect(const string strServer, const string strPort, const stri
   ptRequest->m["Request"]->i("Server", strServer);
   ptRequest->m["Request"]->i("Port", strPort);
   ptRequest->m["Request"]->i("User", strUser);
-  ptRequest->m["Request"]->i("Password", strPassword);
+  if (!strPassphrase.empty())
+  {
+    ptRequest->m["Request"]->i("Passphrase", strPassphrase);
+  }
+  if (!strPassword.empty())
+  {
+    ptRequest->m["Request"]->i("Password", strPassword);
+  }
+  if (!strPrivateKey.empty())
+  {
+    ptRequest->m["Request"]->i("PrivateKey", strPrivateKey);
+  }
   if (request(ptRequest, ptResponse, strError))
   {
     bResult = true;

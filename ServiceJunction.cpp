@@ -131,12 +131,12 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[bridge] Encountered an unknown error.";
           }
         }
         else
         {
-          strError = "Encountered an unknown error.";
+          strError = "[bridge] Encountered an unknown error.";
         }
         if (out.size() == 2)
         {
@@ -265,7 +265,7 @@ extern "C++"
         }
         else
         {
-          strError = "Encountered an unknown error.";
+          strError = "[curl] Encountered an unknown error.";
         }
         requestResponse.clear();
       }
@@ -423,7 +423,7 @@ extern "C++"
         }
         else
         {
-          strError = "Encountered an unknown error.";
+          strError = "[email] Encountered an unknown error.";
         }
         requestResponse.clear();
       }
@@ -510,7 +510,7 @@ extern "C++"
             }
             else
             {
-              strError = "Encountered an unknown error.";
+              strError = "[finance] Encountered an unknown error.";
             }
             requestResponse.clear();
           }
@@ -609,7 +609,7 @@ extern "C++"
             }
             else
             {
-              strError = "Encountered an unknown error.";
+              strError = "[fusionQuery] Encountered an unknown error.";
             }
             requestResponse.clear();
           }
@@ -688,7 +688,7 @@ extern "C++"
         }
         else
         {
-          strError = "Encountered an unknown error.";
+          strError = "[fusionUpdate] Encountered an unknown error.";
         }
         requestResponse.clear();
       }
@@ -845,7 +845,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[jwt] Encountered an unknown error.";
           }
           delete ptStatus;
         }
@@ -926,7 +926,7 @@ extern "C++"
         }
         else
         {
-          strError = "Encountered an unknown error.";
+          strError = "[logger] Encountered an unknown error.";
         }
         delete ptJson;
       }
@@ -1073,7 +1073,7 @@ extern "C++"
             }
             else
             {
-              strError = "Encountered an unknown error.";
+              strError = "[mssqlQuery] Encountered an unknown error.";
             }
             requestResponse.clear();
           }
@@ -1143,7 +1143,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[mssqlUpdate] Encountered an unknown error.";
           }
           requestResponse.clear();
         }
@@ -1218,7 +1218,7 @@ extern "C++"
             }
             else
             {
-              strError = "Encountered an unknown error.";
+              strError = "[mysqlQuery] Encountered an unknown error.";
             }
             requestResponse.clear();
           }
@@ -1297,7 +1297,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[mysqlUpdate] Encountered an unknown error.";
           }
           requestResponse.clear();
         }
@@ -1377,7 +1377,7 @@ extern "C++"
             }
             else
             {
-              strError = "Encountered an unknown error.";
+              strError = "[oracleQuery] Encountered an unknown error.";
             }
             requestResponse.clear();
           }
@@ -1455,7 +1455,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[oracleUpdate] Encountered an unknown error.";
           }
           requestResponse.clear();
         }
@@ -1530,7 +1530,7 @@ extern "C++"
         }
         else
         {
-          strError = "Encountered an unknown error.";
+          strError = "[page] Encountered an unknown error.";
         }
         requestResponse.clear();
       }
@@ -1619,7 +1619,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[pdf] Encountered an unknown error.";
           }
           delete ptStatus;
         }
@@ -2530,7 +2530,7 @@ extern "C++"
             }
             else
             {
-              strError = "Encountered an unknown error.";
+              strError = "[teradataQuery] Encountered an unknown error.";
             }
             requestResponse.clear();
           }
@@ -2600,7 +2600,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[teradataUpdate] Encountered an unknown error.";
           }
           requestResponse.clear();
         }

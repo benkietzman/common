@@ -487,12 +487,12 @@ extern "C++"
                               }
                               else
                               {
-                                strError = "Encountered an unknown error.";
+                                strError = "[getMessages] Encountered an unknown error.";
                               }
                             }
                             else
                             {
-                              strError = "Encountered an unknown error.";
+                              strError = "[getMessages] Encountered an unknown error.";
                             }
                           }
                         }
@@ -774,12 +774,12 @@ extern "C++"
                         }
                         else
                         {
-                          strError = "Encountered an unknown error.";
+                          strError = "[request] Encountered an unknown error.";
                         }
                       }
                       else
                       {
-                        strError = "Encountered an unknown error.";
+                        strError = "[request] Encountered an unknown error.";
                       }
                     }
                   }

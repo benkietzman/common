@@ -914,7 +914,7 @@ extern "C++"
           }
           else
           {
-            strError = "Encountered an unknown error.";
+            strError = "[request] Encountered an unknown error.";
           }
           delete ptStatus;
         }

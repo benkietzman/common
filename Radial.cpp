@@ -448,7 +448,7 @@ bool Radial::connect(string &strError)
                       }
                       else
                       {
-                        strError = "Encountered an unknown error.";
+                        strError = "[connect] Encountered an unknown error.";
                       }
                     }
                     else
@@ -1142,7 +1142,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
                 }
                 else
                 {
-                  strError = "Encountered an unknown error.";
+                  strError = "[request] Encountered an unknown error.";
                 }
               }
             }
@@ -1333,7 +1333,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
                       }
                       else
                       {
-                        strError = "Encountered an unknown error.";
+                        strError = "[request] Encountered an unknown error.";
                       }
                     }
                   }

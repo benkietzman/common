@@ -164,7 +164,7 @@ class Common
       Handlebars.registerHelper('duration', (CTime) =>
       {
         let CNow = Math.floor(Date.now() / 1000);
-        let strDuration = null;
+        let strDuration = '';
         if (CNow > CTime)
         {
           let unDays = 0;
@@ -172,12 +172,12 @@ class Common
           let unMinutes = 0;
           let unSeconds = 0;
           unSeconds = CNow - CTime;
-          unDays = unSeconds / 86400;
-          unSeconds = unSeconds % 86400;
-          unHours = unSeconds / 3600;
-          unSeconds = unSeconds % 3600;
-          unMinutes = unSeconds / 60;
-          unSeconds = unSeconds % 60;
+          unDays = Math.floor(unSeconds / 86400);
+          unSeconds %= 86400;
+          unHours = Math.floor(unSeconds / 3600);
+          unSeconds %= 3600;
+          unMinutes = Math.floot(unSeconds / 60);
+          unSeconds %= 60;
           if (unDays > 0)
           {
             strDuration += unDays + "d";

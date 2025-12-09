@@ -176,7 +176,7 @@ class Common
           unSeconds %= 86400;
           unHours = Math.floor(unSeconds / 3600);
           unSeconds %= 3600;
-          unMinutes = Math.floot(unSeconds / 60);
+          unMinutes = Math.floor(unSeconds / 60);
           unSeconds %= 60;
           if (unDays > 0)
           {

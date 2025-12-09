@@ -163,34 +163,37 @@ class Common
       });
       Handlebars.registerHelper('duration', (CTime) =>
       {
-        let CNow = Math.floor(Date.now() / 1000);
         let strDuration = '';
-        if (CNow > CTime)
+        if (CTime)
         {
-          let unDays = 0;
-          let unHours = 0;
-          let unMinutes = 0;
-          let unSeconds = 0;
-          unSeconds = CNow - CTime;
-          unDays = Math.floor(unSeconds / 86400);
-          unSeconds %= 86400;
-          unHours = Math.floor(unSeconds / 3600);
-          unSeconds %= 3600;
-          unMinutes = Math.floor(unSeconds / 60);
-          unSeconds %= 60;
-          if (unDays > 0)
+          let CNow = Math.floor(Date.now() / 1000);
+          if (CNow > CTime)
           {
-            strDuration += unDays + "d";
+            let unDays = 0;
+            let unHours = 0;
+            let unMinutes = 0;
+            let unSeconds = 0;
+            unSeconds = CNow - CTime;
+            unDays = Math.floor(unSeconds / 86400);
+            unSeconds %= 86400;
+            unHours = Math.floor(unSeconds / 3600);
+            unSeconds %= 3600;
+            unMinutes = Math.floor(unSeconds / 60);
+            unSeconds %= 60;
+            if (unDays > 0)
+            {
+              strDuration += unDays + "d";
+            }
+            if (unHours > 0)
+            {
+              strDuration += unHours + "h";
+            }
+            if (unMinutes > 0)
+            {
+              strDuration += unMinutes + "m";
+            }
+            strDuration += unSeconds + "s";
           }
-          if (unHours > 0)
-          {
-            strDuration += unHours + "h";
-          }
-          if (unMinutes > 0)
-          {
-            strDuration += unMinutes + "m";
-          }
-          strDuration += unSeconds + "s";
         }
         return strDuration;
       });

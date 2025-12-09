@@ -184,7 +184,7 @@ class Common
           }
           if (unHours > 0)
           {
-            sDuration += unHours + "h";
+            strDuration += unHours + "h";
           }
           if (unMinutes > 0)
           {

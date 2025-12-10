@@ -163,39 +163,7 @@ class Common
       });
       Handlebars.registerHelper('duration', (CTime) =>
       {
-        let strDuration = '';
-        if (CTime)
-        {
-          let CNow = Math.floor(Date.now() / 1000);
-          if (CNow > CTime)
-          {
-            let unDays = 0;
-            let unHours = 0;
-            let unMinutes = 0;
-            let unSeconds = 0;
-            unSeconds = CNow - CTime;
-            unDays = Math.floor(unSeconds / 86400);
-            unSeconds %= 86400;
-            unHours = Math.floor(unSeconds / 3600);
-            unSeconds %= 3600;
-            unMinutes = Math.floor(unSeconds / 60);
-            unSeconds %= 60;
-            if (unDays > 0)
-            {
-              strDuration += unDays + "d";
-            }
-            if (unHours > 0)
-            {
-              strDuration += unHours + "h";
-            }
-            if (unMinutes > 0)
-            {
-              strDuration += unMinutes + "m";
-            }
-            strDuration += unSeconds + "s";
-          }
-        }
-        return strDuration;
+        return this.duration(CTime);
       });
       Handlebars.registerHelper('eachFilter', (a, k, v, options) =>
       {
@@ -1083,6 +1051,46 @@ class Common
   {
     let eventHandle = new CustomEvent(strHandle, {'detail': data});
     document.dispatchEvent(eventHandle);
+  }
+  // }}}
+  // {{{ duration()
+  duration(CTime)
+  {
+    let strDuration = '';
+
+    if (CTime)
+    {
+      let CNow = Math.floor(Date.now() / 1000);
+      if (CNow > CTime)
+      {
+        let unDays = 0;
+        let unHours = 0;
+        let unMinutes = 0;
+        let unSeconds = 0;
+        unSeconds = CNow - CTime;
+        unDays = Math.floor(unSeconds / 86400);
+        unSeconds %= 86400;
+        unHours = Math.floor(unSeconds / 3600);
+        unSeconds %= 3600;
+        unMinutes = Math.floor(unSeconds / 60);
+        unSeconds %= 60;
+        if (unDays > 0)
+        {
+          strDuration += unDays + "d";
+        }
+        if (unHours > 0)
+        {
+          strDuration += unHours + "h";
+        }
+        if (unMinutes > 0)
+        {
+          strDuration += unMinutes + "m";
+        }
+        strDuration += unSeconds + "s";
+      }
+    }
+
+    return strDuration;
   }
   // }}}
   // {{{ enableJwt()

@@ -123,6 +123,7 @@ extern "C++"
                 size_t unPosition;
                 string strBuffers[2];
                 stringstream ssBuffer;
+                time(&(CTime[0]));
                 ssBuffer << "CONNECT " << strServer << ":" << strPort << " HTTP/1.0\r\n\r\n";
                 strBuffers[1] = ssBuffer.str();
                 while (!bExit && (CTime[1] - CTime[0]) <= 5)

@@ -82,9 +82,11 @@ extern "C++"
       * \param fdSocket Contains the socket.
       * \param strError Contains the error.
       * \param bProxy Contains the proxy bolean value.
+      * \param unSocketTimeout Contains the socket timeout.
+      * \param unProxyTimeout Contains the proxy timeout.
       * \return Returns a boolean true/false value.
       */
-      bool connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy = false);
+      bool connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy = false, const size_t unSocketTimeout = 5000, const size_t unProxyTimeout = 5000);
       /*! \fn bool connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError)
       * \brief Connect to a server and port via a proxy.
       * \param strServer Contains the server.
@@ -93,9 +95,11 @@ extern "C++"
       * \param strProxyPort Contains the proxy port.
       * \param fdSocket Contains the socket.
       * \param strError Contains the error.
+      * \param unSocketTimeout Contains the socket timeout.
+      * \param unProxyTimeout Contains the proxy timeout.
       * \return Returns a boolean true/false value.
       */
-      bool connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError);
+      bool connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError, const size_t unSocketTimeout = 5000, const size_t unProxyTimeout = 5000);
       /*! \fn void daemonize()
       * \brief Turns the process into a system daemon.
       */

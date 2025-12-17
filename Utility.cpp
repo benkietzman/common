@@ -46,11 +46,11 @@ extern "C++"
     }
     // }}}
     // {{{ connect()
-    bool Utility::connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy)
+    bool Utility::connect(const string strServer, const string strPort, int &fdSocket, string &strError, const bool bProxy, const size_t unSocketTimeout, const size_t unProxyTimeout)
     {
-      return connect(strServer, strPort, ((bProxy)?m_strProxyServer:""), ((bProxy)?m_strProxyPort:""), fdSocket, strError);
+      return connect(strServer, strPort, ((bProxy)?m_strProxyServer:""), ((bProxy)?m_strProxyPort:""), fdSocket, strError, unSocketTimeout, unProxyTimeout);
     }
-    bool Utility::connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError)
+    bool Utility::connect(const string strServer, const string strPort, const string strProxyServer, const string strProxyPort, int &fdSocket, string &strError, const size_t unSocketTimeout, const size_t unProxyTimeout)
     {
       bool bResult = false;
 
@@ -61,8 +61,10 @@ extern "C++"
           addrinfo hints, *result;
           bool bUseProxy = false;
           int nReturn;
+          size_t unDuration;
           string strDestServer = strServer, strDestPort = strPort;
           time_t CTime[2];
+          timespec start, stop;
           memset(&hints, 0, sizeof(addrinfo));
           hints.ai_family = AF_UNSPEC;
           hints.ai_socktype = SOCK_STREAM;
@@ -72,8 +74,7 @@ extern "C++"
             strDestServer = strProxyServer;
             strDestPort = strProxyPort;
           }
-          time(&(CTime[0]));
-          CTime[1] = CTime[0];
+          clock_gettime(CLOCK_REALTIME, &start);
           if ((nReturn = getaddrinfo(strDestServer.c_str(), strDestPort.c_str(), &hints, &result)) == 0)
           {
             bool bConnected[2] = {false, false}, bTimeout = false;
@@ -85,7 +86,9 @@ extern "C++"
                 bool bDone = false;
                 bConnected[0] = true;
                 fdNonBlocking(fdSocket, strError);
-                while (!bDone && (CTime[1] - CTime[0]) <= 5)
+                clock_gettime(CLOCK_REALTIME, &stop);
+                unDuration = ((stop.tv_sec - start.tv_sec) * 1000) + ((stop.tv_nsec - start.tv_nsec) / 1000000);
+                while (!bDone && unDuration <= unSocketTimeout)
                 {
                   if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
                   {
@@ -97,8 +100,10 @@ extern "C++"
                   }
                   else
                   {
-                    msleep(100);
+                    msleep(10);
                     time(&(CTime[1]));
+                    clock_gettime(CLOCK_REALTIME, &stop);
+                    unDuration = ((stop.tv_sec - start.tv_sec) * 1000) + ((stop.tv_nsec - start.tv_nsec) / 1000000);
                   }
                 }
                 fdBlocking(fdSocket, strError);
@@ -123,10 +128,12 @@ extern "C++"
                 size_t unPosition;
                 string strBuffers[2];
                 stringstream ssBuffer;
-                time(&(CTime[0]));
+                clock_gettime(CLOCK_REALTIME, &start);
                 ssBuffer << "CONNECT " << strServer << ":" << strPort << " HTTP/1.0\r\n\r\n";
                 strBuffers[1] = ssBuffer.str();
-                while (!bExit && (CTime[1] - CTime[0]) <= 5)
+                clock_gettime(CLOCK_REALTIME, &stop);
+                unDuration = ((stop.tv_sec - start.tv_sec) * 1000) + ((stop.tv_nsec - start.tv_nsec) / 1000000);
+                while (!bExit && unDuration <= unProxyTimeout)
                 {
                   pollfd fds[1];
                   fds[0].fd = fdSocket;
@@ -208,7 +215,8 @@ extern "C++"
                     ssError << "poll(" << errno << ") error:  " << strerror(errno);
                     strError = ssError.str();
                   }
-                  time(&(CTime[1]));
+                  clock_gettime(CLOCK_REALTIME, &stop);
+                  unDuration = ((stop.tv_sec - start.tv_sec) * 1000) + ((stop.tv_nsec - start.tv_nsec) / 1000000);
                 }
                 if (!bResult)
                 {

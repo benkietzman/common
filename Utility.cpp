@@ -224,7 +224,9 @@ extern "C++"
                   fdSocket = -1;
                   if (!bExit)
                   {
-                    strError = "Timed out due to proxy connection taking longer than five seconds.";
+                    stringstream ssError;
+                    ssError << "Timed out due to proxy connection taking longer than " << unProxyTimeout << " ms.";
+                    strError = ssError.str();
                   }
                 }
               }
@@ -235,7 +237,9 @@ extern "C++"
             }
             else if (bTimeout)
             {
-              strError = "Timed out due to connection taking longer than five seconds.";
+              stringstream ssError;
+              ssError << "Timed out due to connection taking longer than " << unSocketTimeout << " ms.";
+              strError = ssError.str();
             }
             else
             {

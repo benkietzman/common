@@ -102,9 +102,11 @@ extern "C++"
     // {{{ tar()
     bool Archive::tar(const string strFile, list<string> fileList)
     {
-      bool bResult = true;
-      TAR *ptTar;
+      bool bResult = false;
 
+      #ifdef COMMON_TAR
+      TAR *ptTar;
+      bResult = true;
       if (tar_open(&ptTar, (char *)strFile.c_str(), NULL, O_WRONLY | O_CREAT, 0644, 0) == 0)
       {
         for (list<string>::iterator i = fileList.begin(); i != fileList.end(); i++)
@@ -118,6 +120,7 @@ extern "C++"
       {
         bResult = false;
       }
+      #endif
 
       return bResult;
     }
@@ -138,9 +141,11 @@ extern "C++"
     // {{{ untar()
     bool Archive::untar(const string strFile, const bool bKeepOriginal)
     {
-      bool bResult = true;
-      TAR *ptTar;
+      bool bResult = false;
 
+      #ifdef COMMON_TAR
+      TAR *ptTar;
+      bResult = true;
       if (tar_open(&ptTar, (char *)strFile.c_str(), NULL, O_RDONLY, 0, 0) == 0 && tar_extract_all(ptTar, NULL) == 0)
       {
         tar_close(ptTar);
@@ -149,6 +154,7 @@ extern "C++"
       {
         bResult = false;
       }
+      #endif
       if (bResult && !bKeepOriginal)
       {
         remove(strFile.c_str());

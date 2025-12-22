@@ -284,6 +284,7 @@ if [ $bFoundTar -eq 1 ]; then
   if [ -d "/usr/local/opt/libtar/include" ]; then
     printf " -I/usr/local/opt/libtar/include" >> Makefile
   fi
+  printf " -DCOMMON_TAR" >> Makefile
 fi
 if [ $bFoundXmlRpc -eq 1 ]; then
   if [ -d "/usr/local/opt/xmlrpc-c/include" ]; then

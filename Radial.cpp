@@ -361,7 +361,7 @@ bool Radial::connect(string &strError)
           }
           if (!server.empty())
           {
-            int fdSocket = -1, nReturn = -1;
+            int fdSocket = -1;
             SSL_METHOD *method = (SSL_METHOD *)SSLv23_client_method();
             if ((m_ctx = SSL_CTX_new(method)) != NULL)
             {
@@ -385,9 +385,6 @@ bool Radial::connect(string &strError)
                     unPick = 0;
                   }
                   strServer = radialServer[unPick];
-                  memset(&hints, 0, sizeof(addrinfo));
-                  hints.ai_family = AF_UNSPEC;
-                  hints.ai_socktype = SOCK_STREAM;
                   if (utility()->connect(strServer, "7277", fdSocket, strError, true))
                   {
                     bConnected[0] = true;

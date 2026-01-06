@@ -367,7 +367,7 @@ bool Radial::connect(string &strError)
             {
               for (auto i = server.begin(); !bResult && i != server.end(); i++)
               {
-                bool bConnected[4] = {false, false, false, false};
+                bool bConnected[2] = {false, false};
                 string strServer;
                 unsigned int unAttempt = 0, unPick = 0, unSeed = time(NULL);
                 vector<string> radialServer;
@@ -377,9 +377,8 @@ bool Radial::connect(string &strError)
                 }
                 srand(unSeed);
                 unPick = rand_r(&unSeed) % radialServer.size();
-                while (!bConnected[3] && unAttempt++ < radialServer.size())
+                while (!bConnected[1] && unAttempt++ < radialServer.size())
                 {
-                  addrinfo hints, *result;
                   bConnected[0] = false;
                   if (unPick == radialServer.size())
                   {
@@ -389,43 +388,22 @@ bool Radial::connect(string &strError)
                   memset(&hints, 0, sizeof(addrinfo));
                   hints.ai_family = AF_UNSPEC;
                   hints.ai_socktype = SOCK_STREAM;
-                  m_mutexGetAddrInfo.lock();
-                  nReturn = getaddrinfo(strServer.c_str(), "7277", &hints, &result);
-                  m_mutexGetAddrInfo.unlock();
-                  if (nReturn == 0)
+                  if (utility()->connect(strServer, "7277", fdSocket, strError, true))
                   {
-                    addrinfo *rp;
                     bConnected[0] = true;
-                    for (rp = result; !bConnected[3] && rp != NULL; rp = rp->ai_next)
+                    if ((m_ssl = utility()->sslConnect(m_ctx, fdSocket, strError)) != NULL)
                     {
-                      bConnected[1] = bConnected[2] = false;
-                      if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
-                      {
-                        bConnected[1] = true;
-                        if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
-                        {
-                          bConnected[2] = true;
-                          if ((m_ssl = utility()->sslConnect(m_ctx, fdSocket, strError)) != NULL)
-                          {
-                            bConnected[3] = true;
-                          }
-                          else
-                          {
-                            close(fdSocket);
-                          }
-                        }
-                        else
-                        {
-                          close(fdSocket);
-                        }
-                      }
+                      bConnected[1] = true;
                     }
-                    freeaddrinfo(result);
+                    else
+                    {
+                      close(fdSocket);
+                    }
                   }
                   unPick++;
                 }
                 radialServer.clear();
-                if (bConnected[3])
+                if (bConnected[1])
                 {
                   bool bExit = false;
                   list<Json *> messages;
@@ -461,23 +439,6 @@ bool Radial::connect(string &strError)
                     delete messages.front();
                     messages.pop_front();
                   }
-                }
-                else
-                {
-                  stringstream ssError;
-                  if (!bConnected[0])
-                  {
-                    ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
-                  }
-                  else if (!bConnected[2])
-                  {
-                    ssError << ((!bConnected[1])?"socket":"connect") << "(" << errno << ") " << strerror(errno);
-                  }
-                  else
-                  {
-                    ssError << "Central::utilty()->sslConnect() error [" << strError << "]  ";
-                  }
-                  strError = ssError.str();
                 }
               }
             }
@@ -1223,7 +1184,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
       {
         for (list<string>::iterator i = server.begin(); !bDone && i != server.end(); i++)
         {
-          bool bConnected[4] = {false, false, false, false};
+          bool bConnected[2] = {false, false};
           int fdSocket = -1, nReturn = -1;
           SSL *ssl = NULL;
           string strServer;
@@ -1241,50 +1202,25 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
           #ifdef COMMON_SOLARIS
           sema_wait(&m_semaRadialRequestLock);
           #endif
-          while (!bConnected[3] && unAttempt++ < radialServer.size())
+          while (!bConnected[1] && unAttempt++ < radialServer.size())
           {
-            addrinfo hints, *result;
-            bConnected[0] = bConnected[1] = bConnected[2] = false;
+            bConnected[0] = false;
             if (unPick == radialServer.size())
             {
               unPick = 0;
             }
             strServer = radialServer[unPick];
-            memset(&hints, 0, sizeof(addrinfo));
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_socktype = SOCK_STREAM;
-            m_mutexGetAddrInfo.lock();
-            nReturn = getaddrinfo(strServer.c_str(), "7234", &hints, &result);
-            m_mutexGetAddrInfo.unlock();
-            if (nReturn == 0)
+            if (utility()->connect(strServer, "7234", fdSocket, strError, true))
             {
-              addrinfo *rp;
               bConnected[0] = true;
-              for (rp = result; !bConnected[3] && rp != NULL; rp = rp->ai_next)
+              if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
               {
-                bConnected[1] = bConnected[2] = false;
-                if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
-                {
-                  bConnected[1] = true;
-                  if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
-                  {
-                    bConnected[2] = true;
-                    if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
-                    {
-                      bConnected[3] = true;
-                    }
-                    else
-                    {
-                      close(fdSocket);
-                    }
-                  }
-                  else
-                  {
-                    close(fdSocket);
-                  }
-                }
+                bConnected[1] = true;
               }
-              freeaddrinfo(result);
+              else
+              {
+                close(fdSocket);
+              }
             }
             unPick++;
           }
@@ -1295,7 +1231,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
           sema_post(&m_semaRadialRequestLock);
           #endif
           radialServer.clear();
-          if (bConnected[3])
+          if (bConnected[1])
           {
             bool bExit = false;
             size_t unPosition;
@@ -1390,27 +1326,6 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
             SSL_free(ssl);
             close(fdSocket);
           }
-          else
-          {
-            stringstream ssError;
-            if (!bConnected[0])
-            {
-              ssError << "getaddrinfo(" << nReturn << ") " << gai_strerror(nReturn);
-            }
-            else if (!bConnected[1])
-            {
-              ssError << "socket(" << errno << ") " << strerror(errno);
-            }
-            else if (!bConnected[2])
-            {
-              ssError << "connect(" << errno << ") " << strerror(errno);
-            }
-            else
-            {
-              ssError << "Utility::sslConnect() " << strError;
-            }
-            strError = ssError.str();
-          }
         }
         if (!bResult && strError.empty())
         {
@@ -1489,45 +1404,22 @@ void Radial::requestThread()
           unPick = rand_r(&unSeed) % radialServer.size();
           while (m_bUseSingleSocket && !bConnected && unAttempt++ < radialServer.size())
           {
-            addrinfo hints, *result;
             if (unPick == radialServer.size())
             {
               unPick = 0;
             }
             strServer = radialServer[unPick];
-            memset(&hints, 0, sizeof(addrinfo));
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_socktype = SOCK_STREAM;
-            m_mutexGetAddrInfo.lock();
-            nReturn = getaddrinfo(strServer.c_str(), "7234", &hints, &result);
-            m_mutexGetAddrInfo.unlock();
-            if (nReturn == 0)
+            if (utility()->connect(strServer, "7234", fdSocket, strError, true))
             {
-              addrinfo *rp;
-              for (rp = result; m_bUseSingleSocket && !bConnected && rp != NULL; rp = rp->ai_next)
+              if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
               {
-                if ((fdSocket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) >= 0)
-                {
-                  if (::connect(fdSocket, rp->ai_addr, rp->ai_addrlen) == 0)
-                  {
-                    if ((ssl = utility()->sslConnect(ctx, fdSocket, strError)) != NULL)
-                    {
-                      bConnected = true;
-                    }
-                    else
-                    {
-                      close(fdSocket);
-                      fdSocket = -1;
-                    }
-                  }
-                  else
-                  {
-                    close(fdSocket);
-                    fdSocket = -1;
-                  }
-                }
+                bConnected = true;
               }
-              freeaddrinfo(result);
+              else
+              {
+                close(fdSocket);
+                fdSocket = -1;
+              }
             }
             unPick++;
           }

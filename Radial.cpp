@@ -776,7 +776,7 @@ bool Radial::getMessages(string &strError)
               bNeedWrite = bWantWrite = false;
               if (nReturn <= 0)
               {
-                switch (SSL_get_error(ssl, nReturn))
+                switch (SSL_get_error(m_ssl, nReturn))
                 {
                   case SSL_ERROR_WANT_READ: bNeedWrite = true; break;
                   case SSL_ERROR_WANT_WRITE: bNeedWrite = bWantWrite = true; break;

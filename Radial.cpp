@@ -721,7 +721,7 @@ bool Radial::getMessages(string &strError)
     }
     else
     {
-      bool bClose = false, bExit = false;
+      bool bClose = false, bExit = false, bNeedWrite = false, bWantWrite = false;
       int nReturn;
       size_t unPosition;
       string strLine;
@@ -730,13 +730,13 @@ bool Radial::getMessages(string &strError)
         pollfd fds[1];
         fds[0].fd = m_fdSocket;
         fds[0].events = POLLIN;
-        if (m_strBuffer[1].empty() && !m_buffer[1].empty())
+        if (m_strBuffer[1].empty() && !m_buffer[1].empty() && !bNeedWrite)
         {
           m_strBuffer[1].append(m_buffer[1].front()+"\n");
           m_strLine = m_buffer[1].front();
           m_buffer[1].pop_front();
         }
-        if (!m_strBuffer[1].empty())
+        if (bWantWrite || !m_strBuffer[1].empty())
         {
           fds[0].events |= POLLOUT;
         }
@@ -746,6 +746,14 @@ bool Radial::getMessages(string &strError)
           {
             if (utility()->sslRead(m_ssl, m_strBuffer[0], nReturn))
             {
+              bWantWrite = false;
+              if (nReturn <= 0)
+              {
+                switch (SSL_get_error(m_ssl, nReturn))
+                {
+                  case SSL_ERROR_WANT_WRITE: bWantWrite = true; break;
+                }
+              }
               while ((unPosition = m_strBuffer[0].find("\n")) != string::npos)
               {
                 bResult = true;
@@ -763,7 +771,19 @@ bool Radial::getMessages(string &strError)
           }
           if (fds[0].revents & POLLOUT)
           {
-            if (!utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn))
+            if (utility()->sslWrite(m_ssl, m_strBuffer[1], nReturn))
+            {
+              bNeedWrite = bWantWrite = false;
+              if (nReturn <= 0)
+              {
+                switch (SSL_get_error(ssl, nReturn))
+                {
+                  case SSL_ERROR_WANT_READ: bNeedWrite = true; break;
+                  case SSL_ERROR_WANT_WRITE: bNeedWrite = bWantWrite = true; break;
+                }
+              }
+            }
+            else
             {
               stringstream ssError;
               bClose = bExit = true;

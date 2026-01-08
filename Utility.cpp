@@ -529,6 +529,7 @@ extern "C++"
       while (!bExit)
       {
         bool bRead = false;
+        ERR_clear_error();
         if ((nReturn = SSL_read(ssl, &cChar, 1)) == 1)
         {
           bRead = true;
@@ -1033,6 +1034,7 @@ extern "C++"
           char *pszBuffer = new char[m_unReadSize];
           int nPending, nSize = m_unReadSize;
           bResult = true;
+          ERR_clear_error();
           if ((nReturn = SSL_read(ssl, pszBuffer, nSize)) > 0)
           {
             strBuffer.append(pszBuffer, nReturn);
@@ -1043,6 +1045,7 @@ extern "C++"
               {
                 nPending = nSize;
               }
+              ERR_clear_error();
               if ((nReturn = SSL_read(ssl, pszBuffer, nPending)) > 0)
               {
                 strBuffer.append(pszBuffer, nReturn);
@@ -1180,6 +1183,7 @@ extern "C++"
         if (!bBlocking || fcntl(SSL_get_fd(ssl), F_SETFL, lArg) == 0)
         {
           bResult = true;
+          ERR_clear_error();
           if ((nReturn = SSL_write(ssl, strBuffer.c_str(), ((strBuffer.size() < m_unSslWriteSize)?strBuffer.size():m_unSslWriteSize))) > 0)
           {
             strBuffer.erase(0, nReturn);

@@ -1230,7 +1230,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
           radialServer.clear();
           if (bConnected[1])
           {
-            bool bExit = false;
+            bool bExit = false, bWantWrite = false;
             size_t unPosition;
             string strBuffer[2];
             bDone = true;
@@ -1241,7 +1241,7 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
               pollfd fds[1];
               fds[0].fd = fdSocket;
               fds[0].events = POLLIN;
-              if (!strBuffer[1].empty())
+              if (bWantWrite || !strBuffer[1].empty())
               {
                 fds[0].events |= POLLOUT;
               }
@@ -1251,6 +1251,14 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
                 {
                   if (utility()->sslRead(ssl, strBuffer[0], nReturn))
                   {
+                    bWantWrite = false;
+                    if (nReturn <= 0)
+                    {
+                      switch (SSL_get_error(ssl, nReturn))
+                      {
+                        case SSL_ERROR_WANT_WRITE: bWantWrite = true; break;
+                      }
+                    }
                     if ((unPosition = strBuffer[0].find("\n")) != string::npos)
                     {
                       bExit = true;
@@ -1283,7 +1291,18 @@ bool Radial::request(Json *ptRequest, Json *ptResponse, time_t CTimeout, string 
                 }
                 if (fds[0].revents & POLLOUT)
                 {
-                  if (!utility()->sslWrite(ssl, strBuffer[1], nReturn))
+                  if (utility()->sslWrite(ssl, strBuffer[1], nReturn))
+                  {
+                    bWantWrite = false;
+                    if (nReturn <= 0)
+                    {
+                      switch (SSL_get_error(ssl, nReturn))
+                      { 
+                        case SSL_ERROR_WANT_WRITE: bWantWrite = true; break;
+                      }
+                    }
+                  }
+                  else
                   {
                     bExit = true;
                     if (SSL_get_error(ssl, nReturn) != SSL_ERROR_ZERO_RETURN)
@@ -1423,7 +1442,7 @@ void Radial::requestThread()
           radialServer.clear();
           if (bConnected)
           {
-            bool bExit = false;
+            bool bExit = false, bNeedWrite = false, bWantWrite = false;
             list<string> response;
             size_t unPosition;
             string strBuffer[2];
@@ -1435,7 +1454,7 @@ void Radial::requestThread()
               pollfd *fds = new pollfd[m_requests.size() + 1];
               for (map<int, radialreqdata *>::iterator j = m_requests.begin(); j != m_requests.end(); j++)
               {
-                if (!j->second->bSent)
+                if (!j->second->bSent && !bNeedWrite)
                 {
                   j->second->bSent = true;
                   strBuffer[1].append(j->second->strBuffer[0]);
@@ -1450,7 +1469,7 @@ void Radial::requestThread()
               m_mutexRequests.unlock();
               fds[0].fd = fdSocket;
               fds[0].events = POLLIN;
-              if (!strBuffer[1].empty())
+              if (bWantWrite || !strBuffer[1].empty())
               {
                 fds[0].events |= POLLOUT;
               }
@@ -1460,6 +1479,14 @@ void Radial::requestThread()
                 {
                   if (utility()->sslRead(ssl, strBuffer[0], nReturn))
                   {
+                    bWantWrite = false;
+                    if (nReturn <= 0)
+                    {
+                      switch (SSL_get_error(ssl, nReturn))
+                      {
+                        case SSL_ERROR_WANT_WRITE: bWantWrite = true; break;
+                      }
+                    }
                     while ((unPosition = strBuffer[0].find("\n")) != string::npos)
                     {
                       Json *ptJson = new Json(strBuffer[0].substr(0, unPosition));
@@ -1485,7 +1512,19 @@ void Radial::requestThread()
                 }
                 if (fds[0].revents & POLLOUT)
                 {
-                  if (!utility()->sslWrite(ssl, strBuffer[1], nReturn))
+                  if (utility()->sslWrite(ssl, strBuffer[1], nReturn))
+                  {
+                    bNeedWrite = bWantWrite = false;
+                    if (nReturn <= 0)
+                    {
+                      switch (SSL_get_error(ssl, nReturn))
+                      { 
+                        case SSL_ERROR_WANT_READ: bNeedWrite = true; break;
+                        case SSL_ERROR_WANT_WRITE: bNeedWrite = bWantWrite = true; break;
+                      }
+                    }
+                  }
+                  else
                   {
                     bExit = true;
                   }

@@ -113,12 +113,13 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool bridge(const string strUser, const string strPassword, Json *ptRequest, Json *ptResponse, string &strError);
-      /*! \fn bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "")
+      /*! \fn bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPatch, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "")
       * Constructs and sends an email.
       * \param strURL - The input URL.
       * \param strType - The input type.
       * \param ptAuth - The input AUTH variables.
       * \param ptGet - The input GET variables.
+      * \param ptPatch - The input PATCH variables.
       * \param ptPost - The input POST variables.
       * \param ptPut - The input PUT variables.
       * \param strProxy - The outbound proxy.
@@ -132,7 +133,7 @@ extern "C++"
       * \param strCustomRequest Contains the custom request value.
       * \return Returns a boolean true/false value.
       */
-      bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "");
+      bool curl(const string strURL, const string strType, Json *ptAuth, Json *ptGet, Json *ptPatch, Json *ptPost, Json *ptPut, const string strProxy, string &strCookies, string &strHeader, string &strContent, string &strError, const string strUserAgent = "", const bool bMobile = false, const bool bFailOnError = true, const string strCustomRequest = "");
       /*! \fn void dodgeConcentrator(const bool bDodge = true)
       * \brief Dodges the port concentrator.
       */

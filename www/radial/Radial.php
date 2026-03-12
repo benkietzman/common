@@ -722,79 +722,22 @@ class Radial
       }
       if ($bConnected)
       {
-        $bExit = false;
-        $strBuffer = array(null, json_encode($request)."\n");
-        while (!$bExit)
+        fwrite($handle, json_encode($request)."\n");
+        if (!feof($handle))
         {
-          $readfds = [$handle];
-          $writefds = [];
-          if ($strBuffer[1] != '')
+          $response = json_decode(fgets($handle), true);
+          if (isset($response['Status']) && $response['Status'] == 'okay')
           {
-            $writefds[] = $handle;
+            $bResult = true;
           }
-          $errorfds = null;
-          if (($nReturn = stream_select($readfds, $writefds, $errorfds, 0, 250000)) > 0)
+          else if (isset($response['Error']) && $response['Error'] != '')
           {
-            if (in_array($handle, $writefds))
-            {
-              if (($nReturn = fwrite($handle, $strBuffer[1])) !== false)
-              {
-                $strBuffer[1] = substr($strBuffer[1], $nReturn, (strlen($strBuffer[1]) - $nReturn));
-              }
-              else
-              {
-                $bExit = true;
-                $strError = 'fwrite() Failed to write.';
-                $this->setError($strError);
-              }
-            }
-            if (in_array($handle, $readfds))
-            {
-              if (($strData = fread($handle, 65536)) !== false)
-              {
-                if ($strData != '')
-                {
-                  $strBuffer[0] .= $strData;
-                  if (($unPosition = strpos($strBuffer[0], "\n")) !== false)
-                  {
-                    $bExit = true;
-                    $response = json_decode(substr($strBuffer[0], 0, $unPosition), true);
-                    $strBuffer[0] = substr($strBuffer[0], ($unPosition + 1), (strlen($strBuffer[0]) - ($unPosition + 1)));
-                    if (isset($response['Status']) && $response['Status'] == 'okay')
-                    {
-                      $bResult = true;
-                    }
-                    else if (isset($response['Error']) && $response['Error'] != '')
-                    {
-                      $this->setError($response['Error']);
-                    }
-                    else
-                    {
-                      $this->setError('Encountered an unknown error.');
-                    }
-                  }
-                }
-                else
-                {
-                  $bExit = true;
-                }
-              }
-              else
-              {
-                $bExit = true;
-                $strError = 'fread() Failed to read.';
-                $this->setError($strError);
-              }
-            }
+            $this->setError($response['Error']);
           }
-          else if ($nReturn === false)
+          else
           {
-            $bExit = true;
-            $strError = 'stream_select() Failed to select.';
-            $this->setError($strError);
+            $this->setError('Encountered an unknown error.');
           }
-          unset($readfds);
-          unset($writefds);
         }
         fclose($handle);
       }

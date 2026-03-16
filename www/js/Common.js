@@ -251,6 +251,22 @@ class Common
       {
         return data[strIndex];
       });
+      Handlebars.registerHelper('isArray', (value, options) =>
+      {
+        if (!this.isDefined(options))
+        {
+          options = value;
+          value = null;
+        }
+        if (this.isArray(value))
+        {
+          return options.fn(this);
+        }
+        else
+        {
+          return options.inverse(this);
+        }
+      });
       Handlebars.registerHelper('isGlobalAdmin', (options) =>
       {
         if (this.isGlobalAdmin())
@@ -270,6 +286,22 @@ class Common
           application = null;
         }
         if (this.isLocalAdmin(application))
+        {
+          return options.fn(this);
+        }
+        else
+        {
+          return options.inverse(this);
+        }
+      });
+      Handlebars.registerHelper('isObject', (value, options) =>
+      {
+        if (!this.isDefined(options))
+        {
+          options = value;
+          value = null;
+        }
+        if (this.isObject(value))
         {
           return options.fn(this);
         }

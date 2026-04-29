@@ -309,9 +309,9 @@ class Radial
               }
               unset($server);
             }
-            if (isset($this->m_conf['Bridge Server']) && $this->m_conf['Bridge Server'] != '')
+            if (isset($this->m_conf['Radial Server']) && $this->m_conf['Radial Server'] != '')
             {
-              $server = explode(',', $this->m_conf['Bridge Server']);
+              $server = explode(',', $this->m_conf['Radial Server']);
               while (sizeof($server) > 0)
               {
                 $servers[] = array_shift($server);

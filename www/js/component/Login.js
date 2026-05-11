@@ -50,6 +50,7 @@ export default
         let loginType = c.simplify(s.loginType);
         let strLoginType = loginType.type;
         strLoginType[0] = strLoginType[0].toLowerCase();
+console.log('Login Type:  '+strLoginType);
         c.processLogin(strLoginType);
       }
     };

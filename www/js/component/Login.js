@@ -14,6 +14,7 @@ export default
     let s = c.store('Login',
     {
       c: c,
+      loginTypes: null,
       processLoginKey: () =>
       {
         if (window.event.keyCode == 13)
@@ -33,7 +34,7 @@ export default
         let error = {};
         if (c.wsResponse(response, error))
         {
-          console.log(response);
+          s.loginTypes = response.Response;
         }
       });
       c.processLogin();
@@ -44,6 +45,13 @@ export default
   // }}}
   // {{{ template
   template: `
+    {{#if loginTypes}}
+    <select class="form-control float-end" c-model="loginType" json>
+      {{#each loginTypes}}
+      <option value="{{.}}">{{type}}</option>
+      {{/each}}
+    </select>
+    {{/if}}
     {{#if c.login.showForm}}
     <div class="row justify-content-md-center" style="margin-top: 100px;">
       <div class="col-md-auto">

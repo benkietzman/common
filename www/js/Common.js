@@ -24,6 +24,7 @@ class Common
     this.m_messages = [];
     this.m_store = {};
     this.m_strAuthProtocol = null;
+    this.m_strLoginModule = null;
     this.m_strLoginType = null;
     this.m_nUnique = 0;
     this.m_ws = {};
@@ -1633,12 +1634,16 @@ class Common
       request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
-        if (this.m_strLoginType == null)
+        if (this.m_strLoginModule == null)
         {
-          this.m_strLoginType = 'Password';
+          this.m_strLoginModule = 'password';
           if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
-            this.m_strLoginType = response.Response.Module;
+            this.m_strLoginModule = response.Response.Module;
+            if (this.isDefined(response.Response.Type) && response.Response.Type != '')
+            {
+              this.m_strLoginType = response.Response.Type;
+            }
           }
         }
         fetch('/include/common_addons/auth/modules.json',
@@ -1654,14 +1659,14 @@ class Common
           let request = null;
           response = ((response.status == 200)?response.json():{});
           request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
-          request.Request.Type = this.m_strLoginType;
+          request.Request.Type = this.m_strLoginModule;
           if (window.localStorage.getItem('sl_uniqueID'))
           {
             request.Request.UniqueID = window.localStorage.getItem('sl_uniqueID');
           }
-          if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
+          if (this.isDefined(response[this.m_strLoginModule]) && this.isDefined(response[this.m_strLoginModule]['cookie']) && this.isCookie(response[this.m_strLoginModule]['cookie']))
           {
-            request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
+            request.Request.Data = this.getCookie(response[this.m_strLoginModule]['cookie']);
           }
           this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
@@ -1710,7 +1715,7 @@ class Common
                 {
                   this.login.info = 'Processing login...';
                   let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
-                  request.Request = {Type: this.m_strLoginType, Return: document.location.href};
+                  request.Request = {Type: this.m_strLoginModule, Return: document.location.href};
                   this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                   {
                     let error = {};
@@ -1755,9 +1760,9 @@ class Common
     else
     {
       this.login.Application = this.application;
-      if (this.m_strLoginType != '')
+      if (this.m_strLoginModule != '')
       {
-        this.login.LoginType = this.m_strLoginType;
+        this.login.LoginType = this.m_strLoginModule;
       }
       this.request('authProcessLogin', this.simplify(this.login.login), (result) =>
       {
@@ -1785,9 +1790,9 @@ class Common
           {
             let login = {};
             login.Application = this.application;
-            if (this.m_strLoginType != '')
+            if (this.m_strLoginModule != '')
             {
-              login.LoginType = this.m_strLoginType;
+              login.LoginType = this.m_strLoginModule;
             }
             login.Redirect = this.getRedirectPath();
             this.request('authLogin', login, (result) =>
@@ -1843,16 +1848,20 @@ class Common
         this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
         {
           this.logout.info = null;
-          if (this.m_strLoginType == null)
+          if (this.m_strLoginModule == null)
           {
-            this.m_strLoginType = 'Password';
+            this.m_strLoginModule = 'password';
             if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
             {
-              this.m_strLoginType = response.Response.Module;
+              this.m_strLoginModule = response.Response.Module;
+              if (this.isDefined(response.Response.Type) && response.Response.Type != '')
+              {
+                this.m_strLoginType = response.Response.Type;
+              }
             }
           }
           let request = {Interface: 'secure', Section: 'secure', 'Function': 'logout'};
-          request.Request = {Type: this.m_strLoginType, Return: this.getRedirectPath()};
+          request.Request = {Type: this.m_strLoginModule, Return: this.getRedirectPath()};
           this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
           {
             let error = {};
@@ -1881,9 +1890,9 @@ class Common
       {
         let logout = {};
         logout.Application = this.getApplication();
-        if (this.m_strLoginType != '')
+        if (this.m_strLoginModule != '')
         {
-          logout.LoginType = this.m_strLoginType;
+          logout.LoginType = this.m_strLoginModule;
         }
         logout.Redirect = this.getRedirectPath();
         this.request('authLogout', logout, (result) =>
@@ -2424,9 +2433,9 @@ class Common
   };
   // }}}
   // {{{ setSecurity()
-  setSecurity(strLoginType)
+  setSecurity(strLoginModule)
   {
-    this.m_strLoginType = strLoginType;
+    this.m_strLoginModule = strLoginModule;
   };
   // }}}
   // {{{ simplify()

@@ -1731,7 +1731,7 @@ class Common
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
                           this.dispatchEvent('resetMenu', null);
-                          //setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
+                          setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
                         }
                       }
                     }

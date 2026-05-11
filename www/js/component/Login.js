@@ -14,17 +14,12 @@ export default
     let s = c.store('Login',
     {
       c: c,
-      loginTypes: null,
       processLoginKey: () =>
       {
         if (window.event.keyCode == 13)
         {
           c.processLogin();
         }
-      },
-      u: () =>
-      {
-        c.update('Login');
       }
     });
     // }}}
@@ -32,29 +27,6 @@ export default
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
-      let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
-      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
-      {
-        let error = {};
-        if (c.wsResponse(response, error))
-        {
-          if (response.Response.length > 0)
-          {
-            s.loginTypes = response.Response;
-            s.loginType = s.loginTypes[0];
-console.log(s.loginTypes);
-            for (let i = 0; i < s.loginTypes.length; i++)
-            {
-console.log(s.loginTypes[i].type+' == '+c.m_strLoginType);
-              if (s.loginTypes[i].type == c.m_strLoginType)
-              {
-                s.loginType = s.loginTypes[i];
-              }
-            }
-          }
-        }
-        s.u();
-      });
       c.processLogin();
     });
     c.processLogin();
@@ -64,13 +36,11 @@ console.log(s.loginTypes[i].type+' == '+c.m_strLoginType);
   // {{{ template
   template: `
     <b>Login Type:  {{c.m_strLoginType}}</b>
-    {{#if loginTypes}}
     <select class="form-select float-end" c-model="loginType" c-json>
-      {{#each loginTypes}}
+      {{#each c.loginTypes}}
       <option value="{{.}}"{{#ifCond ../c.m_strLoginType "==" type}} selected{{/ifCond}}>{{type}}</option>
       {{/each}}
     </select>
-    {{/if}}
     {{#if c.login.showForm}}
     <div class="row justify-content-md-center" style="margin-top: 100px;">
       <div class="col-md-auto">

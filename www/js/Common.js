@@ -21,6 +21,7 @@ class Common
     this.m_auth = {};
     this.m_intervals = {};
     this.m_listeners = {};
+    this.m_loginTypes = [];
     this.m_messages = [];
     this.m_store = {};
     this.m_strAuthProtocol = null;
@@ -1628,6 +1629,18 @@ class Common
   {
     this.login.info = 'Processing login...';
     this.render(this.id, 'Login', this.component);
+    let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
+    c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+    {
+      let error = {};
+      if (c.wsResponse(response, error))
+      {
+        if (this.isDefined(response.Response))
+        {
+          this.m_loginTypes = response.Response;
+        }
+      }
+    });
     if (this.m_bJwt)
     {
       let request = null;

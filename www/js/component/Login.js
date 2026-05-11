@@ -37,7 +37,7 @@ export default
   template: `
     <b>Login Type:  {{c.m_strLoginType}}</b>
     <select class="form-select float-end" c-model="loginType" c-json>
-      {{#each c.loginTypes}}
+      {{#each c.m_loginTypes}}
       <option value="{{.}}"{{#ifCond ../c.m_strLoginType "==" type}} selected{{/ifCond}}>{{type}}</option>
       {{/each}}
     </select>

@@ -1653,7 +1653,7 @@ class Common
               this.m_strLoginType = response.Response.Module;
               if (this.isDefined(response.Response.Type) && response.Response.Type != '')
               {
-                for (let i = this.m_loginTypes.length; i++)
+                for (let i = 0; i < this.m_loginTypes.length; i++)
                 {
                   if (this.m_loginTypes[i] == response.ResponseType)
                   {

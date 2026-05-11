@@ -48,7 +48,7 @@ export default
   // }}}
   // {{{ template
   template: `
-    <select class="form-select float-end" c-model="loginType" style="width: 20px;" c-json>
+    <select class="form-select float-end" c-model="loginType" style="position: fixed; top: 120px; right: 0px; width: 20px;" c-json>
       {{#each loginTypes}}
       <option value="{{.}}">{{type}}</option>
       {{/each}}

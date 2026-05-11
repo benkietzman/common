@@ -28,7 +28,7 @@ export default
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
       let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
-      c.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
         if (c.wsResponse(response, error))

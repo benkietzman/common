@@ -48,11 +48,16 @@ export default
   // }}}
   // {{{ template
   template: `
-    <select class="form-select float-end" c-model="loginType" c-json>
-      {{#each loginTypes}}
-      <option value="{{.}}">{{type}}</option>
-      {{/each}}
-    </select>
+<div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle float-end" type="button" id="loginType" data-bs-toggle="dropdown" aria-expanded="false">
+        Dropdown button
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="loginType">
+        {{#each loginTypes}}
+        <li><button class="bgn btn-secondary dropdown-item" c-click="switchLogintype({{id}})">{{type}}</button></li>
+        {{/each}}
+      </ul>
+    </div>
     {{#if c.login.showForm}}
     <div class="row justify-content-md-center" style="margin-top: 100px;">
       <div class="col-md-auto">

@@ -1808,7 +1808,7 @@ class Common
                   {
                     this.dispatchEvent('resetMenu', null);
                     this.login.info = 'Waiting to redirect...';
-                    setTimeout(function() {document.location.href = result.data.Response.out.Redirect;}, 2000);
+                    //setTimeout(function() {document.location.href = result.data.Response.out.Redirect;}, 2000);
                   }
                 }
                 else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)

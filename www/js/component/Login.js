@@ -85,8 +85,8 @@ export default
             <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="background: inherit; margin-left: 10px; width: 20px;" c-json>{{#each loginTypes}}<option value="{{json .}}">{{type}}</option>{{/each}}</select>
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
           </div>
+          {{#if c.login.showForm}}
           <div class="card-body bg-primary-subtle">
-            {{#if c.login.showForm}}
             <div class="row">
               <div class="col fs-5">
                 User
@@ -103,8 +103,8 @@ export default
                 <input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()">
               </div>
             </div>
-            {{/if}}
           </div>
+          {{/if}}
           <div class="card-footer">
             {{#if c.login.message}}
             <b class="fs-6 text-danger">{{c.login.message}}</b>

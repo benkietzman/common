@@ -37,19 +37,19 @@ export default
     };
     // }}}
     // {{{ procyessLogin()
-    s.processLogin()
+    s.processLogin = () =>
     {
       c.processLogin(s.strLoginType);
-    }
+    };
     // }}}
     // {{{ processLoginKey()
-    s.processLoginKey: () =>
+    s.processLoginKey = () =>
     {
       if (window.event.keyCode == 13)
       {
         s.processLogin();
       }
-    }
+    };
     // }}}
     // {{{ switchLoginType()
     s.switchLoginType = () =>

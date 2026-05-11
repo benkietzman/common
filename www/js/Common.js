@@ -21,6 +21,7 @@ class Common
     this.m_auth = {};
     this.m_intervals = {};
     this.m_listeners = {};
+    this.m_loginType = {};
     this.m_loginTypes = [];
     this.m_messages = [];
     this.m_store = {};
@@ -1637,6 +1638,10 @@ class Common
         if (this.isDefined(response.Response))
         {
           this.m_loginTypes = response.Response;
+          if (this.m_loginTypes.length > 0)
+          {
+            this.m_loginType = this.m_loginTypes[0];
+          }
         }
       }
       if (this.m_bJwt)

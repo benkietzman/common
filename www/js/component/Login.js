@@ -15,13 +15,7 @@ export default
     {
       c: c,
       loginTypes: [],
-      processLoginKey: () =>
-      {
-        if (window.event.keyCode == 13)
-        {
-          c.processLogin();
-        }
-      }
+      strLoginType: null,
     });
     // }}}
     // {{{ getLoginTypes()
@@ -42,6 +36,21 @@ export default
       });
     };
     // }}}
+    // {{{ procyessLogin()
+    s.processLogin()
+    {
+      c.processLogin(s.strLoginType);
+    }
+    // }}}
+    // {{{ processLoginKey()
+    s.processLoginKey: () =>
+    {
+      if (window.event.keyCode == 13)
+      {
+        s.processLogin();
+      }
+    }
+    // }}}
     // {{{ switchLoginType()
     s.switchLoginType = () =>
     {
@@ -49,7 +58,8 @@ export default
       c.unsetRedirectTimeout();
       if (c.isDefined(loginType) && c.isDefined(loginType.type) && loginType.type.length > 1)
       {
-        c.processLogin(loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1));
+        s.strLoginType = loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1);
+        s.processLogin();
       }
     };
     // }}}
@@ -58,10 +68,10 @@ export default
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
       s.getLoginTypes();
-      c.processLogin();
+      s.processLogin();
     });
     s.getLoginTypes();
-    c.processLogin();
+    s.processLogin();
     // }}}
   },
   // }}}
@@ -102,7 +112,7 @@ export default
             <span class="fs-6 text-warning">{{c.login.info}}</span>
             {{/if}}
             {{#if c.login.showForm}}
-            <button class="btn btn-primary float-end" c-click="c.processLogin()">Login</button>
+            <button class="btn btn-primary float-end" c-click="processLogin()">Login</button>
             {{/if}}
           </div>
         </div>

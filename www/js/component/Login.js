@@ -46,6 +46,7 @@ export default
     s.switchLoginType = () =>
     {
       let loginType = c.simplify(s.loginType);
+      c.unsetRedirectTimeout();
       if (c.isDefined(loginType) && c.isDefined(loginType.type) && loginType.type.length > 1)
       {
         c.processLogin(loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1));
@@ -66,19 +67,15 @@ export default
   // }}}
   // {{{ template
   template: `
-    <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="position: fixed; top: 120px; right: 0px; width: 20px;" c-json>
-      {{#each loginTypes}}
-      <option value="{{json .}}">{{type}}</option>
-      {{/each}}
-    </select>
-    {{#if c.login.showForm}}
     <div class="row justify-content-md-center" style="margin-top: 100px;">
       <div class="col-md-auto">
         <div class="card border border-primary-subtle">
           <div class="card-header bg-primary fs-5 fw-bold">
+            <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="width: 20px;" c-json>{{#each loginTypes}}<option value="{{json .}}">{{type}}</option>{{/each}}</select>
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
           </div>
           <div class="card-body bg-primary-subtle">
+            {{#if c.login.showForm}}
             <div class="row">
               <div class="col fs-5">
                 User
@@ -95,6 +92,7 @@ export default
                 <input class="form-control" type="password" c-model="c.login.login.password" maxlength="64" c-keyup="processLoginKey()">
               </div>
             </div>
+            {{/if}}
           </div>
           <div class="card-footer">
             {{#if c.login.message}}
@@ -103,19 +101,13 @@ export default
             {{#if c.login.info}}
             <span class="fs-6 text-warning">{{c.login.info}}</span>
             {{/if}}
+            {{#if c.login.showForm}}
             <button class="btn btn-primary float-end" c-click="c.processLogin()">Login</button>
+            {{/if}}
           </div>
         </div>
       </div>
     </div>
-    {{else}}
-    {{#if c.login.message}}
-    <div style="color:red;font-weight:bold;"><br>{{c.login.message}}</div>
-    {{/if}}
-    {{#if c.login.info}}
-    <div style="color:orange;"><br>{{c.login.info}}</div>
-    {{/if}}
-    {{/if}}
   `
   // }}}
 }

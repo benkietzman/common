@@ -2595,6 +2595,16 @@ class Common
     }
   }
   // }}}
+  // {{{ unsetRedirectTimeout()
+  unsetRedirectTimeout(n)
+  {
+    if (this.m_redirectTimeout != null)
+    {
+      clearTimeout(this.m_redirectTimeout);
+      this.m_redirectTimeout = null;
+    }
+  }
+  // }}}
   // {{{ update()
   update(name)
   {

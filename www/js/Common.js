@@ -1624,10 +1624,14 @@ class Common
   }
   // }}}
   // {{{ processLogin()
-  processLogin()
+  processLogin(strLoginType)
   {
     this.login.info = 'Processing login...';
     this.render(this.id, 'Login', this.component);
+    if (strLoginType != '')
+    {
+      this.m_strLoginType = strLoginType;
+    }
     if (this.m_bJwt)
     {
       let request = null;

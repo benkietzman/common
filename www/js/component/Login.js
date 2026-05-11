@@ -23,6 +23,17 @@ export default
       }
     });
     // }}}
+    // {{{ switchLoginType()
+    s.switchLoginType = ()
+    {
+      if (c.isDefined(s.loginType) && c.isDefined(s.loginType.type) && s.loginType.type.length > 1)
+      {
+        let strLoginType = s.loginType.type;
+        strLoginType[0] = strLoginType[0].toLowerCase();
+        c.processLogin(strLoginType);
+      }
+    };
+    // }}}
     // {{{ main
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>
@@ -48,7 +59,7 @@ export default
   // }}}
   // {{{ template
   template: `
-    <select class="form-select float-end" c-model="loginType" style="position: fixed; top: 120px; right: 0px; width: 20px;" c-json>
+    <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="position: fixed; top: 120px; right: 0px; width: 20px;" c-json>
       {{#each loginTypes}}
       <option value="{{.}}">{{type}}</option>
       {{/each}}

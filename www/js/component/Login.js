@@ -39,7 +39,6 @@ export default
     // {{{ procyessLogin()
     s.processLogin = () =>
     {
-      alert(s.strLoginType);
       c.processLogin(s.strLoginType);
     };
     // }}}

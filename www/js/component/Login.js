@@ -14,7 +14,6 @@ export default
     let s = c.store('Login',
     {
       c: c,
-      loginType: c.m_loginType,
       processLoginKey: () =>
       {
         if (window.event.keyCode == 13)
@@ -37,7 +36,7 @@ export default
   // {{{ template
   template: `
     <b>Login Type:  {{json c.m_loginType}}</b>
-    <select class="form-select float-end" c-model="loginType" c-json>
+    <select class="form-select float-end" c-model="c.m_loginType" c-json>
       {{#each c.m_loginTypes}}
       <option value="{{.}}">{{type}}</option>
       {{/each}}

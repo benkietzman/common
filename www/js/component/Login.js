@@ -45,10 +45,10 @@ export default
     // {{{ switchLoginType()
     s.switchLoginType = () =>
     {
-console.log(s.loginType);
       if (c.isDefined(s.loginType) && c.isDefined(s.loginType.type) && s.loginType.type.length > 1)
       {
-        let strLoginType = s.loginType.type;
+        let loginType = c.simplify(s.loginType);
+        let strLoginType = loginType.type;
         strLoginType[0] = strLoginType[0].toLowerCase();
         c.processLogin(strLoginType);
       }

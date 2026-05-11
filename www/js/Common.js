@@ -1736,7 +1736,7 @@ class Common
                         {
                           this.dispatchEvent('resetMenu', null);
                           this.login.info = 'Waiting to redirect...';
-                          this.setReroutePath(response.Response.Redirect);
+                          this.m_strReroutePath = response.Response.Redirect;
                           this.setRerouteTimeout();
                         }
                       }
@@ -1813,7 +1813,7 @@ class Common
                   {
                     this.dispatchEvent('resetMenu', null);
                     this.login.info = 'Waiting to redirect...';
-                    this.setReroutePath(result.data.Response.out.Redirect);
+                    this.m_strReroutePath = result.data.Response.out.Redirect;
                     this.setRerouteTimeout();
                   }
                 }

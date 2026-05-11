@@ -21,7 +21,6 @@ class Common
     this.m_auth = {};
     this.m_intervals = {};
     this.m_listeners = {};
-    this.m_loginType = {};
     this.m_loginTypes = [];
     this.m_messages = [];
     this.m_store = {};
@@ -1629,145 +1628,190 @@ class Common
   {
     this.login.info = 'Processing login...';
     this.render(this.id, 'Login', this.component);
-    let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
-    this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+    if (this.m_bJwt)
     {
-      let error = {};
-      if (this.wsResponse(response, error))
+      let request = null;
+      request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
+      this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
-        if (this.isDefined(response.Response))
+        if (this.m_strLoginType == null)
         {
-          this.m_loginTypes = response.Response;
-          if (this.m_loginTypes.length > 0)
+          this.m_strLoginType = 'password';
+          if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
-            this.m_loginType = this.m_loginTypes[0];
+            this.m_strLoginType = response.Response.Module;
           }
         }
-      }
-      if (this.m_bJwt)
-      {
-        let request = null;
-        request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
-        this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+        fetch('/include/common_addons/auth/modules.json',
         {
-          if (this.m_strLoginType == null)
+          method: 'GET',
+          headers:
           {
-            this.m_strLoginType = 'password';
-            if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
+            'Content-Type': 'application/json'
+          }
+        })
+        .then((response) =>
+        {
+          let request = null;
+          response = ((response.status == 200)?response.json():{});
+          request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
+          request.Request.Type = this.m_strLoginType;
+          if (window.localStorage.getItem('sl_uniqueID'))
+          {
+            request.Request.UniqueID = window.localStorage.getItem('sl_uniqueID');
+          }
+          if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
+          {
+            request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
+          }
+          this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+          {
+            let error = {};
+            this.login.info = null;
+            if (this.wsResponse(response, error))
             {
-              this.m_strLoginType = response.Response.Module;
-              if (this.isDefined(response.Response.Type) && response.Response.Type != '')
+              if (this.isDefined(response.Error))
               {
-                for (let i = 0; i < this.m_loginTypes.length; i++)
+                if (this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
                 {
-                  if (this.m_loginTypes[i].type == response.Response.Type)
-                  {
-                    this.m_loginType = this.m_loginTypes[i];
-                  }
+                  this.login.message = response.Error.Message;
+                }
+                else if (response.Error.length > 0 && response.Error.search('Please provide the User.') == -1)
+                {
+                  this.login.message = response.Error;
                 }
               }
+              if (this.isDefined(response.Response.auth))
+              {
+                this.m_auth = null;
+                this.m_auth = response.Response.auth;
+                this.m_bHaveAuth = true;
+                if (this.isDefined(response.Response.jwt))
+                {
+                  window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
+                }
+                if (this.isDefined(this.m_auth.login_title))
+                {
+                  if (!this.isDefined(this.login.login) || !this.login.login)
+                  {
+                    this.login.login = {};
+                  }
+                  this.login.login.title = this.m_auth.login_title;
+                  if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                  {
+                    this.login.showForm = true;
+                  }
+                }
+                if (this.isValid())
+                {
+                  this.dispatchEvent('resetMenu', null);
+                  document.location.href = this.m_strRedirectPath;
+                }
+                else
+                {
+                  this.login.info = 'Processing login...';
+                  let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
+                  request.Request = {Type: this.m_strLoginType, Return: document.location.href};
+                  this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+                  {
+                    let error = {};
+                    this.login.info = null;
+                    if (this.wsResponse(response, error))
+                    {
+                      if (common.isDefined(response.Response))
+                      {
+                        if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
+                        {
+                          window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
+                        }
+                        if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
+                        {
+                          this.dispatchEvent('resetMenu', null);
+                          document.location.href = response.Response.Redirect;
+                        }
+                      }
+                    }
+                    else
+                    {
+                      this.login.message = error.message;
+                    }
+                    this.render(this.id, 'Login', this.component);
+                  });
+                }
+              }
+              if (this.isDefined(error.message))
+              {
+                this.login.message = error.message;
+              }
+            }
+            else
+            {
+              this.login.message = error.message;
+            }
+            this.render(this.id, 'Login', this.component);
+          });
+        });
+      });
+    }
+    else
+    {
+      this.login.Application = this.application;
+      if (this.m_strLoginType != '')
+      {
+        this.login.LoginType = this.m_strLoginType;
+      }
+      this.request('authProcessLogin', this.simplify(this.login.login), (result) =>
+      {
+        let error = {};
+        this.login.info = null;
+        if (this.response(result, error))
+        {
+          this.m_auth = null;
+          this.m_auth = result.data.Response.out;
+          this.m_bHaveAuth = true;
+          if (this.isDefined(this.m_auth.login_title))
+          {
+            this.login.login.title = this.m_auth.login_title;
+            if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+            {
+              this.login.showForm = true;
             }
           }
-          fetch('/include/common_addons/auth/modules.json',
+          if (this.isValid())
           {
-            method: 'GET',
-            headers:
-            {
-              'Content-Type': 'application/json'
-            }
-          })
-          .then((response) =>
+            this.dispatchEvent('resetMenu', null);
+            document.location.href = this.m_strRedirectPath;
+          }
+          else
           {
-            let request = null;
-            response = ((response.status == 200)?response.json():{});
-            request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
-            request.Request.Type = this.m_strLoginType;
-            if (window.localStorage.getItem('sl_uniqueID'))
+            let login = {};
+            login.Application = this.application;
+            if (this.m_strLoginType != '')
             {
-              request.Request.UniqueID = window.localStorage.getItem('sl_uniqueID');
+              login.LoginType = this.m_strLoginType;
             }
-            if (this.isDefined(response[this.m_strLoginType]) && this.isDefined(response[this.m_strLoginType]['cookie']) && this.isCookie(response[this.m_strLoginType]['cookie']))
-            {
-              request.Request.Data = this.getCookie(response[this.m_strLoginType]['cookie']);
-            }
-            this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+            login.Redirect = this.getRedirectPath();
+            this.request('authLogin', login, (result) =>
             {
               let error = {};
               this.login.info = null;
-              if (this.wsResponse(response, error))
+              if (this.response(result, error))
               {
-                if (this.isDefined(response.Error))
+                if (this.isDefined(result.data.Response.out.Status) && result.data.Response.out.Status == 'okay')
                 {
-                  if (this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
-                  {
-                    this.login.message = response.Error.Message;
-                  }
-                  else if (response.Error.length > 0 && response.Error.search('Please provide the User.') == -1)
-                  {
-                    this.login.message = response.Error;
-                  }
-                }
-                if (this.isDefined(response.Response.auth))
-                {
-                  this.m_auth = null;
-                  this.m_auth = response.Response.auth;
-                  this.m_bHaveAuth = true;
-                  if (this.isDefined(response.Response.jwt))
-                  {
-                    window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
-                  }
-                  if (this.isDefined(this.m_auth.login_title))
-                  {
-                    if (!this.isDefined(this.login.login) || !this.login.login)
-                    {
-                      this.login.login = {};
-                    }
-                    this.login.login.title = this.m_auth.login_title;
-                    if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
-                    {
-                      this.login.showForm = true;
-                    }
-                  }
-                  if (this.isValid())
+                  if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
                     this.dispatchEvent('resetMenu', null);
-                    document.location.href = this.m_strRedirectPath;
-                  }
-                  else
-                  {
-                    this.login.info = 'Processing login...';
-                    let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
-                    request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-                    this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
-                    {
-                      let error = {};
-                      this.login.info = null;
-                      if (this.wsResponse(response, error))
-                      {
-                        if (common.isDefined(response.Response))
-                        {
-                          if (common.isDefined(response.Response.UniqueID) && response.Response.UniqueID.length > 0)
-                          {
-                            window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
-                          }
-                          if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
-                          {
-                            this.dispatchEvent('resetMenu', null);
-                            document.location.href = response.Response.Redirect;
-                          }
-                        }
-                      }
-                      else
-                      {
-                        this.login.message = error.message;
-                      }
-                      this.render(this.id, 'Login', this.component);
-                    });
+                    document.location.href = result.data.Response.out.Redirect;
                   }
                 }
-                if (this.isDefined(error.message))
+                else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)
                 {
-                  this.login.message = error.message;
+                  this.login.message = result.data.Response.out.Error;
+                }
+                else
+                {
+                  this.login.message = 'Encountered an unknown error.';
                 }
               }
               else
@@ -1776,86 +1820,15 @@ class Common
               }
               this.render(this.id, 'Login', this.component);
             });
-          });
-        });
-      }
-      else
-      {
-        this.login.Application = this.application;
-        if (this.m_strLoginType != '')
-        {
-          this.login.LoginType = this.m_strLoginType;
+          }
         }
-        this.request('authProcessLogin', this.simplify(this.login.login), (result) =>
+        else
         {
-          let error = {};
-          this.login.info = null;
-          if (this.response(result, error))
-          {
-            this.m_auth = null;
-            this.m_auth = result.data.Response.out;
-            this.m_bHaveAuth = true;
-            if (this.isDefined(this.m_auth.login_title))
-            {
-              this.login.login.title = this.m_auth.login_title;
-              if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
-              {
-                this.login.showForm = true;
-              }
-            }
-            if (this.isValid())
-            {
-              this.dispatchEvent('resetMenu', null);
-              document.location.href = this.m_strRedirectPath;
-            }
-            else
-            {
-              let login = {};
-              login.Application = this.application;
-              if (this.m_strLoginType != '')
-              {
-                login.LoginType = this.m_strLoginType;
-              }
-              login.Redirect = this.getRedirectPath();
-              this.request('authLogin', login, (result) =>
-              {
-                let error = {};
-                this.login.info = null;
-                if (this.response(result, error))
-                {
-                  if (this.isDefined(result.data.Response.out.Status) && result.data.Response.out.Status == 'okay')
-                  {
-                    if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
-                    {
-                      this.dispatchEvent('resetMenu', null);
-                      document.location.href = result.data.Response.out.Redirect;
-                    }
-                  }
-                  else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)
-                  {
-                    this.login.message = result.data.Response.out.Error;
-                  }
-                  else
-                  {
-                    this.login.message = 'Encountered an unknown error.';
-                  }
-                }
-                else
-                {
-                  this.login.message = error.message;
-                }
-                this.render(this.id, 'Login', this.component);
-              });
-            }
-          }
-          else
-          {
-            this.login.message = error.message;
-          }
-          this.render(this.id, 'Login', this.component);
-        });
-      }
-    });
+          this.login.message = error.message;
+        }
+        this.render(this.id, 'Login', this.component);
+      });
+    }
   }
   // }}}
   // {{{ processLogout()

@@ -27,6 +27,19 @@ export default
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
+      let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
+      c.wsRequest(this.m_strAuthProtocol, request).then((response) =>
+      {
+        let error = {};
+        if (c.wsResponse(response, error))
+        {
+          if (c.isDefined(response.Response))
+          {
+            s.loginTypes = response.Response;
+            c.update('Login');
+          }
+        }
+      });
       c.processLogin();
     });
     c.processLogin();
@@ -35,9 +48,8 @@ export default
   // }}}
   // {{{ template
   template: `
-    <b>Login Type:  {{json c.m_loginType}}</b>
-    <select class="form-select float-end" c-model="c.m_loginType" c-json>
-      {{#each c.m_loginTypes}}
+    <select class="form-select float-end" c-model="loginType" c-json>
+      {{#each loginTypes}}
       <option value="{{.}}">{{type}}</option>
       {{/each}}
     </select>

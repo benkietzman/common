@@ -1631,7 +1631,7 @@ class Common
     this.login.info = 'Processing login...';
     this.login.showForm = false;
     this.render(this.id, 'Login', this.component);
-    if (strLoginType != '')
+    if (strLoginType)
     {
       this.m_strLoginType = strLoginType;
     }

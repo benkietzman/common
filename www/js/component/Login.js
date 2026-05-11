@@ -45,10 +45,11 @@ export default
   // }}}
   // {{{ template
   template: `
+    <b>Login Type:  {{c.m_strLoginType}}</b>
     {{#if loginTypes}}
-    <select class="form-control float-end" c-model="loginType" json>
+    <select class="form-select float-end" c-model="loginType" c-json>
       {{#each loginTypes}}
-      <option value="{{.}}">{{type}}</option>
+      <option value="{{.}}"{{#ifCond c.m_strLoginType "==" type}} selected{{/ifCond}}>{{type}}</option>
       {{/each}}
     </select>
     {{/if}}

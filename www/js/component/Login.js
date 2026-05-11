@@ -24,7 +24,7 @@ export default
     });
     // }}}
     // {{{ switchLoginType()
-    s.switchLoginType = ()
+    s.switchLoginType = () =>
     {
       if (c.isDefined(s.loginType) && c.isDefined(s.loginType.type) && s.loginType.type.length > 1)
       {

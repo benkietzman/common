@@ -48,9 +48,7 @@ export default
       let loginType = c.simplify(s.loginType);
       if (c.isDefined(loginType) && c.isDefined(loginType.type) && loginType.type.length > 1)
       {
-        let strLoginType = loginType.type;
-        strLoginType[0] = strLoginType[0].toLowerCase();
-        c.processLogin(strLoginType);
+        c.processLogin(loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1));
       }
     };
     // }}}

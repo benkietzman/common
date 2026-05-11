@@ -44,6 +44,7 @@ export default
     // {{{ switchLoginType()
     s.switchLoginType = () =>
     {
+console.log(s.loginType);
       if (c.isDefined(s.loginType) && c.isDefined(s.loginType.type) && s.loginType.type.length > 1)
       {
         let strLoginType = s.loginType.type;

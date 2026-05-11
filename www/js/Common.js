@@ -1732,7 +1732,7 @@ class Common
                         {
                           this.dispatchEvent('resetMenu', null);
                           this.login.info = 'Waiting to redirect...';
-                          setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
+                          //setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
                         }
                       }
                     }

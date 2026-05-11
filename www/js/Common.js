@@ -1660,7 +1660,7 @@ class Common
               {
                 for (let i = 0; i < this.m_loginTypes.length; i++)
                 {
-                  if (this.m_loginTypes[i] == response.ResponseType)
+                  if (this.m_loginTypes[i] == response.Response.Type)
                   {
                     this.m_loginType = this.m_loginTypes[i];
                   }

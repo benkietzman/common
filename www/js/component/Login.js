@@ -38,7 +38,7 @@ export default
     <b>Login Type:  {{json c.m_loginType}}</b>
     <select class="form-select float-end" c-model="c.m_loginType" c-json>
       {{#each c.m_loginTypes}}
-      <option value="{{.}}"{{#ifCond c.m_loginType.type "==" type}} selected{{/ifCond}}>{{type}}</option>
+      <option value="{{.}}">{{type}}</option>
       {{/each}}
     </select>
     {{#if c.login.showForm}}

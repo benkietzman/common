@@ -31,7 +31,7 @@ export default
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
-        if (this.wsResponse(response, error))
+        if (c.wsResponse(response, error))
         {
           console.log(response);
         }

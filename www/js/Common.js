@@ -1736,7 +1736,7 @@ class Common
                           this.dispatchEvent('resetMenu', null);
                           this.login.info = 'Waiting to redirect...';
                           this.setRedirectPath(response.Response.Redirect);
-                          this.setRedirectTimeout(2000);
+                          this.setRedirectTimeout();
                         }
                       }
                     }
@@ -1813,7 +1813,7 @@ class Common
                     this.dispatchEvent('resetMenu', null);
                     this.login.info = 'Waiting to redirect...';
                     this.setRedirectPath(result.data.Response.out.Redirect);
-                    this.setRedirectTimeout(2000);
+                    this.setRedirectTimeout();
                   }
                 }
                 else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)
@@ -2420,9 +2420,9 @@ class Common
   }
   // }}}
   // {{{ setRedirectTimeout()
-  setRedirectTimeout(unDuration)
+  setRedirectTimeout()
   {
-    this.m_redirectTimeout = setTimeout(function() {document.location.href = common.getRedirectPath();}, unDuration);
+    this.m_redirectTimeout = setTimeout(function() {document.location.href = common.getRedirectPath();}, 5000);
   }
   // }}}
   // {{{ setRequestPath()

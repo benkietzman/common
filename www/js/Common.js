@@ -1719,7 +1719,6 @@ class Common
                   this.login.info = 'Processing login...';
                   let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
                   request.Request = {Type: this.m_strLoginType, Return: document.location.href};
-alert(JSON.stringify(request));
                   this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                   {
                     let error = {};

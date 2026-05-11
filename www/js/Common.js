@@ -1631,7 +1631,7 @@ class Common
     this.login.info = 'Processing login...';
     this.login.showForm = false;
     this.render(this.id, 'Login', this.component);
-    if (strLoginType)
+    if (strLoginType != '')
     {
       this.m_strLoginType = strLoginType;
     }
@@ -1719,6 +1719,7 @@ class Common
                   this.login.info = 'Processing login...';
                   let request = {Interface: 'secure', Section: 'secure', 'Function': 'login'};
                   request.Request = {Type: this.m_strLoginType, Return: document.location.href};
+alert(request);
                   this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
                   {
                     let error = {};

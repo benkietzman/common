@@ -55,7 +55,7 @@ export default
     s.switchLoginType = () =>
     {
       let loginType = c.simplify(s.loginType);
-      c.unsetRedirectTimeout();
+      c.unsetRerouteTimeout();
       if (c.isDefined(loginType) && c.isDefined(loginType.type) && loginType.type.length > 1)
       {
         s.strLoginType = loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1);

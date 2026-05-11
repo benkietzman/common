@@ -1731,6 +1731,7 @@ class Common
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
                           this.dispatchEvent('resetMenu', null);
+                          await new Promise(r => setTimeout(r, 2000));
                           document.location.href = response.Response.Redirect;
                         }
                       }
@@ -1806,6 +1807,7 @@ class Common
                   if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
                     this.dispatchEvent('resetMenu', null);
+                    await new Promise(r => setTimeout(r, 2000));
                     document.location.href = result.data.Response.out.Redirect;
                   }
                 }

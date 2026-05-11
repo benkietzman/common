@@ -23,11 +23,12 @@ class Common
     this.m_listeners = {};
     this.m_loginTypes = [];
     this.m_messages = [];
-    this.m_redirectTimeout = null;
+    this.m_rerouteTimeout = null;
     this.m_store = {};
     this.m_strAuthProtocol = null;
     this.m_strLoginType = null;
     this.m_strRedirectPath = null;
+    this.m_strReroutePath = null;
     this.m_nUnique = 0;
     this.m_ws = {};
     this.menu = {left: [], right: []};
@@ -1735,8 +1736,8 @@ class Common
                         {
                           this.dispatchEvent('resetMenu', null);
                           this.login.info = 'Waiting to redirect...';
-                          this.setRedirectPath(response.Response.Redirect);
-                          this.setRedirectTimeout();
+                          this.setReroutePath(response.Response.Redirect);
+                          this.setRerouteTimeout();
                         }
                       }
                     }
@@ -1812,8 +1813,8 @@ class Common
                   {
                     this.dispatchEvent('resetMenu', null);
                     this.login.info = 'Waiting to redirect...';
-                    this.setRedirectPath(result.data.Response.out.Redirect);
-                    this.setRedirectTimeout();
+                    this.setReroutePath(result.data.Response.out.Redirect);
+                    this.setRerouteTimeout();
                   }
                 }
                 else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)
@@ -2419,10 +2420,10 @@ class Common
     this.m_strRedirectPath = strPath;
   }
   // }}}
-  // {{{ setRedirectTimeout()
-  setRedirectTimeout()
+  // {{{ setRerouteTimeout()
+  setRerouteTimeout()
   {
-    this.m_redirectTimeout = setTimeout(function() {document.location.href = common.getRedirectPath();}, 5000);
+    this.m_rerouteTimeout = setTimeout(function() {document.location.href = common.getRedirectPath();}, 5000);
   }
   // }}}
   // {{{ setRequestPath()
@@ -2596,13 +2597,13 @@ class Common
     }
   }
   // }}}
-  // {{{ unsetRedirectTimeout()
-  unsetRedirectTimeout(n)
+  // {{{ unsetRerouteTimeout()
+  unsetRerouteTimeout(n)
   {
-    if (this.m_redirectTimeout != null)
+    if (this.m_rerouteTimeout != null)
     {
-      clearTimeout(this.m_redirectTimeout);
-      this.m_redirectTimeout = null;
+      clearTimeout(this.m_rerouteTimeout);
+      this.m_rerouteTimeout = null;
     }
   }
   // }}}

@@ -21,6 +21,10 @@ export default
         {
           c.processLogin();
         }
+      },
+      u: () =>
+      {
+        c.update('Login');
       }
     });
     // }}}
@@ -34,8 +38,21 @@ export default
         let error = {};
         if (c.wsResponse(response, error))
         {
-          s.loginTypes = response.Response;
+          if (response.Response.length > 0)
+          {
+            s.loginTypes = response.Response;
+            s.loginType = s.loginTypes[0];
+            for (let i = 0; i < s.loginTypes; i++)
+            {
+console.log(s.loginTypes[i].type+' == '+c.m_strLoginType);
+              if (s.loginTypes[i].type == c.m_strLoginType)
+              {
+                s.loginType = s.loginTypes[i];
+              }
+            }
+          }
         }
+        s.u();
       });
       c.processLogin();
     });
@@ -49,7 +66,7 @@ export default
     {{#if loginTypes}}
     <select class="form-select float-end" c-model="loginType" c-json>
       {{#each loginTypes}}
-      <option value="{{.}}"{{#ifCond ../c.m_strLoginType "==" type}} selected{{/ifCond}}>{{../c.m_strLoginType}} - {{type}}</option>
+      <option value="{{.}}"{{#ifCond ../c.m_strLoginType "==" type}} selected{{/ifCond}}>{{type}}</option>
       {{/each}}
     </select>
     {{/if}}

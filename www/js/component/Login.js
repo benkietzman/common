@@ -23,6 +23,24 @@ export default
       }
     });
     // }}}
+    // {{{ getLoginTypes()
+    s.getLoginTypes = () =>
+    {
+      let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+      {
+        let error = {};
+        if (c.wsResponse(response, error))
+        {
+          if (c.isDefined(response.Response))
+          {
+            s.loginTypes = response.Response;
+            c.update('Login');
+          }
+        }
+      });
+    };
+    // }}}
     // {{{ switchLoginType()
     s.switchLoginType = () =>
     {
@@ -38,21 +56,10 @@ export default
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
-      let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
-      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
-      {
-        let error = {};
-        if (c.wsResponse(response, error))
-        {
-          if (c.isDefined(response.Response))
-          {
-            s.loginTypes = response.Response;
-            c.update('Login');
-          }
-        }
-      });
+      s.getLoginTypes();
       c.processLogin();
     });
+    s.getLoginTypes();
     c.processLogin();
     // }}}
   },

@@ -1630,10 +1630,10 @@ class Common
     this.login.info = 'Processing login...';
     this.render(this.id, 'Login', this.component);
     let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
-    c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+    this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
     {
       let error = {};
-      if (c.wsResponse(response, error))
+      if (this.wsResponse(response, error))
       {
         if (this.isDefined(response.Response))
         {

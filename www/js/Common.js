@@ -1731,7 +1731,7 @@ class Common
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
                           this.dispatchEvent('resetMenu', null);
-                          setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
+                          setTimeout(function() {document.location.href = response.Response.Redirect;}, 10000);
                         }
                       }
                     }
@@ -1806,7 +1806,7 @@ class Common
                   if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
                     this.dispatchEvent('resetMenu', null);
-                    setTimeout(function() {document.location.href = result.data.Response.out.Redirect;}, 2000);
+                    setTimeout(function() {document.location.href = result.data.Response.out.Redirect;}, 10000);
                   }
                 }
                 else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)

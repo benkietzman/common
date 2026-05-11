@@ -1735,6 +1735,7 @@ class Common
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
                           this.dispatchEvent('resetMenu', null);
+                          this.login.info = 'Waiting to redirect...';
                           this.m_strReroutePath = response.Response.Redirect;
                           this.setRerouteTimeout();
                         }
@@ -1811,6 +1812,7 @@ class Common
                   if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
                     this.dispatchEvent('resetMenu', null);
+                    this.login.info = 'Waiting to redirect...';
                     this.m_strReroutePath = result.data.Response.out.Redirect;
                     this.setRerouteTimeout();
                   }
@@ -2421,28 +2423,7 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
-    this.login.info = 'Redirecting in 5 seconds...';
-    this.m_rerouteCount = 5;
-    this.m_rerouteTimeout = setTimeout(function()
-    {
-      if (common.m_rerouteCount > 0)
-      {
-        common.m_rerouteCount--;
-        common.login.info = 'Redirecting in ' + common.m_rerouteCount + ' second';
-        if (common.m_rerouteCount != 1)
-        {
-          common.login.info += 's';
-        }
-        common.login.info += '...';
-        common.render(common.id, 'Login', common.component);
-      }
-      else
-      {
-        common.login.info = 'Redirecting now...';
-        common.render(common.id, 'Login', common.component);
-        document.location.href = common.m_strReroutePath;
-      }
-    }, 1000);
+    this.m_rerouteTimeout = setTimeout(function() {document.location.href = common.m_strReroutePath;}, 5000);
   }
   // }}}
   // {{{ setRequestPath()

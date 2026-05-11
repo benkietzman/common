@@ -1624,7 +1624,7 @@ class Common
   }
   // }}}
   // {{{ processLogin()
-  processLogin(strLoginType)
+  async processLogin(strLoginType)
   {
     this.login.info = 'Processing login...';
     this.render(this.id, 'Login', this.component);

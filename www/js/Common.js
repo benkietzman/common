@@ -23,9 +23,11 @@ class Common
     this.m_listeners = {};
     this.m_loginTypes = [];
     this.m_messages = [];
+    this.m_redirectTimeout = null;
     this.m_store = {};
     this.m_strAuthProtocol = null;
     this.m_strLoginType = null;
+    this.m_strRedirectPath = null;
     this.m_nUnique = 0;
     this.m_ws = {};
     this.menu = {left: [], right: []};
@@ -1709,7 +1711,7 @@ class Common
                 if (this.isValid())
                 {
                   this.dispatchEvent('resetMenu', null);
-                  document.location.href = this.m_strRedirectPath;
+                  document.location.href = this.getRedirectPath();
                 }
                 else
                 {
@@ -1732,7 +1734,8 @@ class Common
                         {
                           this.dispatchEvent('resetMenu', null);
                           this.login.info = 'Waiting to redirect...';
-                          setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
+                          this.setRedirectPath(response.Response.Redirect);
+                          this.setRedirectTimeout(2000);
                         }
                       }
                     }
@@ -1785,7 +1788,7 @@ class Common
           if (this.isValid())
           {
             this.dispatchEvent('resetMenu', null);
-            document.location.href = this.m_strRedirectPath;
+            document.location.href = this.getRedirectPath();
           }
           else
           {
@@ -1808,7 +1811,8 @@ class Common
                   {
                     this.dispatchEvent('resetMenu', null);
                     this.login.info = 'Waiting to redirect...';
-                    setTimeout(function() {document.location.href = result.data.Response.out.Redirect;}, 2000);
+                    this.setRedirectPath(result.data.Response.out.Redirect);
+                    this.setRedirectTimeout(2000);
                   }
                 }
                 else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)
@@ -1938,7 +1942,7 @@ class Common
         window.localStorage.removeItem('sl_uniqueID');
       }
       this.dispatchEvent('resetMenu', null);
-      document.location.href = this.m_strRedirectPath;
+      document.location.href = this.getRedirectPath();
     }
   }
   // }}}
@@ -2412,6 +2416,12 @@ class Common
   setRedirectPath(strPath)
   {
     this.m_strRedirectPath = strPath;
+  }
+  // }}}
+  // {{{ setRedirectTimeout()
+  setRedirectTimeout(unDuration)
+  {
+    this.m_redirectTimeout = setTimeout(function() {document.location.href = this.getRedirectPath();}, unDuration);
   }
   // }}}
   // {{{ setRequestPath()

@@ -14,6 +14,7 @@ export default
     let s = c.store('Login',
     {
       c: c,
+      loginTypes: [],
       processLoginKey: () =>
       {
         if (window.event.keyCode == 13)

@@ -35,7 +35,7 @@ export default
   // }}}
   // {{{ template
   template: `
-    <b>Login Type:  {{c.m_strLoginType}}</b>
+    <b>Login Type:  {{json c.m_loginType}}</b>
     <select class="form-select float-end" c-model="loginType" c-json>
       {{#each c.m_loginTypes}}
       <option value="{{.}}">{{type}}</option>

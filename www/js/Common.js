@@ -1624,7 +1624,7 @@ class Common
   }
   // }}}
   // {{{ processLogin()
-  async processLogin(strLoginType)
+  processLogin(strLoginType)
   {
     this.login.info = 'Processing login...';
     this.render(this.id, 'Login', this.component);
@@ -1731,8 +1731,7 @@ class Common
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
                           this.dispatchEvent('resetMenu', null);
-                          await new Promise(r => setTimeout(r, 2000));
-                          document.location.href = response.Response.Redirect;
+                          setTimeout(function() {document.location.href = response.Response.Redirect;}, 2000);
                         }
                       }
                     }
@@ -1807,8 +1806,7 @@ class Common
                   if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
                     this.dispatchEvent('resetMenu', null);
-                    await new Promise(r => setTimeout(r, 2000));
-                    document.location.href = result.data.Response.out.Redirect;
+                    setTimeout(function() {document.location.href = result.data.Response.out.Redirect;}, 2000);
                   }
                 }
                 else if (this.isDefined(result.data.Response.out.Error) && result.data.Response.out.Error.length > 0)

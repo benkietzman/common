@@ -56,6 +56,7 @@ export default
     {
       let loginType = c.simplify(s.loginType);
       c.unsetRerouteTimeout();
+      c.login.message = false;
       if (c.isDefined(loginType) && c.isDefined(loginType.type) && loginType.type.length > 1)
       {
         s.strLoginType = loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1);

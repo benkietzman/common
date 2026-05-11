@@ -1635,7 +1635,7 @@ class Common
       {
         if (this.m_strLoginType == null)
         {
-          this.m_strLoginType = 'password';
+          this.m_strLoginType = 'Password';
           if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
             this.m_strLoginType = response.Response.Module;
@@ -1845,7 +1845,7 @@ class Common
           this.logout.info = null;
           if (this.m_strLoginType == null)
           {
-            this.m_strLoginType = 'password';
+            this.m_strLoginType = 'Password';
             if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
             {
               this.m_strLoginType = response.Response.Module;

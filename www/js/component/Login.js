@@ -43,7 +43,7 @@ export default
             s.loginTypes = response.Response;
             s.loginType = s.loginTypes[0];
 console.log(s.loginTypes);
-            for (let i = 0; i < s.loginTypes; i++)
+            for (let i = 0; i < s.loginTypes.length; i++)
             {
 console.log(s.loginTypes[i].type+' == '+c.m_strLoginType);
               if (s.loginTypes[i].type == c.m_strLoginType)

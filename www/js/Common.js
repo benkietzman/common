@@ -2421,7 +2421,7 @@ class Common
   // {{{ setRedirectTimeout()
   setRedirectTimeout(unDuration)
   {
-    this.m_redirectTimeout = setTimeout(function() {document.location.href = this.getRedirectPath();}, unDuration);
+    this.m_redirectTimeout = setTimeout(function() {document.location.href = c.getRedirectPath();}, unDuration);
   }
   // }}}
   // {{{ setRequestPath()

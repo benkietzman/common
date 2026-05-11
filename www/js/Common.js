@@ -2425,24 +2425,24 @@ class Common
     this.m_rerouteCount = 5;
     this.m_rerouteTimeout = setTimeout(function()
     {
-      if (this.m_rerouteCount > 0)
+      if (common.m_rerouteCount > 0)
       {
-        this.m_rerouteCount--;
-        this.login.info = 'Redirecting in ' + this.m_rerouteCount + ' second';
-        if (this.m_rerouteCount != 1)
+        common.m_rerouteCount--;
+        common.login.info = 'Redirecting in ' + common.m_rerouteCount + ' second';
+        if (common.m_rerouteCount != 1)
         {
-          this.login.info += 's';
+          common.login.info += 's';
         }
-        this.login.info += '...';
-        this.render(this.id, 'Login', this.component);
+        common.login.info += '...';
+        common.render(common.id, 'Login', common.component);
       }
       else
       {
-        this.login.info = 'Redirecting now...';
-        this.render(this.id, 'Login', this.component);
+        common.login.info = 'Redirecting now...';
+        common.render(common.id, 'Login', common.component);
         document.location.href = common.m_strReroutePath;
       }
-    }, 5000);
+    }, 1000);
   }
   // }}}
   // {{{ setRequestPath()

@@ -2423,7 +2423,7 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
-    this.m_rerouteTimeout = setTimeout(function() {document.location.href = common.getRedirectPath();}, 5000);
+    this.m_rerouteTimeout = setTimeout(function() {document.location.href = common.m_strReroutePath;}, 5000);
   }
   // }}}
   // {{{ setRequestPath()

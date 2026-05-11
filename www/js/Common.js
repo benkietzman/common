@@ -1676,11 +1676,11 @@ class Common
             {
               if (this.isDefined(response.Error))
               {
-                if (this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide the User.') == -1)
+                if (this.isDefined(response.Error.Message) && response.Error.Message.length > 0 && response.Error.Message.search('Please provide') == -1)
                 {
                   this.login.message = response.Error.Message;
                 }
-                else if (response.Error.length > 0 && response.Error.search('Please provide the User.') == -1)
+                else if (response.Error.length > 0 && response.Error.search('Please provide') == -1)
                 {
                   this.login.message = response.Error;
                 }

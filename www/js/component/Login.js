@@ -27,6 +27,15 @@ export default
     c.setMenu('Login', null);
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
+      let request = {Interface: 'central', Section: 'central', 'Function': 'loginTypes'};
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+      {
+        let error = {};
+        if (this.wsResponse(response, error))
+        {
+          console.log(response);
+        }
+      });
       c.processLogin();
     });
     c.processLogin();

@@ -71,7 +71,7 @@ export default
       <div class="col-md-auto">
         <div class="card border border-primary-subtle">
           <div class="card-header bg-primary fs-5 fw-bold">
-            <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="width: 20px;" c-json>{{#each loginTypes}}<option value="{{json .}}">{{type}}</option>{{/each}}</select>
+            <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="background: inherit; width: 20px;" c-json>{{#each loginTypes}}<option value="{{json .}}">{{type}}</option>{{/each}}</select>
             <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
           </div>
           <div class="card-body bg-primary-subtle">

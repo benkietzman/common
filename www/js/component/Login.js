@@ -70,7 +70,7 @@ console.log(s.loginType);
   template: `
     <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="position: fixed; top: 120px; right: 0px; width: 20px;" c-json>
       {{#each loginTypes}}
-      <option value="{{.}}">{{type}}</option>
+      <option value="{{json .}}">{{type}}</option>
       {{/each}}
     </select>
     {{#if c.login.showForm}}

@@ -2454,10 +2454,10 @@ class Common
       }
       strMessage += '...';
       common.login.rerouteMessage.value = strMessage;
-      if (common.login.count <= 0)
-      {
+      //if (common.login.count <= 0)
+      //{
         document.location.href = common.login.reroutePath;
-      }
+      //}
     }, 1000);
   }
   // }}}

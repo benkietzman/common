@@ -2653,6 +2653,7 @@ class Common
       clearTimeout(this.login.rerouteTimeout);
       this.login.rerouteTimeout = false;
       this.login.rerouteMessage.v = null;
+      this.login.reroutePath = false;
     }
   }
   // }}}

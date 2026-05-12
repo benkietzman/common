@@ -16,7 +16,7 @@ class Common
     this.debug = false;
     this.footer = {engineer: false};
     this.autoLoads = {};
-    this.login = {count: 5, info: false, login: {password: '', title: '', userid: ''}, message: false, rerouteMessage: false, reroutePath: false, rerouteTimeout = false, showForm: false};
+    this.login = {count: 5, info: false, login: {password: '', title: '', userid: ''}, message: false, rerouteMessage: false, reroutePath: false, rerouteTimeout: false, showForm: false};
     this.logout = {info: false, message: false};
     this.m_auth = {};
     this.m_intervals = {};

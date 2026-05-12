@@ -2439,7 +2439,7 @@ class Common
       strMessage += 'now';
     }
     strMessage += '...';
-    this.login.redirect.value(strMessage);
+    this.login.redirect.v(strMessage);
     this.m_rerouteTimeout = setTimeout(function()
     {
       let info = document.getElementById('login_info');
@@ -2457,7 +2457,7 @@ class Common
         strMessage += 'now';
       }
       strMessage += '...';
-      common.login.redirect.value(strMessage);
+      common.login.redirect.v(strMessage);
       if (common.m_unRerouteCount <= 0)
       {
         document.location.href = common.m_strReroutePath;

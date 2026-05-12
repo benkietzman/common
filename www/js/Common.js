@@ -16,7 +16,7 @@ class Common
     this.debug = false;
     this.footer = {engineer: false};
     this.autoLoads = {};
-    this.login = {count: 5, info: false, login: {password: '', title: '', userid: ''}, message: false, rerouteMessage: false, reroutePath: false, rerouteTimeout: false, showForm: false};
+    this.login = {count: 5, info: false, login: {password: '', title: '', userid: ''}, message: false, rerouteMessage: null, reroutePath: false, rerouteTimeout: false, showForm: false};
     this.logout = {info: false, message: false};
     this.m_auth = {};
     this.m_intervals = {};
@@ -1733,7 +1733,6 @@ class Common
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
                           this.dispatchEvent('resetMenu', null);
-                          this.login.info = 'Waiting to redirect...';
                           this.login.reroutePath = response.Response.Redirect;
                           this.setRerouteTimeout();
                         }
@@ -1810,7 +1809,6 @@ class Common
                   if (this.isDefined(result.data.Response.out.Redirect) && result.data.Response.out.Redirect.length > 0)
                   {
                     this.dispatchEvent('resetMenu', null);
-                    this.login.info = 'Waiting to redirect...';
                     this.login.reroutePath = result.data.Response.out.Redirect;
                     this.setRerouteTimeout();
                   }
@@ -2421,6 +2419,21 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
+    let strMessage = 'Redirecting ';
+    if (this.login.count > 0)
+    {
+      strMessage += 'in ' + this.login.count + 'second';
+      if (this.login.count != 1)
+      {
+        strMessage += 's';
+      }
+    }
+    else
+    {
+      strMessage += 'now';
+    }
+    strMessage += '...';
+    this.login.rerouteMessage.v = strMessage;
     this.login.rerouteTimeout = setTimeout(this.setRerouteTimeoutIter, 1000);
   }
   // }}}
@@ -2428,6 +2441,7 @@ class Common
   setRerouteTimeoutIter()
   {
     let strMessage = 'Redirecting ';
+    common.login.count--;
     if (common.login.count > 0)
     {
       strMessage += 'in ' + common.login.count + 'second';
@@ -2444,7 +2458,6 @@ class Common
     common.login.rerouteMessage.v = strMessage;
     if (common.login.count > 0)
     {
-      common.login.count--;
       common.login.rerouteTimeout = setTimeout(common.setRerouteTimeoutIter, 1000);
     }
     else

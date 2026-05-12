@@ -36,7 +36,7 @@ export default
       });
     };
     // }}}
-    // {{{ procyessLogin()
+    // {{{ processLogin()
     s.processLogin = () =>
     {
       c.processLogin(s.strLoginType);

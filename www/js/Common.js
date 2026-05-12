@@ -2422,7 +2422,7 @@ class Common
     let strMessage = 'Redirecting ';
     if (this.login.count > 0)
     {
-      strMessage += 'in ' + this.login.count + 'second';
+      strMessage += 'in ' + this.login.count + ' second';
       if (this.login.count != 1)
       {
         strMessage += 's';
@@ -2444,7 +2444,7 @@ class Common
     common.login.count--;
     if (common.login.count > 0)
     {
-      strMessage += 'in ' + common.login.count + 'second';
+      strMessage += 'in ' + common.login.count + ' second';
       if (common.login.count != 1)
       {
         strMessage += 's';

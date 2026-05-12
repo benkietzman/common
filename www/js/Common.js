@@ -2438,7 +2438,7 @@ class Common
       strMessage += 'now';
     }
     strMessage += '...';
-    //this.login.redirect.value(strMessage);
+    this.login.redirect.v = strMessage;
     this.m_rerouteTimeout = setTimeout(function()
     {
       let strMessage = 'Redirecting ';
@@ -2455,11 +2455,11 @@ class Common
         strMessage += 'now';
       }
       strMessage += '...';
-      //common.login.redirect.value(strMessage);
-      //if (common.m_unRerouteCount <= 0)
-      //{
+      common.login.redirect.value = strMessage;
+      if (common.m_unRerouteCount <= 0)
+      {
         document.location.href = common.m_strReroutePath;
-      //}
+      }
     }, 1000);
   }
   // }}}

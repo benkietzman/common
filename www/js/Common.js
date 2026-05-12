@@ -2424,7 +2424,6 @@ class Common
   setRerouteTimeout()
   {
     this.m_unRerouteCount = 5;
-    let info = document.getElementById('login_info');
     let strMessage = 'Redirecting ';
     if (this.m_unRerouteCount > 0)
     {
@@ -2439,10 +2438,9 @@ class Common
       strMessage += 'now';
     }
     strMessage += '...';
-    this.login.redirect.v(strMessage);
+    //this.login.redirect.value(strMessage);
     this.m_rerouteTimeout = setTimeout(function()
     {
-      let info = document.getElementById('login_info');
       let strMessage = 'Redirecting ';
       if (common.m_unRerouteCount > 0)
       {
@@ -2457,11 +2455,11 @@ class Common
         strMessage += 'now';
       }
       strMessage += '...';
-      common.login.redirect.v(strMessage);
-      if (common.m_unRerouteCount <= 0)
-      {
+      //common.login.redirect.value(strMessage);
+      //if (common.m_unRerouteCount <= 0)
+      //{
         document.location.href = common.m_strReroutePath;
-      }
+      //}
     }, 1000);
   }
   // }}}

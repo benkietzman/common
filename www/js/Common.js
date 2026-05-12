@@ -2445,7 +2445,7 @@ class Common
     if (common.login.count > 0)
     {
       common.login.count--;
-      this.login.rerouteTimeout = setTimeout(setRerouteTimeoutIter, 1000);
+      common.login.rerouteTimeout = setTimeout(setRerouteTimeoutIter, 1000);
     }
     else
     {

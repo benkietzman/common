@@ -2423,7 +2423,44 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
-    this.m_rerouteTimeout = setTimeout(function() {document.location.href = common.m_strReroutePath;}, 5000);
+    this.m_unRerouteCount = 5;
+    let strMessage = 'Redirecting ';
+    if (this.m_unRerouteCount > 0)
+    {
+      strMessage += 'in ' + this.m_unRerouteCount + 'second';
+      if (this.m_unRerouteCount != 1)
+      {
+        strMessage += 's';
+      }
+    }
+    else
+    {
+      strMessage += 'now';
+    }
+    strMessage += '...';
+    document.getElementById("login_info").innerHtml(strMessage);
+    this.m_rerouteTimeout = setTimeout(function()
+    {
+      let strMessage = 'Redirecting ';
+      if (common.m_unRerouteCount > 0)
+      {
+        strMessage += 'in ' + common.m_unRerouteCount + 'second';
+        if (common.m_unRerouteCount != 1)
+        {
+          strMessage += 's';
+        }
+      }
+      else
+      {
+        strMessage += 'now';
+      }
+      strMessage += '...';
+      document.getElementById("login_info").innerHtml(strMessage);
+      if (common.m_unRerouteCount <= 0)
+      {
+        document.location.href = common.m_strReroutePath;
+      }
+    }, 1000);
   }
   // }}}
   // {{{ setRequestPath()

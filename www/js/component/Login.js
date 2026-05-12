@@ -110,7 +110,7 @@ export default
             <b class="fs-6 text-danger">{{c.login.message}}</b>
             {{/if}}
             {{#if c.login.info}}
-            <span class="fs-6 text-warning">{{c.login.info}}</span>
+            <span class="fs-6 text-warning" id="login_info">{{c.login.info}}</span>
             {{/if}}
             {{#if c.login.showForm}}
             <button class="btn btn-primary float-end" c-click="processLogin()">Login</button>

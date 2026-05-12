@@ -2421,11 +2421,17 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
+    this.login.rerouteTimeout = setTimeout(setRerouteTimeoutIter, 1000);
+  }
+  // }}}
+  // {{{ setRerouteTimeoutIter()
+  setRerouteTimeoutIter()
+  {
     let strMessage = 'Redirecting ';
-    if (this.login.count > 0)
+    if (common.login.count > 0)
     {
-      strMessage += 'in ' + this.login.count + 'second';
-      if (this.login.count != 1)
+      strMessage += 'in ' + common.login.count + 'second';
+      if (common.login.count != 1)
       {
         strMessage += 's';
       }
@@ -2435,30 +2441,16 @@ class Common
       strMessage += 'now';
     }
     strMessage += '...';
-    this.login.rerouteMessage.v = strMessage;
-    this.login.rerouteTimeout = setTimeout(function()
+    common.login.rerouteMessage.v = strMessage;
+    if (common.login.count > 0)
     {
-      let strMessage = 'Redirecting ';
       common.login.count--;
-      if (common.login.count > 0)
-      {
-        strMessage += 'in ' + common.login.count + 'second';
-        if (common.login.count != 1)
-        {
-          strMessage += 's';
-        }
-      }
-      else
-      {
-        strMessage += 'now';
-      }
-      strMessage += '...';
-      common.login.rerouteMessage.value = strMessage;
-      //if (common.login.count <= 0)
-      {
-        document.location.href = common.login.reroutePath;
-      }
-    }, 1000);
+      this.login.rerouteTimeout = setTimeout(setRerouteTimeoutIter, 1000);
+    }
+    else
+    {
+      document.location.href = common.login.reroutePath;
+    }
   }
   // }}}
   // {{{ setRequestPath()

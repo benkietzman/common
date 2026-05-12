@@ -2421,7 +2421,7 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
-    this.login.rerouteTimeout = setTimeout(setRerouteTimeoutIter, 1000);
+    this.login.rerouteTimeout = setTimeout(this.setRerouteTimeoutIter, 1000);
   }
   // }}}
   // {{{ setRerouteTimeoutIter()
@@ -2445,7 +2445,7 @@ class Common
     if (common.login.count > 0)
     {
       common.login.count--;
-      common.login.rerouteTimeout = setTimeout(setRerouteTimeoutIter, 1000);
+      common.login.rerouteTimeout = setTimeout(common.setRerouteTimeoutIter, 1000);
     }
     else
     {

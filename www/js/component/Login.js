@@ -112,7 +112,7 @@ export default
             {{#if c.login.info}}
             <span class="fs-6 text-warning">{{c.login.info}}</span>
             {{/if}}
-            <span class="fs-6 text-warning" c-model="c.login.redirect"></span>
+            <span class="fs-6 text-warning" c-model="c.login.rerouteMessage"></span>
             {{#if c.login.showForm}}
             <button class="btn btn-primary float-end" c-click="processLogin()">Login</button>
             {{/if}}

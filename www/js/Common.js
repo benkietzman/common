@@ -16,19 +16,17 @@ class Common
     this.debug = false;
     this.footer = {engineer: false};
     this.autoLoads = {};
-    this.login = {login: {password: '', title: '', userid: ''}, info: false, message: false, redirect: false, showForm: false};
+    this.login = {count: 5, info: false, login: {password: '', title: '', userid: ''}, message: false, rerouteMessage: false, reroutePath: false, rerouteTimeout = false, showForm: false};
     this.logout = {info: false, message: false};
     this.m_auth = {};
     this.m_intervals = {};
     this.m_listeners = {};
     this.m_loginTypes = [];
     this.m_messages = [];
-    this.m_rerouteTimeout = null;
     this.m_store = {};
     this.m_strAuthProtocol = null;
     this.m_strLoginType = null;
     this.m_strRedirectPath = null;
-    this.m_strReroutePath = null;
     this.m_nUnique = 0;
     this.m_ws = {};
     this.menu = {left: [], right: []};
@@ -1736,7 +1734,7 @@ class Common
                         {
                           this.dispatchEvent('resetMenu', null);
                           this.login.info = 'Waiting to redirect...';
-                          this.m_strReroutePath = response.Response.Redirect;
+                          this.login.reroutePath = response.Response.Redirect;
                           this.setRerouteTimeout();
                         }
                       }
@@ -1813,7 +1811,7 @@ class Common
                   {
                     this.dispatchEvent('resetMenu', null);
                     this.login.info = 'Waiting to redirect...';
-                    this.m_strReroutePath = result.data.Response.out.Redirect;
+                    this.login.reroutePath = result.data.Response.out.Redirect;
                     this.setRerouteTimeout();
                   }
                 }
@@ -2423,12 +2421,11 @@ class Common
   // {{{ setRerouteTimeout()
   setRerouteTimeout()
   {
-    this.m_unRerouteCount = 5;
     let strMessage = 'Redirecting ';
-    if (this.m_unRerouteCount > 0)
+    if (this.login.count > 0)
     {
-      strMessage += 'in ' + this.m_unRerouteCount + 'second';
-      if (this.m_unRerouteCount != 1)
+      strMessage += 'in ' + this.login.count + 'second';
+      if (this.login.count != 1)
       {
         strMessage += 's';
       }
@@ -2438,14 +2435,15 @@ class Common
       strMessage += 'now';
     }
     strMessage += '...';
-    this.login.redirect.v = strMessage;
-    this.m_rerouteTimeout = setTimeout(function()
+    this.login.rerouteMessage.v = strMessage;
+    this.login.rerouteTimeout = setTimeout(function()
     {
       let strMessage = 'Redirecting ';
-      if (common.m_unRerouteCount > 0)
+      common.login.count--;
+      if (common.login.count > 0)
       {
-        strMessage += 'in ' + common.m_unRerouteCount + 'second';
-        if (common.m_unRerouteCount != 1)
+        strMessage += 'in ' + common.login.count + 'second';
+        if (common.login.count != 1)
         {
           strMessage += 's';
         }
@@ -2455,11 +2453,11 @@ class Common
         strMessage += 'now';
       }
       strMessage += '...';
-      common.login.redirect.value = strMessage;
-      //if (common.m_unRerouteCount <= 0)
-      //{
-        document.location.href = common.m_strReroutePath;
-      //}
+      common.login.rerouteMessage.value = strMessage;
+      if (common.login.count <= 0)
+      {
+        document.location.href = common.login.reroutePath;
+      }
     }, 1000);
   }
   // }}}
@@ -2637,10 +2635,10 @@ class Common
   // {{{ unsetRerouteTimeout()
   unsetRerouteTimeout(n)
   {
-    if (this.m_rerouteTimeout != null)
+    if (this.login.rerouteTimeout)
     {
-      clearTimeout(this.m_rerouteTimeout);
-      this.m_rerouteTimeout = null;
+      clearTimeout(this.login.rerouteTimeout);
+      this.login.rerouteTimeout = false;
     }
   }
   // }}}

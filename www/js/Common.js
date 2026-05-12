@@ -2456,10 +2456,10 @@ class Common
       }
       strMessage += '...';
       common.login.redirect.value = strMessage;
-      if (common.m_unRerouteCount <= 0)
-      {
+      //if (common.m_unRerouteCount <= 0)
+      //{
         document.location.href = common.m_strReroutePath;
-      }
+      //}
     }, 1000);
   }
   // }}}

@@ -1703,7 +1703,11 @@ class Common
                     this.login.login = {};
                   }
                   this.login.login.title = this.m_auth.login_title;
-                  if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+                  if (this.login.login.title.length >= 30 && this.login.login.title.substr(this.login.login.title.length - 30, 30) == ' (please wait for redirect...)')
+                  {
+                    this.login.login.title = this.login.login.title.substr(0, (this.login.login.title.length - 30));
+                  }
+                  else
                   {
                     this.login.showForm = true;
                   }
@@ -1779,7 +1783,11 @@ class Common
           if (this.isDefined(this.m_auth.login_title))
           {
             this.login.login.title = this.m_auth.login_title;
-            if (this.login.login.title.length <= 30 || this.login.login.title.substr(this.login.login.title.length - 30, 30) != ' (please wait for redirect...)')
+            if (this.login.login.title.length >= 30 && this.login.login.title.substr(this.login.login.title.length - 30, 30) == ' (please wait for redirect...)')
+            {
+              this.login.login.title = this.login.login.title.substr(0, (this.login.login.title.length - 30));
+            }
+            else
             {
               this.login.showForm = true;
             }

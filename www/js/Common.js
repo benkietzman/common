@@ -1652,7 +1652,7 @@ class Common
             }
             if (this.isDefined(response.Response.Remote) && response.Response.Remote)
             {
-              this.m_bLoginRemote = response.Response.Remote;
+              this.m_bLoginRemote = ((response.Response.Remote == 1)?true:false);
             }
           }
         }

@@ -15,7 +15,6 @@ export default
     {
       c: c,
       loginTypes: [],
-      strLoginType: null,
     });
     // }}}
     // {{{ getLoginTypes()
@@ -39,7 +38,7 @@ export default
     // {{{ processLogin()
     s.processLogin = () =>
     {
-      c.processLogin(s.strLoginType);
+      c.processLogin();
     };
     // }}}
     // {{{ processLoginKey()
@@ -52,16 +51,25 @@ export default
     };
     // }}}
     // {{{ switchLoginType()
-    s.switchLoginType = () =>
+    s.switchLoginType = (strLoginType) =>
     {
-      let loginType = c.simplify(s.loginType);
+      if (!c.isDefined(strLoginType))
+      {
+        strLoginType = c.simplify(s.loginType);
+      }
+      for (let i = 0; i < s.loginTypes.length; i++)
+      {
+        if (s.loginTypes[i].type == strLoginType)
+        {
+          let loginType = c.simplify(s.loginTypes[i]);
+          c.m_bLoginRemote = loginType.remote.value;
+          c.m_strLoginTitle = loginType.title;
+        }
+      }
+      c.m_strLoginType = strLoginType.charAt(0).toLowerCase() + strLoginType.slice(1);
       c.unsetRerouteTimeout();
       c.login.message = false;
-      if (c.isDefined(loginType) && c.isDefined(loginType.type) && loginType.type.length > 1)
-      {
-        s.strLoginType = loginType.type.charAt(0).toLowerCase() + loginType.type.slice(1);
-        s.processLogin();
-      }
+      s.processLogin();
     };
     // }}}
     // {{{ main
@@ -82,10 +90,21 @@ export default
       <div class="col-md-auto">
         <div class="card border border-primary-subtle">
           <div class="card-header bg-primary fs-5 fw-bold">
-            <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="background: inherit; margin-left: 10px; width: 20px;" c-json>{{#each loginTypes}}<option value="{{json .}}">{{type}}</option>{{/each}}</select>
-            <i class="bi bi-box-arrow-in-right"></i> {{c.login.login.title}}
+            <select class="form-select float-end" c-change="switchLoginType()" c-model="loginType" style="background: inherit; margin-left: 10px; width: 20px;">{{#each loginTypes}}<option value="{{type}}">{{type}}</option>{{/each}}</select>
+            <i class="bi bi-box-arrow-in-right"></i> {{c.m_strLoginTitle}}
           </div>
-          {{#if c.login.showForm}}
+          {{#ifCond c.m_strLoginType "==" 'auto'}}
+          <div class="card-body bg-primary-subtle">
+            <ul class="list-group">
+              {{#each ../loginTypes}}
+              {{#ifCond type "!=" 'Auto'}}
+              <button class="btn btn-primary list-group-item" type="button" c-click="switchLoginType('{{../type}}')" style="margin: 10px;">{{../type}}</button>
+              {{/ifCond}}
+              {{/each}}
+            </ul>
+          </div>
+          {{else}}
+          {{#if ../c.login.showForm}}
           <div class="card-body bg-primary-subtle">
             <div class="row">
               <div class="col fs-5">
@@ -105,6 +124,7 @@ export default
             </div>
           </div>
           {{/if}}
+          {{/ifCond}}
           <div class="card-footer">
             {{#if c.login.message}}
             <b class="fs-6 text-danger">{{c.login.message}}</b>

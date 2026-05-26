@@ -19,13 +19,15 @@ class Common
     this.login = {count: 5, info: false, login: {password: '', title: '', userid: ''}, message: false, rerouteMessage: null, reroutePath: false, rerouteTimeout: false, showForm: false};
     this.logout = {info: false, message: false};
     this.m_auth = {};
+    this.m_bLoginRemote = false;
     this.m_intervals = {};
     this.m_listeners = {};
     this.m_loginTypes = [];
     this.m_messages = [];
     this.m_store = {};
     this.m_strAuthProtocol = null;
-    this.m_strLoginType = null;
+    this.m_strLoginTitle = '';
+    this.m_strLoginType = '';
     this.m_strRedirectPath = null;
     this.m_nUnique = 0;
     this.m_ws = {};
@@ -1625,27 +1627,33 @@ class Common
   }
   // }}}
   // {{{ processLogin()
-  processLogin(strLoginType)
+  processLogin()
   {
     this.login.info = 'Processing login...';
     this.login.showForm = false;
     this.render(this.id, 'Login', this.component);
-    if (strLoginType != '')
-    {
-      this.m_strLoginType = strLoginType;
-    }
     if (this.m_bJwt)
     {
       let request = null;
       request = {Interface: 'secure', Section: 'secure', 'Function': 'getSecurityModule', Request: {}};
       this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
       {
-        if (this.m_strLoginType == null)
+        if (this.m_strLoginType == '')
         {
           this.m_strLoginType = 'password';
+          this.m_strLoginTitle = '';
+          this.m_bLoginRemote = false;
           if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
           {
             this.m_strLoginType = response.Response.Module;
+            if (this.isDefined(response.Response.Title) && response.Response.Title != '')
+            {
+              this.m_strLoginTitle = response.Response.Title;
+            }
+            if (this.isDefined(response.Response.Remote) && response.Response.Remote)
+            {
+              this.m_bLoginRemote = response.Response.Remote;
+            }
           }
         }
         fetch('/include/common_addons/auth/modules.json',
@@ -1696,21 +1704,9 @@ class Common
                 {
                   window.localStorage.setItem('sl_wsJwt', response.Response.jwt);
                 }
-                if (this.isDefined(this.m_auth.login_title))
+                if (!this.m_bLoginRemote)
                 {
-                  if (!this.isDefined(this.login.login) || !this.login.login)
-                  {
-                    this.login.login = {};
-                  }
-                  this.login.login.title = this.m_auth.login_title;
-                  if (this.login.login.title.length >= 30 && this.login.login.title.substr(this.login.login.title.length - 30, 30) == ' (please wait for redirect...)')
-                  {
-                    this.login.login.title = this.login.login.title.substr(0, (this.login.login.title.length - 30));
-                  }
-                  else
-                  {
-                    this.login.showForm = true;
-                  }
+                  this.login.showForm = true;
                 }
                 if (this.isValid())
                 {
@@ -1734,9 +1730,9 @@ class Common
                         {
                           window.localStorage.setItem('sl_uniqueID', response.Response.UniqueID);
                         }
+                        this.dispatchEvent('resetMenu', null);
                         if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
                         {
-                          this.dispatchEvent('resetMenu', null);
                           this.login.reroutePath = response.Response.Redirect;
                           this.setRerouteTimeout();
                         }
@@ -1780,17 +1776,9 @@ class Common
           this.m_auth = null;
           this.m_auth = result.data.Response.out;
           this.m_bHaveAuth = true;
-          if (this.isDefined(this.m_auth.login_title))
+          if (!this.m_bLoginRemote)
           {
-            this.login.login.title = this.m_auth.login_title;
-            if (this.login.login.title.length >= 30 && this.login.login.title.substr(this.login.login.title.length - 30, 30) == ' (please wait for redirect...)')
-            {
-              this.login.login.title = this.login.login.title.substr(0, (this.login.login.title.length - 30));
-            }
-            else
-            {
-              this.login.showForm = true;
-            }
+            this.login.showForm = true;
           }
           if (this.isValid())
           {
@@ -1860,7 +1848,7 @@ class Common
         this.wsRequest(this.m_strAuthProtocol, request).then((response) =>
         {
           this.logout.info = null;
-          if (this.m_strLoginType == null)
+          if (this.m_strLoginType == '')
           {
             this.m_strLoginType = 'password';
             if (this.isDefined(response.Response) && this.isDefined(response.Response.Module) && response.Response.Module != '')
@@ -1876,14 +1864,14 @@ class Common
             this.logout.info = null;
             if (this.wsResponse(response, error))
             {
+              this.m_bHaveAuth = false;
+              this.m_auth = null;
+              this.m_auth = {admin: false, apps: {}};
+              window.localStorage.removeItem('sl_wsJwt');
+              window.localStorage.removeItem('sl_uniqueID');
+              this.dispatchEvent('resetMenu', null);
               if (this.isDefined(response.Response.Redirect) && response.Response.Redirect.length > 0)
               {
-                this.m_bHaveAuth = false;
-                this.m_auth = null;
-                this.m_auth = {admin: false, apps: {}};
-                window.localStorage.removeItem('sl_wsJwt');
-                window.localStorage.removeItem('sl_uniqueID');
-                this.dispatchEvent('resetMenu', null);
                 document.location.href = response.Response.Redirect;
               }
             }

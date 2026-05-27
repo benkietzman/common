@@ -1073,6 +1073,7 @@ class Common
   {
     return btoa(String.fromCharCode(...new Uint8Array(buffer)));
   }
+  // ]}}
   // {{{ clearMenu()
   clearMenu()
   {

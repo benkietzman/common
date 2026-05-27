@@ -545,6 +545,12 @@ class Common
     }
   }
   // }}}
+  // {{{ base64ToBuffer()
+  base64ToBuffer(base64)
+  {
+    return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+  }
+  // }}}
   // {{{ bind()
   bind(id, name)
   {
@@ -1062,6 +1068,11 @@ class Common
     }
   }
   // }}}
+  // {{{ bufferToBase64()
+  bufferToBase64(buffer)
+  {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  }
   // {{{ clearMenu()
   clearMenu()
   {

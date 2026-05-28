@@ -92,6 +92,12 @@ extern "C++"
       return central(ptData, strError);
     }
     // }}}
+    // {{{ passkey()
+    bool Warden::passkey(Json *ptPublicKeyCredential, string &strError)
+    {
+      return request("passkey", ptPublicKeyCredential, strError);
+    }
+    // }}}
     // {{{ password()
     bool Warden::password(Json *ptData, string &strError)
     {

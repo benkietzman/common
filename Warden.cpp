@@ -93,9 +93,9 @@ extern "C++"
     }
     // }}}
     // {{{ passkey()
-    bool Warden::passkey(Json *ptPublicKeyCredential, string &strError)
+    bool Warden::passkey(Json *ptData, string &strError)
     {
-      return request("passkey", ptPublicKeyCredential, strError);
+      return request("passkey", ptData, strError);
     }
     // }}}
     // {{{ password()

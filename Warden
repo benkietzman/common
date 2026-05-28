@@ -122,13 +122,13 @@ extern "C++"
       * \return Returns a boolean true/false value.
       */
       bool central(const string strUser, Json *ptData, string &strError);
-      /*! \fn bool passkey(Json *ptPublicKeyCredential, string &strError)
+      /*! \fn bool passkey(Json *ptData, string &strError)
       * \brief Submits a passkey request.
-      * \param ptPublicKeyCredential Contains the public key credential.
+      * \param ptData Contains the data.
       * \param strError Contains the error message.
       * \return Returns a boolean true/false value.
       */
-      bool passkey(Json *ptPublicKeyCredential, string &strError);
+      bool passkey(Json *ptData, string &strError);
       /*! \fn bool password(Json *ptData, string &strError)
       * \brief Submits a password request.
       * \param ptData Contains the data.

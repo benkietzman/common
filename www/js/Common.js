@@ -1639,7 +1639,7 @@ class Common
   }
   // }}}
   // {{{ processLogin()
-  processLogin()
+  processLogin(passkey)
   {
     this.login.info = 'Processing login...';
     this.login.showForm = false;
@@ -1681,6 +1681,10 @@ class Common
           let request = null;
           response = ((response.status == 200)?response.json():{});
           request = {Interface: 'secure', Section: 'secure', 'Function': 'process', Request: this.simplify(this.login.login)};
+          if (passkey !== null)
+          {
+            request.Request.passkey = passkey;
+          }
           request.Request.Type = this.m_strLoginType;
           if (window.localStorage.getItem('sl_uniqueID'))
           {

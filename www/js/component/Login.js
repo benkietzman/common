@@ -24,21 +24,48 @@ export default
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
-        if (c.wsResponse(response, error))
+        if (c.wsResponse(response, error) && c.isDefined(response.Response))
         {
-          if (c.isDefined(response.Response))
-          {
-            s.loginTypes = response.Response;
-            c.update('Login');
-          }
+          s.loginTypes = response.Response;
+          c.update('Login');
         }
       });
     };
     // }}}
-    // {{{ processLogin()
-    s.processLogin = () =>
+    // {{{ passkey()
+    s.passkey = () =>
     {
-      c.processLogin();
+      let request = {Interface: 'secure', Section: 'secure', 'Function': 'passkeyAssertion'};
+      c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
+      {
+        let error = {};
+        if (c.wsResponse(response, error) && c.isDefined(response.Response))
+        {
+          if (c.isDefined(response.Response.publicKey) && c.isDefined(response.Response.publicKey.challenge))
+          {
+            response.Response.publicKey.challenge = c.base64ToBuffer(response.Response.publicKey.challenge);
+          }
+          navigator.credentials.get(response.Response)
+          .then((publicKeyCredential) =>
+          {
+            s.processLogin
+            ({
+              data: c.bufferToBase64(publicKeyCredential.response.authenticatorData),
+              id: publicKeyCredential.id,
+              rawId: c.bufferToBase64(publicKeyCredential.rawId),
+              signature: c.bufferToBase64(publicKeyCredential.response.signature),
+              type: publicKeyCredential.type
+            });
+          });
+        }
+      });
+    };
+    // }}}
+    // }}}
+    // {{{ processLogin()
+    s.processLogin = (publicKeyCredential) =>
+    {
+      c.processLogin(publicKeyCredential);
     };
     // }}}
     // {{{ processLoginKey()
@@ -77,9 +104,11 @@ export default
     c.attachEvent('commonWsReady_' + c.application, (data) =>
     {
       s.getLoginTypes();
+      s.passkey();
       s.processLogin();
     });
     s.getLoginTypes();
+    s.passkey();
     s.processLogin();
     // }}}
   },

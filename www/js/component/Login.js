@@ -61,7 +61,6 @@ export default
       });
     };
     // }}}
-    // }}}
     // {{{ processLogin()
     s.processLogin = (publicKeyCredential) =>
     {

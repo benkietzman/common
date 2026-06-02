@@ -48,6 +48,8 @@ extern "C++"
     class StringManip
     {
       private:
+      unsigned char m_base64[256];
+
       int isBase64(char c);
       string pad(string &, const string, const char, const int, const int);
       string toCase(string &, const string, int);
@@ -57,6 +59,7 @@ extern "C++"
       ~StringManip();
       string cleanNonPrintable(string &strClean, const string strString);
       string decodeBase64(string strIn, string &strOut);
+      uint8_t *decodeBase64(string strIn, size_t &len, string &strError);
 			string decryptAes(const string strIn, const string strSecret, string &strOut, string &strError);
       string encodeBase64(string strIn, string &strOut);
       string encryptAes(const string strIn, const string strSecret, string &strOut, string &strError);

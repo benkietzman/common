@@ -21,6 +21,75 @@ extern "C++"
     // {{{ StringManip()
     StringManip::StringManip()
     {
+      for (int i = 0; i < 256; i++)
+      {
+        m_base64[i] = 0x80;
+      }
+      m_base64['A'] = 0;
+      m_base64['B'] = 1;
+      m_base64['C'] = 2;
+      m_base64['D'] = 3;
+      m_base64['E'] = 4;
+      m_base64['F'] = 5;
+      m_base64['G'] = 6;
+      m_base64['H'] = 7;
+      m_base64['I'] = 8;
+      m_base64['J'] = 9;
+      m_base64['K'] = 10;
+      m_base64['L'] = 11;
+      m_base64['M'] = 12;
+      m_base64['N'] = 13;
+      m_base64['O'] = 14;
+      m_base64['P'] = 15;
+      m_base64['Q'] = 16;
+      m_base64['R'] = 17;
+      m_base64['S'] = 18;
+      m_base64['T'] = 19;
+      m_base64['U'] = 20;
+      m_base64['V'] = 21;
+      m_base64['W'] = 22;
+      m_base64['X'] = 23;
+      m_base64['Y'] = 24;
+      m_base64['Z'] = 25;
+      m_base64['a'] = 26;
+      m_base64['b'] = 27;
+      m_base64['c'] = 28;
+      m_base64['d'] = 29;
+      m_base64['e'] = 30;
+      m_base64['f'] = 31;
+      m_base64['g'] = 32;
+      m_base64['h'] = 33;
+      m_base64['i'] = 34;
+      m_base64['j'] = 35;
+      m_base64['k'] = 36;
+      m_base64['l'] = 37;
+      m_base64['m'] = 38;
+      m_base64['n'] = 39;
+      m_base64['o'] = 40;
+      m_base64['p'] = 41;
+      m_base64['q'] = 42;
+      m_base64['r'] = 43;
+      m_base64['s'] = 44;
+      m_base64['t'] = 45;
+      m_base64['u'] = 46;
+      m_base64['v'] = 47;
+      m_base64['w'] = 48;
+      m_base64['x'] = 49;
+      m_base64['y'] = 50;
+      m_base64['z'] = 51;
+      m_base64['0'] = 52;
+      m_base64['1'] = 53;
+      m_base64['2'] = 54;
+      m_base64['3'] = 55;
+      m_base64['4'] = 56;
+      m_base64['5'] = 57;
+      m_base64['6'] = 58;
+      m_base64['7'] = 59;
+      m_base64['8'] = 60;
+      m_base64['9'] = 61;
+      m_base64['+'] = 62;
+      m_base64['/'] = 63;
+      m_base64['='] = 0x81;
     }
     // }}}
     // {{{ ~StringManip()
@@ -112,6 +181,123 @@ extern "C++"
       #endif
 
       return strOut;
+    }
+    uint8_t *StringManip::decodeBase64(const string strIn, size_t &len, string &strError)
+    {
+      bool bExit = false;
+      size_t padding = 0, valid = 0;
+      uint8_t *out = NULL;
+
+      for (size_t i = 0; !bExit && i < strIn.size(); ++i)
+      {
+        unsigned char c = (unsigned char)strIn[i];
+        unsigned char v = m_base64[c];
+        if (v == 0x80)
+        {
+          if (isspace(c))
+          {
+            continue;
+          }
+          bExit = true;
+          break;
+        }
+        if (v == 0x81)
+        {
+          padding++;
+          valid++;
+        }
+        else
+        {
+          valid++;
+        }
+      }
+      if (!bExit)
+      {
+        if (valid % 4 == 0)
+        {
+          size_t out_capacity = (valid / 4) * 3;
+          if (padding)
+          {
+            out_capacity -= padding;
+          }
+          out = (uint8_t *)malloc((out_capacity)?out_capacity:1);
+          if (out != NULL)
+          {
+            bool bSubExit = false;
+            size_t out_i = 0;
+            unsigned char quartet[4];
+            size_t q = 0;
+            for (size_t i = 0; !bSubExit && i < strIn.size(); ++i)
+            {
+              unsigned char c = (unsigned char)strIn[i];
+              unsigned char v = m_base64[c];
+              if (isspace(c))
+              {
+                continue;
+              }
+              if (v == 0x81)
+              {
+                quartet[q++] = 0x81;
+              }
+              else
+              {
+                quartet[q++] = v;
+              }
+              if (q == 4)
+              {
+                if (quartet[2] == 0x81)
+                {
+                  if (out_i + 1 > out_capacity)
+                  {
+                    bSubExit = true;
+                    break;
+                  }
+                  out[out_i++] = (quartet[0] << 2) | (quartet[1] >> 4);
+                }
+                else if (quartet[3] == 0x81)
+                {
+                  if (out_i + 2 > out_capacity)
+                  {
+                    bSubExit = true;
+                    break;
+                  }
+                  out[out_i++] = (quartet[0] << 2) | (quartet[1] >> 4);
+                  out[out_i++] = ((quartet[1] & 0xF) << 4) | (quartet[2] >> 2);
+                }
+                else
+                {
+                  if (out_i + 3 > out_capacity)
+                  {
+                    bSubExit = true;
+                    break;
+                  }
+                  out[out_i++] = (quartet[0] << 2) | (quartet[1] >> 4);
+                  out[out_i++] = ((quartet[1] & 0xF) << 4) | (quartet[2] >> 2);
+                  out[out_i++] = ((quartet[2] & 0x3) << 6) | quartet[3];
+                }
+                q = 0;
+              }
+            }
+            len = out_i;
+          }
+          else
+          {
+            stringstream ssError;
+            ssError << "malloc(" << errno << ") " << strerror(errno);
+            strError = ssError.str();
+          }
+        }
+        else
+        {
+          strError = "Invalid modulus.";
+        }
+      }
+      else
+      {
+        strError = "Failed to preprocess.";
+      }
+
+      return out;
     }
     // }}}
     // {{{ decryptAes()

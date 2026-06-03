@@ -23,6 +23,7 @@
 #include <b64/encode.h>
 #endif
 #include <cerrno>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>

@@ -53,6 +53,7 @@ export default
               authenticatorData: c.bufferToBase64(publicKeyCredential.response.authenticatorData),
               clientDataJSON: c.bufferToBase64(publicKeyCredential.response.clientDataJSON),
               id: publicKeyCredential.id,
+              password: null,
               rawId: c.bufferToBase64(publicKeyCredential.rawId),
               signature: c.bufferToBase64(publicKeyCredential.response.signature),
               type: publicKeyCredential.type

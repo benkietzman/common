@@ -17,16 +17,16 @@ export default
       loginTypes: [],
     });
     // }}}
-    // {{{ getLoginPasskeyRegistration()
-    s.getLoginPasskeyRegistration = () =>
+    // {{{ getLoginPasskeyRegister()
+    s.getLoginPasskeyRegister = () =>
     {
-      let request = {Interface: 'central', Section: 'central', 'Function': 'loginPasskeyRegistration'};
+      let request = {Interface: 'central', Section: 'central', 'Function': 'loginPasskeyRegister'};
       c.wsRequest(c.m_strAuthProtocol, request).then((response) =>
       {
         let error = {};
         if (c.wsResponse(response, error) && c.isDefined(response.Response))
         {
-          s.loginPasskeyRegistration = response.Response;
+          s.loginPasskeyRegister = response.Response;
           c.update('Login');
         }
       });
@@ -194,7 +194,7 @@ export default
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-        {{loginPasskeyRegistration}}
+        {{loginPasskeyRegister}}
       </div>
       <div class="col-md-3">
       </div>

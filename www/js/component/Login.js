@@ -50,7 +50,8 @@ export default
           {
             s.processLogin
             ({
-              data: c.bufferToBase64(publicKeyCredential.response.authenticatorData),
+              authenticatorData: c.bufferToBase64(publicKeyCredential.response.authenticatorData),
+              clientDataJSON: c.bufferToBase64(publicKeyCredential.response.clientDataJSON),
               id: publicKeyCredential.id,
               rawId: c.bufferToBase64(publicKeyCredential.rawId),
               signature: c.bufferToBase64(publicKeyCredential.response.signature),

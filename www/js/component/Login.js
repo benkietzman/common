@@ -173,6 +173,17 @@ export default
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-3">
+      </div>
+      <div class="col-md-6">
+        <div class="card card-body card-inverse" style="margin-top: 20px;">
+          It is recommended to register a passkey.  You can do that once authenticated. From Central, click the Profile menu, locate the Security Profile section, and click the Passkeys button.  Registering a passkey enhances your online security and simplifies the login process by eliminating the need to remember complex passwords.  It allows you to authenticate using biometric methods or a PIN, making it faster and more intuitive.
+        </div>
+      </div>
+      <div class="col-md-3">
+      </div>
+    </div>
   `
   // }}}
 }

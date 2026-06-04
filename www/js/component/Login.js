@@ -194,7 +194,7 @@ export default
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-        {{{loginPasskeyRegister}}}
+        <pre style="background: inherit; color: inherit; margin-top: 20px; text-align: justify; white-space: pre-wrap; word-break: break-word;">{{{loginPasskeyRegister}}}</pre>
       </div>
       <div class="col-md-3">
       </div>

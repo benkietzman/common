@@ -145,7 +145,9 @@ export default
             <ul class="list-group">
               {{#each ../loginTypes}}
               {{#ifCond type "!=" 'Auto'}}
+              {{#ifCond ../type "!=" 'Passkey'}}
               <button class="btn btn-primary list-group-item" type="button" c-click="switchLoginType('{{../type}}')" style="margin: 10px;">{{../type}}</button>
+              {{/ifCond}}
               {{/ifCond}}
               {{/each}}
             </ul>

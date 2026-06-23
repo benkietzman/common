@@ -61,9 +61,9 @@ extern "C++"
       string cleanNonPrintable(string &strClean, const string strString);
       string decodeBase64(string strIn, string &strOut);
       uint8_t *decodeBase64(string strIn, size_t &len, string &strError);
-			string decryptAes(const string strIn, const string strSecret, string &strOut, string &strError);
+			string decryptAes(const string strIn, const string strSecret, string &strOut, string &strError, const string strCipher = "AES-128 ECB");
       string encodeBase64(string strIn, string &strOut);
-      string encryptAes(const string strIn, const string strSecret, string &strOut, string &strError);
+      string encryptAes(const string strIn, const string strSecret, string &strOut, string &strError, const string strCipher = "AES-128 ECB");
       string escape(const string strIn, string &strOut);
       string getToken(string &strToken, const string strString, const int nIndex, const string strDelimiter, const bool bIgnoreBlanks = false);
       string htmlEntityDecode(const string strOld, string &strNew);

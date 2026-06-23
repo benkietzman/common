@@ -301,7 +301,7 @@ extern "C++"
     }
     // }}}
     // {{{ decryptAes()
-    string StringManip::decryptAes(const string strIn, const string strSecret, string &strOut, string &strError)
+    string StringManip::decryptAes(const string strIn, const string strSecret, string &strOut, string &strError, const string strCipher)
     {
       strOut.clear();
       if (!strIn.empty())
@@ -326,7 +326,9 @@ extern "C++"
                   EVP_CIPHER_CTX *ctx;
                   if ((ctx = EVP_CIPHER_CTX_new()) != NULL)
                   {
-                    if (EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, puszKey, NULL))
+                    const EVP_CIPHER *cipher = ((strCipher == "AES-256 GCM")?EVP_aes_256_gcm():EVP_aes_128_ecb());
+                    EVP_aes_128_ecb();
+                    if (EVP_DecryptInit_ex(ctx, cipher, NULL, puszKey, NULL))
                     {
                       int nLength;
                       if (EVP_DecryptUpdate(ctx, puszOut, &nLength, puszIn, nIn))
@@ -491,7 +493,7 @@ extern "C++"
     }
     // }}} 
     // {{{ encryptAes()
-    string StringManip::encryptAes(const string strIn, const string strSecret, string &strOut, string &strError)
+    string StringManip::encryptAes(const string strIn, const string strSecret, string &strOut, string &strError, const string strCipher)
     {
       strOut.clear();
       if (!strIn.empty())
@@ -516,7 +518,8 @@ extern "C++"
                   EVP_CIPHER_CTX *ctx;
                   if ((ctx = EVP_CIPHER_CTX_new()) != NULL)
                   {
-                    if (EVP_EncryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, puszKey, NULL))
+                    const EVP_CIPHER *cipher = ((strCipher == "AES-256 GCM")?EVP_aes_256_gcm():EVP_aes_128_ecb());
+                    if (EVP_EncryptInit_ex(ctx, cipher, NULL, puszKey, NULL))
                     {
                       int nLength;
                       if (EVP_EncryptUpdate(ctx, puszOut, &nLength, puszIn, nIn))

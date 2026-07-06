@@ -340,34 +340,30 @@ extern "C++"
                         }
                         else
                         {
-                          char szBuffer[120];
                           ssError.str("");
-                          ssError << "EVP_DecryptFinal_ex(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                          ssError << "EVP_DecryptFinal_ex() " << ERR_lib_error_string(ERR_get_error());
                           strError = ssError.str();
                         }
                       }
                       else
                       {
-                        char szBuffer[120];
                         ssError.str("");
-                        ssError << "EVP_DecryptUpdate(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                        ssError << "EVP_DecryptUpdate() " << ERR_lib_error_string(ERR_get_error());
                         strError = ssError.str();
                       }
                     }
                     else
                     {
-                      char szBuffer[120];
                       ssError.str("");
-                      ssError << "EVP_DecryptInit_ex(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                      ssError << "EVP_DecryptInit_ex() " << ERR_lib_error_string(ERR_get_error());
                       strError = ssError.str();
                     }
                     EVP_CIPHER_CTX_free(ctx);
                   }
                   else
                   {
-                    char szBuffer[120];
                     ssError.str("");
-                    ssError << "EVP_CIPHER_CTX_new(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                    ssError << "EVP_CIPHER_CTX_new() " << ERR_lib_error_string(ERR_get_error());
                     strError = ssError.str();
                   }
                   free(puszOut);
@@ -531,34 +527,30 @@ extern "C++"
                         }
                         else
                         {
-                          char szBuffer[120];
                           ssError.str("");
-                          ssError << "EVP_EncryptFinal_ex(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                          ssError << "EVP_EncryptFinal_ex() " << ERR_lib_error_string(ERR_get_error());
                           strError = ssError.str();
                         }
                       }
                       else
                       {
-                        char szBuffer[120];
                         ssError.str("");
-                        ssError << "EVP_EncryptUpdate(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                        ssError << "EVP_EncryptUpdate() " << ERR_lib_error_string(ERR_get_error());
                         strError = ssError.str();
                       }
                     }
                     else
                     {
-                      char szBuffer[120];
                       ssError.str("");
-                      ssError << "EVP_EncryptInit_ex(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                      ssError << "EVP_EncryptInit_ex() " << ERR_lib_error_string(ERR_get_error());
                       strError = ssError.str();
                     }
                     EVP_CIPHER_CTX_free(ctx);
                   }
                   else
                   {
-                    char szBuffer[120];
                     ssError.str("");
-                    ssError << "EVP_CIPHER_CTX_new(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                    ssError << "EVP_CIPHER_CTX_new() " << ERR_lib_error_string(ERR_get_error());
                     strError = ssError.str();
                   }
                   free(puszOut);
@@ -580,9 +572,8 @@ extern "C++"
             }
             else
             {
-              char szBuffer[120];
               ssError.str("");
-              ssError << "SHA512(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+              ssError << "SHA512() " << ERR_lib_error_string(ERR_get_error());
               strError = ssError.str();
             }
             free(puszKey);

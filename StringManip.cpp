@@ -327,7 +327,6 @@ extern "C++"
                   if ((ctx = EVP_CIPHER_CTX_new()) != NULL)
                   {
                     const EVP_CIPHER *cipher = ((strCipher == "AES-256 GCM")?EVP_aes_256_gcm():EVP_aes_128_ecb());
-                    EVP_aes_128_ecb();
                     if (EVP_DecryptInit_ex(ctx, cipher, NULL, puszKey, NULL))
                     {
                       int nLength;

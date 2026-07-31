@@ -35,6 +35,8 @@ sema_t m_semaRadialThrottle;
 // {{{ Radial()
 Radial::Radial(string &strError)
 {
+  ifstream inTimeZone;
+
   #ifdef COMMON_LINUX
   sem_init(&m_semaRadialRequestLock, 0, 10);
   #endif
@@ -48,6 +50,12 @@ Radial::Radial(string &strError)
   m_unThrottle = 0;
   m_unUniqueID = 0;
   m_pUtility = new Utility(strError);
+  inTimeZone.open("/etc/timezone");
+  if (inTimeZone)
+  { 
+    inTimeZone >> m_strTimeZone;
+  }
+  inTimeZone.close();
 }
 // }}}
 // {{{ ~Radial()

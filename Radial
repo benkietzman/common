@@ -76,6 +76,7 @@ extern "C++"
       int m_fdSocket;
       list<string> m_buffer[2];
       map<int, radialreqdata *> m_requests;
+      mutex m_mutexTimeZone;
       size_t m_unThrottle;
       size_t m_unUniqueID;
       SSL *m_ssl;
@@ -89,6 +90,7 @@ extern "C++"
       string m_strPassword;
       string m_strServer;
       string m_strTimeout;
+      string m_strTimeZone;
       string m_strUser;
       string m_strUserID;
       thread *m_pThreadRequest;

@@ -96,6 +96,8 @@ extern "C++"
       Json(const string strJson);
       Json(Json *ptJson);
       ~Json();
+      bool empty(list<string> keys);
+      bool exist(list<string> keys);
       string fcif(string &strFcif, const bool bAppend = false);
       void flatten(list<string> &jsonList);
       void flatten(map<string, string> &jsonMap, const bool bOverwrite = false, const bool bMultiLayer = true);
@@ -141,6 +143,7 @@ extern "C++"
       void push_front(const string strValue, const char cType = 's');
       void push_front(Json *ptJson);
       void setError(const string strError);
+      string val(list<string> keys);
       void value(const string strValue, const char cType = 's');
       string x(string &strXml, const bool bAppend = false);
       string xml(string &strXml, const bool bAppend = false);

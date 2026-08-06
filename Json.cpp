@@ -247,6 +247,44 @@ extern "C++"
       clearMap();
     }
     // }}}
+    // {{{ Json::empty()
+    bool Json::empty(list<string> keys)
+    {
+      bool bResult = false;
+      Json *ptCurrent = m_ptCurrent;
+  
+      while (!keys.empty() && ptCurrent->m.find(keys.front()) != ptCurrent->m.end())
+      {
+        ptCurrent = ptCurrent->m[keys.front()];
+        keys.pop_front();
+      } 
+      if (!keys.empty() || ptCurrent->v.empty())
+      {
+        bResult = true;
+      }
+    
+      return bResult;
+    }
+    // }}}
+    // {{{ Json::exist()
+    bool Json::exist(list<string> keys)
+    {
+      bool bResult = false;
+      Json *ptCurrent = m_ptCurrent;
+
+      while (!keys.empty() && ptCurrent->m.find(keys.front()) != ptCurrent->m.end())
+      {
+        ptCurrent = ptCurrent->m[keys.front()];
+        keys.pop_front();
+      }
+      if (keys.empty())
+      {
+        bResult = true;
+      }
+
+      return bResult;
+    }
+    // }}}
     // {{{ Json::fcif()
     string Json::fcif(string &strFcif, const bool bAppend)
     {
@@ -1150,6 +1188,25 @@ extern "C++"
     void Json::setError(const string strError)
     {
       m_strError = strError;
+    }
+    // }}}
+    // {{{ Json::val()
+    string Json::val(list<string> keys)
+    { 
+      string strValue;
+      Json *ptCurrent = m_ptCurrent;
+
+      while (!keys.empty() && ptCurrent->m.find(keys.front()) != ptCurrent->m.end())
+      {
+        ptCurrent = ptCurrent->m[keys.front()];
+        keys.pop_front();
+      }
+      if (keys.empty())
+      {
+        strValue = ptCurrent->v;
+      }
+
+      return strValue;
     }
     // }}}
     // {{{ Json::value()

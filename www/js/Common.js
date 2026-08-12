@@ -2100,12 +2100,6 @@ class Common
     }
   }
   // }}}
-  // {{{ replaceAt()
-  replaceAt(strValue, nIndex, strReplacement, nRemove)
-  {
-    return strValue.slice(0, nIndex) + strReplacement + strValue.slice(nIndex + nRemove);
-  }
-  // }}}
   // {{{ request()
   request(strFunction, request, callback)
   {

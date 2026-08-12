@@ -879,16 +879,13 @@ extern "C++"
     string StringManip::toCase(string &strCase, const string strString, int nCase)
     {
       strCase = strString;
-      for (size_t nPosition = 0; nPosition < strCase.size(); nPosition++)
+      if (nCase == 0)
       {
-        if (nCase == 0)
-        {
-          strCase[nPosition] = tolower(strCase[nPosition]);
-        }
-        else
-        {
-          strCase[nPosition] = toupper(strCase[nPosition]);
-        }
+        transform(strCase.begin(), strCase.end(), strCase.begin(), ::tolower);
+      }
+      else
+      {
+        transform(strCase.begin(), strCase.end(), strCase.begin(), ::toupper);
       }
 
       return strCase;

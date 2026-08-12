@@ -22,6 +22,7 @@
 #include <b64/decode.h>
 #include <b64/encode.h>
 #endif
+#include <algorithm>
 #include <cerrno>
 #include <cstdint>
 #include <cstdlib>

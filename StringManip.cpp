@@ -1196,11 +1196,7 @@ extern "C++"
       for (unsigned int i = 0; i < unSize; i++)
       {
         c = strData[i];
-        if (c == ' ')
-        {
-          ssResult << '+';
-        }
-        else if ((c < '0' && c != '-' && c != '.') || (c < 'A' && c > '9') || (c > 'Z' && c < 'a' && c != '_') || (c > 'z'))
+        if ((c < '0' && c != '-' && c != '.') || (c < 'A' && c > '9') || (c > 'Z' && c < 'a' && c != '_') || (c > 'z'))
         {
           ssResult << '%' << hexchars[c >> 4] << hexchars[c & 15];
         }

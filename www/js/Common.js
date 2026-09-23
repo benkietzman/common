@@ -354,9 +354,14 @@ class Common
       {
         return (((v instanceof String) && v.length > 0)?v.replace(/ /g, ''):v);
       });
-      Handlebars.registerHelper('substring', (str, start, end) =>
+      Handlebars.registerHelper('substring', (str, start, end, options) =>
       {
-        return str.substring(start, end);
+        if (!this.isDefined(options))
+        {
+          options = end;
+          end = null;
+        }
+        return ((end != null)?str.substring(start, end):str.substring(start));
       });
       Handlebars.registerHelper('subtract', (v1, v2) =>
       {

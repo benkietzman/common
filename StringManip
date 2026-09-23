@@ -32,9 +32,11 @@
 #ifdef COMMON_OPENSSL
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
+#include <openssl/core_names.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include <openssl/rand.h>
 #include <openssl/sha.h>
 #endif
 #include <sstream>

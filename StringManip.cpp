@@ -306,33 +306,38 @@ extern "C++"
       strOut.clear();
       if (!strIn.empty())
       {
+        string strData;
+        stringstream ssData, ssIn(strIn);
+        unsigned char iv[12], tag[16];
+        ssIn.read((char *)iv, 12);
+        ssIn.read((char *)tag, 16);
+        ssData << ssIn.rdbuf();
+        strData = ssData.str();
         if (!strSecret.empty())
         {
           stringstream ssError;
           unsigned char *puszKey;
           #ifdef COMMON_OPENSSL
-          if ((puszKey = (unsigned char *)malloc(SHA512_DIGEST_LENGTH)) != NULL)
+          if ((puszKey = (unsigned char *)malloc((strCipher == "AES-256 GCM")?SHA256_DIGEST_LENGTH:SHA512_DIGEST_LENGTH)) != NULL)
           {
-            if (SHA512((unsigned char *)strSecret.c_str(), strSecret.size(), puszKey) != NULL)
+            if ((strCipher == "AES-256 GCM" && SHA256((unsigned char *)strSecret.c_str(), strSecret.size(), puszKey) != NULL) || (strCipher != "AES-256 GCM" && SHA512((unsigned char *)strSecret.c_str(), strSecret.size(), puszKey) != NULL))
             {
-              int nIn = strIn.size();
-              unsigned char *puszIn;
-              if ((puszIn = (unsigned char *)malloc(nIn)) != NULL)
+              unsigned char *puszOut;
+              if ((puszOut = (unsigned char *)malloc(strData.size()*16)) != NULL)
               {
-                unsigned char *puszOut;
-                memcpy(puszIn, strIn.c_str(), nIn);
-                if ((puszOut = (unsigned char *)malloc(nIn*16)) != NULL)
+                EVP_CIPHER_CTX *ctx;
+                if ((ctx = EVP_CIPHER_CTX_new()) != NULL)
                 {
-                  EVP_CIPHER_CTX *ctx;
-                  if ((ctx = EVP_CIPHER_CTX_new()) != NULL)
+                  const EVP_CIPHER *cipher = ((strCipher == "AES-256 GCM")?EVP_aes_256_gcm():EVP_aes_128_ecb());
+                  if (EVP_DecryptInit_ex(ctx, cipher, NULL, puszKey, ((strCipher == "AES-256 GCM")?iv:NULL)))
                   {
-                    const EVP_CIPHER *cipher = ((strCipher == "AES-256 GCM")?EVP_aes_256_gcm():EVP_aes_128_ecb());
-                    if (EVP_DecryptInit_ex(ctx, cipher, NULL, puszKey, NULL))
+                    int nLength;
+                    if (EVP_DecryptUpdate(ctx, puszOut, &nLength, (unsigned char *)strData.data(), strData.size()))
                     {
-                      int nLength;
-                      if (EVP_DecryptUpdate(ctx, puszOut, &nLength, puszIn, nIn))
+                      int nOut = nLength;
+                      OSSL_PARAM params[] = {OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, tag, sizeof(tag)), OSSL_PARAM_END};
+                      if (strCipher != "AES-256 GCM" || EVP_CIPHER_CTX_set_params(ctx, params) == 1)
                       {
-                        int nOut = nLength;
                         if (EVP_DecryptFinal_ex(ctx, puszOut + nLength, &nLength))
                         {
                           nOut += nLength;
@@ -348,46 +353,45 @@ extern "C++"
                       else
                       {
                         ssError.str("");
-                        ssError << "EVP_DecryptUpdate() " << ERR_lib_error_string(ERR_get_error());
+                        ssError << "EVP_CIPHER_CTX_ctrl() " << ERR_lib_error_string(ERR_get_error());
                         strError = ssError.str();
                       }
                     }
                     else
                     {
                       ssError.str("");
-                      ssError << "EVP_DecryptInit_ex() " << ERR_lib_error_string(ERR_get_error());
+                      ssError << "EVP_DecryptUpdate() " << ERR_lib_error_string(ERR_get_error());
                       strError = ssError.str();
                     }
-                    EVP_CIPHER_CTX_free(ctx);
                   }
                   else
                   {
                     ssError.str("");
-                    ssError << "EVP_CIPHER_CTX_new() " << ERR_lib_error_string(ERR_get_error());
+                    ssError << "EVP_DecryptInit_ex() " << ERR_lib_error_string(ERR_get_error());
                     strError = ssError.str();
                   }
-                  free(puszOut);
+                  EVP_CIPHER_CTX_free(ctx);
                 }
                 else
                 {
                   ssError.str("");
-                  ssError << "malloc(" << errno << ") " << strerror(errno);
+                  ssError << "EVP_CIPHER_CTX_new() " << ERR_lib_error_string(ERR_get_error());
                   strError = ssError.str();
                 }
-                free(puszIn);
+                free(puszOut);
               }
               else
               {
-                char szBuffer[120];
                 ssError.str("");
-                ssError << "SHA512(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
+                ssError << "malloc(" << errno << ") " << strerror(errno);
                 strError = ssError.str();
               }
             }
             else
             {
+              char szBuffer[120];
               ssError.str("");
-              ssError << "malloc(" << errno << ") " << strerror(errno);
+              ssError << ((strCipher == "AES-256 GCM")?"SHA256":"SHA512") << "(" << ERR_get_error() << ") " << ERR_error_string(ERR_get_error(), szBuffer);
               strError = ssError.str();
             }
             free(puszKey);
@@ -498,32 +502,45 @@ extern "C++"
           stringstream ssError;
           unsigned char *puszKey;
           #ifdef COMMON_OPENSSL
-          if ((puszKey = (unsigned char *)malloc(SHA512_DIGEST_LENGTH)) != NULL)
+          if ((puszKey = (unsigned char *)malloc((strCipher == "AES-256 GCM")?SHA256_DIGEST_LENGTH:SHA512_DIGEST_LENGTH)) != NULL)
           {
-            if (SHA512((unsigned char *)strSecret.c_str(), strSecret.size(), puszKey) != NULL)
+            if ((strCipher == "AES-256 GCM" && SHA256((unsigned char *)strSecret.c_str(), strSecret.size(), puszKey) != NULL) || (strCipher != "AES-256 GCM" && SHA512((unsigned char *)strSecret.c_str(), strSecret.size(), puszKey) != NULL))
             {
-              int nIn = strIn.size();
-              unsigned char *puszIn;
-              if ((puszIn = (unsigned char *)malloc(nIn)) != NULL)
+              unsigned char iv[12];
+              if (strCipher != "AES-256 GCM" || RAND_bytes(iv, sizeof(iv)) == 1)
               {
                 unsigned char *puszOut;
-                memcpy(puszIn, strIn.c_str(), nIn);
-                if ((puszOut = (unsigned char *)malloc(nIn*16)) != NULL)
+                if ((puszOut = (unsigned char *)malloc(strIn.size()*16)) != NULL)
                 {
                   EVP_CIPHER_CTX *ctx;
                   if ((ctx = EVP_CIPHER_CTX_new()) != NULL)
                   {
                     const EVP_CIPHER *cipher = ((strCipher == "AES-256 GCM")?EVP_aes_256_gcm():EVP_aes_128_ecb());
-                    if (EVP_EncryptInit_ex(ctx, cipher, NULL, puszKey, NULL))
+                    if (EVP_EncryptInit_ex(ctx, cipher, NULL, puszKey, ((strCipher == "AES-256 GCM")?iv:NULL)))
                     {
                       int nLength;
-                      if (EVP_EncryptUpdate(ctx, puszOut, &nLength, puszIn, nIn))
+                      if (EVP_EncryptUpdate(ctx, puszOut, &nLength, (unsigned char *)strIn.data(), strIn.size()))
                       {
                         int nOut = nLength;
                         if (EVP_EncryptFinal_ex(ctx, puszOut + nLength, &nLength))
                         {
+                          unsigned char tag[16];
+                          OSSL_PARAM params[] = {OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, tag, sizeof(tag)), OSSL_PARAM_END};
                           nOut += nLength;
-                          strOut.assign((char *)puszOut, nOut);
+                          if (strCipher != "AES-256 GCM" || EVP_CIPHER_CTX_get_params(ctx, params) == 1)
+                          {
+                            stringstream ssOut;
+                            ssOut.write((char *)iv, 12);
+                            ssOut.write((char *)tag, 16);
+                            ssOut.write((char *)puszOut, nOut);
+                            strOut = ssOut.str();
+                          }
+                          else
+                          {
+                            ssError.str("");
+                            ssError << "EVP_CIPHER_CTX_ctrl() " << ERR_lib_error_string(ERR_get_error());
+                            strError = ssError.str();
+                          }
                         }
                         else
                         {
@@ -561,12 +578,11 @@ extern "C++"
                   ssError << "malloc(" << errno << ") " << strerror(errno);
                   strError = ssError.str();
                 }
-                free(puszIn);
               }
               else
               {
                 ssError.str("");
-                ssError << "malloc(" << errno << ") " << strerror(errno);
+                ssError << "RAND_bytes(" << errno << ") " << strerror(errno);
                 strError = ssError.str();
               }
             }

@@ -354,7 +354,7 @@ class Common
       {
         return (((v instanceof String) && v.length > 0)?v.replace(/ /g, ''):v);
       });
-      Handlebars.registerHelper('substring', (str, start, end, options) =>
+      Handlebars.registerHelper('sub', (str, start, end, options) =>
       {
         if (!this.isDefined(options))
         {

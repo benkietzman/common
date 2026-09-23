@@ -354,6 +354,10 @@ class Common
       {
         return (((v instanceof String) && v.length > 0)?v.replace(/ /g, ''):v);
       });
+      Handlebars.registerHelper('substring', (str, start, end) =>
+      {
+        return str.substring(start, end);
+      });
       Handlebars.registerHelper('subtract', (v1, v2) =>
       {
         return (Number(v1) - Number(v2));

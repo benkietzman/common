@@ -335,8 +335,12 @@ extern "C++"
                     if (EVP_DecryptUpdate(ctx, puszOut, &nLength, (unsigned char *)strData.data(), strData.size()))
                     {
                       int nOut = nLength;
+                      #ifdef COMMON_OPENSSL_CORE_NAMES
                       OSSL_PARAM params[] = {OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, tag, sizeof(tag)), OSSL_PARAM_END};
                       if (strCipher != "AES-256 GCM" || EVP_CIPHER_CTX_set_params(ctx, params) == 1)
+                      #else
+                      if (strCipher != "AES-256 GCM" || EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, sizeof(tag), tag) == 1)
+                      #endif
                       {
                         if (EVP_DecryptFinal_ex(ctx, puszOut + nLength, &nLength))
                         {
@@ -353,7 +357,11 @@ extern "C++"
                       else
                       {
                         ssError.str("");
+                        #ifdef COMMON_OPENSSL_CORE_NAMES
+                        ssError << "EVP_CIPHER_CTX_set_params() " << ERR_lib_error_string(ERR_get_error());
+                        #else
                         ssError << "EVP_CIPHER_CTX_ctrl() " << ERR_lib_error_string(ERR_get_error());
+                        #endif
                         strError = ssError.str();
                       }
                     }
@@ -525,9 +533,13 @@ extern "C++"
                         if (EVP_EncryptFinal_ex(ctx, puszOut + nLength, &nLength))
                         {
                           unsigned char tag[16];
-                          OSSL_PARAM params[] = {OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, tag, sizeof(tag)), OSSL_PARAM_END};
                           nOut += nLength;
+                          #ifdef COMMON_OPENSSL_CORE_NAMES
+                          OSSL_PARAM params[] = {OSSL_PARAM_construct_octet_string(OSSL_CIPHER_PARAM_AEAD_TAG, tag, sizeof(tag)), OSSL_PARAM_END};
                           if (strCipher != "AES-256 GCM" || EVP_CIPHER_CTX_get_params(ctx, params) == 1)
+                          #else
+                          if (strCipher != "AES-256 GCM" || EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, sizeof(tag), tag) == 1)
+                          #endif
                           {
                             stringstream ssOut;
                             ssOut.write((char *)iv, 12);
@@ -538,7 +550,11 @@ extern "C++"
                           else
                           {
                             ssError.str("");
+                            #ifdef COMMON_OPENSSL_CORE_NAMES
+                            ssError << "EVP_CIPHER_CTX_get_params() " << ERR_lib_error_string(ERR_get_error());
+                            #else
                             ssError << "EVP_CIPHER_CTX_ctrl() " << ERR_lib_error_string(ERR_get_error());
+                            #endif
                             strError = ssError.str();
                           }
                         }

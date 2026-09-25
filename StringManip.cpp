@@ -309,8 +309,11 @@ extern "C++"
         string strData;
         stringstream ssData, ssIn(strIn);
         unsigned char iv[12], tag[16];
-        ssIn.read((char *)iv, 12);
-        ssIn.read((char *)tag, 16);
+        if (strCipher == "AES-256 GCM")
+        {
+          ssIn.read((char *)iv, 12);
+          ssIn.read((char *)tag, 16);
+        }
         ssData << ssIn.rdbuf();
         strData = ssData.str();
         if (!strSecret.empty())

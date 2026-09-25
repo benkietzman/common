@@ -545,8 +545,11 @@ extern "C++"
                           #endif
                           {
                             stringstream ssOut;
-                            ssOut.write((char *)iv, 12);
-                            ssOut.write((char *)tag, 16);
+                            if (strCipher == "AES-256 GCM")
+                            {
+                              ssOut.write((char *)iv, 12);
+                              ssOut.write((char *)tag, 16);
+                            }
                             ssOut.write((char *)puszOut, nOut);
                             strOut = ssOut.str();
                           }

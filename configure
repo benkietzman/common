@@ -274,7 +274,7 @@ if [ $bFoundOpenSsl -eq 1 ]; then
     printf " -I/usr/local/opt/openssl/include" >> Makefile
   fi
   printf " -DCOMMON_OPENSSL" >> Makefile
-  if [ $bFoundOpenSsl -eq 1 ]; then
+  if [ $bFoundOpenSslCoreNames -eq 1 ]; then
     printf " -DCOMMON_OPENSSL_CORE_NAMES" >> Makefile
   fi
 fi

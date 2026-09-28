@@ -1506,6 +1506,8 @@ class Common
   {
     let bResult = false;
 
+console.log('isLocalAdmin("'+strApplication+'")');
+
     if (this.isDefined(this.m_auth) && ((this.isDefined(this.m_auth.admin) && this.m_auth.admin) || (strApplication != null && this.isDefined(this.m_auth.apps) && this.isDefined(this.m_auth.apps[strApplication]) && this.m_auth.apps[strApplication])))
     {
       bResult = true;

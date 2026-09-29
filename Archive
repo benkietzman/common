@@ -26,9 +26,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 using namespace std;
-#ifdef COMMON_TAR
-#include <libtar.h>
-#endif
 #include <zlib.h>
 // }}}
 extern "C++"
@@ -36,9 +33,9 @@ extern "C++"
   namespace common
   {
     // {{{ Archive
-    //! Performs many tar and gzip operations.
+    //! Performs gzip operations.
     /*!
-    * This class requires the tar and z libraries during compilation.
+    * This class requires the z library during compilation.
     * ex: g++ -g -o program program.o -ltar -lz
     */
     class Archive
@@ -46,51 +43,6 @@ extern "C++"
       public:
       Archive();
       ~Archive();
-
-      //! Auto-select compression/archiving depending on the file extension.
-      /*!
-      * Will not Compress, GZip, or BZip2 because of file extension dependancy.
-      * When a list is provided it will tar the list.
-      * \param strFile - The output file.
-      * \param fileList - The list of files/directories to be archived.
-      * \sa Auto(const string strFile, const string strFiles = "")
-      */
-      bool Auto(const string strFile, list<string> fileList);
-      //! Non-list version of Auto.
-      /*!
-      * \param strFile - The output file.
-      * \param strFiles - The file/directory to be archived.
-      * \sa Auto(const string strFile, list<string> fileList)
-      */
-      bool Auto(const string strFile, const string strFiles = "");
-      //! Auto-select uncompression and unarchiving depending on the file extension.
-      /*!
-      * Intended to be an unarchiver, but will firstly uncompress if needed.
-      * \param strFile - The file to be uncompressed and unarchived.
-      */
-      bool AutoUntar(const string strFile);
-
-      //! Archives a list of files/directories using tar.
-      /*!
-      * \param strFile - The output file.
-      * \param fileList - The list of files/directories to be archived.
-      * \sa tar(const string strFile, const string strFiles)
-      */
-      bool tar(const string strFile, list<string> fileList);
-      //! Archive a file/directory using tar.
-      /*!
-      * \param strFile - The output file.
-      * \param strFiles - The file/directory to be archived.
-      * \warning Non-list version of tar.
-      * \sa tar(const string strFile, list<string> fileList)
-      */
-      bool tar(const string strFile, const string strFiles);
-      //! Unpacks an archive using tar.
-      /*!
-      * \param strFile - The input file.
-      * \param bKeepOriginal - Determines whether to keep the original file.
-      */
-      bool untar(const string strFile, const bool bKeepOriginal = true);
 
       //! Compresses a file using gzip.
       /*!

@@ -38,7 +38,6 @@ bFoundMJson=0
 bFoundOpenSsl=0
 bFoundOpenSslCoreNames=0
 bFoundSamba=0
-bFoundTar=0
 bFoundXmlRpc=0
 bFoundZLib=0
 
@@ -65,9 +64,6 @@ for s in ${var[@]}; do
   fi
   if [ -f "/opt/app/workload/include/libsmbclient.h" -o -f "/opt/csw/include/libsmbclient.h" -o -f "/usr/include/libsmbclient.h" -o -f "/usr/include/samba/libsmbclient.h" -o -f "/usr/include/samba-4.0/libsmbclient.h" -o -f "/usr/local/include/libsmbclient.h" -o -f "/data/extras/include/libsmbclient.h" ]; then
     bFoundSamba=1
-  fi
-  if [ -f "/opt/app/workload/include/libtar.h" -o -f "/usr/include/libtar.h" -o -f "/usr/local/include/libtar.h" -o -f "/data/extras/include/libtar.h" -o -f "/usr/local/opt/libtar/include/libtar.h" ]; then
-    bFoundTar=1
   fi
   if [ -f "/opt/app/workload/include/xmlrpc-c/base.h" -o -f "/usr/include/xmlrpc-c/base.h" -o -f "/usr/local/include/xmlrpc-c/base.h" -o -f "/data/extras/include/xmlrpc-c/base.h" ]; then
     bFoundXmlRpc=1
@@ -123,17 +119,6 @@ elif [ $bRunningUbuntu -eq 1 ]; then
   printf "not found - sudo apt install libsmbclient-dev";
 else
   printf "not found - skipping (http://www.samba.org/samba/download)";
-fi
-printf "\n";
-printf "Configuring Tar...";
-if [ $bFoundTar -eq 1 ]; then
-  printf "found";
-elif [ $bRunningMacOS -eq 1 ]; then
-  printf "not found - brew install libtar";
-elif [ $bRunningUbuntu -eq 1 ]; then
-  printf "not found - sudo apt install libtar-dev";
-else
-  printf "not found - skipping (https://repo.or.cz/libtar.git)";
 fi
 printf "\n";
 printf "Configuring XMLRPC...";
@@ -197,7 +182,7 @@ if [ $bFoundMJson -eq 1 ]; then
     fi
   fi
 fi
-if [ $bFoundTar -eq 1 -a $bFoundZLib -eq 1 ]; then
+if [ $bFoundZLib -eq 1 ]; then
   printf " Archive.o" >> Makefile;
 fi
 if [ $bFoundSamba -eq 1 ]; then
@@ -237,7 +222,7 @@ if [ $bFoundB64 -eq 1 -o $bFoundOpenSsl -eq 1 ]; then
     printf " Irc.o" >> Makefile
   fi
 fi
-if [ $bFoundTar -eq 1 -a $bFoundZLib -eq 1 ]; then
+if [ $bFoundZLib -eq 1 ]; then
   printf " Archive.o" >> Makefile
 fi
 if [ $bFoundSamba -eq 1 ]; then
@@ -286,12 +271,6 @@ if [ $bFoundSamba -eq 1 ]; then
   elif [ -f "/usr/include/samba-4.0/libsmbclient.h" ]; then
     printf " -I/usr/include/samba-4.0" >> Makefile
   fi
-fi
-if [ $bFoundTar -eq 1 ]; then
-  if [ -d "/usr/local/opt/libtar/include" ]; then
-    printf " -I/usr/local/opt/libtar/include" >> Makefile
-  fi
-  printf " -DCOMMON_TAR" >> Makefile
 fi
 if [ $bFoundXmlRpc -eq 1 ]; then
   if [ -d "/usr/local/opt/xmlrpc-c/include" ]; then

@@ -36,7 +36,7 @@ extern "C++"
     //! Performs gzip operations.
     /*!
     * This class requires the z library during compilation.
-    * ex: g++ -g -o program program.o -ltar -lz
+    * ex: g++ -g -o program program.o -lz
     */
     class Archive
     {

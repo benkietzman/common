@@ -861,7 +861,7 @@ extern "C++"
         }
       }
       bDone = false;
-      for (size_t i = strTrim.size() - 1; !bDone && i >= 0; i--)
+      for (ssize_t i = strTrim.size() - 1; !bDone && i >= 0; i--)
       {
         if (isspace(strTrim[i]))
         {

@@ -631,7 +631,7 @@ class Radial
   }
   // }}}
   // {{{ maestroFlowExec()
-  public function maestroFlowExec($strUser, $strPassword, $strPlan, $strFlow, $request, $response)
+  public function maestroFlowExec($strUser, $strPassword, $strPlan, $strFlow, $request, &$response)
   {
     $bResult = false;
 

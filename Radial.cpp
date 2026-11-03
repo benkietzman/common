@@ -955,10 +955,21 @@ bool Radial::maestroFlowExec(const string strPlan, const string strFlow, Json *p
   }
   if (request(ptReq, ptRes, strError))
   {
-    if (ptRes->exist({"Response", "Response"}))
+    if (ptRes->exist({"Response"}))
     {
-      bResult = true;
-      if (ptResponse != NULL)
+      if (ptRes->m["Response"]->val({"Status"}) == "okay")
+      {
+        bResult = true;
+      }
+      else if (!ptRes->m["Response"]->empty({"Error"}))
+      {
+        strError = ptRes->m["Response"]->m["Error"]->v;
+      }
+      else
+      {
+        strError = "Encountered an unknown error.";
+      }
+      if (ptResponse != NULL && ptRes->m["Response"]->exist({"Response"}))
       {
         ptResponse->merge(ptRes->m["Response"]->m["Response"], true, false);
       }

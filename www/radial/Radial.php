@@ -656,10 +656,28 @@ class Radial
     $res = null;
     if ($this->request($req, $res))
     {
-      $bResult = true;
       if (isset($res['Response']))
       {
-        $response = $res['Response'];
+        if (isset($res['Response']['Status']) && $res['Response']['Status'] == 'okay')
+        {
+          $bResult = true;
+        }
+        else if (isset($res['Response']['Error']) && $res['Response']['Error'] != '')
+        {
+          setError($res['Response']['Error']);
+        }
+        else
+        {
+          setError('Encountered an unknown error.');
+        }
+        if ($response != null && isset($res['Response']['Response']))
+        {
+          $response = $res['Response']['Response'];
+        }
+      }
+      else
+      {
+        setError('Failed to receive a Response');
       }
     }
     unset($req);

@@ -146,6 +146,7 @@ extern "C++"
       bool hubPing(string &strError);
       bool ircChat(const string strTarget, const string strMessage, string &strError);
       bool linkStatus(list<string> &nodes, string &strMaster, string &strError);
+      bool maestroFlowExec(const string strUser, const string strPassword, const string strPlan, const string strFlow, Json *ptRequest, Json *ptResponse, string &strError);
       bool mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError);
       bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strID, string &strRows, string &strError);
       bool mysqlUpdate(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strUpdate, string &strError);

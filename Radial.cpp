@@ -938,6 +938,50 @@ bool Radial::linkStatus(list<string> &nodes, string &strMaster, string &strError
   return bResult;
 }
 // }}}
+// {{{ maestroFlowExec()
+bool Radial::maestroFlowExec(const string strUser, const string strPassword, const string strPlan, const string strFlow, Json *ptRequest, Json *ptResponse, string &strError)
+{
+  bool bResult = false;
+  Json *ptReq = new Json, *ptRes = new Json;
+
+  ptReq->i("Interface", "maestro");
+  ptReq->i("Function", "flowExec");
+  if (!strUser.empty())
+  {
+    ptReq->i("User", strUser);
+  }
+  if (!strPassword.empty())
+  {
+    ptReq->i("Password", strPassword);
+  }
+  ptReq->m["Request"] = new Json;
+  ptReq->m["Request"]->i("Plan", strPlan);
+  ptReq->m["Request"]->i("Flow", strFlow);
+  if (ptRequest != NULL)
+  {
+    ptReq->m["Request"]->i("Request", ptRequest);
+  }
+  if (request(ptReq, ptRes, strError))
+  {
+    if (ptRes->exist({"Response", "Response"}))
+    {
+      bResult = true;
+      if (ptResponse != NULL)
+      {
+        ptResponse->merge(ptRes->m["Response"]->m["Response"], true, false);
+      }
+    }
+    else
+    {
+      strError = "Failed to receive a Response.";
+    }
+  }
+  delete ptReq;
+  delete ptRes;
+
+  return bResult;
+}
+// }}}
 // {{{ mysqlQuery()
 bool Radial::mysqlQuery(const string strUser, const string strPassword, const string strServer, const string strDatabase, const string strQuery, list<map<string, string> > &result, string &strError)
 {

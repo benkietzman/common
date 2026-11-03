@@ -630,6 +630,44 @@ class Radial
     return $bResult;
   }
   // }}}
+  // {{{ maestroFlowExec()
+  public function maestroFlowExec($strUser, $strPassword, $strPlan, $strFlow, $request, $response)
+  {
+    $bResult = false;
+
+    $req = [];
+    $req['Interface'] = 'maestro';
+    $req['Function'] = 'flowExec';
+    if ($strUser != '')
+    {
+      $req['User'] = $strUser;
+    }
+    if ($strPassword != '')
+    {
+      $req['Password'] = $strPassword;
+    }
+    $req['Request'] = [];
+    $req['Request']['Plan'] = $strPlan;
+    $req['Request']['Flow'] = $strFlow;
+    if ($request != null)
+    {
+      $req['Request']['Request'] = $request;
+    }
+    $res = null;
+    if ($this->request($req, $res))
+    {
+      $bResult = true;
+      if (isset($res['Response']))
+      {
+        $response = $res['Response'];
+      }
+    }
+    unset($req);
+    unset($resp);
+
+    return $bResult;
+  }
+  // }}}
   // {{{ putMessages()
   public function putMessages(&$messages)
   {

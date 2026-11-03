@@ -631,21 +631,13 @@ class Radial
   }
   // }}}
   // {{{ maestroFlowExec()
-  public function maestroFlowExec($strUser, $strPassword, $strPlan, $strFlow, $request, &$response)
+  public function maestroFlowExec($strPlan, $strFlow, $request, &$response)
   {
     $bResult = false;
 
     $req = [];
     $req['Interface'] = 'maestro';
     $req['Function'] = 'flowExec';
-    if ($strUser != '')
-    {
-      $req['User'] = $strUser;
-    }
-    if ($strPassword != '')
-    {
-      $req['Password'] = $strPassword;
-    }
     $req['Request'] = [];
     $req['Request']['Plan'] = $strPlan;
     $req['Request']['Flow'] = $strFlow;
@@ -670,7 +662,7 @@ class Radial
         {
           setError('Encountered an unknown error.');
         }
-        if ($response != null && isset($res['Response']['Response']))
+        if (isset($res['Response']['Response']))
         {
           $response = $res['Response']['Response'];
         }

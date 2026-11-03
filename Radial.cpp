@@ -939,21 +939,13 @@ bool Radial::linkStatus(list<string> &nodes, string &strMaster, string &strError
 }
 // }}}
 // {{{ maestroFlowExec()
-bool Radial::maestroFlowExec(const string strUser, const string strPassword, const string strPlan, const string strFlow, Json *ptRequest, Json *ptResponse, string &strError)
+bool Radial::maestroFlowExec(const string strPlan, const string strFlow, Json *ptRequest, Json *ptResponse, string &strError)
 {
   bool bResult = false;
   Json *ptReq = new Json, *ptRes = new Json;
 
   ptReq->i("Interface", "maestro");
   ptReq->i("Function", "flowExec");
-  if (!strUser.empty())
-  {
-    ptReq->i("User", strUser);
-  }
-  if (!strPassword.empty())
-  {
-    ptReq->i("Password", strPassword);
-  }
   ptReq->m["Request"] = new Json;
   ptReq->m["Request"]->i("Plan", strPlan);
   ptReq->m["Request"]->i("Flow", strFlow);

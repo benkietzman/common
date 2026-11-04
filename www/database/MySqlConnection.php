@@ -40,7 +40,14 @@ class MySqlConnection extends DatabaseConnection
     $this->m_strUser = $strUser;
     $this->m_strPassword = $strPassword;
     $this->m_strServer = $strServer;
-    $this->m_db = new mysqli((($bPersistant)?'p:':'').$strServer, $strUser, $strPassword);
+    try
+    {
+      $this->m_db = new mysqli((($bPersistant)?'p:':'').$strServer, $strUser, $strPassword);
+    }
+    catch (mysqli_sql_exception $e)
+    {
+      $this->m_db = new mysqli((($bPersistant)?'p:':'').$strServer, $strUser, $strPassword);
+    }
     if ($this->m_db->connect_error != '')
     {
       $this->m_strError = $this->m_db->connect_error;
